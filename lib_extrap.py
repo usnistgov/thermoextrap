@@ -99,25 +99,25 @@ def symDerivAvgX(order):
 def buildAvgFuncsDependent(xvals, uvals, order):
   """Same as buildAvgFuncs, but for an observable that explicitly depends on
      the variable we're extrapolating over. In this case, xvals should be 3D.
-     The first dimension is time, just like uvals, the second dimension should
-     be elements of the observable vector, and the last dimension should match
-     order and be DERIVATIVES of the observable vector elements to the order of
-     the index of that dimension. So the first index of zero on this dimension
-     is the zeroth-order derivative, which is just the observable itself.
-     As an example, if you performed Widom insertions, have that the observable
-     and its derivatives are:
+     The first dimension is time, just like uvals, the LAST dimension should
+     be elements of the observable vector, and the second (or middle) dimension
+     should match order and be DERIVATIVES of the observable vector elements to
+     the order of the index of that dimension. So the first index of zero on
+     this dimension is the zeroth-order derivative, which is just the observable
+     itself. As an example, if you performed Widom insertions, have that the
+     observable and its derivatives are:
             x = exp(-B*dU)
         dx/dB = -dU*exp(-B*dU)
     d^2x/dB^2 = (dU^2)*exp(-B*dU)
            etc.
   """
   #Make sure have provided derivatives in observable up to desired order
-  if xvals.shape[2] < order+1:
-    print('Maximum provided order of derivatives of observable (%i) is less than desired order (%i).'%(xvals.shape[2]-1, order))
+  if xvals.shape[1] < order+1:
+    print('Maximum provided order of derivatives of observable (%i) is less than desired order (%i).'%(xvals.shape[1]-1, order))
     print('Setting order to match.')
-    order = xvals.shape[2] - 1
-  elif xvals.shape[2] >= order+1:
-    xvals = xvals[:,:,:order+1]
+    order = xvals.shape[1] - 1
+  elif xvals.shape[1] >= order+1:
+    xvals = xvals[:,:order+1,:]
 
   #To allow for vector-valued observables, must make sure uvals can be transposed
   uvalsT = np.array([uvals]).T
@@ -130,7 +130,7 @@ def buildAvgFuncsDependent(xvals, uvals, order):
   for o in range(order+1):
     dictu[o] = np.average(uvals**o)
     for j in range(order+1):
-      dictxu[(j,o)] = np.average(xvals[:,:,j]*(uvalsT**o), axis=0)
+      dictxu[(j,o)] = np.average(xvals[:,j,:]*(uvalsT**o), axis=0)
 
   class ufunc(Function):
     avgdict = copy.deepcopy(dictu)
@@ -155,6 +155,7 @@ def symDerivAvgXdependent(order):
   """
   #First define some consistent symbols
   b = symbols('b') #Beta or inverse temperature
+  k = symbols('k')
 
   f = Function('f')(b) #Functions representing the numerator and denominator of an average
   z = Function('z')(b)
@@ -349,7 +350,7 @@ class ExtrapModel:
 
     sampSize = self.x.shape[0]
     randInds = np.random.choice(sampSize, size=sampSize, replace=True)
-    sampX = self.x[randInds, :]
+    sampX = self.x[randInds]
     sampU = self.U[randInds]
     return (sampX, sampU)
 
@@ -546,7 +547,7 @@ class InterpModel(ExtrapModel):
     if len(xData.shape) == 2:
       xData = np.reshape(xData, (xData.shape[0], xData.shape[1], 1))
 
-    #Define the order of the polynomial wer're going to compute
+    #Define the order of the polynomial we're going to compute
     order = self.maxOrder
     pOrder = refB.shape[0]*(order+1) - 1 #Also the number of coefficients we solve for minus 1
 
