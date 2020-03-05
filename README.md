@@ -7,4 +7,4 @@ Requirements:
 - sympy
 - pymbar (optional)
 
-See IG_example.ipynb for a Jupyter notebook tutorial.
+See Ideal_Gas_Example.ipynb for a Jupyter notebook tutorial.
