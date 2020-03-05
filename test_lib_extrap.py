@@ -1,4 +1,11 @@
 
+#Need to set this code up with very specific tests
+#So set random number seed, run things through and make sure matches every time
+#Think about what exactly to test here
+#Should include exactly testing IG model as well as other functions using this model
+#Importantly, need to determine what goes here versus in the tutorial.
+#There will likely be overlap between the two, but this should really be the test.
+
 import numpy as np
 from lib_extrap import *
 
