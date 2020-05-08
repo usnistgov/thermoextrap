@@ -1540,7 +1540,8 @@ class RecursiveInterp:
       #This is implicit in returning bootstrap standard deviation as estimate of uncertainty
       #If DON'T want to assume this, boostrap function should return confidence intervals
       #And that will require a good bit of re-coding throughout this whole class
-      p12 = 2.0*norm.cdf(-abs(z12))
+      #p12 = 2.0*norm.cdf(-abs(z12)) #Null hypothesis that coefficients same
+      p12 = norm.cdf(abs(z12)) - norm.cdf(-abs(z12)) #Null hypothesis coefficients different
 
       #To check full interval, must retrain model with data
       fullCoeffs = self.model.train(self.edgeB[aset[[0,2]]],
@@ -1549,9 +1550,11 @@ class RecursiveInterp:
                                     saveParams=True)
       fullErr = self.model.bootstrap(None)
       z1full = (reg1Coeffs - fullCoeffs) / np.sqrt(reg1Err**2 + fullErr**2)
-      p1full = 2.0*norm.cdf(-abs(z1full))
+      #p1full = 2.0*norm.cdf(-abs(z1full))
+      p1full = norm.cdf(abs(z1full)) - norm.cdf(-abs(z1full))
       z2full = (reg2Coeffs - fullCoeffs) / np.sqrt(reg2Err**2 + fullErr**2)
-      p2full = 2.0*norm.cdf(-abs(z2full))
+      #p2full = 2.0*norm.cdf(-abs(z2full))
+      p2full = norm.cdf(abs(z2full)) - norm.cdf(-abs(z2full))
 
       allPvals.append(np.vstack((p12, p1full, p2full)))
       print('Interval with edges %s (indices %s):'%(str(self.edgeB[aset]), str(aset)))
