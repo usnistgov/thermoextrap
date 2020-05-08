@@ -6,12 +6,15 @@ import time
 import copy
 import numpy as np
 from sympy import *
-from pymbar import mbar
 from scipy.stats import norm
 from scipy.special import binom
 from scipy.special import factorial
 import matplotlib.pyplot as plt
 
+try:
+  from pymbar import mbar
+except ImportError:
+  print("Could not find pymbar - will not import and functions involving this will not work.")
 
 def buildAvgFuncs(xvals, uvals, order):
   """Defines sympy functions mapping specific sympy function representations to values.
