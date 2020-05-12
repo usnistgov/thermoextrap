@@ -22,7 +22,7 @@ def buildAvgFuncs(xvals, uvals, order):
      other words, providing an integer to the function u or xu will produce the desired
      average quantity. Once the symbolic derivative is defined as a lambdified function
      of two sympy functions, can just input the custom sympy functions defined here to
-     substitute in all the right values. Note that if the observable is vector-valued 
+     substitute in all the right values. Note that if the observable is vector-valued
      the functions will return vectors for averages.
   """
   #To allow for vector-valued observables, must make sure uvals can be transposed
@@ -68,7 +68,7 @@ def symDerivAvgX(order):
   avgFunc = f / z
   thisderiv = avgFunc.diff(b, order)
   #Pick out what we want to substitute by object type
-  tosub = thisderiv.atoms(sym.Function, sym.Derivative) 
+  tosub = thisderiv.atoms(sym.Function, sym.Derivative)
 
   #When we sub in, must do in order of highest to lowest derivatives, then functions
   #Otherwise substitution doesn't work because derivatives computed recursively by sympy
@@ -152,7 +152,7 @@ def buildAvgFuncsDependent(xvals, uvals, order):
 
 def symDerivAvgXdependent(order):
   """Same as symDerivAvgX except for one line when substituting for f(b) and its
-     derivatives. Instead of substituting xu(i), it substitutes xu(i,j) so that 
+     derivatives. Instead of substituting xu(i), it substitutes xu(i,j) so that
      derivatives are possible with the observable depending explicitly on the
      extrapolation variable. This is meant to be used with buildAvgFuncsDependent.
   """
@@ -169,7 +169,7 @@ def symDerivAvgXdependent(order):
   avgFunc = f / z
   thisderiv = avgFunc.diff(b, order)
   #Pick out what we want to substitute by object type
-  tosub = thisderiv.atoms(sym.Function, sym.Derivative) 
+  tosub = thisderiv.atoms(sym.Function, sym.Derivative)
 
   #When we sub in, must do in order of highest to lowest derivatives, then functions
   #Otherwise substitution doesn't work because derivatives computed recursively by sympy
@@ -210,7 +210,7 @@ def extrapToPoly(B0, derivs):
   """Converts an extrapolation around a reference point to a polynomial over all real
      numbers by collecting terms. Input is the reference state point and the derivatives
      at that state point (starting with the zeroth derivative, which is just the
-     observable value). Only works for SINGLE observable element if observable is a 
+     observable value). Only works for SINGLE observable element if observable is a
      vector (so derivs must be a 1D array).
   """
   coeffs = np.zeros(len(derivs))
@@ -225,7 +225,7 @@ def bootstrapPolyCoeffs(extModel, n=100, order=3):
      via extrapToPoly function. This will only reliably work if provided an
      ExtrapModel object for which extModel.train returns the derivatives and
      extModel.refB returns the reference point and the data can be resampled
-     from extModel.resampleData. Might make more sense to include this in the 
+     from extModel.resampleData. Might make more sense to include this in the
      class definition, but don't want to be inherited by other classes.
   """
   bShape = (n,) + extModel.params[:order+1,:].shape
@@ -361,9 +361,9 @@ class ExtrapModel:
   def bootstrap(self, B, order=None, n=100):
     """Obtain estimates of uncertainty in model predictions via bootstrapping.
        Should not need to change this function - instead modify resampleData
-       to match with the data structure. If B is None or a length zero array, 
+       to match with the data structure. If B is None or a length zero array,
        i.e. no new state points are provided, then the std in the PARAMETERS
-       of the model are reported from bootstrapping. Note that to change the 
+       of the model are reported from bootstrapping. Note that to change the
        REFERENCE state point and data, MUST RETRAIN!
     """
     if order is None:
@@ -555,7 +555,7 @@ class InterpModel(ExtrapModel):
     pOrder = refB.shape[0]*(order+1) - 1 #Also the number of coefficients we solve for minus 1
 
     #Need to put together systems of equations to solve
-    #Will have to solve one system for each component of a vector-valued observable 
+    #Will have to solve one system for each component of a vector-valued observable
     #Fortunately, matrix to invert same for each value of beta regardless of observable
     #Just the values we want the polynomial to match with (derivVals) will be different
     derivVals = np.zeros((pOrder+1, xData.shape[2]))
@@ -604,7 +604,7 @@ class InterpModel(ExtrapModel):
        So just use self.maxOrder as the highest order derivative information
        to use throughout the entire model.
        Can also specify parameters to use. If params is None, will just use
-       the parameters found during training. refB will be ignored as it is 
+       the parameters found during training. refB will be ignored as it is
        not needed once the polynomial is known.
     """
     #Use parameters for estimate
@@ -655,7 +655,7 @@ class InterpModel(ExtrapModel):
 
 class MBARModel(InterpModel):
   """Very similar to interpolation model so inheriting this class.
-     Must also have at least two reference states and will use as many as 
+     Must also have at least two reference states and will use as many as
      provided to make estimate. Resampling will be the same, just need to
      change the train and predict functions.
   """
@@ -699,7 +699,7 @@ class MBARModel(InterpModel):
        params should be an pymbar MBAR object and this will just wrap the
        computeExpectations function. Note that refB is ignored because it
        is not needed once data at refB has been incorporated into the mbar
-       object. To include more data or data at other state points, need 
+       object. To include more data or data at other state points, need
        to retrain.
     """
     #Check if have parameters
@@ -726,7 +726,7 @@ class MBARModel(InterpModel):
 
 
 class PerturbModel:
-  """Class to hold information about a perturbation. 
+  """Class to hold information about a perturbation.
   """
 
   #Otherwise, it just needs to define some variables
@@ -836,7 +836,7 @@ class PerturbModel:
     B = np.array(B)
 
     #Last dimension should be observable vector size
-    bootStraps = np.zeros((n, B.shape[0], self.x.shape[-1])) 
+    bootStraps = np.zeros((n, B.shape[0], self.x.shape[-1]))
 
     #Loop for as many resamples as we want
     for i in range(n):
@@ -854,12 +854,12 @@ class PerturbModel:
 def extrapWithSamples(B, B0, x, U, order):
   """Uses symbolic logic to perform extrapolation to arbitrarily high order.
      Makes use of the buildAvgDict and symDerivAvgX functions defined above.
-     B is the inverse temperature to extrapolate to (can be an array of values), 
-     B0 is the reference, x is the reference observable values, and U is the 
-     reference potential energy values. Order is the highest order expansion 
-     coefficient (derivative) to compute. The function returns both the extrapolated 
-     value and the derivatives. Vector-valued observables are allowed for x, but 
-     the first dimension should run over independent observations and match the size 
+     B is the inverse temperature to extrapolate to (can be an array of values),
+     B0 is the reference, x is the reference observable values, and U is the
+     reference potential energy values. Order is the highest order expansion
+     coefficient (derivative) to compute. The function returns both the extrapolated
+     value and the derivatives. Vector-valued observables are allowed for x, but
+     the first dimension should run over independent observations and match the size
      of U.
   """
   if x.shape[0] != U.shape[0]:
@@ -897,7 +897,7 @@ def extrapWithSamples(B, B0, x, U, order):
 
 
 def extrapWeighted(B, refB1, refB2, x1, x2, u1, u2, order1, order2, m=20):
-  """Performs extrapolation from two points to an interior point and weights with a 
+  """Performs extrapolation from two points to an interior point and weights with a
      Minkowski-like function proposed by Mahynski, Errington, and Shen (2017).
   """
   def weightsMinkowski(d1, d2, m=20):
@@ -958,7 +958,7 @@ def interpPolyMultiPoint(B, refB, x, U, order):
   pOrder = refB.shape[0]*(order+1) - 1 #Also the number of coefficients we solve for minus 1
 
   #Need to put together systems of equations to solve
-  #Will have to solve one system for each component of a vector-valued observable 
+  #Will have to solve one system for each component of a vector-valued observable
   #Fortunately, matrix to invert will be same for each value of beta regardless of observable
   #Just the values we want the polynomial to match with (derivVals) will be different
   derivVals = np.zeros((pOrder+1, x.shape[2]))
@@ -1494,7 +1494,7 @@ class RecursiveInterp:
 
   def checkPolynomialConsistency(self, doPlot=False):
     """If the interpolation model is a polynomial, checks to see if the polynomials
-       are locally consistent. In other words, we want the coefficients between 
+       are locally consistent. In other words, we want the coefficients between
        neighboring regions to match closely to each other, and to the larger region
        composed of the two neighboring sub-regions. Essentially, this checks to make
        sure the local curvature is staying constant as you zoom in. If it is, your
