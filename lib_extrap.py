@@ -1,8 +1,8 @@
 #Library of functions useful for extrapolation (or interpolation)
 #Makes heavy use of sympy to go to arbitrary order derivatives
+"""Library of functions useful for extrapolation and interpolation.
+"""
 
-
-import time
 import copy
 import numpy as np
 import sympy as sym
@@ -120,7 +120,8 @@ def buildAvgFuncsDependent(xvals, uvals, order):
   """
   #Make sure have provided derivatives in observable up to desired order
   if xvals.shape[1] < order+1:
-    print('Maximum provided order of derivatives of observable (%i) is less than desired order (%i).'%(xvals.shape[1]-1, order))
+    print('Maximum provided order of derivatives of observable (%i) ' \
+          'is less than desired order (%i).'%(xvals.shape[1]-1, order))
     print('Setting order to match.')
     order = xvals.shape[1] - 1
   elif xvals.shape[1] >= order+1:
@@ -200,7 +201,10 @@ def symDerivAvgXdependent(order):
             #        = <x(4)> - 4*<x(3)*u> + 6*<x(2)*u^2> - 4*<x(1)*u^3> + <x*u^4>
             #In the above, f(4) or x(4) represents the 4th derivtive of f or x with
             #respect to the extrapolation variable b.
-            subvals[d] = sym.Sum(((-1)**k)*sym.binomial(d.derivative_count, k)*xu(d.derivative_count-k, k), (k, 0, d.derivative_count)).doit()*z
+            subvals[d] = sym.Sum(((-1)**k) \
+                                 * sym.binomial(d.derivative_count, k) \
+                                 * xu(d.derivative_count-k, k),
+                                 (k, 0, d.derivative_count)).doit()*z
           elif str(d.expr) == 'z(b)':
             subvals[d] = ((-1)**d.derivative_count)*u(d.derivative_count)*z
 
@@ -285,7 +289,8 @@ class ExtrapModel:
     """
 
     if x.shape[0] != U.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
       raise ValueError('x and U must have same shape in first dimension')
 
     avgUfunc, avgXUfunc = buildAvgFuncs(x, U, self.maxOrder)
@@ -431,11 +436,13 @@ class ExtrapWeightedModel(ExtrapModel):
     #(data sets at each state point must have the same number of samples)
     if (xData.shape[0] != 2) or (uData.shape[0] != 2):
       print('Must provide observable and potential energy data from 2 state points!')
-      print('First dimensions of provided data are not 2 but %i and %i'%(xData.shape[0], uData.shape[0]))
+      print('First dimensions of provided data are not 2' \
+            ' but %i and %i'%(xData.shape[0], uData.shape[0]))
       raise ValueError('xData and uData must have first dimension of 2')
 
     if isinstance(refB, (int, float)):
-      print('Must provide 2 reference beta values as a list or array, but got only a number.')
+      print('Must provide 2 reference beta values as a list or array,' \
+            'but got only a number.')
       raise TypeError('refB must be a list or array of length 2, not float or int')
 
     refB = np.array(refB)
@@ -545,7 +552,8 @@ class InterpModel(ExtrapModel):
     refB = np.array(refB)
 
     if xData.shape[0] != uData.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
       raise ValueError('x and U must have same shape in first dimension')
 
     if (xData.shape[0] != refB.shape[0]) or (uData.shape[0] != refB.shape[0]):
@@ -582,8 +590,9 @@ class InterpModel(ExtrapModel):
       for j in range(order+1):
         #Suppress warnings about divide by zero since we actually want this to return infinity
         with np.errstate(divide='ignore'):
-          mat[((order+1)*i)+j, :] = ( ((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
-                                    * factorial(np.arange(pOrder+1))/factorial(np.arange(pOrder+1)-j) )
+          mat[((order+1)*i)+j, :] = (((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
+                                     * factorial(np.arange(pOrder+1))
+                                     / factorial(np.arange(pOrder+1)-j))
 
     #The above formula works everywhere except where the matrix should have zeros
     #Instead of zeros, it inserts infinity, so fix this
@@ -674,7 +683,8 @@ class MBARModel(InterpModel):
     refB = np.array(refB)
 
     if xData.shape[0] != uData.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
       raise ValueError('x and U must have same shape in first dimension')
 
     if (xData.shape[0] != refB.shape[0]) or (uData.shape[0] != refB.shape[0]):
@@ -756,7 +766,8 @@ class PerturbModel:
 
     #Also check if observable data matches up with potential energy
     if xData.shape[0] != uData.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
       raise ValueError('x and U must have same shape in first dimension')
 
     params = [xData, uData]
@@ -868,7 +879,8 @@ def extrapWithSamples(B, B0, x, U, order):
      of U.
   """
   if x.shape[0] != U.shape[0]:
-    print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+    print('First observable dimension (%i) and size of potential energy' \
+          ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
     raise ValueError('x and U must have same shape in first dimension')
 
   #Next need to make sure x has at least two dimensions
@@ -940,7 +952,8 @@ def interpPolyMultiPoint(B, refB, x, U, order):
   refB = np.array(refB)
 
   if x.shape[0] != U.shape[0]:
-    print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+    print('First observable dimension (%i) and size of potential energy' \
+          ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
     raise ValueError('x and U must have same shape in first dimension')
 
   if (x.shape[0] != refB.shape[0]) or (U.shape[0] != refB.shape[0]):
@@ -981,8 +994,9 @@ def interpPolyMultiPoint(B, refB, x, U, order):
     for j in range(order+1):
       #Suppress warnings about divide by zero since we actually want this to return infinity
       with np.errstate(divide='ignore'):
-        mat[((order+1)*i)+j, :] = ( ((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
-                                    * factorial(np.arange(pOrder+1))/factorial(np.arange(pOrder+1)-j) )
+        mat[((order+1)*i)+j, :] = (((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
+                                   * factorial(np.arange(pOrder+1))
+                                   / factorial(np.arange(pOrder+1)-j))
 
   #The above formula works everywhere except where the matrix should have zeros
   #Instead of zeros, it inserts infinity, so fix this
@@ -1011,7 +1025,8 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
      and standard reweighting. Uses MBAR code instead of mine if desired.
   """
   if x.shape[0] != U.shape[0]:
-    print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+    print('First observable dimension (%i) and size of potential energy' \
+          ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
     raise ValueError('x and U must have same shape in first dimension')
 
   #Check shape of observables and add dimension if needed
@@ -1075,7 +1090,8 @@ class VolumeExtrapModel(ExtrapModel):
     """
 
     if x.shape[0] != W.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
       raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
@@ -1117,7 +1133,8 @@ class VolumeExtrapWeightedModel(ExtrapWeightedModel):
     """
 
     if x.shape[0] != W.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
       raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
@@ -1159,7 +1176,8 @@ class VolumeInterpModel(InterpModel):
     """
 
     if x.shape[0] != W.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
       raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
@@ -1224,30 +1242,33 @@ class IGmodel:
     """Samples s samples of x from the probability density at inverse temperature B
        Does sampling based on inversion of cumulative distribution function
     """
-    randvec = np.random.rand(size=s)
+    randvec = np.random.rand(s)
     randx = -(1.0/B)*np.log(1.0 - randvec*(1.0 - np.exp(-B*L)))
     return randx
 
-  def sampleU(self, B, s=1000, L=1.0): #Really just resampling the sum of x values many times to get distribution of U for large N
+  def sampleU(self, B, s=1000, L=1.0):
     """Samples s (=1000 by default) potential energy values from a system self.nP particles.
        Particle positions are randomly sampled with sampleX at the inverse temperature B.
     """
+    #Really just resampling the sum of x values many times to get distribution of U for large N
     randu = np.zeros(s)
     for i in range(s):
-        randu[i] = np.sum(self.sampleX(B, self.nP, L=L))
+      randu[i] = np.sum(self.sampleX(B, self.nP, L=L))
     return randu
 
-  def PofU(self, U, B, L=1.0): #Provides P(U) in the limit of a large number of particles (becomes Gaussian)
+  def PofU(self, U, B, L=1.0):
     """In the large-N limit, the probability of the potential energy is Normal, so provides that
     """
+    #Provides P(U) in the limit of a large number of particles (becomes Gaussian)
     avgU = self.nP*self.avgX(B, L=L)
     stdU = np.sqrt(self.nP*self.varX(B, L=L))
     return norm.pdf(U, avgU, stdU)
 
-  def pertAnalytic(self, B, B0, L=1.0): #Really just the same as average of x, but it's a nice check of all the math
+  def pertAnalytic(self, B, B0, L=1.0):
     """Analytical perturbation of the system from B0 to B.
        Nice check to see if get same thing as avgX
     """
+    #Really just the same as average of x, but it's a nice check all the math
     def pertNumer(B, B0):
       prefac = B0 / (1.0 - np.exp(-B0*L))
       term1 = (1.0 - np.exp(-B*L)) / (B**2)
@@ -1270,9 +1291,9 @@ class IGmodel:
     outvec = np.zeros(order+1)
     outval = 0.0
     for k in range(order+1):
-        thisdiff = sym.diff(self.avgXsym, self.b, k)
-        outvec[k] = thisdiff.subs({self.b:B0, self.l:L})
-        outval += outvec[k]*(dBeta**k)/np.math.factorial(k)
+      thisdiff = sym.diff(self.avgXsym, self.b, k)
+      outvec[k] = thisdiff.subs({self.b:B0, self.l:L})
+      outval += outvec[k]*(dBeta**k)/np.math.factorial(k)
     return (outval, outvec)
 
   def extrapAnalyticVolume(self, L, L0, order, B=1.0):
@@ -1283,9 +1304,9 @@ class IGmodel:
     outvec = np.zeros(order+1)
     outval = 0.0
     for k in range(order+1):
-        thisdiff = sym.diff(self.avgXsym, self.l, k)
-        outvec[k] = thisdiff.subs({self.b:B, self.l:L0})
-        outval += outvec[k]*(dL**k)/np.math.factorial(k)
+      thisdiff = sym.diff(self.avgXsym, self.l, k)
+      outvec[k] = thisdiff.subs({self.b:B, self.l:L0})
+      outval += outvec[k]*(dL**k)/np.math.factorial(k)
     return (outval, outvec)
 
   #Want to be able to create sample data set we can work with at a reference beta
@@ -1333,7 +1354,9 @@ class RecursiveInterp:
     xdata, udata = datModel.genData(B, nConfigs=10000)
     return xdata, udata
 
-  def recursiveTrain(self, B1, B2, xData1=None, xData2=None, uData1=None, uData2=None, recurseDepth=0, recurseMax=10, Bavail=None, verbose=False, doPlot=False, plotCompareFunc=None):
+  def recursiveTrain(self, B1, B2, xData1=None, xData2=None, uData1=None, uData2=None,
+                     recurseDepth=0, recurseMax=10,
+                     Bavail=None, verbose=False, doPlot=False, plotCompareFunc=None):
     """Recursively trains interpolating models on successively smaller intervals
        until error tolerance is reached. The next state point to subdivide an
        interval is chosen as the point where the bootstrapped error is the largest.
@@ -1350,9 +1373,9 @@ class RecursiveInterp:
 
     #Generate data somehow if not provided
     if xData1 is None:
-       xData1, uData1 = self.getData(B1)
+      xData1, uData1 = self.getData(B1)
     if xData2 is None:
-       xData2, uData2 = self.getData(B2)
+      xData2, uData2 = self.getData(B2)
 
     #And format it for training interpolation models
     xData = np.array([xData1, xData2])
@@ -1422,7 +1445,6 @@ class RecursiveInterp:
       plt.gcf().tight_layout()
       plt.show(block=False)
       plt.pause(5)
-      #time.sleep(5)
       plt.close()
 
     if newB is not None:
@@ -1474,12 +1496,14 @@ class RecursiveInterp:
 
       #Check if out of lower bound
       if beta < self.edgeB[0]:
-        print("Have provided point %f below interpolation function interval edges (%s)."%(beta, str(self.edgeB)))
+        print('Have provided point %f below interpolation function' \
+              ' interval edges (%s).'%(beta, str(self.edgeB)))
         raise IndexError('Interpolation point below range')
 
       #Check if out of upper bound
       if beta > self.edgeB[-1]:
-        print("Have provided point %f above interpolation function interval edges (%s)."%(beta, str(self.edgeB)))
+        print('Have provided point %f above interpolation function' \
+              ' interval edges (%s).'%(beta, str(self.edgeB)))
         raise IndexError('Interpolation point above range')
 
       #And get correct index for interpolating polynomial
