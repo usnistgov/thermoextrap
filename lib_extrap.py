@@ -5,7 +5,7 @@
 import time
 import copy
 import numpy as np
-from sympy import *
+import sympy as sym
 from scipy.stats import norm
 from scipy.special import binom
 from scipy.special import factorial
@@ -37,13 +37,13 @@ def buildAvgFuncs(xvals, uvals, order):
     dictu[o] = np.average(uvals**o)
     dictxu[o] = np.average(xvals*(uvalsT**o), axis=0)
 
-  class ufunc(Function):
+  class ufunc(sym.Function):
     avgdict = copy.deepcopy(dictu)
     @classmethod
     def eval(cls, x):
       return cls.avgdict[x]
 
-  class xufunc(Function):
+  class xufunc(sym.Function):
     avgdict = copy.deepcopy(dictxu)
     @classmethod
     def eval(cls, x):
@@ -57,18 +57,18 @@ def symDerivAvgX(order):
      Returns a substituted string that can be substituted again to get an actual value.
   """
   #First define some consistent symbols
-  b = symbols('b') #Beta or inverse temperature
+  b = sym.symbols('b') #Beta or inverse temperature
 
-  f = Function('f')(b) #Functions representing the numerator and denominator of an average
-  z = Function('z')(b)
+  f = sym.Function('f')(b) #Functions representing the numerator and denominator of an average
+  z = sym.Function('z')(b)
 
-  u = Function('u') #Functions that will represent various averages
-  xu = Function('xu')
+  u = sym.Function('u') #Functions that will represent various averages
+  xu = sym.Function('xu')
 
   avgFunc = f / z
   thisderiv = avgFunc.diff(b, order)
   #Pick out what we want to substitute by object type
-  tosub = thisderiv.atoms(Function, Derivative) 
+  tosub = thisderiv.atoms(sym.Function, sym.Derivative) 
 
   #When we sub in, must do in order of highest to lowest derivatives, then functions
   #Otherwise substitution doesn't work because derivatives computed recursively by sympy
@@ -77,13 +77,13 @@ def symDerivAvgX(order):
 
     if o == 0:
       for d in tosub:
-        if isinstance(d, Function):
+        if isinstance(d, sym.Function):
           if str(d) == 'f(b)':
             subvals[d] = xu(0)*z
 
     else:
       for d in tosub:
-        if isinstance(d, Derivative) and d.derivative_count == o:
+        if isinstance(d, sym.Derivative) and d.derivative_count == o:
           if str(d.expr) == 'f(b)':
             subvals[d] = ((-1)**d.derivative_count)*xu(d.derivative_count)*z
           elif str(d.expr) == 'z(b)':
@@ -93,9 +93,9 @@ def symDerivAvgX(order):
     thisderiv = thisderiv.subs(subvals)
 
     #To allow for vector-valued function inputs and to gain speed, lambdify
-    thisderiv = expand(simplify(thisderiv))
+    thisderiv = sym.expand(sym.simplify(thisderiv))
 
-  returnfunc = lambdify((u, xu), thisderiv, "numpy")
+  returnfunc = sym.lambdify((u, xu), thisderiv, "numpy")
   return returnfunc
 
 
@@ -135,13 +135,13 @@ def buildAvgFuncsDependent(xvals, uvals, order):
     for j in range(order+1):
       dictxu[(j,o)] = np.average(xvals[:,j,:]*(uvalsT**o), axis=0)
 
-  class ufunc(Function):
+  class ufunc(sym.Function):
     avgdict = copy.deepcopy(dictu)
     @classmethod
     def eval(cls, x):
       return cls.avgdict[x]
 
-  class xufunc(Function):
+  class xufunc(sym.Function):
     avgdict = copy.deepcopy(dictxu)
     @classmethod
     def eval(cls, x, y):
@@ -157,19 +157,19 @@ def symDerivAvgXdependent(order):
      extrapolation variable. This is meant to be used with buildAvgFuncsDependent.
   """
   #First define some consistent symbols
-  b = symbols('b') #Beta or inverse temperature
-  k = symbols('k')
+  b = sym.symbols('b') #Beta or inverse temperature
+  k = sym.symbols('k')
 
-  f = Function('f')(b) #Functions representing the numerator and denominator of an average
-  z = Function('z')(b)
+  f = sym.Function('f')(b) #Functions representing the numerator and denominator of an average
+  z = sym.Function('z')(b)
 
-  u = Function('u') #Functions that will represent various averages
-  xu = Function('xu')
+  u = sym.Function('u') #Functions that will represent various averages
+  xu = sym.Function('xu')
 
   avgFunc = f / z
   thisderiv = avgFunc.diff(b, order)
   #Pick out what we want to substitute by object type
-  tosub = thisderiv.atoms(Function, Derivative) 
+  tosub = thisderiv.atoms(sym.Function, sym.Derivative) 
 
   #When we sub in, must do in order of highest to lowest derivatives, then functions
   #Otherwise substitution doesn't work because derivatives computed recursively by sympy
@@ -178,13 +178,13 @@ def symDerivAvgXdependent(order):
 
     if o == 0:
       for d in tosub:
-        if isinstance(d, Function):
+        if isinstance(d, sym.Function):
           if str(d) == 'f(b)':
             subvals[d] = xu(0,0)*z
 
     else:
       for d in tosub:
-        if isinstance(d, Derivative) and d.derivative_count == o:
+        if isinstance(d, sym.Derivative) and d.derivative_count == o:
           if str(d.expr) == 'f(b)':
             #Instead of substituting f(k)(b) = <x*(-u^k)> = xu(k), we want to do...
             #(4th order as an example)
@@ -192,7 +192,7 @@ def symDerivAvgXdependent(order):
             #        = <x(4)> - 4*<x(3)*u> + 6*<x(2)*u^2> - 4*<x(1)*u^3> + <x*u^4>
             #In the above, f(4) or x(4) represents the 4th derivtive of f or x with
             #respect to the extrapolation variable b.
-            subvals[d] = Sum(((-1)**k)*binomial(d.derivative_count,k)*xu(d.derivative_count-k,k), (k,0,d.derivative_count)).doit()*z
+            subvals[d] = Sum(((-1)**k)*sym.binomial(d.derivative_count,k)*xu(d.derivative_count-k,k), (k,0,d.derivative_count)).doit()*z
           elif str(d.expr) == 'z(b)':
             subvals[d] = ((-1)**d.derivative_count)*u(d.derivative_count)*z
 
@@ -200,9 +200,9 @@ def symDerivAvgXdependent(order):
     thisderiv = thisderiv.subs(subvals)
 
     #To allow for vector-valued function inputs and to gain speed, lambdify
-    thisderiv = expand(simplify(thisderiv))
+    thisderiv = sym.expand(sym.simplify(thisderiv))
 
-  returnfunc = lambdify((u, xu), thisderiv, "numpy")
+  returnfunc = sym.lambdify((u, xu), thisderiv, "numpy")
   return returnfunc
 
 
@@ -1175,9 +1175,9 @@ class IGmodel:
   #All such classes will have identical symbols and functions, which is desirable here
   #Because volume is of secondary interest, set default parameter for this so that
   #it does not need to be specified (keeps older code compatible, too)
-  b, l = symbols('b l')
-  avgXsym = (1/b) - l/(exp(b*l) - 1)
-  avgXlambdify = lambdify([b, l], avgXsym, "numpy")
+  b, l = sym.symbols('b l')
+  avgXsym = (1/b) - l/(sym.exp(b*l) - 1)
+  avgXlambdify = sym.lambdify([b, l], avgXsym, "numpy")
 
   @classmethod
   def avgX(cls, B, L=1.0):
@@ -1262,7 +1262,7 @@ class IGmodel:
     outvec = np.zeros(order+1)
     outval = 0.0
     for k in range(order+1):
-        thisdiff = diff(self.avgXsym, self.b, k)
+        thisdiff = sym.diff(self.avgXsym, self.b, k)
         outvec[k] = thisdiff.subs({self.b:B0, self.l:L})
         outval += outvec[k]*(dBeta**k)/np.math.factorial(k)
     return (outval, outvec)
@@ -1275,7 +1275,7 @@ class IGmodel:
     outvec = np.zeros(order+1)
     outval = 0.0
     for k in range(order+1):
-        thisdiff = diff(self.avgXsym, self.l, k)
+        thisdiff = sym.diff(self.avgXsym, self.l, k)
         outvec[k] = thisdiff.subs({self.b:B, self.l:L0})
         outval += outvec[k]*(dL**k)/np.math.factorial(k)
     return (outval, outvec)
