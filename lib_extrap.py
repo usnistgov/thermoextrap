@@ -120,7 +120,7 @@ def buildAvgFuncsDependent(xvals, uvals, order):
     print('Setting order to match.')
     order = xvals.shape[1] - 1
   elif xvals.shape[1] >= order+1:
-    xvals = xvals[:,:order+1,:]
+    xvals = xvals[:, :order+1, :]
 
   #To allow for vector-valued observables, must make sure uvals can be transposed
   uvalsT = np.array([uvals]).T
@@ -133,7 +133,7 @@ def buildAvgFuncsDependent(xvals, uvals, order):
   for o in range(order+1):
     dictu[o] = np.average(uvals**o)
     for j in range(order+1):
-      dictxu[(j,o)] = np.average(xvals[:,j,:]*(uvalsT**o), axis=0)
+      dictxu[(j, o)] = np.average(xvals[:, j, :]*(uvalsT**o), axis=0)
 
   class ufunc(sym.Function):
     avgdict = copy.deepcopy(dictu)
@@ -145,7 +145,7 @@ def buildAvgFuncsDependent(xvals, uvals, order):
     avgdict = copy.deepcopy(dictxu)
     @classmethod
     def eval(cls, x, y):
-      return cls.avgdict[(x,y)]
+      return cls.avgdict[(x, y)]
 
   return (ufunc, xufunc)
 
@@ -180,7 +180,7 @@ def symDerivAvgXdependent(order):
       for d in tosub:
         if isinstance(d, sym.Function):
           if str(d) == 'f(b)':
-            subvals[d] = xu(0,0)*z
+            subvals[d] = xu(0, 0)*z
 
     else:
       for d in tosub:
@@ -192,7 +192,7 @@ def symDerivAvgXdependent(order):
             #        = <x(4)> - 4*<x(3)*u> + 6*<x(2)*u^2> - 4*<x(1)*u^3> + <x*u^4>
             #In the above, f(4) or x(4) represents the 4th derivtive of f or x with
             #respect to the extrapolation variable b.
-            subvals[d] = Sum(((-1)**k)*sym.binomial(d.derivative_count,k)*xu(d.derivative_count-k,k), (k,0,d.derivative_count)).doit()*z
+            subvals[d] = Sum(((-1)**k)*sym.binomial(d.derivative_count, k)*xu(d.derivative_count-k, k), (k, 0, d.derivative_count)).doit()*z
           elif str(d.expr) == 'z(b)':
             subvals[d] = ((-1)**d.derivative_count)*u(d.derivative_count)*z
 
@@ -216,7 +216,7 @@ def extrapToPoly(B0, derivs):
   coeffs = np.zeros(len(derivs))
   for k, d in enumerate(derivs):
     for l in range(k+1):
-      coeffs[l] += ((-B0)**(k-l))*d*binom(k,l)/np.math.factorial(k)
+      coeffs[l] += ((-B0)**(k-l))*d*binom(k, l)/np.math.factorial(k)
   return coeffs
 
 
@@ -228,14 +228,14 @@ def bootstrapPolyCoeffs(extModel, n=100, order=3):
      from extModel.resampleData. Might make more sense to include this in the
      class definition, but don't want to be inherited by other classes.
   """
-  bShape = (n,) + extModel.params[:order+1,:].shape
+  bShape = (n,) + extModel.params[:order+1, :].shape
   bootStraps = np.zeros(bShape)
   for i in range(n):
     thisx, thisU = extModel.resampleData()
     thisParams = extModel.train(extModel.refB, thisx, thisU, saveParams=False)
-    thisCoeffs = np.zeros(thisParams[:order+1,:].shape)
+    thisCoeffs = np.zeros(thisParams[:order+1, :].shape)
     for j in range(thisParams.shape[1]):
-      thisCoeffs[:,j] = extrapToPoly(extModel.refB, thisParams[:order+1,j])
+      thisCoeffs[:, j] = extrapToPoly(extModel.refB, thisParams[:order+1, j])
     bootStraps[i] = thisCoeffs
   bootStd = np.std(bootStraps, ddof=1, axis=0)
   return bootStd
@@ -394,7 +394,7 @@ class ExtrapModel:
       thisParams = self.train(self.refB, thisx, thisU, saveParams=False)
       if B is not None:
         #Predict the new value with the specific parameters
-        bootStraps[i,:,:] = self.predict(B, order=order, params=thisParams)
+        bootStraps[i, :, :] = self.predict(B, order=order, params=thisParams)
       else:
         bootStraps[i] = thisParams
 
@@ -489,8 +489,8 @@ class ExtrapWeightedModel(ExtrapModel):
     #Perform extrapolation from both reference points
     predictVals = np.zeros((2, B.shape[0], self.x.shape[-1]))
     for o in range(order+1):
-      predictVals[0] += np.tensordot((dBeta[0]**o), params[0,o], axes=0)/np.math.factorial(o)
-      predictVals[1] += np.tensordot((dBeta[1]**o), params[1,o], axes=0)/np.math.factorial(o)
+      predictVals[0] += np.tensordot((dBeta[0]**o), params[0, o], axes=0)/np.math.factorial(o)
+      predictVals[1] += np.tensordot((dBeta[1]**o), params[1, o], axes=0)/np.math.factorial(o)
 
     w1, w2 = weightsMinkowski(abs(dBeta[0]), abs(dBeta[1]))
 
@@ -567,7 +567,7 @@ class InterpModel(ExtrapModel):
 
       #Loop over observable elements, with unique derivatives for each
       for j in range(xData.shape[2]):
-        derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:,j]
+        derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:, j]
 
       #Loop over orders, filling out matrix for solving systems of equations
       for j in range(order+1):
@@ -585,7 +585,7 @@ class InterpModel(ExtrapModel):
     matInv = np.linalg.inv(mat)
     coeffs = np.zeros((pOrder+1, xData.shape[2]))
     for j in range(xData.shape[2]):
-      coeffs[:,j] = np.dot(matInv, derivVals[:,j])
+      coeffs[:, j] = np.dot(matInv, derivVals[:, j])
 
     if saveParams:
       self.refB = refB
@@ -720,7 +720,7 @@ class MBARModel(InterpModel):
     x = np.reshape(self.x, (self.x.shape[0]*self.x.shape[1], self.x.shape[2]))
 
     for i in range(len(B)):
-      predictVals[i,:] = params.computeMultipleExpectations(x.T, B[i]*allU)[0]
+      predictVals[i, :] = params.computeMultipleExpectations(x.T, B[i]*allU)[0]
 
     return predictVals
 
@@ -793,7 +793,7 @@ class PerturbModel:
       mbarObj = mbar.MBAR(np.array([refB*U]), [U.shape[0]])
       predictVals = np.zeros((len(B), x.shape[1]))
       for i in range(len(B)):
-        predictVals[i,:] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
+        predictVals[i, :] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
 
     else:
       #Compute what goes in the exponent and subtract out the maximum
@@ -844,7 +844,7 @@ class PerturbModel:
       #"Train", which here just packages the data, but don't change model params
       thisParams = self.train(self.refB, thisx, thisU, saveParams=False)
       #Predict the new value with the resampled data
-      bootStraps[i,:,:] = self.predict(B, params=thisParams, useMBAR=useMBAR)
+      bootStraps[i, :, :] = self.predict(B, params=thisParams, useMBAR=useMBAR)
 
     #Compute uncertainty
     bootStd = np.std(bootStraps, ddof=1, axis=0)
@@ -972,7 +972,7 @@ def interpPolyMultiPoint(B, refB, x, U, order):
 
     #Loop over observable elements, with unique derivatives for each
     for j in range(x.shape[2]):
-      derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:,j]
+      derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:, j]
 
     #Loop over orders, filling out matrix for solving systems of equations
     for j in range(order+1):
@@ -990,7 +990,7 @@ def interpPolyMultiPoint(B, refB, x, U, order):
   matInv = np.linalg.inv(mat)
   coeffs = np.zeros((pOrder+1, x.shape[2]))
   for j in range(x.shape[2]):
-    coeffs[:,j] = np.dot(matInv, derivVals[:,j])
+    coeffs[:, j] = np.dot(matInv, derivVals[:, j])
 
   #Calculate the polynomial interpolation values at each desired beta
   outvals = np.zeros((len(B), x.shape[2])) #Each row is a different beta value
@@ -1026,7 +1026,7 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
     mbarObj = mbar.MBAR(np.array([refB*U]), [U.shape[0]])
     outval = np.zeros((len(B), x.shape[1]))
     for i in range(len(B)):
-      outval[i,:] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
+      outval[i, :] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
 
   else:
     #Compute what goes in the exponent and subtract out the maximum
@@ -1364,12 +1364,12 @@ class RecursiveInterp:
     relErr = np.zeros(bootErr.shape)
     for i in range(bootErr.shape[0]):
       for j in range(bootErr.shape[1]):
-        if abs(predictVals[i,j]) == 0.0:
+        if abs(predictVals[i, j]) == 0.0:
           #If value is exactly zero, either really unlucky
           #Or inherently no error because it IS zero - assume this
-          relErr[i,j] = 0.0
+          relErr[i, j] = 0.0
         else:
-          relErr[i,j] = bootErr[i,j] / abs(predictVals[i,j])
+          relErr[i, j] = bootErr[i, j] / abs(predictVals[i, j])
 
     #Checking maximum over both tested interior state points AND observable values
     #(if observable is a vector, use element with maximum error
@@ -1402,7 +1402,7 @@ class RecursiveInterp:
     #Do some plotting just as a visual for how things are going, if desired
     if doPlot:
       interpVals = np.linspace(B1, B2, 20)
-      interp = self.model.predict(interpVals, order=self.maxOrder)[:,0]
+      interp = self.model.predict(interpVals, order=self.maxOrder)[:, 0]
       plt.clf()
       plt.plot(interpVals, interp)
       if newB is not None:
@@ -1483,12 +1483,12 @@ class RecursiveInterp:
         self.model.refB = np.array([self.edgeB[paramInd-1], self.edgeB[paramInd]])
         predictVals[i] = self.model.predict(beta,
                                             params=self.modelParams[paramInd-1],
-                                            order=self.maxOrder)[0,:]
+                                            order=self.maxOrder)[0, :]
       else:
         self.model.refB = np.array([self.edgeB[paramInd], self.edgeB[paramInd+1]])
         predictVals[i] = self.model.predict(beta,
                                             params=self.modelParams[paramInd],
-                                            order=self.maxOrder)[0,:]
+                                            order=self.maxOrder)[0, :]
 
     return predictVals
 
@@ -1519,7 +1519,7 @@ class RecursiveInterp:
     allInds = np.arange(self.edgeB.shape[0])
     nrows = allInds.size - 3 + 1
     n = allInds.strides[0]
-    edgeSets = np.lib.stride_tricks.as_strided(allInds, shape=(nrows,3), strides=(n,n))
+    edgeSets = np.lib.stride_tricks.as_strided(allInds, shape=(nrows, 3), strides=(n, n))
 
     #Will record and return p-values from hypothesis tests
     allPvals = []
@@ -1547,7 +1547,7 @@ class RecursiveInterp:
       p12 = norm.cdf(abs(z12)) - norm.cdf(-abs(z12)) #Null hypothesis coefficients different
 
       #To check full interval, must retrain model with data
-      fullCoeffs = self.model.train(self.edgeB[aset[[0,2]]],
+      fullCoeffs = self.model.train(self.edgeB[aset[[0, 2]]],
                                     np.array([self.xData[aset[0]], self.xData[aset[2]]]),
                                     np.array([self.uData[aset[0]], self.uData[aset[2]]]),
                                     saveParams=True)
@@ -1570,9 +1570,9 @@ class RecursiveInterp:
 
       if doPlot:
         plotPoints = np.linspace(self.edgeB[aset[0]], self.edgeB[aset[2]], 50)
-        plotFull = np.polynomial.polynomial.polyval(plotPoints, fullCoeffs[:,0])
-        plotReg1 = np.polynomial.polynomial.polyval(plotPoints, reg1Coeffs[:,0])
-        plotReg2 = np.polynomial.polynomial.polyval(plotPoints, reg2Coeffs[:,0])
+        plotFull = np.polynomial.polynomial.polyval(plotPoints, fullCoeffs[:, 0])
+        plotReg1 = np.polynomial.polynomial.polyval(plotPoints, reg1Coeffs[:, 0])
+        plotReg2 = np.polynomial.polynomial.polyval(plotPoints, reg2Coeffs[:, 0])
         pAx.plot(plotPoints, plotFull, color = pColors[i], linestyle='-')
         pAx.plot(plotPoints, plotReg1, color = pColors[i], linestyle=':')
         pAx.plot(plotPoints, plotReg2, color = pColors[i], linestyle='--')
