@@ -38,12 +38,16 @@ def buildAvgFuncs(xvals, uvals, order):
     dictxu[o] = np.average(xvals*(uvalsT**o), axis=0)
 
   class ufunc(sym.Function):
+    """Modified sympy Function class to output powers of potential energies.
+    """
     avgdict = copy.deepcopy(dictu)
     @classmethod
     def eval(cls, x):
       return cls.avgdict[x]
 
   class xufunc(sym.Function):
+    """Modified sympy Function class to output powers of potential energies.
+    """
     avgdict = copy.deepcopy(dictxu)
     @classmethod
     def eval(cls, x):
@@ -136,12 +140,16 @@ def buildAvgFuncsDependent(xvals, uvals, order):
       dictxu[(j, o)] = np.average(xvals[:, j, :]*(uvalsT**o), axis=0)
 
   class ufunc(sym.Function):
+    """Modified sympy Function class to output powers of potential energies.
+    """
     avgdict = copy.deepcopy(dictu)
     @classmethod
     def eval(cls, x):
       return cls.avgdict[x]
 
   class xufunc(sym.Function):
+    """Modified sympy Function class to output product of observable and potential energies.
+    """
     avgdict = copy.deepcopy(dictxu)
     @classmethod
     def eval(cls, x, y):
@@ -192,7 +200,7 @@ def symDerivAvgXdependent(order):
             #        = <x(4)> - 4*<x(3)*u> + 6*<x(2)*u^2> - 4*<x(1)*u^3> + <x*u^4>
             #In the above, f(4) or x(4) represents the 4th derivtive of f or x with
             #respect to the extrapolation variable b.
-            subvals[d] = Sum(((-1)**k)*sym.binomial(d.derivative_count, k)*xu(d.derivative_count-k, k), (k, 0, d.derivative_count)).doit()*z
+            subvals[d] = sym.Sum(((-1)**k)*sym.binomial(d.derivative_count, k)*xu(d.derivative_count-k, k), (k, 0, d.derivative_count)).doit()*z
           elif str(d.expr) == 'z(b)':
             subvals[d] = ((-1)**d.derivative_count)*u(d.derivative_count)*z
 
@@ -261,6 +269,8 @@ class ExtrapModel:
   #Calculates symbolic derivatives up to maximum order given data
   #Returns list of functions that can be used to evaluate derivatives for specific data
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     derivs = []
     for o in range(self.maxOrder+1):
       derivs.append(symDerivAvgX(o))
@@ -320,14 +330,12 @@ class ExtrapModel:
     if params is None:
       if self.params is None:
         raise TypeError('self.params is None - need to train model before predicting')
-      else:
-        params = self.params
+      params = self.params
 
     if refB is None:
       if self.refB is None:
         raise TypeError('self.refB is None - need to specify reference beta')
-      else:
-        refB = self.refB
+      refB = self.refB
 
     if order is None:
       order = self.maxOrder
@@ -428,9 +436,12 @@ class ExtrapWeightedModel(ExtrapModel):
 
     if isinstance(refB, (int, float)):
       print('Must provide 2 reference beta values as a list or array, but got only a number.')
+      raise TypeError('refB must be a list or array of length 2, not float or int')
+
     refB = np.array(refB)
     if refB.shape[0] != 2:
       print('Need exactly 2 reference beta values, but got %i'%refB.shape[0])
+      raise ValueError('refB must be a list or array of exactly length 2')
 
     if len(xData.shape) == 2:
       xData = np.reshape(xData, (xData.shape[0], xData.shape[1], 1))
@@ -466,14 +477,12 @@ class ExtrapWeightedModel(ExtrapModel):
     if params is None:
       if self.params is None:
         raise TypeError('self.params is None - need to train model before predicting')
-      else:
-        params = self.params
+      params = self.params
 
     if refB is None:
       if self.refB is None:
         raise TypeError('self.refB is None - need to specify reference beta')
-      else:
-        refB = self.refB
+      refB = self.refB
 
     if order is None:
       order = self.maxOrder
@@ -611,8 +620,7 @@ class InterpModel(ExtrapModel):
     if params is None:
       if self.params is None:
         raise TypeError('self.params is None - need to train model before predicting')
-      else:
-        params = self.params
+      params = self.params
 
     if order is None:
       order = self.maxOrder
@@ -707,8 +715,7 @@ class MBARModel(InterpModel):
       #Use trained parameters if you have them
       if self.params is None:
         raise TypeError('self.params is None - need to train model before predicting')
-      else:
-        params = self.params
+      params = self.params
 
     #Make sure B is an array, even if just has one element
     if isinstance(B, (int, float)):
@@ -771,14 +778,12 @@ class PerturbModel:
       #Use trained parameters if you have them
       if self.params is None:
         raise TypeError('self.params is None - need to train model before predicting')
-      else:
-        params = self.params
+      params = self.params
 
     if refB is None:
       if self.refB is None:
         raise TypeError('self.refB is None - need to specify reference beta')
-      else:
-        refB = self.refB
+      refB = self.refB
 
     #Specify "parameters" as desired data to use
     x = params[0]
@@ -932,8 +937,6 @@ def interpPolyMultiPoint(B, refB, x, U, order):
      order is the maximum order derivative used at each point where data is provided.
      Returns polynomial values at specified betas and polynomial coefficients.
   """
-  from scipy.special import factorial
-
   refB = np.array(refB)
 
   if x.shape[0] != U.shape[0]:
@@ -1022,7 +1025,6 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
   B = np.array(B)
 
   if useMBAR:
-    from pymbar import mbar
     mbarObj = mbar.MBAR(np.array([refB*U]), [U.shape[0]])
     outval = np.zeros((len(B), x.shape[1]))
     for i in range(len(B)):
@@ -1055,6 +1057,8 @@ class VolumeExtrapModel(ExtrapModel):
   #Can't go to higher order in practice, so don't return any symbolic derivatives
   #Instead, just use this to check and make sure not asking for order above 1
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     if self.maxOrder > 1:
       print('Volume extrapolation cannot go above 1st order without derivatives of forces.')
       print('Setting order to 1st order.')
@@ -1095,6 +1099,8 @@ class VolumeExtrapWeightedModel(ExtrapWeightedModel):
   #Can't go to higher order in practice, so don't return any symbolic derivatives
   #Instead, just use this to check and make sure not asking for order above 1
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     if self.maxOrder > 1:
       print('Volume extrapolation cannot go above 1st order without derivatives of forces.')
       print('Setting order to 1st order.')
@@ -1135,6 +1141,8 @@ class VolumeInterpModel(InterpModel):
   #Can't go to higher order in practice, so don't return any symbolic derivatives
   #Instead, just use this to check and make sure not asking for order above 1
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     if self.maxOrder > 1:
       print('Volume extrapolation cannot go above 1st order without derivatives of forces.')
       print('Setting order to 1st order.')
@@ -1216,7 +1224,7 @@ class IGmodel:
     """Samples s samples of x from the probability density at inverse temperature B
        Does sampling based on inversion of cumulative distribution function
     """
-    randvec = np.random.random(size=s)
+    randvec = np.random.rand(size=s)
     randx = -(1.0/B)*np.log(1.0 - randvec*(1.0 - np.exp(-B*L)))
     return randx
 
