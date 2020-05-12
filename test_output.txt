@@ -1,0 +1,169 @@
+
+
+Testing Ideal Gas Model
+	B=1.000000, L=1.000000
+		Sample vs Analytic <x>:    0.418329 vs 0.418023
+		Sample vs Analytic var(x): 0.079226 vs 0.079326
+		Sample vs Analytic <U>:    418.329242 vs 418.023293
+		Sample vs Analytic var(U): 77.918109 vs 79.326406
+	B=1.000000, L=10.000000
+		Sample vs Analytic <x>:    0.999871 vs 0.999546
+		Sample vs Analytic var(x): 0.998458 vs 0.995460
+		Sample vs Analytic <U>:    999.871429 vs 999.545980
+		Sample vs Analytic var(U): 943.706406 vs 995.459595
+	B=10.000000, L=1.000000
+		Sample vs Analytic <x>:    0.099861 vs 0.099955
+		Sample vs Analytic var(x): 0.009931 vs 0.009955
+		Sample vs Analytic <U>:    99.860611 vs 99.954598
+		Sample vs Analytic var(U): 9.637414 vs 9.954596
+	B=10.000000, L=10.000000
+		Sample vs Analytic <x>:    0.100004 vs 0.100000
+		Sample vs Analytic var(x): 0.009951 vs 0.010000
+		Sample vs Analytic <U>:    100.003659 vs 100.000000
+		Sample vs Analytic var(U): 10.432374 vs 10.000000
+
+
+Testing Extrapolation Routines
+
+	In temperature for IG:
+		Analytical values:        [0.34255 0.16236 0.05152]
+		Analytical derivatives:   [ 0.41802 -0.07933  0.00771]
+		1D data:
+		Estimated values:         [[ 0.33853]
+ [ 0.08398]
+ [-0.19446]]
+		Estimated derivatives:    [[   0.41808]
+ [  -0.07822]
+ [  -0.00265]
+ [   0.08364]
+ [   6.33708]
+ [-274.08691]
+ [2277.     ]]
+		Bootstrapped std values:  [[0.00849]
+ [0.13614]
+ [0.4174 ]]
+		Bootstrapped std derivs:  [[   0.00009]
+ [   0.00104]
+ [   0.01599]
+ [   0.36009]
+ [   7.77307]
+ [ 175.31064]
+ [4041.99799]]
+		3D data:
+		Estimated values:         [[ 0.33853  0.33853  0.33853]
+ [ 0.08398  0.08398  0.08398]
+ [-0.19446 -0.19446 -0.19446]]
+		Estimated derivatives:    [[ 0.41808  0.41808  0.41808]
+ [-0.07822 -0.07822 -0.07822]
+ [-0.00265 -0.00265 -0.00265]]
+		Bootstrapped std values:  [[0.00818 0.00818 0.00818]
+ [0.1312  0.1312  0.1312 ]
+ [0.40227 0.40227 0.40227]]
+		Bootstrapped std derivs:  [[0.00008 0.00008 0.00008]
+ [0.00115 0.00115 0.00115]
+ [0.01807 0.01807 0.01807]]
+		Perturbation:
+		Estimated values:         [[0.38095]
+ [0.38086]
+ [0.38086]]
+		Bootstrapped std values:  [[0.00289]
+ [0.00264]
+ [0.00263]]
+
+	In volume for IG:
+		Analytical values:        [ 0.68125  0.56523 -0.90931]
+		Analytical derivatives:   [ 0.41802  0.3387  -0.15095]
+Volume extrapolation cannot go above 1st order without derivatives of forces.
+Setting order to 1st order.
+[[ 0.41808]
+ [-0.02607]]
+		Estimated values:         [[0.75794]
+ [1.77752]
+ [2.79711]]
+		Estimated derivatives:    [[0.41808]
+ [0.33986]]
+		Bootstrapped std values:  [[0.00037]
+ [0.00144]
+ [0.00252]]
+		Bootstrapped std derivs:  [[0.00009]
+ [0.00034]]
+
+
+Testing Interpolation Routines
+
+	In temperature for IG:
+		Analytical values (1):        [0.34255 0.16236 0.05152]
+		Analytical derivatives (1):   [ 0.41802 -0.07933  0.00771]
+		Analytical values (2):        [0.24214 0.17416 0.12377]
+		Analytical derivatives (2):   [ 0.09995 -0.00995  0.00195]
+		Weighted extrapolation:
+		Estimated values:         [[0.33986]
+ [0.1057 ]
+ [0.11987]]
+		Estimated derivatives:    [[[ 0.41808]
+  [-0.07822]]
+
+ [[ 0.09998]
+  [-0.00994]]]
+		Bootstrapped std values:  [[0.00115]
+ [0.00452]
+ [0.00033]]
+		Bootstrapped std derivs:  [[[0.00008]
+  [0.00119]]
+
+ [[0.00003]
+  [0.00015]]]
+		Polynomial interpolation:
+		Estimated values:         [[0.34635]
+ [0.19868]
+ [0.12512]]
+		Estimated coefficients:   [[ 0.50322]
+ [-0.09228]
+ [ 0.00735]
+ [-0.00022]]
+		Bootstrapped std values:  [[0.00088]
+ [0.0014 ]
+ [0.00044]]
+		Bootstrapped std coeffs:  [[0.00147]
+ [0.00175]
+ [0.00031]
+ [0.00001]]
+		MBAR:
+		Estimated values:         [[0.38095]
+ [0.11416]
+ [0.11414]]
+		Bootstrapped std values:  [[0.00386]
+ [0.00386]
+ [0.00348]]
+
+	In volume for IG:
+		Analytical values (1):        [ 0.68125  0.56523 -0.90931]
+		Analytical derivatives (1):   [ 0.41802  0.3387  -0.15095]
+		Analytical values (2):        [0.98465 0.99296 0.998  ]
+		Analytical derivatives (2):   [ 0.99955  0.00041 -0.00036]
+		Weighted extrapolation:
+		Estimated values:         [[0.75794]
+ [1.76864]
+ [0.99859]]
+		Estimated derivatives:    [[[0.41808]
+  [0.33986]]
+
+ [[0.99887]
+  [0.00014]]]
+		Bootstrapped std values:  [[0.00037]
+ [0.00136]
+ [0.00101]]
+		Bootstrapped std derivs:  [[[0.00009]
+  [0.00033]]
+
+ [[0.0003 ]
+  [0.00054]]]
+
+
+Testing Recursive Interpolation
+
+Interpolating from points 1.000000 and 10.000000
+Recursion depth on this branch: 0
+Maximum bootstrapped error within interval: 0.006505
+No additional extrapolation points necessary on this interval.
+Single interpolation region. No point in checking consistency.
