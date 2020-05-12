@@ -276,7 +276,7 @@ class ExtrapModel:
 
     if x.shape[0] != U.shape[0]:
       print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-      return
+      raise ValueError('x and U must have same shape in first dimension')
 
     avgUfunc, avgXUfunc = buildAvgFuncs(x, U, self.maxOrder)
     derivVals = np.zeros((self.maxOrder+1, x.shape[1]))
@@ -319,13 +319,13 @@ class ExtrapModel:
     #Use parameters for estimate - for extrapolation, the parameters are the derivatives
     if params is None:
       if self.params is None:
-        return
+        raise TypeError('self.params is None - need to train model before predicting')
       else:
         params = self.params
 
     if refB is None:
       if self.refB is None:
-        return
+        raise TypeError('self.refB is None - need to specify reference beta')
       else:
         refB = self.refB
 
@@ -349,7 +349,7 @@ class ExtrapModel:
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampSize = self.x.shape[0]
     randInds = np.random.choice(sampSize, size=sampSize, replace=True)
@@ -424,7 +424,7 @@ class ExtrapWeightedModel(ExtrapModel):
     if (xData.shape[0] != 2) or (uData.shape[0] != 2):
       print('Must provide observable and potential energy data from 2 state points!')
       print('First dimensions of provided data are not 2 but %i and %i'%(xData.shape[0], uData.shape[0]))
-      return
+      raise ValueError('xData and uData must have first dimension of 2')
 
     if isinstance(refB, (int, float)):
       print('Must provide 2 reference beta values as a list or array, but got only a number.')
@@ -465,13 +465,13 @@ class ExtrapWeightedModel(ExtrapModel):
     #Use parameters for estimate - for extrapolation, the parameters are the derivatives
     if params is None:
       if self.params is None:
-        return
+        raise TypeError('self.params is None - need to train model before predicting')
       else:
         params = self.params
 
     if refB is None:
       if self.refB is None:
-        return
+        raise TypeError('self.refB is None - need to specify reference beta')
       else:
         refB = self.refB
 
@@ -506,7 +506,7 @@ class ExtrapWeightedModel(ExtrapModel):
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampX = np.zeros(self.x.shape)
     sampU = np.zeros(self.U.shape)
@@ -537,11 +537,11 @@ class InterpModel(ExtrapModel):
 
     if xData.shape[0] != uData.shape[0]:
       print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
-      return
+      raise ValueError('x and U must have same shape in first dimension')
 
     if (xData.shape[0] != refB.shape[0]) or (uData.shape[0] != refB.shape[0]):
       print('First dimension of data must match number of provided beta values.')
-      return
+      raise ValueError('For interpolation, first dimension of xData, uData, and refB must match.')
 
     #Want to be able to handle vector-value observables
     #So make sure x has 3 dimensions, even if technically observable is scalar
@@ -610,7 +610,7 @@ class InterpModel(ExtrapModel):
     #Use parameters for estimate
     if params is None:
       if self.params is None:
-        return
+        raise TypeError('self.params is None - need to train model before predicting')
       else:
         params = self.params
 
@@ -639,7 +639,7 @@ class InterpModel(ExtrapModel):
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampX = np.zeros(self.x.shape)
     sampU = np.zeros(self.U.shape)
@@ -667,11 +667,11 @@ class MBARModel(InterpModel):
 
     if xData.shape[0] != uData.shape[0]:
       print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
-      return
+      raise ValueError('x and U must have same shape in first dimension')
 
     if (xData.shape[0] != refB.shape[0]) or (uData.shape[0] != refB.shape[0]):
       print('First dimension of data must match number of provided beta values.')
-      return
+      raise ValueError('For interpolation, first dimension of xData, uData, and refB must match.')
 
     #Want to be able to handle vector-value observables
     #So make sure x has 3 dimensions, even if technically observable is scalar
@@ -706,7 +706,7 @@ class MBARModel(InterpModel):
     if params is None:
       #Use trained parameters if you have them
       if self.params is None:
-        return
+        raise TypeError('self.params is None - need to train model before predicting')
       else:
         params = self.params
 
@@ -750,7 +750,7 @@ class PerturbModel:
     #Also check if observable data matches up with potential energy
     if xData.shape[0] != uData.shape[0]:
       print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
-      return
+      raise ValueError('x and U must have same shape in first dimension')
 
     params = [xData, uData]
 
@@ -770,13 +770,13 @@ class PerturbModel:
     if params is None:
       #Use trained parameters if you have them
       if self.params is None:
-        return
+        raise TypeError('self.params is None - need to train model before predicting')
       else:
         params = self.params
 
     if refB is None:
       if self.refB is None:
-        return
+        raise TypeError('self.refB is None - need to specify reference beta')
       else:
         refB = self.refB
 
@@ -815,7 +815,7 @@ class PerturbModel:
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampSize = self.x.shape[0]
     randInds = np.random.choice(sampSize, size=sampSize, replace=True)
@@ -828,7 +828,7 @@ class PerturbModel:
     """Obtain estimates of uncertainty in model predictions via bootstrapping.
     """
     if self.params is None:
-      return
+      raise TypeError('self.params is None - need to train model before bootstrapping')
 
     #Make sure B is an array, even if just has one element
     if isinstance(B, (int, float)):
@@ -864,7 +864,7 @@ def extrapWithSamples(B, B0, x, U, order):
   """
   if x.shape[0] != U.shape[0]:
     print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-    return
+    raise ValueError('x and U must have same shape in first dimension')
 
   #Next need to make sure x has at least two dimensions
   if len(x.shape) == 1:
@@ -938,11 +938,11 @@ def interpPolyMultiPoint(B, refB, x, U, order):
 
   if x.shape[0] != U.shape[0]:
     print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-    return
+    raise ValueError('x and U must have same shape in first dimension')
 
   if (x.shape[0] != refB.shape[0]) or (U.shape[0] != refB.shape[0]):
     print('First dimension of data must match number of provided beta values.')
-    return
+    raise ValueError('For interpolation, first dimension of xData, uData, and refB must match.')
 
   #Want to be able to handle vector-value observables
   #So make sure x has 3 dimensions, even if technically observable is scalar
@@ -1009,7 +1009,7 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
   """
   if x.shape[0] != U.shape[0]:
     print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-    return
+    raise ValueError('x and U must have same shape in first dimension')
 
   #Check shape of observables and add dimension if needed
   #Note that for observables with more than 1 dimension, things won't work
@@ -1072,7 +1072,7 @@ class VolumeExtrapModel(ExtrapModel):
 
     if x.shape[0] != W.shape[0]:
       print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
-      return
+      raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
     avgX = np.average(x, axis=0)
@@ -1112,7 +1112,7 @@ class VolumeExtrapWeightedModel(ExtrapWeightedModel):
 
     if x.shape[0] != W.shape[0]:
       print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
-      return
+      raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
     avgX = np.average(x, axis=0)
@@ -1152,7 +1152,7 @@ class VolumeInterpModel(InterpModel):
 
     if x.shape[0] != W.shape[0]:
       print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
-      return
+      raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
     avgX = np.average(x, axis=0)
@@ -1191,7 +1191,7 @@ class IGmodel:
     """
     term1 = 1.0/(B**2)
     term2 = (L**2)*np.exp(B*L)/((np.exp(B*L) - 1)**2)
-    return (term1 - term2)
+    return term1 - term2
 
   @classmethod
   def PofX(cls, x, B, L=1.0): #This will also give P(U) exactly for single particle if a = 1
@@ -1199,7 +1199,7 @@ class IGmodel:
     """
     numer = B*np.exp(-B*x)
     denom = 1.0 - np.exp(-B*L)
-    return (numer / denom)
+    return numer / denom
 
   @classmethod
   def cdfX(cls, x, B, L=1.0): #Cumulative distribution function for X
@@ -1207,7 +1207,7 @@ class IGmodel:
     """
     numer = 1.0 - np.exp(-B*x)
     denom = 1.0 - np.exp(-B*L)
-    return (numer / denom)
+    return numer / denom
 
   def __init__(self, nParticles=1000):
     self.nP = nParticles #Number of particles
@@ -1244,15 +1244,15 @@ class IGmodel:
       prefac = B0 / (1.0 - np.exp(-B0*L))
       term1 = (1.0 - np.exp(-B*L)) / (B**2)
       term2 = L*np.exp(-B*L) / B
-      return (prefac*(term1 - term2))
+      return prefac*(term1 - term2)
 
     def pertDenom(B, B0):
       prefac = B0 / B
       numer = 1.0 - np.exp(-B*L)
       denom = 1.0 - np.exp(-B0*L)
-      return (prefac*numer/denom)
+      return prefac*numer/denom
 
-    return (pertNumer(B, B0) / pertDenom(B, B0))
+    return pertNumer(B, B0) / pertDenom(B, B0)
 
   def extrapAnalytic(self, B, B0, order, L=1.0):
     """Analytical extrapolation from B0 to B at specified order.
@@ -1334,7 +1334,7 @@ class RecursiveInterp:
        specific state points and you do not wish to generate more.
     """
     if recurseDepth > recurseMax:
-      return
+      raise RecursionError('Maximum recursion depth reached.')
 
     if verbose:
       print('\nInterpolating from points %f and %f'%(B1, B2))
@@ -1457,7 +1457,7 @@ class RecursiveInterp:
     #Make sure we've done some training
     if len(self.modelParams) == 0:
       print("First must train the piecewise model!")
-      return
+      raise ValueError('Must train before predicting')
 
     #For each state point in B, select a piecewise model to use
     predictVals = np.zeros((len(B), self.model.x.shape[2]))
@@ -1465,16 +1465,17 @@ class RecursiveInterp:
     for i, beta in enumerate(B):
 
       #Check if out of lower bound
-      try:
-        paramInd = np.where(self.edgeB <= beta)[0][-1]
-      except IndexError:
+      if beta < self.edgeB[0]:
         print("Have provided point %f below interpolation function interval edges (%s)."%(beta, str(self.edgeB)))
-        return
+        raise IndexError('Interpolation point below range')
 
       #Check if out of upper bound
       if beta > self.edgeB[-1]:
         print("Have provided point %f above interpolation function interval edges (%s)."%(beta, str(self.edgeB)))
-        return
+        raise IndexError('Interpolation point above range')
+
+      #And get correct index for interpolating polynomial
+      paramInd = np.where(self.edgeB <= beta)[0][-1]
 
       #Don't want to train model (already done!) but need to manually specify
       #both the parameters AND the reference state points
@@ -1504,15 +1505,15 @@ class RecursiveInterp:
     """
     if not isinstance(self.model, InterpModel):
       print('Can only check polynomial consistency with a polynomial interpolation model class.')
-      return
+      raise TypeError('Incorrect class provided')
 
     if len(self.modelParams) == 0:
       print('No model parameters found. Must train model before checking consistency.')
-      return
+      raise ValueError('self.modelParams is length 0 - must train model first')
 
     if len(self.modelParams) == 1:
       print('Single interpolation region. No point in checking consistency.')
-      return
+      raise ValueError('self.modelParams is length 1 - nothing to check')
 
     #Need to subdivide the full interval into pairs of neighboring intervals
     #Easiest way is to take state point edge values in sliding sets of three
@@ -1573,9 +1574,9 @@ class RecursiveInterp:
         plotFull = np.polynomial.polynomial.polyval(plotPoints, fullCoeffs[:, 0])
         plotReg1 = np.polynomial.polynomial.polyval(plotPoints, reg1Coeffs[:, 0])
         plotReg2 = np.polynomial.polynomial.polyval(plotPoints, reg2Coeffs[:, 0])
-        pAx.plot(plotPoints, plotFull, color = pColors[i], linestyle='-')
-        pAx.plot(plotPoints, plotReg1, color = pColors[i], linestyle=':')
-        pAx.plot(plotPoints, plotReg2, color = pColors[i], linestyle='--')
+        pAx.plot(plotPoints, plotFull, color=pColors[i], linestyle='-')
+        pAx.plot(plotPoints, plotReg1, color=pColors[i], linestyle=':')
+        pAx.plot(plotPoints, plotReg2, color=pColors[i], linestyle='--')
         allPlotY = np.hstack((plotFull, plotReg1, plotReg2))
         if np.min(allPlotY) < plotYmin:
           plotYmin = np.min(allPlotY)
