@@ -7,7 +7,8 @@
 #There will likely be overlap between the two, but this should really be the test.
 
 import numpy as np
-from lib_extrap import *
+#from lib_extrap import *
+from libextrap import *
 
 
 #Set random number seed
