@@ -1,11 +1,11 @@
 #Library of functions useful for extrapolation (or interpolation)
 #Makes heavy use of sympy to go to arbitrary order derivatives
+"""Library of functions useful for extrapolation and interpolation.
+"""
 
-
-import time
 import copy
 import numpy as np
-from sympy import *
+import sympy as sym
 from scipy.stats import norm
 from scipy.special import binom
 from scipy.special import factorial
@@ -22,7 +22,7 @@ def buildAvgFuncs(xvals, uvals, order):
      other words, providing an integer to the function u or xu will produce the desired
      average quantity. Once the symbolic derivative is defined as a lambdified function
      of two sympy functions, can just input the custom sympy functions defined here to
-     substitute in all the right values. Note that if the observable is vector-valued 
+     substitute in all the right values. Note that if the observable is vector-valued
      the functions will return vectors for averages.
   """
   #To allow for vector-valued observables, must make sure uvals can be transposed
@@ -37,13 +37,17 @@ def buildAvgFuncs(xvals, uvals, order):
     dictu[o] = np.average(uvals**o)
     dictxu[o] = np.average(xvals*(uvalsT**o), axis=0)
 
-  class ufunc(Function):
+  class ufunc(sym.Function):
+    """Modified sympy Function class to output powers of potential energies.
+    """
     avgdict = copy.deepcopy(dictu)
     @classmethod
     def eval(cls, x):
       return cls.avgdict[x]
 
-  class xufunc(Function):
+  class xufunc(sym.Function):
+    """Modified sympy Function class to output powers of potential energies.
+    """
     avgdict = copy.deepcopy(dictxu)
     @classmethod
     def eval(cls, x):
@@ -57,18 +61,18 @@ def symDerivAvgX(order):
      Returns a substituted string that can be substituted again to get an actual value.
   """
   #First define some consistent symbols
-  b = symbols('b') #Beta or inverse temperature
+  b = sym.symbols('b') #Beta or inverse temperature
 
-  f = Function('f')(b) #Functions representing the numerator and denominator of an average
-  z = Function('z')(b)
+  f = sym.Function('f')(b) #Functions representing the numerator and denominator of an average
+  z = sym.Function('z')(b)
 
-  u = Function('u') #Functions that will represent various averages
-  xu = Function('xu')
+  u = sym.Function('u') #Functions that will represent various averages
+  xu = sym.Function('xu')
 
   avgFunc = f / z
   thisderiv = avgFunc.diff(b, order)
   #Pick out what we want to substitute by object type
-  tosub = thisderiv.atoms(Function, Derivative) 
+  tosub = thisderiv.atoms(sym.Function, sym.Derivative)
 
   #When we sub in, must do in order of highest to lowest derivatives, then functions
   #Otherwise substitution doesn't work because derivatives computed recursively by sympy
@@ -77,13 +81,13 @@ def symDerivAvgX(order):
 
     if o == 0:
       for d in tosub:
-        if isinstance(d, Function):
+        if isinstance(d, sym.Function):
           if str(d) == 'f(b)':
             subvals[d] = xu(0)*z
 
     else:
       for d in tosub:
-        if isinstance(d, Derivative) and d.derivative_count == o:
+        if isinstance(d, sym.Derivative) and d.derivative_count == o:
           if str(d.expr) == 'f(b)':
             subvals[d] = ((-1)**d.derivative_count)*xu(d.derivative_count)*z
           elif str(d.expr) == 'z(b)':
@@ -93,9 +97,9 @@ def symDerivAvgX(order):
     thisderiv = thisderiv.subs(subvals)
 
     #To allow for vector-valued function inputs and to gain speed, lambdify
-    thisderiv = expand(simplify(thisderiv))
+    thisderiv = sym.expand(sym.simplify(thisderiv))
 
-  returnfunc = lambdify((u, xu), thisderiv, "numpy")
+  returnfunc = sym.lambdify((u, xu), thisderiv, "numpy")
   return returnfunc
 
 
@@ -116,11 +120,12 @@ def buildAvgFuncsDependent(xvals, uvals, order):
   """
   #Make sure have provided derivatives in observable up to desired order
   if xvals.shape[1] < order+1:
-    print('Maximum provided order of derivatives of observable (%i) is less than desired order (%i).'%(xvals.shape[1]-1, order))
+    print('Maximum provided order of derivatives of observable (%i) ' \
+          'is less than desired order (%i).'%(xvals.shape[1]-1, order))
     print('Setting order to match.')
     order = xvals.shape[1] - 1
   elif xvals.shape[1] >= order+1:
-    xvals = xvals[:,:order+1,:]
+    xvals = xvals[:, :order+1, :]
 
   #To allow for vector-valued observables, must make sure uvals can be transposed
   uvalsT = np.array([uvals]).T
@@ -133,43 +138,47 @@ def buildAvgFuncsDependent(xvals, uvals, order):
   for o in range(order+1):
     dictu[o] = np.average(uvals**o)
     for j in range(order+1):
-      dictxu[(j,o)] = np.average(xvals[:,j,:]*(uvalsT**o), axis=0)
+      dictxu[(j, o)] = np.average(xvals[:, j, :]*(uvalsT**o), axis=0)
 
-  class ufunc(Function):
+  class ufunc(sym.Function):
+    """Modified sympy Function class to output powers of potential energies.
+    """
     avgdict = copy.deepcopy(dictu)
     @classmethod
     def eval(cls, x):
       return cls.avgdict[x]
 
-  class xufunc(Function):
+  class xufunc(sym.Function):
+    """Modified sympy Function class to output product of observable and potential energies.
+    """
     avgdict = copy.deepcopy(dictxu)
     @classmethod
     def eval(cls, x, y):
-      return cls.avgdict[(x,y)]
+      return cls.avgdict[(x, y)]
 
   return (ufunc, xufunc)
 
 
 def symDerivAvgXdependent(order):
   """Same as symDerivAvgX except for one line when substituting for f(b) and its
-     derivatives. Instead of substituting xu(i), it substitutes xu(i,j) so that 
+     derivatives. Instead of substituting xu(i), it substitutes xu(i,j) so that
      derivatives are possible with the observable depending explicitly on the
      extrapolation variable. This is meant to be used with buildAvgFuncsDependent.
   """
   #First define some consistent symbols
-  b = symbols('b') #Beta or inverse temperature
-  k = symbols('k')
+  b = sym.symbols('b') #Beta or inverse temperature
+  k = sym.symbols('k')
 
-  f = Function('f')(b) #Functions representing the numerator and denominator of an average
-  z = Function('z')(b)
+  f = sym.Function('f')(b) #Functions representing the numerator and denominator of an average
+  z = sym.Function('z')(b)
 
-  u = Function('u') #Functions that will represent various averages
-  xu = Function('xu')
+  u = sym.Function('u') #Functions that will represent various averages
+  xu = sym.Function('xu')
 
   avgFunc = f / z
   thisderiv = avgFunc.diff(b, order)
   #Pick out what we want to substitute by object type
-  tosub = thisderiv.atoms(Function, Derivative) 
+  tosub = thisderiv.atoms(sym.Function, sym.Derivative)
 
   #When we sub in, must do in order of highest to lowest derivatives, then functions
   #Otherwise substitution doesn't work because derivatives computed recursively by sympy
@@ -178,13 +187,13 @@ def symDerivAvgXdependent(order):
 
     if o == 0:
       for d in tosub:
-        if isinstance(d, Function):
+        if isinstance(d, sym.Function):
           if str(d) == 'f(b)':
-            subvals[d] = xu(0,0)*z
+            subvals[d] = xu(0, 0)*z
 
     else:
       for d in tosub:
-        if isinstance(d, Derivative) and d.derivative_count == o:
+        if isinstance(d, sym.Derivative) and d.derivative_count == o:
           if str(d.expr) == 'f(b)':
             #Instead of substituting f(k)(b) = <x*(-u^k)> = xu(k), we want to do...
             #(4th order as an example)
@@ -192,7 +201,10 @@ def symDerivAvgXdependent(order):
             #        = <x(4)> - 4*<x(3)*u> + 6*<x(2)*u^2> - 4*<x(1)*u^3> + <x*u^4>
             #In the above, f(4) or x(4) represents the 4th derivtive of f or x with
             #respect to the extrapolation variable b.
-            subvals[d] = Sum(((-1)**k)*binomial(d.derivative_count,k)*xu(d.derivative_count-k,k), (k,0,d.derivative_count)).doit()*z
+            subvals[d] = sym.Sum(((-1)**k) \
+                                 * sym.binomial(d.derivative_count, k) \
+                                 * xu(d.derivative_count-k, k),
+                                 (k, 0, d.derivative_count)).doit()*z
           elif str(d.expr) == 'z(b)':
             subvals[d] = ((-1)**d.derivative_count)*u(d.derivative_count)*z
 
@@ -200,9 +212,9 @@ def symDerivAvgXdependent(order):
     thisderiv = thisderiv.subs(subvals)
 
     #To allow for vector-valued function inputs and to gain speed, lambdify
-    thisderiv = expand(simplify(thisderiv))
+    thisderiv = sym.expand(sym.simplify(thisderiv))
 
-  returnfunc = lambdify((u, xu), thisderiv, "numpy")
+  returnfunc = sym.lambdify((u, xu), thisderiv, "numpy")
   return returnfunc
 
 
@@ -210,13 +222,13 @@ def extrapToPoly(B0, derivs):
   """Converts an extrapolation around a reference point to a polynomial over all real
      numbers by collecting terms. Input is the reference state point and the derivatives
      at that state point (starting with the zeroth derivative, which is just the
-     observable value). Only works for SINGLE observable element if observable is a 
+     observable value). Only works for SINGLE observable element if observable is a
      vector (so derivs must be a 1D array).
   """
   coeffs = np.zeros(len(derivs))
   for k, d in enumerate(derivs):
     for l in range(k+1):
-      coeffs[l] += ((-B0)**(k-l))*d*binom(k,l)/np.math.factorial(k)
+      coeffs[l] += ((-B0)**(k-l))*d*binom(k, l)/np.math.factorial(k)
   return coeffs
 
 
@@ -225,17 +237,17 @@ def bootstrapPolyCoeffs(extModel, n=100, order=3):
      via extrapToPoly function. This will only reliably work if provided an
      ExtrapModel object for which extModel.train returns the derivatives and
      extModel.refB returns the reference point and the data can be resampled
-     from extModel.resampleData. Might make more sense to include this in the 
+     from extModel.resampleData. Might make more sense to include this in the
      class definition, but don't want to be inherited by other classes.
   """
-  bShape = (n,) + extModel.params[:order+1,:].shape
+  bShape = (n,) + extModel.params[:order+1, :].shape
   bootStraps = np.zeros(bShape)
   for i in range(n):
     thisx, thisU = extModel.resampleData()
     thisParams = extModel.train(extModel.refB, thisx, thisU, saveParams=False)
-    thisCoeffs = np.zeros(thisParams[:order+1,:].shape)
+    thisCoeffs = np.zeros(thisParams[:order+1, :].shape)
     for j in range(thisParams.shape[1]):
-      thisCoeffs[:,j] = extrapToPoly(extModel.refB, thisParams[:order+1,j])
+      thisCoeffs[:, j] = extrapToPoly(extModel.refB, thisParams[:order+1, j])
     bootStraps[i] = thisCoeffs
   bootStd = np.std(bootStraps, ddof=1, axis=0)
   return bootStd
@@ -261,6 +273,8 @@ class ExtrapModel:
   #Calculates symbolic derivatives up to maximum order given data
   #Returns list of functions that can be used to evaluate derivatives for specific data
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     derivs = []
     for o in range(self.maxOrder+1):
       derivs.append(symDerivAvgX(o))
@@ -275,8 +289,9 @@ class ExtrapModel:
     """
 
     if x.shape[0] != U.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-      return
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+      raise ValueError('x and U must have same shape in first dimension')
 
     avgUfunc, avgXUfunc = buildAvgFuncs(x, U, self.maxOrder)
     derivVals = np.zeros((self.maxOrder+1, x.shape[1]))
@@ -319,15 +334,13 @@ class ExtrapModel:
     #Use parameters for estimate - for extrapolation, the parameters are the derivatives
     if params is None:
       if self.params is None:
-        return
-      else:
-        params = self.params
+        raise TypeError('self.params is None - need to train model before predicting')
+      params = self.params
 
     if refB is None:
       if self.refB is None:
-        return
-      else:
-        refB = self.refB
+        raise TypeError('self.refB is None - need to specify reference beta')
+      refB = self.refB
 
     if order is None:
       order = self.maxOrder
@@ -349,7 +362,7 @@ class ExtrapModel:
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampSize = self.x.shape[0]
     randInds = np.random.choice(sampSize, size=sampSize, replace=True)
@@ -361,9 +374,9 @@ class ExtrapModel:
   def bootstrap(self, B, order=None, n=100):
     """Obtain estimates of uncertainty in model predictions via bootstrapping.
        Should not need to change this function - instead modify resampleData
-       to match with the data structure. If B is None or a length zero array, 
+       to match with the data structure. If B is None or a length zero array,
        i.e. no new state points are provided, then the std in the PARAMETERS
-       of the model are reported from bootstrapping. Note that to change the 
+       of the model are reported from bootstrapping. Note that to change the
        REFERENCE state point and data, MUST RETRAIN!
     """
     if order is None:
@@ -394,7 +407,7 @@ class ExtrapModel:
       thisParams = self.train(self.refB, thisx, thisU, saveParams=False)
       if B is not None:
         #Predict the new value with the specific parameters
-        bootStraps[i,:,:] = self.predict(B, order=order, params=thisParams)
+        bootStraps[i, :, :] = self.predict(B, order=order, params=thisParams)
       else:
         bootStraps[i] = thisParams
 
@@ -423,14 +436,19 @@ class ExtrapWeightedModel(ExtrapModel):
     #(data sets at each state point must have the same number of samples)
     if (xData.shape[0] != 2) or (uData.shape[0] != 2):
       print('Must provide observable and potential energy data from 2 state points!')
-      print('First dimensions of provided data are not 2 but %i and %i'%(xData.shape[0], uData.shape[0]))
-      return
+      print('First dimensions of provided data are not 2' \
+            ' but %i and %i'%(xData.shape[0], uData.shape[0]))
+      raise ValueError('xData and uData must have first dimension of 2')
 
     if isinstance(refB, (int, float)):
-      print('Must provide 2 reference beta values as a list or array, but got only a number.')
+      print('Must provide 2 reference beta values as a list or array,' \
+            'but got only a number.')
+      raise TypeError('refB must be a list or array of length 2, not float or int')
+
     refB = np.array(refB)
     if refB.shape[0] != 2:
       print('Need exactly 2 reference beta values, but got %i'%refB.shape[0])
+      raise ValueError('refB must be a list or array of exactly length 2')
 
     if len(xData.shape) == 2:
       xData = np.reshape(xData, (xData.shape[0], xData.shape[1], 1))
@@ -465,15 +483,13 @@ class ExtrapWeightedModel(ExtrapModel):
     #Use parameters for estimate - for extrapolation, the parameters are the derivatives
     if params is None:
       if self.params is None:
-        return
-      else:
-        params = self.params
+        raise TypeError('self.params is None - need to train model before predicting')
+      params = self.params
 
     if refB is None:
       if self.refB is None:
-        return
-      else:
-        refB = self.refB
+        raise TypeError('self.refB is None - need to specify reference beta')
+      refB = self.refB
 
     if order is None:
       order = self.maxOrder
@@ -489,8 +505,8 @@ class ExtrapWeightedModel(ExtrapModel):
     #Perform extrapolation from both reference points
     predictVals = np.zeros((2, B.shape[0], self.x.shape[-1]))
     for o in range(order+1):
-      predictVals[0] += np.tensordot((dBeta[0]**o), params[0,o], axes=0)/np.math.factorial(o)
-      predictVals[1] += np.tensordot((dBeta[1]**o), params[1,o], axes=0)/np.math.factorial(o)
+      predictVals[0] += np.tensordot((dBeta[0]**o), params[0, o], axes=0)/np.math.factorial(o)
+      predictVals[1] += np.tensordot((dBeta[1]**o), params[1, o], axes=0)/np.math.factorial(o)
 
     w1, w2 = weightsMinkowski(abs(dBeta[0]), abs(dBeta[1]))
 
@@ -506,7 +522,7 @@ class ExtrapWeightedModel(ExtrapModel):
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampX = np.zeros(self.x.shape)
     sampU = np.zeros(self.U.shape)
@@ -536,12 +552,13 @@ class InterpModel(ExtrapModel):
     refB = np.array(refB)
 
     if xData.shape[0] != uData.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
-      return
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
+      raise ValueError('x and U must have same shape in first dimension')
 
     if (xData.shape[0] != refB.shape[0]) or (uData.shape[0] != refB.shape[0]):
       print('First dimension of data must match number of provided beta values.')
-      return
+      raise ValueError('For interpolation, first dimension of xData, uData, and refB must match.')
 
     #Want to be able to handle vector-value observables
     #So make sure x has 3 dimensions, even if technically observable is scalar
@@ -555,7 +572,7 @@ class InterpModel(ExtrapModel):
     pOrder = refB.shape[0]*(order+1) - 1 #Also the number of coefficients we solve for minus 1
 
     #Need to put together systems of equations to solve
-    #Will have to solve one system for each component of a vector-valued observable 
+    #Will have to solve one system for each component of a vector-valued observable
     #Fortunately, matrix to invert same for each value of beta regardless of observable
     #Just the values we want the polynomial to match with (derivVals) will be different
     derivVals = np.zeros((pOrder+1, xData.shape[2]))
@@ -567,14 +584,15 @@ class InterpModel(ExtrapModel):
 
       #Loop over observable elements, with unique derivatives for each
       for j in range(xData.shape[2]):
-        derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:,j]
+        derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:, j]
 
       #Loop over orders, filling out matrix for solving systems of equations
       for j in range(order+1):
         #Suppress warnings about divide by zero since we actually want this to return infinity
         with np.errstate(divide='ignore'):
-          mat[((order+1)*i)+j, :] = ( ((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
-                                    * factorial(np.arange(pOrder+1))/factorial(np.arange(pOrder+1)-j) )
+          mat[((order+1)*i)+j, :] = (((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
+                                     * factorial(np.arange(pOrder+1))
+                                     / factorial(np.arange(pOrder+1)-j))
 
     #The above formula works everywhere except where the matrix should have zeros
     #Instead of zeros, it inserts infinity, so fix this
@@ -585,7 +603,7 @@ class InterpModel(ExtrapModel):
     matInv = np.linalg.inv(mat)
     coeffs = np.zeros((pOrder+1, xData.shape[2]))
     for j in range(xData.shape[2]):
-      coeffs[:,j] = np.dot(matInv, derivVals[:,j])
+      coeffs[:, j] = np.dot(matInv, derivVals[:, j])
 
     if saveParams:
       self.refB = refB
@@ -604,15 +622,14 @@ class InterpModel(ExtrapModel):
        So just use self.maxOrder as the highest order derivative information
        to use throughout the entire model.
        Can also specify parameters to use. If params is None, will just use
-       the parameters found during training. refB will be ignored as it is 
+       the parameters found during training. refB will be ignored as it is
        not needed once the polynomial is known.
     """
     #Use parameters for estimate
     if params is None:
       if self.params is None:
-        return
-      else:
-        params = self.params
+        raise TypeError('self.params is None - need to train model before predicting')
+      params = self.params
 
     if order is None:
       order = self.maxOrder
@@ -639,7 +656,7 @@ class InterpModel(ExtrapModel):
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampX = np.zeros(self.x.shape)
     sampU = np.zeros(self.U.shape)
@@ -655,7 +672,7 @@ class InterpModel(ExtrapModel):
 
 class MBARModel(InterpModel):
   """Very similar to interpolation model so inheriting this class.
-     Must also have at least two reference states and will use as many as 
+     Must also have at least two reference states and will use as many as
      provided to make estimate. Resampling will be the same, just need to
      change the train and predict functions.
   """
@@ -666,12 +683,13 @@ class MBARModel(InterpModel):
     refB = np.array(refB)
 
     if xData.shape[0] != uData.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
-      return
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
+      raise ValueError('x and U must have same shape in first dimension')
 
     if (xData.shape[0] != refB.shape[0]) or (uData.shape[0] != refB.shape[0]):
       print('First dimension of data must match number of provided beta values.')
-      return
+      raise ValueError('For interpolation, first dimension of xData, uData, and refB must match.')
 
     #Want to be able to handle vector-value observables
     #So make sure x has 3 dimensions, even if technically observable is scalar
@@ -699,16 +717,15 @@ class MBARModel(InterpModel):
        params should be an pymbar MBAR object and this will just wrap the
        computeExpectations function. Note that refB is ignored because it
        is not needed once data at refB has been incorporated into the mbar
-       object. To include more data or data at other state points, need 
+       object. To include more data or data at other state points, need
        to retrain.
     """
     #Check if have parameters
     if params is None:
       #Use trained parameters if you have them
       if self.params is None:
-        return
-      else:
-        params = self.params
+        raise TypeError('self.params is None - need to train model before predicting')
+      params = self.params
 
     #Make sure B is an array, even if just has one element
     if isinstance(B, (int, float)):
@@ -720,13 +737,13 @@ class MBARModel(InterpModel):
     x = np.reshape(self.x, (self.x.shape[0]*self.x.shape[1], self.x.shape[2]))
 
     for i in range(len(B)):
-      predictVals[i,:] = params.computeMultipleExpectations(x.T, B[i]*allU)[0]
+      predictVals[i, :] = params.computeMultipleExpectations(x.T, B[i]*allU)[0]
 
     return predictVals
 
 
 class PerturbModel:
-  """Class to hold information about a perturbation. 
+  """Class to hold information about a perturbation.
   """
 
   #Otherwise, it just needs to define some variables
@@ -749,8 +766,9 @@ class PerturbModel:
 
     #Also check if observable data matches up with potential energy
     if xData.shape[0] != uData.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
-      return
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(xData.shape[0], uData.shape[0]))
+      raise ValueError('x and U must have same shape in first dimension')
 
     params = [xData, uData]
 
@@ -770,15 +788,13 @@ class PerturbModel:
     if params is None:
       #Use trained parameters if you have them
       if self.params is None:
-        return
-      else:
-        params = self.params
+        raise TypeError('self.params is None - need to train model before predicting')
+      params = self.params
 
     if refB is None:
       if self.refB is None:
-        return
-      else:
-        refB = self.refB
+        raise TypeError('self.refB is None - need to specify reference beta')
+      refB = self.refB
 
     #Specify "parameters" as desired data to use
     x = params[0]
@@ -793,7 +809,7 @@ class PerturbModel:
       mbarObj = mbar.MBAR(np.array([refB*U]), [U.shape[0]])
       predictVals = np.zeros((len(B), x.shape[1]))
       for i in range(len(B)):
-        predictVals[i,:] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
+        predictVals[i, :] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
 
     else:
       #Compute what goes in the exponent and subtract out the maximum
@@ -815,7 +831,7 @@ class PerturbModel:
        Should be adjusted to match the data structure.
     """
     if self.x is None:
-      return
+      raise TypeError('self.x is None - need to define data in model (i.e. train)')
 
     sampSize = self.x.shape[0]
     randInds = np.random.choice(sampSize, size=sampSize, replace=True)
@@ -828,7 +844,7 @@ class PerturbModel:
     """Obtain estimates of uncertainty in model predictions via bootstrapping.
     """
     if self.params is None:
-      return
+      raise TypeError('self.params is None - need to train model before bootstrapping')
 
     #Make sure B is an array, even if just has one element
     if isinstance(B, (int, float)):
@@ -836,7 +852,7 @@ class PerturbModel:
     B = np.array(B)
 
     #Last dimension should be observable vector size
-    bootStraps = np.zeros((n, B.shape[0], self.x.shape[-1])) 
+    bootStraps = np.zeros((n, B.shape[0], self.x.shape[-1]))
 
     #Loop for as many resamples as we want
     for i in range(n):
@@ -844,7 +860,7 @@ class PerturbModel:
       #"Train", which here just packages the data, but don't change model params
       thisParams = self.train(self.refB, thisx, thisU, saveParams=False)
       #Predict the new value with the resampled data
-      bootStraps[i,:,:] = self.predict(B, params=thisParams, useMBAR=useMBAR)
+      bootStraps[i, :, :] = self.predict(B, params=thisParams, useMBAR=useMBAR)
 
     #Compute uncertainty
     bootStd = np.std(bootStraps, ddof=1, axis=0)
@@ -854,17 +870,18 @@ class PerturbModel:
 def extrapWithSamples(B, B0, x, U, order):
   """Uses symbolic logic to perform extrapolation to arbitrarily high order.
      Makes use of the buildAvgDict and symDerivAvgX functions defined above.
-     B is the inverse temperature to extrapolate to (can be an array of values), 
-     B0 is the reference, x is the reference observable values, and U is the 
-     reference potential energy values. Order is the highest order expansion 
-     coefficient (derivative) to compute. The function returns both the extrapolated 
-     value and the derivatives. Vector-valued observables are allowed for x, but 
-     the first dimension should run over independent observations and match the size 
+     B is the inverse temperature to extrapolate to (can be an array of values),
+     B0 is the reference, x is the reference observable values, and U is the
+     reference potential energy values. Order is the highest order expansion
+     coefficient (derivative) to compute. The function returns both the extrapolated
+     value and the derivatives. Vector-valued observables are allowed for x, but
+     the first dimension should run over independent observations and match the size
      of U.
   """
   if x.shape[0] != U.shape[0]:
-    print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-    return
+    print('First observable dimension (%i) and size of potential energy' \
+          ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+    raise ValueError('x and U must have same shape in first dimension')
 
   #Next need to make sure x has at least two dimensions
   if len(x.shape) == 1:
@@ -897,7 +914,7 @@ def extrapWithSamples(B, B0, x, U, order):
 
 
 def extrapWeighted(B, refB1, refB2, x1, x2, u1, u2, order1, order2, m=20):
-  """Performs extrapolation from two points to an interior point and weights with a 
+  """Performs extrapolation from two points to an interior point and weights with a
      Minkowski-like function proposed by Mahynski, Errington, and Shen (2017).
   """
   def weightsMinkowski(d1, d2, m=20):
@@ -932,17 +949,16 @@ def interpPolyMultiPoint(B, refB, x, U, order):
      order is the maximum order derivative used at each point where data is provided.
      Returns polynomial values at specified betas and polynomial coefficients.
   """
-  from scipy.special import factorial
-
   refB = np.array(refB)
 
   if x.shape[0] != U.shape[0]:
-    print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-    return
+    print('First observable dimension (%i) and size of potential energy' \
+          ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+    raise ValueError('x and U must have same shape in first dimension')
 
   if (x.shape[0] != refB.shape[0]) or (U.shape[0] != refB.shape[0]):
     print('First dimension of data must match number of provided beta values.')
-    return
+    raise ValueError('For interpolation, first dimension of xData, uData, and refB must match.')
 
   #Want to be able to handle vector-value observables
   #So make sure x has 3 dimensions, even if technically observable is scalar
@@ -958,7 +974,7 @@ def interpPolyMultiPoint(B, refB, x, U, order):
   pOrder = refB.shape[0]*(order+1) - 1 #Also the number of coefficients we solve for minus 1
 
   #Need to put together systems of equations to solve
-  #Will have to solve one system for each component of a vector-valued observable 
+  #Will have to solve one system for each component of a vector-valued observable
   #Fortunately, matrix to invert will be same for each value of beta regardless of observable
   #Just the values we want the polynomial to match with (derivVals) will be different
   derivVals = np.zeros((pOrder+1, x.shape[2]))
@@ -972,14 +988,15 @@ def interpPolyMultiPoint(B, refB, x, U, order):
 
     #Loop over observable elements, with unique derivatives for each
     for j in range(x.shape[2]):
-      derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:,j]
+      derivVals[(order+1)*i:(order+1)*(i+1), j] = thisderivs[:, j]
 
     #Loop over orders, filling out matrix for solving systems of equations
     for j in range(order+1):
       #Suppress warnings about divide by zero since we actually want this to return infinity
       with np.errstate(divide='ignore'):
-        mat[((order+1)*i)+j, :] = ( ((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
-                                    * factorial(np.arange(pOrder+1))/factorial(np.arange(pOrder+1)-j) )
+        mat[((order+1)*i)+j, :] = (((np.ones(pOrder+1)*beta)**(np.arange(pOrder+1) - j))
+                                   * factorial(np.arange(pOrder+1))
+                                   / factorial(np.arange(pOrder+1)-j))
 
   #The above formula works everywhere except where the matrix should have zeros
   #Instead of zeros, it inserts infinity, so fix this
@@ -990,7 +1007,7 @@ def interpPolyMultiPoint(B, refB, x, U, order):
   matInv = np.linalg.inv(mat)
   coeffs = np.zeros((pOrder+1, x.shape[2]))
   for j in range(x.shape[2]):
-    coeffs[:,j] = np.dot(matInv, derivVals[:,j])
+    coeffs[:, j] = np.dot(matInv, derivVals[:, j])
 
   #Calculate the polynomial interpolation values at each desired beta
   outvals = np.zeros((len(B), x.shape[2])) #Each row is a different beta value
@@ -1008,8 +1025,9 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
      and standard reweighting. Uses MBAR code instead of mine if desired.
   """
   if x.shape[0] != U.shape[0]:
-    print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
-    return
+    print('First observable dimension (%i) and size of potential energy' \
+          ' array (%i) don\'t match!'%(x.shape[0], U.shape[0]))
+    raise ValueError('x and U must have same shape in first dimension')
 
   #Check shape of observables and add dimension if needed
   #Note that for observables with more than 1 dimension, things won't work
@@ -1022,11 +1040,10 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
   B = np.array(B)
 
   if useMBAR:
-    from pymbar import mbar
     mbarObj = mbar.MBAR(np.array([refB*U]), [U.shape[0]])
     outval = np.zeros((len(B), x.shape[1]))
     for i in range(len(B)):
-      outval[i,:] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
+      outval[i, :] = mbarObj.computeMultipleExpectations(x.T, B[i]*U)[0]
 
   else:
     #Compute what goes in the exponent and subtract out the maximum
@@ -1055,6 +1072,8 @@ class VolumeExtrapModel(ExtrapModel):
   #Can't go to higher order in practice, so don't return any symbolic derivatives
   #Instead, just use this to check and make sure not asking for order above 1
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     if self.maxOrder > 1:
       print('Volume extrapolation cannot go above 1st order without derivatives of forces.')
       print('Setting order to 1st order.')
@@ -1071,8 +1090,9 @@ class VolumeExtrapModel(ExtrapModel):
     """
 
     if x.shape[0] != W.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
-      return
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
+      raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
     avgX = np.average(x, axis=0)
@@ -1095,6 +1115,8 @@ class VolumeExtrapWeightedModel(ExtrapWeightedModel):
   #Can't go to higher order in practice, so don't return any symbolic derivatives
   #Instead, just use this to check and make sure not asking for order above 1
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     if self.maxOrder > 1:
       print('Volume extrapolation cannot go above 1st order without derivatives of forces.')
       print('Setting order to 1st order.')
@@ -1111,8 +1133,9 @@ class VolumeExtrapWeightedModel(ExtrapWeightedModel):
     """
 
     if x.shape[0] != W.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
-      return
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
+      raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
     avgX = np.average(x, axis=0)
@@ -1135,6 +1158,8 @@ class VolumeInterpModel(InterpModel):
   #Can't go to higher order in practice, so don't return any symbolic derivatives
   #Instead, just use this to check and make sure not asking for order above 1
   def calcDerivFuncs(self):
+    """Calculates symbolic derivative functions and returns lambdified functions.
+    """
     if self.maxOrder > 1:
       print('Volume extrapolation cannot go above 1st order without derivatives of forces.')
       print('Setting order to 1st order.')
@@ -1151,8 +1176,9 @@ class VolumeInterpModel(InterpModel):
     """
 
     if x.shape[0] != W.shape[0]:
-      print('First observable dimension (%i) and size of potential energy array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
-      return
+      print('First observable dimension (%i) and size of potential energy' \
+            ' array (%i) don\'t match!'%(x.shape[0], W.shape[0]))
+      raise ValueError('x and U must have same shape in first dimension')
 
     wT = np.array([W]).T
     avgX = np.average(x, axis=0)
@@ -1175,9 +1201,9 @@ class IGmodel:
   #All such classes will have identical symbols and functions, which is desirable here
   #Because volume is of secondary interest, set default parameter for this so that
   #it does not need to be specified (keeps older code compatible, too)
-  b, l = symbols('b l')
-  avgXsym = (1/b) - l/(exp(b*l) - 1)
-  avgXlambdify = lambdify([b, l], avgXsym, "numpy")
+  b, l = sym.symbols('b l')
+  avgXsym = (1/b) - l/(sym.exp(b*l) - 1)
+  avgXlambdify = sym.lambdify([b, l], avgXsym, "numpy")
 
   @classmethod
   def avgX(cls, B, L=1.0):
@@ -1191,7 +1217,7 @@ class IGmodel:
     """
     term1 = 1.0/(B**2)
     term2 = (L**2)*np.exp(B*L)/((np.exp(B*L) - 1)**2)
-    return (term1 - term2)
+    return term1 - term2
 
   @classmethod
   def PofX(cls, x, B, L=1.0): #This will also give P(U) exactly for single particle if a = 1
@@ -1199,7 +1225,7 @@ class IGmodel:
     """
     numer = B*np.exp(-B*x)
     denom = 1.0 - np.exp(-B*L)
-    return (numer / denom)
+    return numer / denom
 
   @classmethod
   def cdfX(cls, x, B, L=1.0): #Cumulative distribution function for X
@@ -1207,7 +1233,7 @@ class IGmodel:
     """
     numer = 1.0 - np.exp(-B*x)
     denom = 1.0 - np.exp(-B*L)
-    return (numer / denom)
+    return numer / denom
 
   def __init__(self, nParticles=1000):
     self.nP = nParticles #Number of particles
@@ -1216,43 +1242,46 @@ class IGmodel:
     """Samples s samples of x from the probability density at inverse temperature B
        Does sampling based on inversion of cumulative distribution function
     """
-    randvec = np.random.random(size=s)
+    randvec = np.random.rand(s)
     randx = -(1.0/B)*np.log(1.0 - randvec*(1.0 - np.exp(-B*L)))
     return randx
 
-  def sampleU(self, B, s=1000, L=1.0): #Really just resampling the sum of x values many times to get distribution of U for large N
+  def sampleU(self, B, s=1000, L=1.0):
     """Samples s (=1000 by default) potential energy values from a system self.nP particles.
        Particle positions are randomly sampled with sampleX at the inverse temperature B.
     """
+    #Really just resampling the sum of x values many times to get distribution of U for large N
     randu = np.zeros(s)
     for i in range(s):
-        randu[i] = np.sum(self.sampleX(B, self.nP, L=L))
+      randu[i] = np.sum(self.sampleX(B, self.nP, L=L))
     return randu
 
-  def PofU(self, U, B, L=1.0): #Provides P(U) in the limit of a large number of particles (becomes Gaussian)
+  def PofU(self, U, B, L=1.0):
     """In the large-N limit, the probability of the potential energy is Normal, so provides that
     """
+    #Provides P(U) in the limit of a large number of particles (becomes Gaussian)
     avgU = self.nP*self.avgX(B, L=L)
     stdU = np.sqrt(self.nP*self.varX(B, L=L))
     return norm.pdf(U, avgU, stdU)
 
-  def pertAnalytic(self, B, B0, L=1.0): #Really just the same as average of x, but it's a nice check of all the math
+  def pertAnalytic(self, B, B0, L=1.0):
     """Analytical perturbation of the system from B0 to B.
        Nice check to see if get same thing as avgX
     """
+    #Really just the same as average of x, but it's a nice check all the math
     def pertNumer(B, B0):
       prefac = B0 / (1.0 - np.exp(-B0*L))
       term1 = (1.0 - np.exp(-B*L)) / (B**2)
       term2 = L*np.exp(-B*L) / B
-      return (prefac*(term1 - term2))
+      return prefac*(term1 - term2)
 
     def pertDenom(B, B0):
       prefac = B0 / B
       numer = 1.0 - np.exp(-B*L)
       denom = 1.0 - np.exp(-B0*L)
-      return (prefac*numer/denom)
+      return prefac*numer/denom
 
-    return (pertNumer(B, B0) / pertDenom(B, B0))
+    return pertNumer(B, B0) / pertDenom(B, B0)
 
   def extrapAnalytic(self, B, B0, order, L=1.0):
     """Analytical extrapolation from B0 to B at specified order.
@@ -1262,9 +1291,9 @@ class IGmodel:
     outvec = np.zeros(order+1)
     outval = 0.0
     for k in range(order+1):
-        thisdiff = diff(self.avgXsym, self.b, k)
-        outvec[k] = thisdiff.subs({self.b:B0, self.l:L})
-        outval += outvec[k]*(dBeta**k)/np.math.factorial(k)
+      thisdiff = sym.diff(self.avgXsym, self.b, k)
+      outvec[k] = thisdiff.subs({self.b:B0, self.l:L})
+      outval += outvec[k]*(dBeta**k)/np.math.factorial(k)
     return (outval, outvec)
 
   def extrapAnalyticVolume(self, L, L0, order, B=1.0):
@@ -1275,9 +1304,9 @@ class IGmodel:
     outvec = np.zeros(order+1)
     outval = 0.0
     for k in range(order+1):
-        thisdiff = diff(self.avgXsym, self.l, k)
-        outvec[k] = thisdiff.subs({self.b:B, self.l:L0})
-        outval += outvec[k]*(dL**k)/np.math.factorial(k)
+      thisdiff = sym.diff(self.avgXsym, self.l, k)
+      outvec[k] = thisdiff.subs({self.b:B, self.l:L0})
+      outval += outvec[k]*(dL**k)/np.math.factorial(k)
     return (outval, outvec)
 
   #Want to be able to create sample data set we can work with at a reference beta
@@ -1325,7 +1354,9 @@ class RecursiveInterp:
     xdata, udata = datModel.genData(B, nConfigs=10000)
     return xdata, udata
 
-  def recursiveTrain(self, B1, B2, xData1=None, xData2=None, uData1=None, uData2=None, recurseDepth=0, recurseMax=10, Bavail=None, verbose=False, doPlot=False, plotCompareFunc=None):
+  def recursiveTrain(self, B1, B2, xData1=None, xData2=None, uData1=None, uData2=None,
+                     recurseDepth=0, recurseMax=10,
+                     Bavail=None, verbose=False, doPlot=False, plotCompareFunc=None):
     """Recursively trains interpolating models on successively smaller intervals
        until error tolerance is reached. The next state point to subdivide an
        interval is chosen as the point where the bootstrapped error is the largest.
@@ -1334,7 +1365,7 @@ class RecursiveInterp:
        specific state points and you do not wish to generate more.
     """
     if recurseDepth > recurseMax:
-      return
+      raise RecursionError('Maximum recursion depth reached.')
 
     if verbose:
       print('\nInterpolating from points %f and %f'%(B1, B2))
@@ -1342,9 +1373,9 @@ class RecursiveInterp:
 
     #Generate data somehow if not provided
     if xData1 is None:
-       xData1, uData1 = self.getData(B1)
+      xData1, uData1 = self.getData(B1)
     if xData2 is None:
-       xData2, uData2 = self.getData(B2)
+      xData2, uData2 = self.getData(B2)
 
     #And format it for training interpolation models
     xData = np.array([xData1, xData2])
@@ -1364,12 +1395,12 @@ class RecursiveInterp:
     relErr = np.zeros(bootErr.shape)
     for i in range(bootErr.shape[0]):
       for j in range(bootErr.shape[1]):
-        if abs(predictVals[i,j]) == 0.0:
+        if abs(predictVals[i, j]) == 0.0:
           #If value is exactly zero, either really unlucky
           #Or inherently no error because it IS zero - assume this
-          relErr[i,j] = 0.0
+          relErr[i, j] = 0.0
         else:
-          relErr[i,j] = bootErr[i,j] / abs(predictVals[i,j])
+          relErr[i, j] = bootErr[i, j] / abs(predictVals[i, j])
 
     #Checking maximum over both tested interior state points AND observable values
     #(if observable is a vector, use element with maximum error
@@ -1402,7 +1433,7 @@ class RecursiveInterp:
     #Do some plotting just as a visual for how things are going, if desired
     if doPlot:
       interpVals = np.linspace(B1, B2, 20)
-      interp = self.model.predict(interpVals, order=self.maxOrder)[:,0]
+      interp = self.model.predict(interpVals, order=self.maxOrder)[:, 0]
       plt.clf()
       plt.plot(interpVals, interp)
       if newB is not None:
@@ -1414,7 +1445,6 @@ class RecursiveInterp:
       plt.gcf().tight_layout()
       plt.show(block=False)
       plt.pause(5)
-      #time.sleep(5)
       plt.close()
 
     if newB is not None:
@@ -1457,7 +1487,7 @@ class RecursiveInterp:
     #Make sure we've done some training
     if len(self.modelParams) == 0:
       print("First must train the piecewise model!")
-      return
+      raise ValueError('Must train before predicting')
 
     #For each state point in B, select a piecewise model to use
     predictVals = np.zeros((len(B), self.model.x.shape[2]))
@@ -1465,16 +1495,19 @@ class RecursiveInterp:
     for i, beta in enumerate(B):
 
       #Check if out of lower bound
-      try:
-        paramInd = np.where(self.edgeB <= beta)[0][-1]
-      except IndexError:
-        print("Have provided point %f below interpolation function interval edges (%s)."%(beta, str(self.edgeB)))
-        return
+      if beta < self.edgeB[0]:
+        print('Have provided point %f below interpolation function' \
+              ' interval edges (%s).'%(beta, str(self.edgeB)))
+        raise IndexError('Interpolation point below range')
 
       #Check if out of upper bound
       if beta > self.edgeB[-1]:
-        print("Have provided point %f above interpolation function interval edges (%s)."%(beta, str(self.edgeB)))
-        return
+        print('Have provided point %f above interpolation function' \
+              ' interval edges (%s).'%(beta, str(self.edgeB)))
+        raise IndexError('Interpolation point above range')
+
+      #And get correct index for interpolating polynomial
+      paramInd = np.where(self.edgeB <= beta)[0][-1]
 
       #Don't want to train model (already done!) but need to manually specify
       #both the parameters AND the reference state points
@@ -1483,18 +1516,18 @@ class RecursiveInterp:
         self.model.refB = np.array([self.edgeB[paramInd-1], self.edgeB[paramInd]])
         predictVals[i] = self.model.predict(beta,
                                             params=self.modelParams[paramInd-1],
-                                            order=self.maxOrder)[0,:]
+                                            order=self.maxOrder)[0, :]
       else:
         self.model.refB = np.array([self.edgeB[paramInd], self.edgeB[paramInd+1]])
         predictVals[i] = self.model.predict(beta,
                                             params=self.modelParams[paramInd],
-                                            order=self.maxOrder)[0,:]
+                                            order=self.maxOrder)[0, :]
 
     return predictVals
 
   def checkPolynomialConsistency(self, doPlot=False):
     """If the interpolation model is a polynomial, checks to see if the polynomials
-       are locally consistent. In other words, we want the coefficients between 
+       are locally consistent. In other words, we want the coefficients between
        neighboring regions to match closely to each other, and to the larger region
        composed of the two neighboring sub-regions. Essentially, this checks to make
        sure the local curvature is staying constant as you zoom in. If it is, your
@@ -1504,22 +1537,22 @@ class RecursiveInterp:
     """
     if not isinstance(self.model, InterpModel):
       print('Can only check polynomial consistency with a polynomial interpolation model class.')
-      return
+      raise TypeError('Incorrect class provided')
 
     if len(self.modelParams) == 0:
       print('No model parameters found. Must train model before checking consistency.')
-      return
+      raise ValueError('self.modelParams is length 0 - must train model first')
 
     if len(self.modelParams) == 1:
       print('Single interpolation region. No point in checking consistency.')
-      return
+      raise ValueError('self.modelParams is length 1 - nothing to check')
 
     #Need to subdivide the full interval into pairs of neighboring intervals
     #Easiest way is to take state point edge values in sliding sets of three
     allInds = np.arange(self.edgeB.shape[0])
     nrows = allInds.size - 3 + 1
     n = allInds.strides[0]
-    edgeSets = np.lib.stride_tricks.as_strided(allInds, shape=(nrows,3), strides=(n,n))
+    edgeSets = np.lib.stride_tricks.as_strided(allInds, shape=(nrows, 3), strides=(n, n))
 
     #Will record and return p-values from hypothesis tests
     allPvals = []
@@ -1547,7 +1580,7 @@ class RecursiveInterp:
       p12 = norm.cdf(abs(z12)) - norm.cdf(-abs(z12)) #Null hypothesis coefficients different
 
       #To check full interval, must retrain model with data
-      fullCoeffs = self.model.train(self.edgeB[aset[[0,2]]],
+      fullCoeffs = self.model.train(self.edgeB[aset[[0, 2]]],
                                     np.array([self.xData[aset[0]], self.xData[aset[2]]]),
                                     np.array([self.uData[aset[0]], self.uData[aset[2]]]),
                                     saveParams=True)
@@ -1570,12 +1603,12 @@ class RecursiveInterp:
 
       if doPlot:
         plotPoints = np.linspace(self.edgeB[aset[0]], self.edgeB[aset[2]], 50)
-        plotFull = np.polynomial.polynomial.polyval(plotPoints, fullCoeffs[:,0])
-        plotReg1 = np.polynomial.polynomial.polyval(plotPoints, reg1Coeffs[:,0])
-        plotReg2 = np.polynomial.polynomial.polyval(plotPoints, reg2Coeffs[:,0])
-        pAx.plot(plotPoints, plotFull, color = pColors[i], linestyle='-')
-        pAx.plot(plotPoints, plotReg1, color = pColors[i], linestyle=':')
-        pAx.plot(plotPoints, plotReg2, color = pColors[i], linestyle='--')
+        plotFull = np.polynomial.polynomial.polyval(plotPoints, fullCoeffs[:, 0])
+        plotReg1 = np.polynomial.polynomial.polyval(plotPoints, reg1Coeffs[:, 0])
+        plotReg2 = np.polynomial.polynomial.polyval(plotPoints, reg2Coeffs[:, 0])
+        pAx.plot(plotPoints, plotFull, color=pColors[i], linestyle='-')
+        pAx.plot(plotPoints, plotReg1, color=pColors[i], linestyle=':')
+        pAx.plot(plotPoints, plotReg2, color=pColors[i], linestyle='--')
         allPlotY = np.hstack((plotFull, plotReg1, plotReg2))
         if np.min(allPlotY) < plotYmin:
           plotYmin = np.min(allPlotY)
