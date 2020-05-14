@@ -11,6 +11,7 @@ from lib_extrap import *
 
 
 #Set random number seed
+#Will actually need to re-do for each test, otherwise if skip test will change results
 np.random.seed(42)
 
 #Set some output options
@@ -52,6 +53,8 @@ wdat4 = -betaVals[1]*m.nP*xdat4
 
 
 ################## Testing Extrapolation Routines ######################
+np.random.seed(42)
+
 print('\n\nTesting Extrapolation Routines')
 analyticTvals, analyticTderivs = m.extrapAnalytic(betaCheck, betaVals[0], checkOrderExt)
 analyticVvals, analyticVderivs = m.extrapAnalyticVolume(lCheck, lVals[0], checkOrderExt)
@@ -66,12 +69,14 @@ extTpredict = extTmodel.predict(betaCheck, order=checkOrderExt)
 extTparamErr = extTmodel.bootstrap(None, order=checkOrderExt)
 extTpredictErr = extTmodel.bootstrap(betaCheck, order=checkOrderExt)
 print('\t\t1D data:')
-print('\t\tEstimated values:        ', extTpredict)
-print('\t\tEstimated derivatives:   ', extTparams)
-print('\t\tBootstrapped std values: ', extTpredictErr)
-print('\t\tBootstrapped std derivs: ', extTparamErr)
+print('\t\tEstimated values:        \n', extTpredict)
+print('\t\tEstimated derivatives:   \n', extTparams)
+print('\t\tBootstrapped std values: \n', extTpredictErr)
+print('\t\tBootstrapped std derivs: \n', extTparamErr)
 #Test with 3D data by replicating
 #Simultaneously test other features by initiating model in different way
+np.random.seed(42)
+
 extTmodel = ExtrapModel(maxOrder=checkOrderExt, refB=betaVals[0],
                         xData=np.tile(np.reshape(xdat1, (xdat1.shape[0], 1)), (1, 3)),
                         uData=udat1)
@@ -79,19 +84,21 @@ extTpredict = extTmodel.predict(betaCheck)
 extTparamErr = extTmodel.bootstrap(None)
 extTpredictErr = extTmodel.bootstrap(betaCheck)
 print('\t\t3D data:')
-print('\t\tEstimated values:        ', extTpredict)
-print('\t\tEstimated derivatives:   ', extTmodel.params)
-print('\t\tBootstrapped std values: ', extTpredictErr)
-print('\t\tBootstrapped std derivs: ', extTparamErr)
+print('\t\tEstimated values:        \n', extTpredict)
+print('\t\tEstimated derivatives:   \n', extTmodel.params)
+print('\t\tBootstrapped std values: \n', extTpredictErr)
+print('\t\tBootstrapped std derivs: \n', extTparamErr)
 #Check perturbation, too
 #Do not look at parameters or error, though
 #For this class, parameters are the data points
+np.random.seed(42)
+
 pertTmodel = PerturbModel(refB=betaVals[0], xData=xdat1, uData=udat1)
 pertTpredict = pertTmodel.predict(betaCheck)
 pertTpredictErr = pertTmodel.bootstrap(betaCheck)
 print('\t\tPerturbation:')
-print('\t\tEstimated values:        ', pertTpredict)
-print('\t\tBootstrapped std values: ', pertTpredictErr)
+print('\t\tEstimated values:        \n', pertTpredict)
+print('\t\tBootstrapped std values: \n', pertTpredictErr)
 
 #Probably don't need to check this anymore, right?
 #If can check against the analytical results of the ideal gas, why do we need extra code?
@@ -99,9 +106,11 @@ print('\t\tBootstrapped std values: ', pertTpredictErr)
 #ext2, extderivs2 = extrapWithSamples(bcheck, betavals[1], xdat2, udat2, checkorder)
 #pertval = perturbWithSamples(bcheck, betavals[0], xdat1, udat1, useMBAR=False)
 
+np.random.seed(42)
+
 print('\n\tIn volume for IG:')
-print('\t\tAnalytical values:       ', analyticVvals)
-print('\t\tAnalytical derivatives:  ', analyticVderivs)
+print('\t\tAnalytical values:       \n', analyticVvals)
+print('\t\tAnalytical derivatives:  \n', analyticVderivs)
 extVmodel = VolumeExtrapModel(maxOrder=checkOrderExt, refB=lVals[0], xData=xdat1, uData=wdat1)
 print(extVmodel.params)
 #Need to correct for dimensionality (1D instead of 3D)
@@ -111,13 +120,15 @@ extVmodel.params[1,0] += extVmodel.params[0,0] / lVals[0]
 extVpredict = extVmodel.predict(lCheck)
 extVparamErr = extVmodel.bootstrap(None)
 extVpredictErr = extVmodel.bootstrap(lCheck)
-print('\t\tEstimated values:        ', extVpredict)
-print('\t\tEstimated derivatives:   ', extVmodel.params)
-print('\t\tBootstrapped std values: ', extVpredictErr)
-print('\t\tBootstrapped std derivs: ', extVparamErr)
+print('\t\tEstimated values:        \n', extVpredict)
+print('\t\tEstimated derivatives:   \n', extVmodel.params)
+print('\t\tBootstrapped std values: \n', extVpredictErr)
+print('\t\tBootstrapped std derivs: \n', extVparamErr)
 
 
 ################## Testing Interpolation Routines ######################
+np.random.seed(42)
+
 print('\n\nTesting Interpolation Routines')
 analyticTvals2, analyticTderivs2 = m.extrapAnalytic(betaCheck, betaVals[1], checkOrderExt)
 analyticVvals2, analyticVderivs2 = m.extrapAnalyticVolume(lCheck, lVals[1], checkOrderExt)
@@ -135,11 +146,13 @@ intTpredict = intTmodel.predict(betaCheck)
 intTparamErr = intTmodel.bootstrap(None)
 intTpredictErr = intTmodel.bootstrap(betaCheck)
 print('\t\tWeighted extrapolation:')
-print('\t\tEstimated values:        ', intTpredict)
-print('\t\tEstimated derivatives:   ', intTmodel.params)
-print('\t\tBootstrapped std values: ', intTpredictErr)
-print('\t\tBootstrapped std derivs: ', intTparamErr)
+print('\t\tEstimated values:        \n', intTpredict)
+print('\t\tEstimated derivatives:   \n', intTmodel.params)
+print('\t\tBootstrapped std values: \n', intTpredictErr)
+print('\t\tBootstrapped std derivs: \n', intTparamErr)
 #Polynomial interpolation
+np.random.seed(42)
+
 intTmodel = InterpModel(maxOrder=checkOrderInt, refB=betaVals,
                         xData=np.array([xdat1, xdat2]),
                         uData=np.array([udat1, udat2]))
@@ -147,27 +160,34 @@ intTpredict = intTmodel.predict(betaCheck)
 intTparamErr = intTmodel.bootstrap(None)
 intTpredictErr = intTmodel.bootstrap(betaCheck)
 print('\t\tPolynomial interpolation:')
-print('\t\tEstimated values:        ', intTpredict)
-print('\t\tEstimated coefficients:  ', intTmodel.params)
-print('\t\tBootstrapped std values: ', intTpredictErr)
-print('\t\tBootstrapped std coeffs: ', intTparamErr)
+print('\t\tEstimated values:        \n', intTpredict)
+print('\t\tEstimated coefficients:  \n', intTmodel.params)
+print('\t\tBootstrapped std values: \n', intTpredictErr)
+print('\t\tBootstrapped std coeffs: \n', intTparamErr)
 #MBAR
-#Similar to perturbation, don't check parameters or their bootstrapped error
-with np.errstate(invalid='ignore'):
-  intTmodel = MBARModel(refB=betaVals,
-                        xData=np.array([xdat1, xdat2]),
-                        uData=np.array([udat1, udat2]))
-  intTpredict = intTmodel.predict(betaCheck)
-  intTpredictErr = intTmodel.bootstrap(betaCheck)
-  print('\t\tMBAR:')
-  print('\t\tEstimated values:        ', intTpredict)
-  print('\t\tBootstrapped std values: ', intTpredictErr)
+np.random.seed(42)
+
+try:
+  #Similar to perturbation, don't check parameters or their bootstrapped error
+  with np.errstate(invalid='ignore'):
+    intTmodel = MBARModel(refB=betaVals,
+                          xData=np.array([xdat1, xdat2]),
+                          uData=np.array([udat1, udat2]))
+    intTpredict = intTmodel.predict(betaCheck)
+    intTpredictErr = intTmodel.bootstrap(betaCheck)
+    print('\t\tMBAR:')
+    print('\t\tEstimated values:        \n', intTpredict)
+    print('\t\tBootstrapped std values: \n', intTpredictErr)
+except NameError:
+    print('pymbar not found, skipping MBAR testing')
 
 
 #Again, shouldn't need these anymore?
 #extW, extWderivs1, extWderivs2 = extrapWeighted(bcheck, betavals[0], betavals[1], xdat1, xdat2, udat1, udat2, checkorder, checkorder)
 #intval, intcoeffs = interpPolyMultiPoint(bcheck, betavals, np.array([xdat1, xdat2]),
 #                                         np.array([udat1, udat2]), checkorder)
+
+np.random.seed(42)
 
 print('\n\tIn volume for IG:')
 print('\t\tAnalytical values (1):       ', analyticVvals)
@@ -186,11 +206,13 @@ intVpredict = intVmodel.predict(lCheck)
 intVparamErr = intVmodel.bootstrap(None)
 intVpredictErr = intVmodel.bootstrap(lCheck)
 print('\t\tWeighted extrapolation:')
-print('\t\tEstimated values:        ', intVpredict)
-print('\t\tEstimated derivatives:   ', intVmodel.params)
-print('\t\tBootstrapped std values: ', intVpredictErr)
-print('\t\tBootstrapped std derivs: ', intVparamErr)
+print('\t\tEstimated values:        \n', intVpredict)
+print('\t\tEstimated derivatives:   \n', intVmodel.params)
+print('\t\tBootstrapped std values: \n', intVpredictErr)
+print('\t\tBootstrapped std derivs: \n', intVparamErr)
 #Polynomial interpolation
+#np.random.seed(42)
+#
 #Can't actually check for ideal gas unless modify dimensionality in calcDerivs
 #intVmodel = VolumeInterpModel(maxOrder=checkOrderInt, refB=lVals,
 #                              xData=np.array([xdat1, xdat3]),
@@ -206,10 +228,12 @@ print('\t\tBootstrapped std derivs: ', intVparamErr)
 
 
 ################## Testing Recursive Interpolation ######################
+np.random.seed(42)
+
 print('\n\nTesting Recursive Interpolation')
 intTmodel = InterpModel(maxOrder=checkOrderInt)
 compareFunc = m.avgX
-piecewiseInterp = RecursiveInterp(intTmodel, betaVals, maxOrder=checkOrderInt, errTol=0.01)
+piecewiseInterp = RecursiveInterp(intTmodel, betaVals, maxOrder=checkOrderInt, errTol=0.005)
 piecewiseInterp.recursiveTrain(betaVals[0], betaVals[1],
                                verbose=True, doPlot=True, plotCompareFunc=compareFunc)
 pVals = piecewiseInterp.checkPolynomialConsistency(doPlot=True)

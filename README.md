@@ -22,6 +22,7 @@ If specific features would be helpful just let us know and we will be happy to w
 Currently, installation is simple.
 Clone this repository and place lib_extrap.py into a directory pointed to by your system and/or python path.
 You should the be able to load in all classes and functions with `from lib_extrap import *`.
+To test installation, run test_lib_extrap.py and diff the output against test_output.txt.
 More sophisticated packaging and robust installation is in the works.
 
 # Contact
