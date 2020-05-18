@@ -20,7 +20,7 @@ If specific features would be helpful just let us know and we will be happy to w
 - pymbar (optional --- for comparisons)
 
 # Installation
-Move into the repository directory `thermoExtrap` and run
+Move into the repository directory and run
 ```
 pip install .
 ```
