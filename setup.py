@@ -8,4 +8,8 @@ setup(name='libExtrap',
                   " and interpolation",
       long_description=open('README.md').read(),
       license=open('LICENSE').read(),
+      install_requires=["numpy",
+                        "scipy",
+                        "sympy",
+                       ],
      )
