@@ -21,11 +21,15 @@ If specific features would be helpful just let us know and we will be happy to w
 
 # Installation
 Move into the repository directory `libExtrap` and run
-```pip install .```
+```
+pip install .
+```
 It is recommended that this is done in a python environment, such as one created with conda.
 The above command will also install numpy, scipy, and sympy if these packages are not detected.
 To disable automatic installation of these packages, use
-```pip install --no-deps .```
+```
+pip install --no-deps .
+```
 Note, however, that if these packages are not installed, the code will not work.
 The initial version of the code was developed and tested with numpy 1.17.2, scipy 1.3.1, and sympy 1.4.
 Earlier versions of these packages may also be compatible, but have not been tested.
