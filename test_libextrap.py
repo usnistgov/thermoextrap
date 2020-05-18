@@ -236,8 +236,8 @@ intTmodel = InterpModel(maxOrder=checkOrderInt)
 compareFunc = m.avgX
 piecewiseInterp = RecursiveInterp(intTmodel, betaVals, maxOrder=checkOrderInt, errTol=0.005)
 piecewiseInterp.recursiveTrain(betaVals[0], betaVals[1],
-                               verbose=True, doPlot=True, plotCompareFunc=compareFunc)
-pVals = piecewiseInterp.checkPolynomialConsistency(doPlot=True)
+                               verbose=True, doPlot=False, plotCompareFunc=compareFunc)
+pVals = piecewiseInterp.checkPolynomialConsistency(doPlot=False)
 
 #pinterp = InterpModel(maxOrder=2)
 #mbarinterp = MBARModel()
