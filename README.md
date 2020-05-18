@@ -16,15 +16,36 @@ If specific features would be helpful just let us know and we will be happy to w
 - numpy
 - scipy
 - sympy
+- matplotlib (optional --- for visual consistency checks)
 - pymbar (optional --- for comparisons)
 
 # Installation
-Currently, installation is simple.
-Clone this repository and place the libextrap directory into a directory pointed to by your system and/or python path.
-You should the be able to load in all classes and functions with `from libextrap import *`.
+Move into the repository directory `libExtrap` and run
+```
+pip install .
+```
+It is recommended that this is done in a python environment, such as one created with conda.
+The above command will also install numpy, scipy, and sympy if these packages are not detected.
+To disable automatic installation of these packages, use
+```
+pip install --no-deps .
+```
+Note, however, that if these packages are not installed, the code will not work.
+The initial version of the code was developed and tested with numpy 1.17.2, scipy 1.3.1, and sympy 1.4.
+Earlier versions of these packages may also be compatible, but have not been tested.
+The code may also be used without pip installation by placing the libextrap directory into a directory pointed to by your system and/or python path.
+
+The matplotlib and pymbar packages are optional.
+The main body of the code will run without these packages, with the exception of reweighting.py which requires pymbar for all of its functionality as this involves performing perturbation theory or MBAR predictions.
+Plotting is only used for visual consistency checks for polynomial interpolation in recursive_interp.py and is disabled by default.
+To install matplotlib or pymbar, you can use you favorite package manager like pip or conda.
+Directions for installing pymbar may include additional subtleties which may be found [here](https://pymbar.readthedocs.io/en/master/getting_started.html#installing-pymbar).
+
+With succesful installation, you should be able to load in all classes and functions with `from libextrap import *`.
 The exception is utilities.py, which contains low-level code that will not be necessary for most use cases.
-To test installation, run test_lib_extrap.py and diff the output against test_output.txt.
-More sophisticated packaging and robust installation is in the works.
+If you want to import specific modules rather than everything, you of course can also do that.
+To test installation, run `python test_libextrap.py` and diff the output against test_output.txt.
+If pymbar is not installed, the output will differ by a single test to check MBAR.
 
 # Contact
 Questions may be addressed to Jacob Monroe at jacob.monroe@nist.gov.
