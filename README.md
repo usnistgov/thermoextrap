@@ -16,6 +16,7 @@ If specific features would be helpful just let us know and we will be happy to w
 - numpy
 - scipy
 - sympy
+- matplotlib (optional --- for visual consistency checks)
 - pymbar (optional --- for comparisons)
 
 # Installation

@@ -5,7 +5,12 @@ This includes the recursive training algorithm and consistency checks.
 
 import numpy as np
 from scipy.stats import norm
-import matplotlib.pyplot as plt
+
+try:
+  import matplotlib.pyplot as plt
+except ImportError:
+  print('Could not find matplotlib - plotting will fail, so ensure that all' \
+        ' doPlot options are set to False, which is the default.')
 
 from libextrap.ig import IGmodel
 from libextrap.interp import InterpModel
