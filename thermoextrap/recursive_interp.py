@@ -12,8 +12,8 @@ except ImportError:
   print('Could not find matplotlib - plotting will fail, so ensure that all' \
         ' doPlot options are set to False, which is the default.')
 
-from libextrap.ig import IGmodel
-from libextrap.interp import InterpModel
+from thermoextrap.ig import IGmodel
+from thermoextrap.interp import InterpModel
 
 
 class RecursiveInterp:

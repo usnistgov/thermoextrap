@@ -10,7 +10,7 @@ try:
 except ImportError:
   print("Could not find pymbar - will not import and functions involving this will not work.")
 
-from libextrap.extrap import ExtrapModel
+from thermoextrap.extrap import ExtrapModel
 
 
 class ExtrapWeightedModel(ExtrapModel):
