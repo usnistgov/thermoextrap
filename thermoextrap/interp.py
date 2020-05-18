@@ -5,11 +5,6 @@
 import numpy as np
 from scipy.special import factorial
 
-try:
-  from pymbar import mbar
-except ImportError:
-  print("Could not find pymbar - will not import and functions involving this will not work.")
-
 from thermoextrap.extrap import ExtrapModel
 
 
