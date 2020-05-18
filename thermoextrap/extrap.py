@@ -9,7 +9,7 @@ try:
 except ImportError:
   print("Could not find pymbar - will not import and functions involving this will not work.")
 
-from libextrap.utilities import symDerivAvgX, buildAvgFuncs
+from thermoextrap.utilities import symDerivAvgX, buildAvgFuncs
 
 
 class ExtrapModel:
