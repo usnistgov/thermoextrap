@@ -20,7 +20,7 @@ If specific features would be helpful just let us know and we will be happy to w
 - pymbar (optional --- for comparisons)
 
 # Installation
-Move into the repository directory `libExtrap` and run
+Move into the repository directory `thermoExtrap` and run
 ```
 pip install .
 ```
@@ -41,10 +41,10 @@ Plotting is only used for visual consistency checks for polynomial interpolation
 To install matplotlib or pymbar, you can use you favorite package manager like pip or conda.
 Directions for installing pymbar may include additional subtleties which may be found [here](https://pymbar.readthedocs.io/en/master/getting_started.html#installing-pymbar).
 
-With succesful installation, you should be able to load in all classes and functions with `from libextrap import *`.
+With succesful installation, you should be able to load in all classes and functions with `from thermoextrap import *`.
 The exception is utilities.py, which contains low-level code that will not be necessary for most use cases.
 If you want to import specific modules rather than everything, you of course can also do that.
-To test installation, run `python test_libextrap.py` and diff the output against test_output.txt.
+To test installation, run `python test_thermoextrap.py` and diff the output against test_output.txt.
 If pymbar is not installed, the output will differ by a single test to check MBAR.
 
 # Contact
