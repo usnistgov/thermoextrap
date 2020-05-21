@@ -200,6 +200,7 @@ class MBARModel(InterpModel):
       B = [B]
     B = np.array(B)
 
+
     allU = self.U.flatten()
     predictVals = np.zeros((len(B), self.x.shape[2]))
     x = np.reshape(self.x, (self.x.shape[0]*self.x.shape[1], self.x.shape[2]))
