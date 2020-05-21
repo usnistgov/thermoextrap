@@ -308,7 +308,6 @@ def resample_indicies(size, nrep, rec="rec", rep="rep"):
     )
 
 
-
 class DatasetSelector(object):
     """
     wrap dataset so can index like ds[i, j]
@@ -478,7 +477,6 @@ class Data(_DataBase):
         return DatasetSelector(self.xu, deriv=self._deriv, moment=self._moment)
 
 
-
 class DataCentral(_DataBase):
     """
     Hold uv/xv data and produce central momemnts
@@ -491,7 +489,6 @@ class DataCentral(_DataBase):
     dxdu : DataArray
         <(x-<x>) * (u-<u>)**moment>
     """
-
 
     @gcached(prop=False)
     def _mean(self, skipna=None):
@@ -618,6 +615,204 @@ def factory_data(
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
+
+def _set_default_symbols():
+    d = {}
+    # symbols:
+    for key in ['b', 'k', 'u1', 'x1_symbol']:
+        d[key] = sp.symbols(key)
+
+    # funcs of b
+    for key in ['f', 'z']:
+        d[key] = sp.Function(key)(d['b'])
+
+    d["Q"] = d["f"] / d["z"]
+
+    for key in ['u', 'x', 'xu', 'du', 'dxdu', 'x1_indexed']:
+        d[key] = sp.IndexedBase(key)
+    return d
+
+
+_DEFAULT_SYMBOLS = _set_default_symbols()
+
+
+@lru_cache(20)
+def _get_default_symbols(*args):
+    out = [_DEFAULT_SYMBOLS[k] for k in args]
+    if len(args) == 1:
+        out = out[0]
+    return out
+
+
+
+
+
+class _SymDeriv2(object):
+    _ave_func, b = _get_default_symbols('Q','b')
+
+    @gcached(prop=False)
+    def __getitem__(self, order):
+        # recusive get derivative
+        if order == 0:
+            return self._ave_func
+        else:
+            return self[order - 1].diff(self.b, 1)
+
+
+class _Subs2(object):
+    f, z, b = _get_default_symbols('f', 'z', 'b')
+
+    def __init__(self, u=None, xu=None):
+        if u is None:
+            u = _get_default_symbols('u')
+        if xu is None:
+            xu = _get_default_symbols('xu')
+        self.u = u
+        self.xu = xu
+
+        self._init_data()
+
+    def _init_data(self):
+        self._data = [[(self.f, self.xu[0] * self.z)]]
+
+    @property
+    def order(self):
+        return len(self._data) - 1
+
+    def _add_order(self):
+        order = self.order + 1
+        new = []
+        # f derivative:
+        lhs = self.f.diff(self.b, order)
+        rhs = (-1) ** order * self.xu[order] * self.z
+        new.append((lhs, rhs))
+
+        # z deriative:
+        lhs = self.z.diff(self.b, order)
+        rhs = (-1) ** order * self.u[order] * self.z
+        new.append((lhs, rhs))
+        self._data.append(new)
+
+    #    @gcached(prop=False)
+    def __getitem__(self, order):
+        assert order >= 0
+        while order > self.order:
+            self._add_order()
+
+        # give up to order
+        # and in reversed order
+        return sum(self._data[: order + 1], [])[-1::-1]
+
+
+class _Subsxbeta2(_Subs2):
+    k = _get_default_symbols('k')
+
+    def _init_data(self):
+        self._data = [[(self.f, self.xu[0, 0] * self.z)]]
+
+    def _add_order(self):
+        order = self.order + 1
+
+        new = []
+
+        # f deriv:
+        lhs = self.f.diff(self.b, order)
+        rhs = (
+            sp.Sum(
+                (
+                    (-1) ** self.k
+                    * sp.binomial(order, self.k)
+                    * self.xu[order - self.k, self.k]
+                ),
+                (self.k, 0, order),
+            ).doit()
+            * self.z
+        )
+        new.append((lhs, rhs))
+
+        # z deriv:
+        lhs = self.z.diff(self.b, order)
+        rhs = (-1) ** order * self.u[order] * self.z
+        new.append((lhs, rhs))
+
+        self._data.append(new)
+
+
+
+class _CentralBase(object):
+
+    u1, x, k, du, dxdu = _get_default_symbols('u1','x','k','du','dxdu')
+
+
+class _Central_u_dxdu(_CentralBase):
+    """
+    u = _Central_u_dxdu()
+
+    u[i] = u({du}, {dxdu})
+    """
+
+    @gcached(prop=False)
+    def _get_ubar_of_dubar(self, n):
+        expr = (
+            sp.Sum(
+                sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
+                (self.k, 0, n),
+            )
+            .doit()
+            .subs({self.du[0]: 1, self.du[1]: 0})
+            .simplify()
+        )
+        return expr
+
+    def __getitem__(self, n):
+        return self._get_ubar_of_dubar(n)
+
+
+central_u_dxdu = _Central_u_dxdu()
+
+
+class _Central_xu_dxdu(_CentralBase):
+    """
+    xu = _Central_xu_dxdu()
+
+    xu[i] = xu({x1}, {du}, {dxdu})
+    """
+    x1 = _get_default_symbols('x1_symbol')
+
+    @gcached(prop=False)
+    def _get_xubar_of_dxdubar(self, n):
+        expr = sp.Sum(
+            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
+            (self.k, 0, n),
+        ) + self.x1 * central_u_dxdu[n]
+        return expr.doit().subs({self.dxdu[0]: 0}).expand().simplify()
+
+    def __getitem__(self, n):
+        return self._get_xubar_of_dxdubar(n)
+
+central_xu_dxdu = _Central_xu_dxdu()
+
+
+class _Central_xu_dxdu_xbeta(_CentralBase):
+
+    x1 = _get_default_symbols('x1_indexed')
+
+    @gcached(prop=False)
+    def _get_xubar_of_dxdubar(self, deriv, n):
+        expr = sp.Sum(
+            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[deriv, self.k],
+            (self.k, 0, n),
+        ) + self.x1[deriv] * central_u_dxdu[n]
+        return expr.doit().subs({self.dxdu[deriv, 0]: 0}).expand().simplify()
+
+    def __getitem__(self, idx):
+        return self._get_xubar_of_dxdubar(*idx)
+
+central_xu_dxdu_xbeta = _Central_xu_dxdu_xbeta()
+
+
+
+
 class _BaseSym(object):
     """
     Base class for symbolic computations
@@ -656,120 +851,6 @@ class _BaseIndex(object):
             return "<{}>".format(self.__class__.__name__)
 
 
-
-
-class _SymDeriv2(_BaseSym):
-    @gcached(prop=False)
-    def __getitem__(self, order):
-        # recusive get derivative
-        if order == 0:
-            return self._ave_func
-        else:
-            return self[order-1].diff(self.b, 1)
-
-
-class _Subs2(_BaseSym):
-    def __init__(self):
-        self._data = [ [(self.f, self.xu[0] * self.z)] ]
-
-    @property
-    def order(self):
-        return len(self._data) - 1
-
-    def _add_order(self):
-        order = self.order + 1
-        new = []
-        # f derivative:
-        lhs = self.f.diff(self.b, order)
-        rhs = (-1) ** order * self.xu[order] * self.z
-        new.append((lhs, rhs))
-
-        # z deriative:
-        lhs = self.z.diff(self.b, order)
-        rhs = (-1) ** order * self.u[order] * self.z
-        new.append((lhs, rhs))
-        self._data.append(new)
-
-#    @gcached(prop=False)
-    def __getitem__(self, order):
-        assert order >= 0
-        while order > self.order:
-            self._add_order()
-
-        # give up to order
-        # and in reversed order
-        return sum(self._data[:order+1], [])[-1::-1]
-
-
-class _Subsxbeta2(_Subs2):
-    k = sp.symbols('k')
-
-    def __init__(self):
-        self._data = [ [(self.f, self.xu[0, 0] * self.z)] ]
-
-    def _add_order(self):
-        order = self.order + 1
-
-        new = []
-
-        # f deriv:
-        lhs = self.f.diff(self.b, order)
-        rhs = (
-            sp.Sum(
-                (
-                    (-1) ** self.k
-                    * sp.binomial(order, self.k)
-                    * self.xu[order - self.k, self.k]
-                ),
-                (self.k, 0, order),
-            ).doit()
-            * self.z
-        )
-        new.append((lhs, rhs))
-
-        # z deriv:
-        lhs = self.z.diff(self.b, order)
-        rhs = (-1) ** order * self.u[order] * self.z
-        new.append((lhs, rhs))
-
-        self._data.append(new)
-
-
-class _Central_u_dxdu(object):
-    """
-    u = _Central_u_dxdu
-    u[i] = f(du, dxdu)
-    """
-
-
-    k = sp.symbols("k")
-    du = sp.IndexedBase("du")
-    dxdu = sp.IndexedBase("dxdu")
-    x = sp.IndexedBase("x")
-
-    u1, x1 = sp.symbols("u1, x1")
-
-    @gcached(prop=False)
-    def _get_ubar_of_dubar(self, n):
-        expr = (
-            sp.Sum(
-                sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
-                (self.k, 0, n),
-            )
-            .doit()
-            .subs({self.du[0]: 1, self.du[1]: 0})
-            .simplify()
-        )
-        return expr
-
-    def __getitem__(self, n):
-        return self._get_ubar_of_dubar(n)
-
-
-
-
-
-
 class _SymDeriv(_BaseIndex, _BaseSym):
     """
     object to handle symbolic differentiation
@@ -784,7 +865,6 @@ class _SymDeriv(_BaseIndex, _BaseSym):
         if order not in self._data:
             self._data[order] = self._get_order(order - 1).diff(self.b, 1)
         return self._data[order]
-
 
 
 class _Subs(_BaseIndex, _BaseSym):
