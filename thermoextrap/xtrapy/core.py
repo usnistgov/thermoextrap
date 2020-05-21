@@ -5,9 +5,16 @@ from functools import lru_cache
 import numpy as np
 import sympy as sp
 import xarray as xr
-
 from scipy.special import factorial as sp_factorial
+
 from .cached_decorators import gcached
+
+try:
+    from pymbar import mbar
+
+    _HAS_PYMBAR = True
+except ImportError:
+    _HAS_PYMBAR = False
 
 # NOTE: General scheme:
 # uv, xv -> samples (values) for u, x
@@ -17,9 +24,9 @@ from .cached_decorators import gcached
 # xu[i, j] = <d^i x/d beta^i * u**j>
 
 
-################################################################################
+###############################################################################
 # Structure(s) to handle data
-################################################################################
+###############################################################################
 def _check_xr(x, dims, strict=True, name=None):
     if isinstance(x, xr.Dataset):
         # don't do anything to datasets
@@ -35,13 +42,13 @@ def _check_xr(x, dims, strict=True, name=None):
             dims = dims[x.ndim]
         for d in dims:
             if d not in x.dims:
-                raise ValueError('{} not in dims'.format(d))
+                raise ValueError("{} not in dims".format(d))
     return x
 
 
-def xrwrap_uv(uv, dims=None, rec='rec', rep='rep', name='u', stict=True):
+def xrwrap_uv(uv, dims=None, rec="rec", rep="rep", name="u", stict=True):
     """
-    wrap uv array
+    wrap uv (energy values) array
 
     assumes uv[rec], or uv[rep, rec] where rec is recored (or time) and rep is replicate
     """
@@ -50,17 +57,19 @@ def xrwrap_uv(uv, dims=None, rec='rec', rep='rep', name='u', stict=True):
     return _check_xr(uv, dims, strict=stict, name=name)
 
 
-def xrwrap_xv(xv,
-              dims=None,
-              rec='rec',
-              rep='rep',
-              deriv='deriv',
-              val='val',
-              xbeta=False,
-              name='x',
-              strict=None):
+def xrwrap_xv(
+    xv,
+    dims=None,
+    rec="rec",
+    rep="rep",
+    deriv="deriv",
+    val="val",
+    xbeta=False,
+    name="x",
+    strict=None,
+):
     """
-    wraps xv array
+    wraps xv (x values) array
 
     if xbeta is False, assumes xv[rec], xv[rec, val], xv[rep, rec, val]
     if xbeta is True, assumes xv[rec, deriv], xv[rec,deriv, val], xv[rep,rec,deriv,val]
@@ -75,48 +84,45 @@ def xrwrap_xv(xv,
         if strict is None:
             strict = False
         if dims is None:
-            dims = {
-                2: [rec, deriv],
-                3: [rec, deriv, val],
-                4: [rep, rec, deriv, val]
-            }
+            dims = {2: [rec, deriv], 3: [rec, deriv, val], 4: [rep, rec, deriv, val]}
     return _check_xr(xv, dims=dims, strict=strict, name=name)
 
 
-def xrwrap_beta(beta, dims=None, stict=False, name='beta'):
+def xrwrap_beta(beta, dims=None, stict=False, name="beta"):
+    """
+    wrap beta values
+    """
     if isinstance(beta, xr.DataArray):
         pass
     else:
         beta = np.array(beta)
         if dims is None:
-            dims = 'beta'
+            dims = "beta"
 
         if beta.ndim == 0:
             beta = xr.DataArray(beta, coords={dims: beta}, name=name)
         elif beta.ndim == 1:
-            beta = xr.DataArray(beta,
-                                 dims=dims,
-                                 coords={dims: beta},
-                                 name=name)
+            beta = xr.DataArray(beta, dims=dims, coords={dims: beta}, name=name)
         else:
             beta = xr.DataArray(beta, dims=dims, name=name)
     return beta
 
 
-def build_aves(uv,
-               xv,
-               order,
-               rec='rec',
-               moment='moment',
-               val='val',
-               rep='rep',
-               deriv='deriv',
-               skipna=False,
-               u_name=None,
-               xu_name=None,
-               xbeta=False,
-               merge=False,
-               transpose=False,
+def build_aves(
+    uv,
+    xv,
+    order,
+    rec="rec",
+    moment="moment",
+    val="val",
+    rep="rep",
+    deriv="deriv",
+    skipna=False,
+    u_name=None,
+    xu_name=None,
+    xbeta=False,
+    merge=False,
+    transpose=False,
 ):
     """
     build averages from values uv, xv up to order `order`
@@ -137,20 +143,19 @@ def build_aves(uv,
 
     u_order = (moment, ...)
     if xbeta:
-        x_order = (deriv, ) + u_order
+        x_order = (deriv,) + u_order
     else:
         x_order = u_order
 
     # do averageing
 
+    # this is faster is some cases then the
+    # simplier
     u = []
     xu = []
-
     uave = uv.mean(rec, skipna=skipna)
     xave = xv.mean(rec, skipna=skipna)
-
-    for i in range(order+1):
-
+    for i in range(order + 1):
         if i == 0:
             # <u**0>
             u.append(xr.ones_like(uave))
@@ -172,7 +177,7 @@ def build_aves(uv,
     u = xr.concat(u, dim=moment)
     xu = xr.concat(xu, dim=moment)
 
-
+    # simple, but sometimes slow....
     # nvals = xr.DataArray(np.arange(order + 1), dims=[moment])
     # un = uv**nvals
     # u = (un).mean(rec, skipna=skipna)
@@ -181,7 +186,6 @@ def build_aves(uv,
     if transpose:
         u = u.trapsose(*u_order)
         xu = xu.transpose(*x_order)
-
 
     if u_name is not None:
         u = u.rename(u_name)
@@ -196,24 +200,24 @@ def build_aves(uv,
 
 
 def build_aves_central(
-        uv,
-        xv,
-        order,
-        rec='rec',
-        moment='moment',
-        val='val',
-        rep='rep',
-        deriv='deriv',
-        skipna=False,
-        du_name=None,
-        dxdu_name=None,
-        xave_name=None,
-        xbeta=False,
-        merge=False,
-        transpose=False,
+    uv,
+    xv,
+    order,
+    rec="rec",
+    moment="moment",
+    val="val",
+    rep="rep",
+    deriv="deriv",
+    skipna=False,
+    du_name=None,
+    dxdu_name=None,
+    xave_name=None,
+    xbeta=False,
+    merge=False,
+    transpose=False,
 ):
     """
-    build averages from values uv, xv up to order `order`
+    build central moments from values uv, xv up to order `order`
 
     Parameters
     ----------
@@ -231,10 +235,9 @@ def build_aves_central(
 
     u_order = (moment, ...)
     if xbeta:
-        x_order = (deriv, ) + u_order
+        x_order = (deriv,) + u_order
     else:
         x_order = u_order
-
 
     xave = xv.mean(rec, skipna=skipna)
     uave = uv.mean(rec, skipna=skipna)
@@ -242,29 +245,28 @@ def build_aves_central(
     DU = []
     DXDU = []
 
-    #i=0
-    #<du**0> = 1
-    #<dx * du**0> = 0
+    # i=0
+    # <du**0> = 1
+    # <dx * du**0> = 0
     dU = []
     dXdU = []
     du = uv - uave
 
-    for i in range(order+1):
+    for i in range(order + 1):
         if i == 0:
-            #<du ** 0> = 1
-            #<dx * du**0> = 0
+            # <du ** 0> = 1
+            # <dx * du**0> = 0
             dU.append(xr.ones_like(uave))
             dXdU.append(xr.zeros_like(xave))
 
         elif i == 1:
-            #<du**1> = 0
-            #(dx * du**1> = ...
+            # <du**1> = 0
+            # (dx * du**1> = ...
 
-            du_n =  du.copy()
+            du_n = du.copy()
             dxdu_n = (xv - xave) * du
             dU.append(xr.zeros_like(uave))
             dXdU.append(dxdu_n.mean(rec, skipna=skipna))
-
 
         else:
             du_n *= du
@@ -272,14 +274,12 @@ def build_aves_central(
             dU.append(du_n.mean(rec, skipna=skipna))
             dXdU.append(dxdu_n.mean(rec, skipna=skipna))
 
-
     dU = xr.concat(dU, dim=moment)
     dXdU = xr.concat(dXdU, dim=moment)
 
     if transpose:
         dU = dU.transpose(*u_order)
         dXdU = dXdU.transpoe(*x_order)
-
 
     if du_name is not None:
         dU = dU.rename(dU_name)
@@ -294,24 +294,29 @@ def build_aves_central(
         return xave, dU, dXdU
 
 
-def resample_indicies(size, nrep, rec='rec', rep='rep'):
+def resample_indicies(size, nrep, rec="rec", rep="rep"):
     """
     get indexing DataArray
     """
     return (
         xr.DataArray(
             [np.random.choice(size, size=size, replace=True) for _ in range(nrep)],
-            dims=[rep, rec])
-        # things are faster with 
-        .transpose('rec', ...)
+            dims=[rep, rec],
+        )
+        # things are faster with
+        .transpose("rec", ...)
     )
+
 
 
 class DatasetSelector(object):
     """
     wrap dataset so can index like ds[i, j]
+
+    Needed for calling sympy.lambdify functions
     """
-    def __init__(self, data, dims=None, deriv='deriv', moment='moment'):
+
+    def __init__(self, data, dims=None, deriv="deriv", moment="moment"):
 
         # Default dims
         if dims is None:
@@ -328,37 +333,32 @@ class DatasetSelector(object):
 
     def __getitem__(self, idx):
         if not isinstance(idx, tuple):
-            idx = (idx, )
+            idx = (idx,)
         assert len(idx) == len(self.dims)
         selector = dict(zip(self.dims, idx))
         return self.data.isel(**selector)
 
 
-
 class _DataBase(object):
-    def __init__(self,
-                 uv,
-                 xv,
-                 order,
-                 skipna=False,
-                 xbeta=False,
-                 rec='rec',
-                 moment='moment',
-                 val='val',
-                 rep='rep',
-                 deriv='deriv',
-                 chunk=None,
-                 compute=None,
-                 **kws):
+    def __init__(
+        self,
+        uv,
+        xv,
+        order,
+        skipna=False,
+        xbeta=False,
+        rec="rec",
+        moment="moment",
+        val="val",
+        rep="rep",
+        deriv="deriv",
+        chunk=None,
+        compute=None,
+        **kws
+    ):
 
         uv = xrwrap_uv(uv, rec=rec, rep=rep)
-        xv = xrwrap_xv(xv,
-                       rec=rec,
-                       rep=rep,
-                       deriv=deriv,
-                       val=val,
-                       xbeta=xbeta)
-
+        xv = xrwrap_xv(xv, rec=rec, rep=rep, deriv=deriv, val=val, xbeta=xbeta)
 
         if chunk is not None:
             if isinstance(chunk, int):
@@ -381,7 +381,6 @@ class _DataBase(object):
         self.chunk = chunk
         self.compute = compute
 
-
         self.order = order
         self.skipna = skipna
         self.xbeta = xbeta
@@ -394,14 +393,14 @@ class _DataBase(object):
         self._kws = kws
 
     def __len__(self):
-        return len(self.uv['rec'])
+        return len(self.uv["rec"])
 
-    def resample(self, nrep, idx=None, chunk=None, compute='None'):
+    def resample(self, nrep, idx=None, chunk=None, compute="None"):
 
         if chunk is None:
             chunk = self.chunk
 
-        if compute is 'None':
+        if compute is "None":
             compute = None
         elif compute is None:
             compute = self.compute
@@ -415,39 +414,46 @@ class _DataBase(object):
         # allow for Dataset
         xv = self.xv.compute().isel(**{self._rec: idx})
 
-        return self.__class__(uv=uv,
-                              xv=xv,
-                              order=self.order,
-                              rec=self._rec,
-                              rep=self._rep,
-                              val=self._val,
-                              moment=self._moment,
-                              deriv=self._deriv,
-                              xbeta=self.xbeta,
-                              skipna=self.skipna,
-                              chunk=chunk,
-                              compute=compute,
-                              **self._kws)
-
+        return self.__class__(
+            uv=uv,
+            xv=xv,
+            order=self.order,
+            rec=self._rec,
+            rep=self._rep,
+            val=self._val,
+            moment=self._moment,
+            deriv=self._deriv,
+            xbeta=self.xbeta,
+            skipna=self.skipna,
+            chunk=chunk,
+            compute=compute,
+            **self._kws
+        )
 
 
 class Data(_DataBase):
+    """
+    Class to hold uv/xv data
+    """
+
     @gcached(prop=False)
     def _mean(self, skipna=None):
         if skipna is None:
             skipna = self.skipna
 
-        return build_aves(uv=self.uv,
-                          xv=self.xv,
-                          order=self.order,
-                          skipna=skipna,
-                          xbeta=self.xbeta,
-                          rep=self._rep,
-                          rec=self._rec,
-                          val=self._val,
-                          moment=self._moment,
-                          deriv=self._deriv,
-                          **self._kws)
+        return build_aves(
+            uv=self.uv,
+            xv=self.xv,
+            order=self.order,
+            skipna=skipna,
+            xbeta=self.xbeta,
+            rep=self._rep,
+            rec=self._rec,
+            val=self._val,
+            moment=self._moment,
+            deriv=self._deriv,
+            **self._kws
+        )
 
     @gcached()
     def u(self):
@@ -474,6 +480,19 @@ class Data(_DataBase):
 
 
 class DataCentral(_DataBase):
+    """
+    Hold uv/xv data and produce central momemnts
+
+    Attributes:
+    xave : DataArray or Dataset
+        <xv>
+    du : DataArray
+        <(u-<u>)**moment>
+    dxdu : DataArray
+        <(x-<x>) * (u-<u>)**moment>
+    """
+
+
     @gcached(prop=False)
     def _mean(self, skipna=None):
         if skipna is None:
@@ -490,7 +509,8 @@ class DataCentral(_DataBase):
             val=self._val,
             moment=self._moment,
             deriv=self._deriv,
-            **self._kws)
+            **self._kws
+        )
 
     @gcached()
     def xave(self):
@@ -521,39 +541,78 @@ class DataCentral(_DataBase):
     def dxdu_selector(self):
         return DatasetSelector(self.dxdu, deriv=self._deriv, moment=self._moment)
 
-
     @gcached()
     def xave_selector(self):
         if self.xbeta:
-            return DataSelector(self.xave, dims=[self._deriv])
+            return DatasetSelector(self.xave, dims=[self._deriv])
         else:
             return self.xave
 
 
 def factory_data(
-        uv,
-        xv,
-        order,
-        central=False,
-        skipna=False,
-        xbeta=False,
-        rec='rec',
-        moment='moment',
-        val='val',
-        rep='rep',
-        deriv='deriv',
-        chunk=None,
-        compute=None,
-        **kws):
+    uv,
+    xv,
+    order,
+    central=False,
+    skipna=False,
+    xbeta=False,
+    rec="rec",
+    moment="moment",
+    val="val",
+    rep="rep",
+    deriv="deriv",
+    chunk=None,
+    compute=None,
+    **kws
+):
+    """
+    Factory function to produce a Data object
+
+    Parameters
+    ----------
+    uv : array-like
+        energy values
+    xv : array-like
+        observable values
+    order : int
+        highest moment to calculate
+    skipna : bool, default=False
+        if True, skip `np.nan` values in creating averages.
+        Can make some "big" calculations slow
+    rec, moment, val, rep, deriv : str
+        names of record (i.e. time), moment, value, replicate,
+        and derivative (with respect to alpha)
+    chunk : int or dict, optional
+        If specified, perform chunking on resulting uv, xv arrays.
+        If integer, chunk with {rec: chunk}
+        otherwise, should be a mapping of form {dim_0: chunk_0, dim_1: chunk_1, ...}
+    compute : bool, optional
+        if compute is True, do compute averages greedily.
+        if compute is False, and have done chunking, then defer calculation of averages (i.e., will be dask future objects).
+        Default is to do greedy calculation
+    kws : dict, optional
+        extra arguments
+    """
 
     if central:
         cls = DataCentral
     else:
         cls = Data
-    return cls(uv=uv, xv=xv, order=order,
-               skipna=skipna, xbeta=xbeta, rec=rec,
-               moment=moment, val=val, rep=rep, deriv=deriv,
-               chunk=chunk, compute=compute, **kws)
+    return cls(
+        uv=uv,
+        xv=xv,
+        order=order,
+        skipna=skipna,
+        xbeta=xbeta,
+        rec=rec,
+        moment=moment,
+        val=val,
+        rep=rep,
+        deriv=deriv,
+        chunk=chunk,
+        compute=compute,
+        **kws
+    )
 
 
 ################################################################################
@@ -563,41 +622,159 @@ class _BaseSym(object):
     """
     Base class for symbolic computations
     """
+
     # symbols:
-    b = sp.symbols('b')
-    f = sp.Function('f')(b)
-    z = sp.Function('z')(b)
+    b = sp.symbols("b")
+    f = sp.Function("f")(b)
+    z = sp.Function("z")(b)
     _ave_func = f / z
 
-    u = sp.IndexedBase('u')
-    xu = sp.IndexedBase('xu')
+    u = sp.IndexedBase("u")
+    xu = sp.IndexedBase("xu")
 
 
 class _BaseIndex(object):
     """
     base class for index-able stuff
     """
+
     def __init__(self):
         self._data = {}
 
     def _get_order(self, order):
-        raise NotImplementedError('to be implemented in subclass')
+        raise NotImplementedError("to be implemented in subclass")
 
     def __getitem__(self, order):
         return self._get_order(order)
 
     def __repr__(self):
         if len(self._data) > 0:
-            return '<{}, order={}>'.format(self.__class__.__name__,
-                                           max(self._data.keys()))
+            return "<{}, order={}>".format(
+                self.__class__.__name__, max(self._data.keys())
+            )
         else:
-            return '<{}>'.format(self.__class__.__name__)
+            return "<{}>".format(self.__class__.__name__)
+
+
+
+
+class _SymDeriv2(_BaseSym):
+    @gcached(prop=False)
+    def __getitem__(self, order):
+        # recusive get derivative
+        if order == 0:
+            return self._ave_func
+        else:
+            return self[order-1].diff(self.b, 1)
+
+
+class _Subs2(_BaseSym):
+    def __init__(self):
+        self._data = [ [(self.f, self.xu[0] * self.z)] ]
+
+    @property
+    def order(self):
+        return len(self._data) - 1
+
+    def _add_order(self):
+        order = self.order + 1
+        new = []
+        # f derivative:
+        lhs = self.f.diff(self.b, order)
+        rhs = (-1) ** order * self.xu[order] * self.z
+        new.append((lhs, rhs))
+
+        # z deriative:
+        lhs = self.z.diff(self.b, order)
+        rhs = (-1) ** order * self.u[order] * self.z
+        new.append((lhs, rhs))
+        self._data.append(new)
+
+#    @gcached(prop=False)
+    def __getitem__(self, order):
+        assert order >= 0
+        while order > self.order:
+            self._add_order()
+
+        # give up to order
+        # and in reversed order
+        return sum(self._data[:order+1], [])[-1::-1]
+
+
+class _Subsxbeta2(_Subs2):
+    k = sp.symbols('k')
+
+    def __init__(self):
+        self._data = [ [(self.f, self.xu[0, 0] * self.z)] ]
+
+    def _add_order(self):
+        order = self.order + 1
+
+        new = []
+
+        # f deriv:
+        lhs = self.f.diff(self.b, order)
+        rhs = (
+            sp.Sum(
+                (
+                    (-1) ** self.k
+                    * sp.binomial(order, self.k)
+                    * self.xu[order - self.k, self.k]
+                ),
+                (self.k, 0, order),
+            ).doit()
+            * self.z
+        )
+        new.append((lhs, rhs))
+
+        # z deriv:
+        lhs = self.z.diff(self.b, order)
+        rhs = (-1) ** order * self.u[order] * self.z
+        new.append((lhs, rhs))
+
+        self._data.append(new)
+
+
+class _Central_u_dxdu(object):
+    """
+    u = _Central_u_dxdu
+    u[i] = f(du, dxdu)
+    """
+
+
+    k = sp.symbols("k")
+    du = sp.IndexedBase("du")
+    dxdu = sp.IndexedBase("dxdu")
+    x = sp.IndexedBase("x")
+
+    u1, x1 = sp.symbols("u1, x1")
+
+    @gcached(prop=False)
+    def _get_ubar_of_dubar(self, n):
+        expr = (
+            sp.Sum(
+                sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
+                (self.k, 0, n),
+            )
+            .doit()
+            .subs({self.du[0]: 1, self.du[1]: 0})
+            .simplify()
+        )
+        return expr
+
+    def __getitem__(self, n):
+        return self._get_ubar_of_dubar(n)
+
+
+
+
 
 
 class _SymDeriv(_BaseIndex, _BaseSym):
     """
     object to handle symbolic differentiation
     """
+
     def __init__(self):
         super(_SymDeriv, self).__init__()
         self._data[0] = self._ave_func
@@ -609,10 +786,12 @@ class _SymDeriv(_BaseIndex, _BaseSym):
         return self._data[order]
 
 
+
 class _Subs(_BaseIndex, _BaseSym):
     """
     object to handle substitution values
     """
+
     def __init__(self):
         super(_Subs, self).__init__()
         self._data[0] = {self.f: self.xu[0] * self.z}
@@ -626,22 +805,24 @@ class _Subs(_BaseIndex, _BaseSym):
             subs = {}
             # f deriv:
             lhs = self.f.diff(self.b, order)
-            rhs = ((-1)**order * self.xu[order] * self.z)
+            rhs = (-1) ** order * self.xu[order] * self.z
             subs[lhs] = rhs
 
             # z deriv:
             lhs = self.z.diff(self.b, order)
-            rhs = ((-1)**order * self.u[order] * self.z)
+            rhs = (-1) ** order * self.u[order] * self.z
             subs[lhs] = rhs
 
             self._data[order] = subs
         return self._data[order]
 
+
 class _Subsxbeta(_BaseIndex, _BaseSym):
     """
     substitutions with x = func(beta)
     """
-    k = sp.symbols('k')
+
+    k = sp.symbols("k")
 
     def __init__(self):
         super(_Subsxbeta, self).__init__()
@@ -657,14 +838,22 @@ class _Subsxbeta(_BaseIndex, _BaseSym):
             subs = {}
             # f deriv:
             lhs = self.f.diff(self.b, order)
-            rhs = (sp.Sum(((-1)**self.k * sp.binomial(order, self.k) *
-                           self.xu[order - self.k, self.k]),
-                          (self.k, 0, order)).doit() * self.z)
+            rhs = (
+                sp.Sum(
+                    (
+                        (-1) ** self.k
+                        * sp.binomial(order, self.k)
+                        * self.xu[order - self.k, self.k]
+                    ),
+                    (self.k, 0, order),
+                ).doit()
+                * self.z
+            )
             subs[lhs] = rhs
 
             # z deriv:
             lhs = self.z.diff(self.b, order)
-            rhs = ((-1)**order * self.u[order] * self.z)
+            rhs = (-1) ** order * self.u[order] * self.z
             subs[lhs] = rhs
 
             self._data[order] = subs
@@ -673,47 +862,44 @@ class _Subsxbeta(_BaseIndex, _BaseSym):
 
 class _SubsCentralMoments(_BaseSym):
 
-    k = sp.symbols('k')
-    du = sp.IndexedBase('du')
-    dxdu = sp.IndexedBase('dxdu')
-    x = sp.IndexedBase('x')
+    k = sp.symbols("k")
+    du = sp.IndexedBase("du")
+    dxdu = sp.IndexedBase("dxdu")
+    x = sp.IndexedBase("x")
 
-    u1, x1 = sp.symbols('u1, x1')
+    u1, x1 = sp.symbols("u1, x1")
 
     def __init__(self):
         self._data = {}
 
         self._order = 0
-        self._data[self.u[0]] =  self._get_ubar_of_dubar(0)
+        self._data[self.u[0]] = self._get_ubar_of_dubar(0)
         self._data[self.xu[0]] = self._get_xubar_of_dxdubar(0)
-
 
     @gcached(prop=False)
     def _get_ubar_of_dubar(self, n):
         expr = (
             sp.Sum(
-                sp.binomial(n, self.k) * self.du[self.k] * self.u1**(n-self.k), 
-                (self.k, 0, n))
+                sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
+                (self.k, 0, n),
+            )
             .doit()
-            .subs({self.du[0] : 1, self.du[1]: 0})
+            .subs({self.du[0]: 1, self.du[1]: 0})
             .simplify()
         )
         return expr
 
     @gcached(prop=False)
     def _get_xubar_of_dxdubar(self, n):
-        expr = (
-            sp.Sum(
-                sp.binomial(n, self.k) * self.u1**(n-self.k) * self.dxdu[self.k],
-                (self.k, 0, n))
-            + self.x1 * self._get_ubar_of_dubar(n)
-        )
-        return expr.doit().subs({self.dxdu[0]:0}).expand().simplify()
-
+        expr = sp.Sum(
+            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
+            (self.k, 0, n),
+        ) + self.x1 * self._get_ubar_of_dubar(n)
+        return expr.doit().subs({self.dxdu[0]: 0}).expand().simplify()
 
     def _update(self, order):
         if order > self._order:
-            for i in range(self._order+1, order+1):
+            for i in range(self._order + 1, order + 1):
                 self._data[self.u[i]] = self._get_ubar_of_dubar(i)
                 self._data[self.xu[i]] = self._get_xubar_of_dxdubar(i)
 
@@ -722,81 +908,135 @@ class _SubsCentralMoments(_BaseSym):
         return self._data
 
 
-
 class _SubsCentralMomentsxbeta(_SubsCentralMoments):
 
-    x1 = sp.IndexedBase('x1')
+    x1 = sp.IndexedBase("x1")
 
     def __init__(self):
 
         self._data = {}
 
         self._order = 0
-        self._data[self.u[0]] =  self._get_ubar_of_dubar(0)
+        self._data[self.u[0]] = self._get_ubar_of_dubar(0)
         self._data[self.xu[0, 0]] = self._get_xubar_of_dxdubar(0, 0)
 
     @gcached(prop=False)
     def _get_xubar_of_dxdubar(self, deriv, n):
-        expr = (
-            sp.Sum(
-                sp.binomial(n, self.k) * self.u1**(n-self.k) * self.dxdu[deriv, self.k],
-                (self.k, 0, n))
-            + self.x1[deriv] * self._get_ubar_of_dubar(n)
-        )
-        return expr.doit().subs({self.dxdu[deriv, 0]:0}).expand().simplify()
+        expr = sp.Sum(
+            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[deriv, self.k],
+            (self.k, 0, n),
+        ) + self.x1[deriv] * self._get_ubar_of_dubar(n)
+        return expr.doit().subs({self.dxdu[deriv, 0]: 0}).expand().simplify()
 
     def _update(self, order):
         if order > self._order:
-            for o in range(self._order+1, order+1):
+            for o in range(self._order + 1, order + 1):
                 self._data[self.u[o]] = self._get_ubar_of_dubar(o)
-            for o in range(order+1):
-                for d in range(order+1):
+            for o in range(order + 1):
+                for d in range(order + 1):
                     key = self.xu[d, o]
                     if key not in self._data:
                         self._data[key] = self._get_xubar_of_dxdubar(d, o)
 
 
-
-class _SymDerivSubs(_BaseIndex):
+class _SymSubs(_BaseIndex):
     def __init__(self, funcs, subs, subs_final=None):
         self.funcs = funcs
         self.subs = subs
         self.subs_final = subs_final
-        super(_SymDerivSubs, self).__init__()
+        super(_SymSubs, self).__init__()
 
     def _get_order(self, order):
         if order not in self._data:
             func = self.funcs[order]
-            for o in range(order, -1, -1):
-                func = func.subs(self.subs[o])
+
+            if self.subs is not None:
+                for o in range(order, -1, -1):
+                    func = func.subs(self.subs[o])
+
             if self.subs_final is not None:
                 func = func.subs(self.subs_final[order])
+
             self._data[order] = func.simplify().expand()
         return self._data[order]
 
 
-class _Lambdify(_BaseIndex, _BaseSym):
+class _LambdifyBase(_BaseIndex):
     def __init__(self, funcs, args=None, **opts):
         self.funcs = funcs
 
-        if args is None:
-            args = (self.u, self.xu)
         self.args = args
         self.opts = opts
-        super(_Lambdify, self).__init__()
+        super(_LambdifyBase, self).__init__()
 
     def _get_order(self, order):
         if order not in self._data:
-            self._data[order] = sp.lambdify(self.args, self.funcs[order],
-                                            **self.opts)
+            self._data[order] = sp.lambdify(self.args, self.funcs[order], **self.opts)
         return self._data[order]
 
 
+class _Lambdify(_LambdifyBase, _BaseSym):
+    def __init__(self, funcs, args=None, **opts):
+        if args is None:
+            args = (self.u, self.xu)
+        super(_Lambdify, self).__init__(funcs=funcs, args=args, **opts)
 
+
+# -Log(X)
+class _SymMinusLog(_BaseIndex):
+    X = sp.IndexedBase("X")
+    dX = sp.IndexedBase("dX")
+    k = sp.symbols("k")
+
+    def __init__(self):
+        super(_SymMinusLog, self).__init__()
+        self._data[0] = -sp.log(self.X[0])
+        self._subs = {}
+        self._order = 0
+
+    def _add_order(self):
+        order = self._order + 1
+        expr = 0
+        for k in range(1, order + 1):
+            expr += (
+                sp.factorial(k - 1) * (-1 / self.X[0]) ** k * sp.bell(order, k, self.dX)
+            )
+
+        self._order = order
+        self._subs[self.dX[order - 1]] = self.X[order]
+        self._data[order] = expr.subs(self._subs).simplify()
+
+    def _get_order(self, order):
+        while order > self._order:
+            self._add_order()
+        return self._data[order]
+
+
+class _LambdifyMinusLog(_LambdifyBase):
+    def __init__(self, funcs, args=None, **opts):
+        if args is None:
+            args = funcs.X
+        super(_LambdifyMinusLog, self).__init__(funcs=funcs, args=args, **opts)
+
+
+class CoefsMinusLog(object):
+    def __init__(self):
+        self.exprs = _SymMinusLog()
+        self.funcs = _LambdifyMinusLog(self.exprs, args=(self.exprs.X,))
+
+    def coefs(self, X, order=None):
+        if order is None:
+            order = len(X) - 1
+        return [self.funcs[i](X) for i in range(order + 1)]
+
+
+@lru_cache(20)
+def factory_CoefsMinusLog():
+    return CoefsMinusLog()
 
 
 class _CoefsBase(object):
-    def __init__(self, xbeta=False, subs_final=None, args=None):
+    def __init__(self, xbeta=False, subs_final=None, args=None, minus_log=None):
 
         self.derivs = _SymDeriv()
         if xbeta:
@@ -805,14 +1045,19 @@ class _CoefsBase(object):
             self.subs = _Subs()
 
         self.subs_final = subs_final
-        self.exprs = _SymDerivSubs(self.derivs, self.subs, self.subs_final)
+        self.exprs = _SymSubs(self.derivs, self.subs, self.subs_final)
         self.funcs = _Lambdify(self.exprs, args=args)
+
+        if minus_log is True:
+            minus_log = factory_CoefsMinusLog().coefs
+        self.minus_log = minus_log
 
 
 class Coefs(_CoefsBase):
-    def __init__(self, xbeta=False):
-        super(Coefs, self).__init__(xbeta=xbeta, subs_final=None, args=None)
-
+    def __init__(self, xbeta=False, minus_log=None):
+        super(Coefs, self).__init__(
+            xbeta=xbeta, subs_final=None, args=None, minus_log=minus_log
+        )
 
     def coefs(self, u, xu, order, norm=True):
         """
@@ -820,18 +1065,23 @@ class Coefs(_CoefsBase):
         """
 
         out = [self.funcs[i](u, xu) for i in range(order + 1)]
+
+        if self.minus_log is not None:
+            out = self.minus_log(out)
+
         if norm:
             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
         return out
 
-
-    def xcoefs(self,
-               ds,
-               order=None,
-               u='u_selector',
-               xu='xu_selector',
-               order_name='order',
-               norm=True):
+    def xcoefs(
+        self,
+        ds,
+        order=None,
+        u="u_selector",
+        xu="xu_selector",
+        order_name="order",
+        norm=True,
+    ):
         if order is None:
             order = ds.order
         out = self.coefs(u=getattr(ds, u), xu=getattr(ds, xu), order=order, norm=norm)
@@ -839,7 +1089,7 @@ class Coefs(_CoefsBase):
 
 
 class CoefsCentral(_CoefsBase):
-    def __init__(self, xbeta=False):
+    def __init__(self, xbeta=False, minus_log=None):
 
         if xbeta:
             subs_final = _SubsCentralMomentsxbeta()
@@ -848,81 +1098,81 @@ class CoefsCentral(_CoefsBase):
 
         args = (subs_final.x1, subs_final.du, subs_final.dxdu)
 
-        super(CoefsCentral, self).__init__(xbeta=xbeta, subs_final=subs_final, args=args)
+        super(CoefsCentral, self).__init__(
+            xbeta=xbeta, subs_final=subs_final, args=args, minus_log=minus_log
+        )
 
     def coefs(self, xave, du, dxdu, order, norm=True):
         """
         coefficients of exapnsion up to specified order
         """
-        out = [self.funcs[i](xave, du, dxdu) for i in range(order+1)]
+        out = [self.funcs[i](xave, du, dxdu) for i in range(order + 1)]
+
+        if self.minus_log is not None:
+            out = self.minus_log(out)
+
         if norm:
             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
         return out
 
-    def xcoefs(self,
-               ds,
-               order=None,
-               du='du_selector',
-               dxdu='dxdu_selector',
-               xave='xave_selector',
-               order_name='order',
-               norm=True):
+    def xcoefs(
+        self,
+        ds,
+        order=None,
+        du="du_selector",
+        dxdu="dxdu_selector",
+        xave="xave_selector",
+        order_name="order",
+        norm=True,
+    ):
         if order is None:
             order = ds.order
-        out = self.coefs(xave=getattr(ds, xave), du=getattr(ds, du),
-                         dxdu=getattr(ds, dxdu), order=order, norm=norm)
+        out = self.coefs(
+            xave=getattr(ds, xave),
+            du=getattr(ds, du),
+            dxdu=getattr(ds, dxdu),
+            order=order,
+            norm=norm,
+        )
         return xr.concat(out, dim=order_name)
-
-
 
 
 # will usually use the same coeffs
 @lru_cache(10)
-def factory_coefs(xbeta=False, central=False):
+def factory_coefs(xbeta=False, central=False, minus_log=None):
     if not central:
-        return Coefs(xbeta=xbeta)
+        return Coefs(xbeta=xbeta, minus_log=minus_log)
     else:
-        return CoefsCentral(xbeta)
-
+        return CoefsCentral(xbeta, minus_log=minus_log)
 
 
 class ExtrapModel(object):
-    def __init__(self, order, beta0, data, coefs=None):
+    def __init__(self, order, beta0, data, coefs=None, minus_log=None):
         self.order = order
         self.beta0 = beta0
         self.data = data
 
         if coefs is None:
-            if hasattr(self.data, 'xbeta'):
-                coefs = factory_coefs(self.data.xbeta)
+            if hasattr(self.data, "xbeta"):
+                coefs = factory_coefs(xbeta=self.data.xbeta, minus_log=minus_log)
             else:
-                raise ValueError('must speficy coefs')
+                raise ValueError("must speficy coefs")
         self.coefs = coefs
 
-
     @gcached(prop=False)
-    def _default_xcoefs(self, order=None, order_name='order', norm=True):
+    def _default_xcoefs(self, order=None, order_name="order", norm=True):
         if order is None:
             order = self.order
-        return self.coefs.xcoefs(self.data,
-                                 order,
-                                 order_name=order_name,
-                                 norm=norm)
+        return self.coefs.xcoefs(self.data, order, order_name=order_name, norm=norm)
 
-    def xcoefs(self, order=None, order_name='order', norm=True):
+    def xcoefs(self, order=None, order_name="order", norm=True):
         return self._default_xcoefs(order, order_name, norm=norm)
-
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
 
     def predict(
-            self,
-            beta,
-            order=None,
-            xcoefs=None,
-            order_name='order',
-            cumsum=False,
+        self, beta, order=None, xcoefs=None, order_name="order", cumsum=False,
     ):
         if order is None:
             order = self.order
@@ -931,13 +1181,13 @@ class ExtrapModel(object):
 
         beta = xrwrap_beta(beta)
 
-        dbeta = (beta - self.beta0)
+        dbeta = beta - self.beta0
         p = xr.DataArray(np.arange(order + 1), dims=order_name)
-        prefac = dbeta**p
+        prefac = dbeta ** p
 
-        out = ((prefac *
-                xcoefs.sel(**{order_name: prefac[order_name]})).assign_coords(
-                    dbeta=dbeta, beta0=self.beta0))
+        out = (prefac * xcoefs.sel(**{order_name: prefac[order_name]})).assign_coords(
+            dbeta=dbeta, beta0=self.beta0
+        )
 
         if cumsum:
             out = out.cumsum(order_name)
@@ -950,18 +1200,24 @@ class ExtrapModel(object):
         return out
 
     def resample(self, nrep, idx=None, **kws):
-        return self.__class__(order=self.order,
-                              beta0=self.beta0,
-                              coefs=self.coefs,
-                              data=self.data.resample(nrep=nrep, idx=idx, **kws))
+        return self.__class__(
+            order=self.order,
+            beta0=self.beta0,
+            coefs=self.coefs,
+            data=self.data.resample(nrep=nrep, idx=idx, **kws),
+        )
 
     @classmethod
-    def from_values(cls, order, beta0, uv, xv, xbeta=False, central=False, **kws):
+    def from_values(
+        cls, order, beta0, uv, xv, xbeta=False, central=False, minus_log=None, **kws
+    ):
         """
         build a model from data
         """
-        data = factory_data(uv=uv, xv=xv, order=order, xbeta=xbeta, central=central, **kws)
-        coefs = factory_coefs(xbeta=xbeta, central=central)
+        data = factory_data(
+            uv=uv, xv=xv, order=order, xbeta=xbeta, central=central, **kws
+        )
+        coefs = factory_coefs(xbeta=xbeta, central=central, minus_log=minus_log)
         return cls(order=order, beta0=beta0, coefs=coefs, data=data)
 
 
@@ -983,26 +1239,25 @@ class _StateCollection(object):
             idxs = [None] * len(self)
         assert len(idxs) == len(self)
 
-        return self.__class__(states=tuple(
-            state.resample(nrep=nrep, idx=idx, **kws) for state, idx in zip(self.states, idxs)))
+        return self.__class__(
+            states=tuple(
+                state.resample(nrep=nrep, idx=idx, **kws)
+                for state, idx in zip(self.states, idxs)
+            )
+        )
 
     @gcached()
     def order(self):
         return min([m.order for m in self])
 
 
-def xr_weights_minkowski(deltas, m=20, dim='state'):
-    deltas_m = deltas**m
+def xr_weights_minkowski(deltas, m=20, dim="state"):
+    deltas_m = deltas ** m
     return 1.0 - deltas_m / deltas_m.sum(dim)
 
 
 class ExtrapWeightedModel(_StateCollection):
-    def predict(self,
-                beta,
-                order=None,
-                xcoefs=None,
-                order_name='order',
-                cumsum=False):
+    def predict(self, beta, order=None, xcoefs=None, order_name="order", cumsum=False):
 
         if order is None:
             order = self.order
@@ -1010,27 +1265,24 @@ class ExtrapWeightedModel(_StateCollection):
             xcoefs = [None] * len(self)
         assert len(xcoefs) == len(self)
 
-        out = xr.concat([
-            m.predict(beta,
-                      order=order,
-                      xcoefs=c,
-                      order_name=order_name,
-                      cumsum=cumsum) for (m, c) in zip(self.states, xcoefs)
-        ],
-                        dim='state')
+        out = xr.concat(
+            [
+                m.predict(
+                    beta, order=order, xcoefs=c, order_name=order_name, cumsum=cumsum
+                )
+                for (m, c) in zip(self.states, xcoefs)
+            ],
+            dim="state",
+        )
 
         w = xr_weights_minkowski(np.abs(out.dbeta))
-        out = (out * w).sum('state') / w.sum('state')
+        out = (out * w).sum("state") / w.sum("state")
         return out
-
-
-    # @classmethod
-    # def from_values(cls, )
 
 
 class InterpModel(_StateCollection):
     @gcached(prop=False)
-    def _default_coefs(self, order=None, order_name='porder'):
+    def _default_coefs(self, order=None, order_name="porder"):
 
         if order is None:
             order = self.order
@@ -1050,9 +1302,12 @@ class InterpModel(_StateCollection):
         for istate, m in enumerate(self.states):
             beta = m.beta0
             for j in range(order + 1):
-                with np.errstate(divide='ignore'):
-                    val = ((beta**(power - j)) * num /
-                           sp_factorial(np.arange(porder + 1) - j))
+                with np.errstate(divide="ignore"):
+                    val = (
+                        (beta ** (power - j))
+                        * num
+                        / sp_factorial(np.arange(porder + 1) - j)
+                    )
                 mat.append(val)
                 states.append(istate)
                 orders.append(j)
@@ -1061,25 +1316,25 @@ class InterpModel(_StateCollection):
         mat[np.isinf(mat)] = 0.0
 
         mat_inv = np.linalg.inv(mat)
-        mat_inv = (xr.DataArray(mat_inv, dims=[
-            order_name, 'state_order'
-        ]).assign_coords(state=('state_order', states)).assign_coords(
-            order=('state_order', orders)).set_index(
-                state_order=['state', 'order']).unstack())
+        mat_inv = (
+            xr.DataArray(mat_inv, dims=[order_name, "state_order"])
+            .assign_coords(state=("state_order", states))
+            .assign_coords(order=("state_order", orders))
+            .set_index(state_order=["state", "order"])
+            .unstack()
+        )
 
         coefs = xr.concat(
-            [m._default_xcoefs(order, norm=False) for m in self.states],
-            dim='state')
+            [m._default_xcoefs(order, norm=False) for m in self.states], dim="state"
+        )
         if isinstance(coefs, xr.Dataset):
-            coefs = xr.Dataset(
-                {k: xr.dot(mat_inv, v)
-                 for k, v in coefs.items()})
+            coefs = xr.Dataset({k: xr.dot(mat_inv, v) for k, v in coefs.items()})
         else:
             coefs = xr.dot(mat_inv, coefs)
 
         return coefs
 
-    def predict(self, beta, order=None, order_name='porder'):
+    def predict(self, beta, order=None, order_name="porder"):
 
         if order is None:
             order = self.order
@@ -1090,15 +1345,13 @@ class InterpModel(_StateCollection):
         porder = len(xcoefs[order_name]) - 1
 
         p = xr.DataArray(np.arange(porder + 1), dims=order_name)
-        prefac = beta**p
+        prefac = beta ** p
 
         out = (prefac * xcoefs).sum(order_name)
         return out
 
 
-
 class PerturbModel(object):
-
     def __init__(self, beta0, data):
 
         self.beta0 = beta0
@@ -1119,15 +1372,15 @@ class PerturbModel(object):
         dbeta_uv_diff = dbeta_uv - dbeta_uv.max(rec)
         expvals = np.exp(dbeta_uv_diff)
 
-        num = xr.dot(expvals , xv, dims='rec') / len(xv[rec])
-        den = expvals.mean('rec')
+        num = xr.dot(expvals, xv, dims="rec") / len(xv[rec])
+        den = expvals.mean("rec")
 
         return num / den
 
     def resample(self, nrep, idx=None, **kws):
         return self.__class__(
-            beta0=self.beta0,
-            data=self.data.resample(nrep=nrep, idx=idx, **kws))
+            beta0=self.beta0, data=self.data.resample(nrep=nrep, idx=idx, **kws)
+        )
 
     @classmethod
     def from_values(cls, beta0, uv, xv, **kws):
@@ -1135,48 +1388,61 @@ class PerturbModel(object):
         return cls(beta0=beta0, data=data)
 
 
+class MBARModel(_StateCollection):
+    """
+    Sadly, this doesn't work as beautifully.
+    """
 
-# class MBarModel(_ModelCollection):
+    def __init__(self, states):
+        if not _HAS_PYMBAR:
+            raise ImportError("need pymbar to use this")
+        super(MBARModel, self).__init__(states)
 
-#     @gcached(prop=False)
-#     def _default_params(self, state_name, beta_name):
+    @gcached(prop=False)
+    def _default_params(self, state_name="state", beta_name="beta"):
 
-#         xv = xr.concat([m.data.xv for m in self], dim=state_name)
-#         uv = xr.concat([m.data.uv for m in self], dim=state_name)
+        # all xvalues:
+        xv = xr.concat([m.data.xv for m in self], dim=state_name)
+        uv = xr.concat([m.data.uv for m in self], dim=state_name)
+        beta0 = xrwrap_beta([m.beta0 for m in self], name=beta_name)
 
-#         beta0 = xrwrap_beta([m.beta0 for m in self], name=beta_name)
+        # make sure uv, xv in correct order
+        rec = self[0].data._rec
+        xv = xv.transpose(state_name, rec, ...)
+        uv = uv.transpose(state_name, rec, ...)
 
-#         return uv, xv, beta0
+        # beta[beta] * uv[state, rec] = out[beta, state, rec]
+        Ukn = (beta0 * uv).values.reshape(len(self), -1)
+        N = np.ones(len(self)) * len(xv["rec"])
+        mbar_obj = mbar.MBAR(Ukn, N)
 
+        return uv, xv, beta0, mbar_obj
 
-#     def predict(self, beta):
+    def predict(self, beta):
+        beta = xrwrap_beta(beta)
+        if beta.ndim == 0:
+            beta = beta.expand_dims(beta.name)
 
-#         beta = xrwrap_beta(beta)
+        uv, xv, beta0, mbar_obj = self._default_params("state", beta.name)
 
-#         uv, xv, beta0 = self._default_params('state',
-#                                               beta.name)
+        dims = xv.dims
+        x = np.array(xv, order="c")
+        x_flat = x.reshape(x.shape[0] * x.shape[1], -1)
 
-#         rec = self[0].data._rec
+        U = uv.values.reshape(-1)
 
-#         dbeta = beta - beta0
+        out = []
+        for b in beta.values:
+            out.append(mbar_obj.computeMultipleExpectations(x_flat.T, b * U)[0])
 
-#         dbeta_uv = (-1.0) * dbeta * uv
-#         dbeta_uv_diff = dbeta_uv - dbeta_uv.max(rec)
-#         expvals = np.exp(dbeta_uv_diff)
+        out = np.array(out)
+        # reshape
+        shape = (out.shape[0],) + x.shape[2:]
+        out = xr.DataArray(
+            out.reshape(shape), dims=(beta.name,) + dims[2:]
+        ).assign_coords(beta=beta)
 
-#         num = xr.dot(expvals , xv) / len(xv[rec])
-#         den = expvals.mean('rec')
-
-#         return num / den
-
-
-
-
-
-        
-
-
-
+        return out
 
 
 # def extrap_to_poly(B0, derivs):
