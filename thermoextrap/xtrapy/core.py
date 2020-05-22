@@ -64,17 +64,17 @@ def xrwrap_xv(
     rep="rep",
     deriv="deriv",
     val="val",
-    xbeta=False,
+    xalpha=False,
     name="x",
     strict=None,
 ):
     """
     wraps xv (x values) array
 
-    if xbeta is False, assumes xv[rec], xv[rec, val], xv[rep, rec, val]
-    if xbeta is True, assumes xv[rec, deriv], xv[rec,deriv, val], xv[rep,rec,deriv,val]
+    if xalpha is False, assumes xv[rec], xv[rec, val], xv[rep, rec, val]
+    if xalpha is True, assumes xv[rec, deriv], xv[rec,deriv, val], xv[rep,rec,deriv,val]
     """
-    if not xbeta:
+    if not xalpha:
         if strict is None:
             strict = False
         if dims is None:
@@ -88,24 +88,24 @@ def xrwrap_xv(
     return _check_xr(xv, dims=dims, strict=strict, name=name)
 
 
-def xrwrap_beta(beta, dims=None, stict=False, name="beta"):
+def xrwrap_alpha(alpha, dims=None, stict=False, name="alpha"):
     """
-    wrap beta values
+    wrap alpha values
     """
-    if isinstance(beta, xr.DataArray):
+    if isinstance(alpha, xr.DataArray):
         pass
     else:
-        beta = np.array(beta)
+        alpha = np.array(alpha)
         if dims is None:
-            dims = "beta"
+            dims = "alpha"
 
-        if beta.ndim == 0:
-            beta = xr.DataArray(beta, coords={dims: beta}, name=name)
-        elif beta.ndim == 1:
-            beta = xr.DataArray(beta, dims=dims, coords={dims: beta}, name=name)
+        if alpha.ndim == 0:
+            alpha = xr.DataArray(alpha, coords={dims: alpha}, name=name)
+        elif alpha.ndim == 1:
+            alpha = xr.DataArray(alpha, dims=dims, coords={dims: alpha}, name=name)
         else:
-            beta = xr.DataArray(beta, dims=dims, name=name)
-    return beta
+            alpha = xr.DataArray(alpha, dims=dims, name=name)
+    return alpha
 
 
 def build_aves(
@@ -120,7 +120,7 @@ def build_aves(
     skipna=False,
     u_name=None,
     xu_name=None,
-    xbeta=False,
+    xalpha=False,
     merge=False,
     transpose=False,
 ):
@@ -142,7 +142,7 @@ def build_aves(
     assert isinstance(xv, (xr.DataArray, xr.Dataset))
 
     u_order = (moment, ...)
-    if xbeta:
+    if xalpha:
         x_order = (deriv,) + u_order
     else:
         x_order = u_order
@@ -212,7 +212,7 @@ def build_aves_central(
     du_name=None,
     dxdu_name=None,
     xave_name=None,
-    xbeta=False,
+    xalpha=False,
     merge=False,
     transpose=False,
 ):
@@ -234,7 +234,7 @@ def build_aves_central(
     assert isinstance(xv, (xr.DataArray, xr.Dataset))
 
     u_order = (moment, ...)
-    if xbeta:
+    if xalpha:
         x_order = (deriv,) + u_order
     else:
         x_order = u_order
@@ -345,7 +345,7 @@ class _DataBase(object):
         xv,
         order,
         skipna=False,
-        xbeta=False,
+        xalpha=False,
         rec="rec",
         moment="moment",
         val="val",
@@ -357,7 +357,7 @@ class _DataBase(object):
     ):
 
         uv = xrwrap_uv(uv, rec=rec, rep=rep)
-        xv = xrwrap_xv(xv, rec=rec, rep=rep, deriv=deriv, val=val, xbeta=xbeta)
+        xv = xrwrap_xv(xv, rec=rec, rep=rep, deriv=deriv, val=val, xalpha=xalpha)
 
         if chunk is not None:
             if isinstance(chunk, int):
@@ -382,7 +382,7 @@ class _DataBase(object):
 
         self.order = order
         self.skipna = skipna
-        self.xbeta = xbeta
+        self.xalpha = xalpha
 
         self._rec = rec
         self._rep = rep
@@ -422,7 +422,7 @@ class _DataBase(object):
             val=self._val,
             moment=self._moment,
             deriv=self._deriv,
-            xbeta=self.xbeta,
+            xalpha=self.xalpha,
             skipna=self.skipna,
             chunk=chunk,
             compute=compute,
@@ -445,7 +445,7 @@ class Data(_DataBase):
             xv=self.xv,
             order=self.order,
             skipna=skipna,
-            xbeta=self.xbeta,
+            xalpha=self.xalpha,
             rep=self._rep,
             rec=self._rec,
             val=self._val,
@@ -476,6 +476,11 @@ class Data(_DataBase):
     def xu_selector(self):
         return DatasetSelector(self.xu, deriv=self._deriv, moment=self._moment)
 
+    @property
+    def _xcoefs_args(self):
+        return (self.u_selector, self.xu_selector)
+
+
 
 class DataCentral(_DataBase):
     """
@@ -500,7 +505,7 @@ class DataCentral(_DataBase):
             xv=self.xv,
             order=self.order,
             skipna=skipna,
-            xbeta=self.xbeta,
+            xalpha=self.xalpha,
             rep=self._rep,
             rec=self._rec,
             val=self._val,
@@ -540,10 +545,15 @@ class DataCentral(_DataBase):
 
     @gcached()
     def xave_selector(self):
-        if self.xbeta:
+        if self.xalpha:
             return DatasetSelector(self.xave, dims=[self._deriv])
         else:
             return self.xave
+
+    @property
+    def _xcoefs_args(self):
+        return (self.xave_selector, self.du_selector, self.dxdu_selector)
+
 
 
 def factory_data(
@@ -552,7 +562,7 @@ def factory_data(
     order,
     central=False,
     skipna=False,
-    xbeta=False,
+    xalpha=False,
     rec="rec",
     moment="moment",
     val="val",
@@ -600,7 +610,7 @@ def factory_data(
         xv=xv,
         order=order,
         skipna=skipna,
-        xbeta=xbeta,
+        xalpha=xalpha,
         rec=rec,
         moment=moment,
         val=val,
@@ -611,66 +621,278 @@ def factory_data(
         **kws
     )
 
-
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
 
-def _set_default_symbols():
-    d = {}
-    # symbols:
-    for key in ['b', 'k', 'u1', 'x1_symbol']:
-        d[key] = sp.symbols(key)
+@lru_cache(100)
+def _get_default_symbol(*args):
+    return sp.symbols(','.join(args))
 
-    # funcs of b
-    for key in ['f', 'z']:
-        d[key] = sp.Function(key)(d['b'])
+@lru_cache(100)
+def _get_default_indexed(*args):
+    out = [sp.IndexedBase(key) for key in args]
+    if len(out) == 1:
+        out = out[0]
+    return out
 
-    d["Q"] = d["f"] / d["z"]
-
-    for key in ['u', 'x', 'xu', 'du', 'dxdu', 'x1_indexed']:
-        d[key] = sp.IndexedBase(key)
-    return d
-
-
-_DEFAULT_SYMBOLS = _set_default_symbols()
-
-
-@lru_cache(20)
-def _get_default_symbols(*args):
-    out = [_DEFAULT_SYMBOLS[k] for k in args]
-    if len(args) == 1:
+@lru_cache(100)
+def _get_default_function(*args):
+    out = [sp.Function(key) for key in args]
+    if len(out) == 1:
         out = out[0]
     return out
 
 
+###############################################################################
+# Central moment classes:
+###############################################################################
+
+
+class _Central_u_dxdu(object):
+    """
+    u = _Central_u_dxdu()
+
+    u[i] = u({du}, {dxdu})
+    """
+
+
+    def __init__(self, use_u1=False, **kwargs):
+        """
+        Parameters
+        kwargs : dict
+            optional values for u, du, u1
+
+        use_u1 : bool, default=False
+            if True, substitue u[1] = u1
+        """
+        self.k = _get_default_symbol('k')
+        for key in ['u','du']:
+            if key in kwargs:
+                val = kwargs[key]
+            else:
+                val = _get_default_indexed(key)
+            setattr(self, key, val)
+
+        if use_u1:
+            key = 'u1'
+            if key in kwargs:
+                val = kwargs[key]
+            else:
+                val = _get_default_symbol(key)
+            setattr(self, key, val)
+
+        else:
+            self.u1 = self.u[1]
+
+
+    @gcached(prop=False)
+    def _get_ubar_of_dubar(self, n):
+        expr = (
+            sp.Sum(
+                sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
+                (self.k, 0, n),
+            )
+            .doit()
+            .subs({self.du[0]: 1, self.du[1]: 0})
+            .simplify()
+        )
+        return expr
+
+    def __getitem__(self, n):
+        return self._get_ubar_of_dubar(n)
+
+
+@lru_cache(5)
+def factory_central_u_dxdu(use_u1=False, **kwargs):
+    return _Central_u_dxdu(use_u1=use_u1, **kwargs)
+
+
+class _Central_xu_dxdu(object):
+    """
+    xu = _Central_xu_dxdu()
+
+    xu[i] = xu({x1}, {du}, {dxdu})
+    """
+
+    def __init__(self, use_u1=False, use_x1=True, **kwargs):
+        """
+        Parameters
+        kwargs : dict
+            optional values for u, x, du, dxdu, u1, x1
+        """
+        self.u = factory_central_u_dxdu(use_u1=use_u1, **kwargs)
+
+        # pointer to self.u attributes
+        for attr in ['u1', 'du', 'k']:
+            setattr(self, attr, getattr(self.u, attr)) 
+
+
+        for key in ['x','dxdu']:
+            if key in kwargs:
+                val = kwargs[key]
+            else:
+                val = _get_default_indexed(key)
+            setattr(self, key, val)
+
+        if use_x1:
+            key = 'x1'
+            if key in kwargs:
+                val = kwargs[key]
+            else:
+                val = _get_default_symbol(key)
+            setattr(self, key, val)
+
+        else:
+            self.x1 = self.x[1]
+
+    @gcached(prop=False)
+    def _get_xubar_of_dxdubar(self, n):
+        expr = sp.Sum(
+            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
+            (self.k, 0, n),
+        ) + self.x1 * self.u[n]
+        return expr.doit().subs({self.dxdu[0]: 0}).expand().simplify()
+
+    def __getitem__(self, n):
+        return self._get_xubar_of_dxdubar(n)
 
 
 
-class _SymDeriv2(object):
-    _ave_func, b = _get_default_symbols('Q','b')
+class _Central_xu_dxdu_xalpha(object):
+    """
+    xu = _Central_xu_dxdu()
+
+    xu[n, i] = < d^n x / dalpha^n u**i>
+    """
+
+    def __init__(self, use_u1=False, use_x1=True, **kwargs):
+        """
+        Parameters
+        kwargs : dict
+            optional values for u, x, du, dxdu, u1, x1
+        """
+        self.u = factory_central_u_dxdu(use_u1=use_u1, **kwargs)
+
+        # pointer to self.u attributes
+        for attr in ['u1', 'du', 'k']:
+            setattr(self, attr, getattr(self.u, attr)) 
+
+
+        for key in ['x','dxdu']:
+            if key in kwargs:
+                val = kwargs[key]
+            else:
+                val = _get_default_indexed(key)
+            setattr(self, key, val)
+
+        if use_x1:
+            key = 'x1'
+            if key in kwargs:
+                val = kwargs[key]
+            else:
+                val = _get_default_indexed(key)
+
+            setattr(self, key, val)
+
+            # NOTE: because could be using x1[deriv] or x[deriv,1]
+            # use a function to wrap this behaviour.
+            self.x1_func = lambda deriv: self.x1[deriv]
+        else:
+            self.x1_func = lambda deriv: self.x[deriv, 1]
+
+    x1 = _get_default_indexed('x1')
+
+    @gcached(prop=False)
+    def _get_xubar_of_dxdubar(self, deriv, n):
+        expr = sp.Sum(
+            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[deriv, self.k],
+            (self.k, 0, n),
+        ) + self.x1_func(deriv) * self.u[n]
+        return expr.doit().subs({self.dxdu[deriv, 0]: 0}).expand().simplify()
+
+    def __getitem__(self, idx):
+        return self._get_xubar_of_dxdubar(*idx)
+
+
+
+@lru_cache(5)
+def factory_central_xu_dxdu(xalpha=False, use_u1=False, use_x1=True, **kwargs):
+    if xalpha:
+        cls = _Central_xu_dxdu_xalpha
+    else:
+        cls = _Central_xu_dxdu
+
+    return cls(use_u1=use_u1, use_x1=use_x1, **kwargs)
+
+
+
+def factory_central_u_xu(xalpha=False, use_u1=False, use_x1=True, **kwargs):
+    u = factory_central_u_dxdu(use_u1=use_u1, **kwargs)
+    xu = factory_central_xu_dxdu(xalpha=xalpha, use_u1=use_u1, use_x1=use_x1, **kwargs)
+    return u, xu
+
+
+class _SymDerivBeta(object):
+    """
+    Analytic derivative of canonical partition function wrt beta
+
+    Q = f / z
+    """
+
+    b = _get_default_symbol('b')
+    f, z = _get_default_function('f', 'z')
+    Q = f(b) / z(b)
+
+    # def __init__(self, **kwargs):
+    #     f, z = _get_default_function('f', 'z')
+    #     self.b = _get_default_symbol('b')
+    #     self.f = f(self.b)
+    #     self.z = z(self.b)
+    #     self.Q = self.f / self.z
+
 
     @gcached(prop=False)
     def __getitem__(self, order):
         # recusive get derivative
+
         if order == 0:
-            return self._ave_func
+            return self.Q
         else:
             return self[order - 1].diff(self.b, 1)
 
 
-class _Subs2(object):
-    f, z, b = _get_default_symbols('f', 'z', 'b')
+class _SubsBeta(object):
+    """
+    d = _SymDerivBeta()
+    s = _SubsBeta()
+    d[k].subs(s[k]) -> derivative in terms of u[i], xu[i]
+
+    As constructed, u, xu can be symbols or something else (to sub in values)
+    """
+
+    b = _get_default_symbol('b')
+    f, z = _get_default_function('f', 'z')
+    f = f(b)
+    z = z(b)
 
     def __init__(self, u=None, xu=None):
-        if u is None:
-            u = _get_default_symbols('u')
-        if xu is None:
-            xu = _get_default_symbols('xu')
-        self.u = u
-        self.xu = xu
+
+        f, z = _get_default_function('f', 'z')
+        self.b = _get_default_symbol('b')
+        self.f = f(self.b)
+        self.z = z(self.b)
+        for key, val in zip(['u', 'xu'], [u, xu]):
+            if val is None:
+                val = _get_default_indexed(key)
+            setattr(self, key, val)
 
         self._init_data()
+
+    @classmethod
+    def from_central_moments(cls, **kwargs):
+        u, xu = factory_central_u_xu(xalpha=False, **kwargs)
+        return cls(u=u, xu=xu)
 
     def _init_data(self):
         self._data = [[(self.f, self.xu[0] * self.z)]]
@@ -698,17 +920,23 @@ class _Subs2(object):
         assert order >= 0
         while order > self.order:
             self._add_order()
-
-        # give up to order
-        # and in reversed order
         return sum(self._data[: order + 1], [])[-1::-1]
 
 
-class _Subsxbeta2(_Subs2):
-    k = _get_default_symbols('k')
+class _SubsBeta_xalpha(_SubsBeta):
+    """
+    substitutions with beta dependencie
+    """
+
+    k = _get_default_symbol('k')
 
     def _init_data(self):
         self._data = [[(self.f, self.xu[0, 0] * self.z)]]
+
+    @classmethod
+    def from_central_moments(cls, **kwargs):
+        u, xu = factory_central_u_xu(xalpha=True, **kwargs)
+        return cls(u=u, xu=xu)
 
     def _add_order(self):
         order = self.order + 1
@@ -717,556 +945,631 @@ class _Subsxbeta2(_Subs2):
 
         # f deriv:
         lhs = self.f.diff(self.b, order)
-        rhs = (
-            sp.Sum(
-                (
-                    (-1) ** self.k
-                    * sp.binomial(order, self.k)
-                    * self.xu[order - self.k, self.k]
-                ),
-                (self.k, 0, order),
-            ).doit()
-            * self.z
-        )
+
+        # Note: sp.Sum doesn't work
+        # right with user defined u/xu
+        rhs = 0
+        for j in range(order+1):
+            rhs += (
+                (-1) ** j *
+                sp.binomial(order, j) *
+                self.xu[order-j, j]
+            )
+        rhs *= self.z
+
+        # NOTE: This doesn't work for non-sympy xu
+        # rhs = (
+        #     sp.Sum(
+        #         (
+        #             (-1) ** self.k
+        #             * sp.binomial(order, self.k)
+        #             * self.xu[order - self.k, self.k]
+        #         ),
+        #         (self.k, 0, order),
+        #     ).doit()
+        #     * self.z
+        # )
+
         new.append((lhs, rhs))
 
         # z deriv:
         lhs = self.z.diff(self.b, order)
         rhs = (-1) ** order * self.u[order] * self.z
         new.append((lhs, rhs))
-
         self._data.append(new)
 
 
-
-class _CentralBase(object):
-
-    u1, x, k, du, dxdu = _get_default_symbols('u1','x','k','du','dxdu')
-
-
-class _Central_u_dxdu(_CentralBase):
-    """
-    u = _Central_u_dxdu()
-
-    u[i] = u({du}, {dxdu})
-    """
-
-    @gcached(prop=False)
-    def _get_ubar_of_dubar(self, n):
-        expr = (
-            sp.Sum(
-                sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
-                (self.k, 0, n),
-            )
-            .doit()
-            .subs({self.du[0]: 1, self.du[1]: 0})
-            .simplify()
-        )
-        return expr
-
-    def __getitem__(self, n):
-        return self._get_ubar_of_dubar(n)
-
-
-central_u_dxdu = _Central_u_dxdu()
-
-
-class _Central_xu_dxdu(_CentralBase):
-    """
-    xu = _Central_xu_dxdu()
-
-    xu[i] = xu({x1}, {du}, {dxdu})
-    """
-    x1 = _get_default_symbols('x1_symbol')
-
-    @gcached(prop=False)
-    def _get_xubar_of_dxdubar(self, n):
-        expr = sp.Sum(
-            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
-            (self.k, 0, n),
-        ) + self.x1 * central_u_dxdu[n]
-        return expr.doit().subs({self.dxdu[0]: 0}).expand().simplify()
-
-    def __getitem__(self, n):
-        return self._get_xubar_of_dxdubar(n)
-
-central_xu_dxdu = _Central_xu_dxdu()
-
-
-class _Central_xu_dxdu_xbeta(_CentralBase):
-
-    x1 = _get_default_symbols('x1_indexed')
-
-    @gcached(prop=False)
-    def _get_xubar_of_dxdubar(self, deriv, n):
-        expr = sp.Sum(
-            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[deriv, self.k],
-            (self.k, 0, n),
-        ) + self.x1[deriv] * central_u_dxdu[n]
-        return expr.doit().subs({self.dxdu[deriv, 0]: 0}).expand().simplify()
-
-    def __getitem__(self, idx):
-        return self._get_xubar_of_dxdubar(*idx)
-
-central_xu_dxdu_xbeta = _Central_xu_dxdu_xbeta()
-
-
-
-
-class _BaseSym(object):
-    """
-    Base class for symbolic computations
-    """
-
-    # symbols:
-    b = sp.symbols("b")
-    f = sp.Function("f")(b)
-    z = sp.Function("z")(b)
-    _ave_func = f / z
-
-    u = sp.IndexedBase("u")
-    xu = sp.IndexedBase("xu")
-
-
-class _BaseIndex(object):
-    """
-    base class for index-able stuff
-    """
-
-    def __init__(self):
-        self._data = {}
-
-    def _get_order(self, order):
-        raise NotImplementedError("to be implemented in subclass")
-
-    def __getitem__(self, order):
-        return self._get_order(order)
-
-    def __repr__(self):
-        if len(self._data) > 0:
-            return "<{}, order={}>".format(
-                self.__class__.__name__, max(self._data.keys())
-            )
-        else:
-            return "<{}>".format(self.__class__.__name__)
-
-
-class _SymDeriv(_BaseIndex, _BaseSym):
-    """
-    object to handle symbolic differentiation
-    """
-
-    def __init__(self):
-        super(_SymDeriv, self).__init__()
-        self._data[0] = self._ave_func
-
-    def _get_order(self, order):
-        # recursively calculate derivative
-        if order not in self._data:
-            self._data[order] = self._get_order(order - 1).diff(self.b, 1)
-        return self._data[order]
-
-
-class _Subs(_BaseIndex, _BaseSym):
-    """
-    object to handle substitution values
-    """
-
-    def __init__(self):
-        super(_Subs, self).__init__()
-        self._data[0] = {self.f: self.xu[0] * self.z}
-
-    def _get_order(self, order):
-        # NOTE: instead of querying the derivative,
-        # here, we just build up all f, z derivatives
-        # which is equivalent.
-        assert order >= 0
-        if order not in self._data:
-            subs = {}
-            # f deriv:
-            lhs = self.f.diff(self.b, order)
-            rhs = (-1) ** order * self.xu[order] * self.z
-            subs[lhs] = rhs
-
-            # z deriv:
-            lhs = self.z.diff(self.b, order)
-            rhs = (-1) ** order * self.u[order] * self.z
-            subs[lhs] = rhs
-
-            self._data[order] = subs
-        return self._data[order]
-
-
-class _Subsxbeta(_BaseIndex, _BaseSym):
-    """
-    substitutions with x = func(beta)
-    """
-
-    k = sp.symbols("k")
-
-    def __init__(self):
-        super(_Subsxbeta, self).__init__()
-        self._data[0] = {self.f: self.xu[0, 0] * self.z}
-
-    def _get_order(self, order):
-
-        # NOTE: instead of querying the derivative,
-        # here, we just build up all f, z derivatives
-        # which is equivalent.
-        assert order >= 0
-        if order not in self._data:
-            subs = {}
-            # f deriv:
-            lhs = self.f.diff(self.b, order)
-            rhs = (
-                sp.Sum(
-                    (
-                        (-1) ** self.k
-                        * sp.binomial(order, self.k)
-                        * self.xu[order - self.k, self.k]
-                    ),
-                    (self.k, 0, order),
-                ).doit()
-                * self.z
-            )
-            subs[lhs] = rhs
-
-            # z deriv:
-            lhs = self.z.diff(self.b, order)
-            rhs = (-1) ** order * self.u[order] * self.z
-            subs[lhs] = rhs
-
-            self._data[order] = subs
-        return self._data[order]
-
-
-class _SubsCentralMoments(_BaseSym):
-
-    k = sp.symbols("k")
-    du = sp.IndexedBase("du")
-    dxdu = sp.IndexedBase("dxdu")
-    x = sp.IndexedBase("x")
-
-    u1, x1 = sp.symbols("u1, x1")
-
-    def __init__(self):
-        self._data = {}
-
-        self._order = 0
-        self._data[self.u[0]] = self._get_ubar_of_dubar(0)
-        self._data[self.xu[0]] = self._get_xubar_of_dxdubar(0)
-
-    @gcached(prop=False)
-    def _get_ubar_of_dubar(self, n):
-        expr = (
-            sp.Sum(
-                sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
-                (self.k, 0, n),
-            )
-            .doit()
-            .subs({self.du[0]: 1, self.du[1]: 0})
-            .simplify()
-        )
-        return expr
-
-    @gcached(prop=False)
-    def _get_xubar_of_dxdubar(self, n):
-        expr = sp.Sum(
-            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
-            (self.k, 0, n),
-        ) + self.x1 * self._get_ubar_of_dubar(n)
-        return expr.doit().subs({self.dxdu[0]: 0}).expand().simplify()
-
-    def _update(self, order):
-        if order > self._order:
-            for i in range(self._order + 1, order + 1):
-                self._data[self.u[i]] = self._get_ubar_of_dubar(i)
-                self._data[self.xu[i]] = self._get_xubar_of_dxdubar(i)
-
-    def __getitem__(self, order):
-        self._update(order)
-        return self._data
-
-
-class _SubsCentralMomentsxbeta(_SubsCentralMoments):
-
-    x1 = sp.IndexedBase("x1")
-
-    def __init__(self):
-
-        self._data = {}
-
-        self._order = 0
-        self._data[self.u[0]] = self._get_ubar_of_dubar(0)
-        self._data[self.xu[0, 0]] = self._get_xubar_of_dxdubar(0, 0)
-
-    @gcached(prop=False)
-    def _get_xubar_of_dxdubar(self, deriv, n):
-        expr = sp.Sum(
-            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[deriv, self.k],
-            (self.k, 0, n),
-        ) + self.x1[deriv] * self._get_ubar_of_dubar(n)
-        return expr.doit().subs({self.dxdu[deriv, 0]: 0}).expand().simplify()
-
-    def _update(self, order):
-        if order > self._order:
-            for o in range(self._order + 1, order + 1):
-                self._data[self.u[o]] = self._get_ubar_of_dubar(o)
-            for o in range(order + 1):
-                for d in range(order + 1):
-                    key = self.xu[d, o]
-                    if key not in self._data:
-                        self._data[key] = self._get_xubar_of_dxdubar(d, o)
-
-
-class _SymSubs(_BaseIndex):
-    def __init__(self, funcs, subs, subs_final=None):
+class _SymSubs(object):
+    def __init__(self, funcs, subs,
+                 subs_final=None,
+                 recursive=True,
+                 simplify=True,
+                 expand=False,
+    ):
         self.funcs = funcs
         self.subs = subs
         self.subs_final = subs_final
-        super(_SymSubs, self).__init__()
 
-    def _get_order(self, order):
-        if order not in self._data:
-            func = self.funcs[order]
+        self.recursive = recursive
+        self.simplify = simplify
+        self.expand = expand
 
-            if self.subs is not None:
+
+    @gcached(prop=False)
+    def __getitem__(self, order):
+        func = self.funcs[order]
+
+        if self.subs is not None:
+            if self.recursive:
                 for o in range(order, -1, -1):
                     func = func.subs(self.subs[o])
+            else:
+                func = func.subs(self.subs[order])
 
-            if self.subs_final is not None:
-                func = func.subs(self.subs_final[order])
+        if self.subs_final is not None:
+            func = func.subs(self.subs_final[order])
 
-            self._data[order] = func.simplify().expand()
-        return self._data[order]
+        if self.simplify:
+            func = func.simplify()
+
+        if self.expand:
+            func = func.expand()
+
+        return func
 
 
-class _LambdifyBase(_BaseIndex):
-    def __init__(self, funcs, args=None, **opts):
-        self.funcs = funcs
-
+class _Lambdify(object):
+    def __init__(self, exprs, args=None, **opts):
+        self.exprs = exprs
         self.args = args
         self.opts = opts
-        super(_LambdifyBase, self).__init__()
-
-    def _get_order(self, order):
-        if order not in self._data:
-            self._data[order] = sp.lambdify(self.args, self.funcs[order], **self.opts)
-        return self._data[order]
 
 
-class _Lambdify(_LambdifyBase, _BaseSym):
-    def __init__(self, funcs, args=None, **opts):
-        if args is None:
-            args = (self.u, self.xu)
-        super(_Lambdify, self).__init__(funcs=funcs, args=args, **opts)
+    @gcached(prop=False)
+    def __getitem__(self, order):
+        return sp.lambdify(self.args, self.exprs[order], **self.opts)
+
+    @classmethod
+    def from_u_xu(cls, exprs, **opts):
+        u, xu = _get_default_indexed('u','xu')
+        args = (u, xu)
+        return cls(exprs=exprs, args=(u, xu), **opts)
+
+    @classmethod
+    def from_du_dxdu(cls, exprs, xalpha=False, **opts):
+        if xalpha:
+            x1 = _get_default_indexed('x1')
+        else:
+            x1 = _get_default_symbol('x1')
+        du, dxdu = _get_default_indexed('du', 'dxdu')
+        return cls(exprs=exprs, args=(x1, du, dxdu), **opts)
 
 
-# -Log(X)
-class _SymMinusLog(_BaseIndex):
-    X = sp.IndexedBase("X")
-    dX = sp.IndexedBase("dX")
-    k = sp.symbols("k")
+class _SymMinusLog(object):
+    X, dX = _get_default_indexed('X', 'dX')
+    @gcached(prop=False)
+    def __getitem__(self, order):
 
-    def __init__(self):
-        super(_SymMinusLog, self).__init__()
-        self._data[0] = -sp.log(self.X[0])
-        self._subs = {}
-        self._order = 0
+        if order == 0:
+            return -sp.log(self.X[0])
 
-    def _add_order(self):
-        order = self._order + 1
         expr = 0
         for k in range(1, order + 1):
             expr += (
                 sp.factorial(k - 1) * (-1 / self.X[0]) ** k * sp.bell(order, k, self.dX)
             )
-
-        self._order = order
-        self._subs[self.dX[order - 1]] = self.X[order]
-        self._data[order] = expr.subs(self._subs).simplify()
-
-    def _get_order(self, order):
-        while order > self._order:
-            self._add_order()
-        return self._data[order]
+        # subber
+        subs = {self.dX[j] : self.X[j+1] for j in range(order+1)}
+        return expr.subs(subs).simplify()
 
 
-class _LambdifyMinusLog(_LambdifyBase):
-    def __init__(self, funcs, args=None, **opts):
-        if args is None:
-            args = funcs.X
-        super(_LambdifyMinusLog, self).__init__(funcs=funcs, args=args, **opts)
+@lru_cache(5)
+def factory_minus_log():
+    s = _SymMinusLog()
+    return _Lambdify(s, (s.X,))
 
 
-class CoefsMinusLog(object):
-    def __init__(self):
-        self.exprs = _SymMinusLog()
-        self.funcs = _LambdifyMinusLog(self.exprs, args=(self.exprs.X,))
+class Coefs(object):
+    def __init__(self, funcs):
+        self.funcs = funcs
 
-    def coefs(self, X, order=None):
-        if order is None:
-            order = len(X) - 1
-        return [self.funcs[i](X) for i in range(order + 1)]
+    def _apply_minus_log(self, X, order):
+        func = factory_minus_log()
+        return [func[i](X) for i in range(order+1)]
 
+    def coefs(self, *args, order, norm=True, minus_log=False):
+        out = [self.funcs[i](*args) for i in range(order+1)]
 
-@lru_cache(20)
-def factory_CoefsMinusLog():
-    return CoefsMinusLog()
-
-
-class _CoefsBase(object):
-    def __init__(self, xbeta=False, subs_final=None, args=None, minus_log=None):
-
-        self.derivs = _SymDeriv()
-        if xbeta:
-            self.subs = _Subsxbeta()
-        else:
-            self.subs = _Subs()
-
-        self.subs_final = subs_final
-        self.exprs = _SymSubs(self.derivs, self.subs, self.subs_final)
-        self.funcs = _Lambdify(self.exprs, args=args)
-
-        if minus_log is True:
-            minus_log = factory_CoefsMinusLog().coefs
-        self.minus_log = minus_log
-
-
-class Coefs(_CoefsBase):
-    def __init__(self, xbeta=False, minus_log=None):
-        super(Coefs, self).__init__(
-            xbeta=xbeta, subs_final=None, args=None, minus_log=minus_log
-        )
-
-    def coefs(self, u, xu, order, norm=True):
-        """
-        coefficients of exapnsion up to specified order
-        """
-
-        out = [self.funcs[i](u, xu) for i in range(order + 1)]
-
-        if self.minus_log is not None:
-            out = self.minus_log(out)
+        if minus_log:
+            out = self._apply_minus_log(X=out, order=order)
 
         if norm:
             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
         return out
 
-    def xcoefs(
-        self,
-        ds,
-        order=None,
-        u="u_selector",
-        xu="xu_selector",
-        order_name="order",
-        norm=True,
-    ):
+    def xcoefs(self, data, order=None, norm=True, minus_log=False,
+               order_name='order'):
         if order is None:
-            order = ds.order
-        out = self.coefs(u=getattr(ds, u), xu=getattr(ds, xu), order=order, norm=norm)
+            order = data.order
+        out = self.coefs(*data._xcoefs_args, order=order, norm=norm, minus_log=minus_log)
         return xr.concat(out, dim=order_name)
 
-
-class CoefsCentral(_CoefsBase):
-    def __init__(self, xbeta=False, minus_log=None):
-
-        if xbeta:
-            subs_final = _SubsCentralMomentsxbeta()
-        else:
-            subs_final = _SubsCentralMoments()
-
-        args = (subs_final.x1, subs_final.du, subs_final.dxdu)
-
-        super(CoefsCentral, self).__init__(
-            xbeta=xbeta, subs_final=subs_final, args=args, minus_log=minus_log
-        )
-
-    def coefs(self, xave, du, dxdu, order, norm=True):
-        """
-        coefficients of exapnsion up to specified order
-        """
-        out = [self.funcs[i](xave, du, dxdu) for i in range(order + 1)]
-
-        if self.minus_log is not None:
-            out = self.minus_log(out)
-
-        if norm:
-            out = [x / np.math.factorial(i) for i, x in enumerate(out)]
-        return out
-
-    def xcoefs(
-        self,
-        ds,
-        order=None,
-        du="du_selector",
-        dxdu="dxdu_selector",
-        xave="xave_selector",
-        order_name="order",
-        norm=True,
-    ):
-        if order is None:
-            order = ds.order
-        out = self.coefs(
-            xave=getattr(ds, xave),
-            du=getattr(ds, du),
-            dxdu=getattr(ds, dxdu),
-            order=order,
-            norm=norm,
-        )
-        return xr.concat(out, dim=order_name)
+    @classmethod
+    def from_sympy(cls, exprs, args):
+        funcs = _Lambdify(exprs, args=args)
+        return cls(funcs=funcs)
 
 
-# will usually use the same coeffs
-@lru_cache(10)
-def factory_coefs(xbeta=False, central=False, minus_log=None):
-    if not central:
-        return Coefs(xbeta=xbeta, minus_log=minus_log)
+
+@lru_cache(5)
+def factory_coefs_beta(xalpha=False, central=False):
+    derivs = _SymDerivBeta()
+
+    if xalpha:
+        cls = _SubsBeta_xalpha
     else:
-        return CoefsCentral(xbeta, minus_log=minus_log)
+        cls = _SubsBeta
 
+    if central:
+        subs = cls.from_central_moments()
+        args = (subs.xu.x1, subs.xu.du, subs.xu.dxdu)
+    else:
+        subs = cls()
+        args = (subs.u, subs.xu)
+
+    exprs = _SymSubs(derivs, subs, recursive=False,
+                     simplify=True, expand=False)
+
+    return Coefs.from_sympy(exprs, args=args)
+
+
+
+
+
+###############################################################################
+# old
+###############################################################################
+# class _BaseIndex(object):
+#     """
+#     base class for index-able stuff
+#     """
+
+#     def __init__(self):
+#         self._data = {}
+
+#     def _get_order(self, order):
+#         raise NotImplementedError("to be implemented in subclass")
+
+#     def __getitem__(self, order):
+#         return self._get_order(order)
+
+#     def __repr__(self):
+#         if len(self._data) > 0:
+#             return "<{}, order={}>".format(
+#                 self.__class__.__name__, max(self._data.keys())
+#             )
+#         else:
+#             return "<{}>".format(self.__class__.__name__)
+
+
+# class _BaseSym(object):
+#     """
+#     Base class for symbolic computations
+#     """
+#     # symbols:
+#     b = sp.symbols("b")
+#     f = sp.Function("f")(b)
+#     z = sp.Function("z")(b)
+#     _ave_func = f / z
+
+#     u = sp.IndexedBase("u")
+#     xu = sp.IndexedBase("xu")
+
+
+
+
+# class _SymDeriv(_BaseIndex, _BaseSym):
+#     """
+#     object to handle symbolic differentiation
+#     """
+
+#     def __init__(self):
+#         super(_SymDeriv, self).__init__()
+#         self._data[0] = self._ave_func
+
+#     def _get_order(self, order):
+#         # recursively calculate derivative
+#         if order not in self._data:
+#             self._data[order] = self._get_order(order - 1).diff(self.b, 1)
+#         return self._data[order]
+
+
+# class _Subs(_BaseIndex, _BaseSym):
+#     """
+#     object to handle substitution values
+#     """
+
+#     def __init__(self):
+#         super(_Subs, self).__init__()
+#         self._data[0] = {self.f: self.xu[0] * self.z}
+
+#     def _get_order(self, order):
+#         # NOTE: instead of querying the derivative,
+#         # here, we just build up all f, z derivatives
+#         # which is equivalent.
+#         assert order >= 0
+#         if order not in self._data:
+#             subs = {}
+#             # f deriv:
+#             lhs = self.f.diff(self.b, order)
+#             rhs = (-1) ** order * self.xu[order] * self.z
+#             subs[lhs] = rhs
+
+#             # z deriv:
+#             lhs = self.z.diff(self.b, order)
+#             rhs = (-1) ** order * self.u[order] * self.z
+#             subs[lhs] = rhs
+
+#             self._data[order] = subs
+#         return self._data[order]
+
+
+# class _Subsxbeta(_BaseIndex, _BaseSym):
+#     """
+#     substitutions with x = func(beta)
+#     """
+
+#     k = sp.symbols("k")
+
+#     def __init__(self):
+#         super(_Subsxbeta, self).__init__()
+#         self._data[0] = {self.f: self.xu[0, 0] * self.z}
+
+#     def _get_order(self, order):
+
+#         # NOTE: instead of querying the derivative,
+#         # here, we just build up all f, z derivatives
+#         # which is equivalent.
+#         assert order >= 0
+#         if order not in self._data:
+#             subs = {}
+#             # f deriv:
+#             lhs = self.f.diff(self.b, order)
+#             rhs = (
+#                 sp.Sum(
+#                     (
+#                         (-1) ** self.k
+#                         * sp.binomial(order, self.k)
+#                         * self.xu[order - self.k, self.k]
+#                     ),
+#                     (self.k, 0, order),
+#                 ).doit()
+#                 * self.z
+#             )
+#             subs[lhs] = rhs
+
+#             # z deriv:
+#             lhs = self.z.diff(self.b, order)
+#             rhs = (-1) ** order * self.u[order] * self.z
+#             subs[lhs] = rhs
+
+#             self._data[order] = subs
+#         return self._data[order]
+
+
+# class _SubsCentralMoments(_BaseSym):
+
+#     k = sp.symbols("k")
+#     du = sp.IndexedBase("du")
+#     dxdu = sp.IndexedBase("dxdu")
+#     x = sp.IndexedBase("x")
+
+#     u1, x1 = sp.symbols("u1, x1")
+
+#     def __init__(self):
+#         self._data = {}
+
+#         self._order = 0
+#         self._data[self.u[0]] = self._get_ubar_of_dubar(0)
+#         self._data[self.xu[0]] = self._get_xubar_of_dxdubar(0)
+
+#     @gcached(prop=False)
+#     def _get_ubar_of_dubar(self, n):
+#         expr = (
+#             sp.Sum(
+#                 sp.binomial(n, self.k) * self.du[self.k] * self.u1 ** (n - self.k),
+#                 (self.k, 0, n),
+#             )
+#             .doit()
+#             .subs({self.du[0]: 1, self.du[1]: 0})
+#             .simplify()
+#         )
+#         return expr
+
+#     @gcached(prop=False)
+#     def _get_xubar_of_dxdubar(self, n):
+#         expr = sp.Sum(
+#             sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
+#             (self.k, 0, n),
+#         ) + self.x1 * self._get_ubar_of_dubar(n)
+#         return expr.doit().subs({self.dxdu[0]: 0}).expand().simplify()
+
+#     def _update(self, order):
+#         if order > self._order:
+#             for i in range(self._order + 1, order + 1):
+#                 self._data[self.u[i]] = self._get_ubar_of_dubar(i)
+#                 self._data[self.xu[i]] = self._get_xubar_of_dxdubar(i)
+
+#     def __getitem__(self, order):
+#         self._update(order)
+#         return self._data
+
+
+# class _SubsCentralMomentsxbeta(_SubsCentralMoments):
+
+#     x1 = sp.IndexedBase("x1")
+
+#     def __init__(self):
+
+#         self._data = {}
+
+#         self._order = 0
+#         self._data[self.u[0]] = self._get_ubar_of_dubar(0)
+#         self._data[self.xu[0, 0]] = self._get_xubar_of_dxdubar(0, 0)
+
+#     @gcached(prop=False)
+#     def _get_xubar_of_dxdubar(self, deriv, n):
+#         expr = sp.Sum(
+#             sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[deriv, self.k],
+#             (self.k, 0, n),
+#         ) + self.x1[deriv] * self._get_ubar_of_dubar(n)
+#         return expr.doit().subs({self.dxdu[deriv, 0]: 0}).expand().simplify()
+
+#     def _update(self, order):
+#         if order > self._order:
+#             for o in range(self._order + 1, order + 1):
+#                 self._data[self.u[o]] = self._get_ubar_of_dubar(o)
+#             for o in range(order + 1):
+#                 for d in range(order + 1):
+#                     key = self.xu[d, o]
+#                     if key not in self._data:
+#                         self._data[key] = self._get_xubar_of_dxdubar(d, o)
+
+
+
+
+# class _LambdifyBase(_BaseIndex):
+#     def __init__(self, funcs, args=None, **opts):
+#         self.funcs = funcs
+
+#         self.args = args
+#         self.opts = opts
+#         super(_LambdifyBase, self).__init__()
+
+#     def _get_order(self, order):
+#         if order not in self._data:
+#             self._data[order] = sp.lambdify(self.args, self.funcs[order], **self.opts)
+#         return self._data[order]
+
+
+# class _Lambdify(_LambdifyBase, _BaseSym):
+#     def __init__(self, funcs, args=None, **opts):
+#         if args is None:
+#             args = (self.u, self.xu)
+#         super(_Lambdify, self).__init__(funcs=funcs, args=args, **opts)
+
+
+
+# # -Log(X)
+# class _SymMinusLog(_BaseIndex):
+#     X = sp.IndexedBase("X")
+#     dX = sp.IndexedBase("dX")
+#     k = sp.symbols("k")
+
+#     def __init__(self):
+#         super(_SymMinusLog, self).__init__()
+#         self._data[0] = -sp.log(self.X[0])
+#         self._subs = {}
+#         self._order = 0
+
+#     def _add_order(self):
+#         order = self._order + 1
+#         expr = 0
+#         for k in range(1, order + 1):
+#             expr += (
+#                 sp.factorial(k - 1) * (-1 / self.X[0]) ** k * sp.bell(order, k, self.dX)
+#             )
+
+#         self._order = order
+#         self._subs[self.dX[order - 1]] = self.X[order]
+#         self._data[order] = expr.subs(self._subs).simplify()
+
+#     def _get_order(self, order):
+#         while order > self._order:
+#             self._add_order()
+#         return self._data[order]
+
+
+# class _LambdifyMinusLog(_LambdifyBase):
+#     def __init__(self, funcs, args=None, **opts):
+#         if args is None:
+#             args = funcs.X
+#         super(_LambdifyMinusLog, self).__init__(funcs=funcs, args=args, **opts)
+
+
+# class CoefsMinusLog(object):
+#     def __init__(self):
+#         self.exprs = _SymMinusLog()
+#         self.funcs = _LambdifyMinusLog(self.exprs, args=(self.exprs.X,))
+
+#     def coefs(self, X, order=None):
+#         if order is None:
+#             order = len(X) - 1
+#         return [self.funcs[i](X) for i in range(order + 1)]
+
+
+# @lru_cache(20)
+# def factory_CoefsMinusLog():
+#     return CoefsMinusLog()
+
+
+# class _CoefsBase(object):
+#     def __init__(self, xbeta=False, subs_final=None, args=None, minus_log=None):
+
+#         self.derivs = _SymDeriv()
+#         if xbeta:
+#             self.subs = _Subsxbeta()
+#         else:
+#             self.subs = _Subs()
+
+#         self.subs_final = subs_final
+#         self.exprs = _SymSubs(self.derivs, self.subs, self.subs_final)
+#         self.funcs = _Lambdify(self.exprs, args=args)
+
+#         if minus_log is True:
+#             minus_log = factory_CoefsMinusLog().coefs
+#         self.minus_log = minus_log
+
+
+# class Coefs(_CoefsBase):
+#     def __init__(self, xbeta=False, minus_log=None):
+#         super(Coefs, self).__init__(
+#             xbeta=xbeta, subs_final=None, args=None, minus_log=minus_log
+#         )
+
+#     def coefs(self, u, xu, order, norm=True):
+#         """
+#         coefficients of exapnsion up to specified order
+#         """
+
+#         out = [self.funcs[i](u, xu) for i in range(order + 1)]
+
+#         if self.minus_log is not None:
+#             out = self.minus_log(out)
+
+#         if norm:
+#             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
+#         return out
+
+#     def xcoefs(
+#         self,
+#         ds,
+#         order=None,
+#         u="u_selector",
+#         xu="xu_selector",
+#         order_name="order",
+#         norm=True,
+#     ):
+#         if order is None:
+#             order = ds.order
+#         out = self.coefs(u=getattr(ds, u), xu=getattr(ds, xu), order=order, norm=norm)
+#         return xr.concat(out, dim=order_name)
+
+
+# class CoefsCentral(_CoefsBase):
+#     def __init__(self, xbeta=False, minus_log=None):
+
+#         if xbeta:
+#             subs_final = _SubsCentralMomentsxbeta()
+#         else:
+#             subs_final = _SubsCentralMoments()
+
+#         args = (subs_final.x1, subs_final.du, subs_final.dxdu)
+
+#         super(CoefsCentral, self).__init__(
+#             xbeta=xbeta, subs_final=subs_final, args=args, minus_log=minus_log
+#         )
+
+#     def coefs(self, xave, du, dxdu, order, norm=True):
+#         """
+#         coefficients of exapnsion up to specified order
+#         """
+#         out = [self.funcs[i](xave, du, dxdu) for i in range(order + 1)]
+
+#         if self.minus_log is not None:
+#             out = self.minus_log(out)
+
+#         if norm:
+#             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
+#         return out
+
+#     def xcoefs(
+#         self,
+#         ds,
+#         order=None,
+#         du="du_selector",
+#         dxdu="dxdu_selector",
+#         xave="xave_selector",
+#         order_name="order",
+#         norm=True,
+#     ):
+#         if order is None:
+#             order = ds.order
+#         out = self.coefs(
+#             xave=getattr(ds, xave),
+#             du=getattr(ds, du),
+#             dxdu=getattr(ds, dxdu),
+#             order=order,
+#             norm=norm,
+#         )
+#         return xr.concat(out, dim=order_name)
+
+
+# # will usually use the same coeffs
+# @lru_cache(10)
+# def factory_coefs(xbeta=False, central=False, minus_log=None):
+#     if not central:
+#         return Coefs(xbeta=xbeta, minus_log=minus_log)
+#     else:
+#         return CoefsCentral(xbeta, minus_log=minus_log)
 
 class ExtrapModel(object):
-    def __init__(self, order, beta0, data, coefs=None, minus_log=None):
-        self.order = order
-        self.beta0 = beta0
+    def __init__(self, alpha0, data, coefs, order=None, minus_log=False):
+        self.alpha0 = alpha0
         self.data = data
-
-        if coefs is None:
-            if hasattr(self.data, "xbeta"):
-                coefs = factory_coefs(xbeta=self.data.xbeta, minus_log=minus_log)
-            else:
-                raise ValueError("must speficy coefs")
         self.coefs = coefs
 
-    @gcached(prop=False)
-    def _default_xcoefs(self, order=None, order_name="order", norm=True):
         if order is None:
             order = self.order
-        return self.coefs.xcoefs(self.data, order, order_name=order_name, norm=norm)
+        if minus_log is None:
+            minus_log = False
 
-    def xcoefs(self, order=None, order_name="order", norm=True):
-        return self._default_xcoefs(order, order_name, norm=norm)
+        self.minus_log = minus_log
+        self.order = order
+
+
+    @gcached(prop=False)
+    def xcoefs(self, order=None, order_name="order", norm=True, minus_log=None):
+        if minus_log is None:
+            minus_log = self.minus_log
+        if order is None:
+            order = self.order
+        return self.coefs.xcoefs(self.data, order=order, order_name=order_name, norm=norm, minus_log=minus_log)
+
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
 
     def predict(
-        self, beta, order=None, xcoefs=None, order_name="order", cumsum=False,
+            self, alpha, order=None, order_name="order", cumsum=False,
+            minus_log=None
     ):
         if order is None:
             order = self.order
-        if xcoefs is None:
-            xcoefs = self._default_xcoefs(order, order_name, norm=True)
 
-        beta = xrwrap_beta(beta)
+        xcoefs = self.xcoefs(order=order, order_name=order_name, norm=True,
+                             minus_log=minus_log)
 
-        dbeta = beta - self.beta0
+        alpha = xrwrap_alpha(alpha)
+        dalpha = alpha - self.alpha0
         p = xr.DataArray(np.arange(order + 1), dims=order_name)
-        prefac = dbeta ** p
+        prefac = dalpha ** p
 
-        out = (prefac * xcoefs.sel(**{order_name: prefac[order_name]})).assign_coords(
-            dbeta=dbeta, beta0=self.beta0
+        out = (
+            (prefac * xcoefs.sel(**{order_name: prefac[order_name]}))
+            .assign_coords(
+                dalpha=dalpha, alpha0=self.alpha0
+            )
         )
 
         if cumsum:
@@ -1274,31 +1577,32 @@ class ExtrapModel(object):
         else:
             out = out.sum(order_name)
 
-        # if delta:
-        #     out = (out, dbeta)
-
         return out
 
     def resample(self, nrep, idx=None, **kws):
         return self.__class__(
             order=self.order,
-            beta0=self.beta0,
+            alpha0=self.alpha0,
             coefs=self.coefs,
             data=self.data.resample(nrep=nrep, idx=idx, **kws),
         )
 
     @classmethod
-    def from_values(
-        cls, order, beta0, uv, xv, xbeta=False, central=False, minus_log=None, **kws
+    def from_values_beta(
+            cls, order, alpha0, uv, xv, xalpha=False, central=False, minus_log=False, **kws
     ):
         """
-        build a model from data
+        build a model from beta extraploation from data
         """
+
         data = factory_data(
-            uv=uv, xv=xv, order=order, xbeta=xbeta, central=central, **kws
+            uv=uv, xv=xv, order=order, xalpha=xalpha, central=central, **kws
         )
-        coefs = factory_coefs(xbeta=xbeta, central=central, minus_log=minus_log)
-        return cls(order=order, beta0=beta0, coefs=coefs, data=data)
+
+        coefs = factory_coefs_beta(xalpha=xalpha, central=central)
+
+        return cls(order=order, alpha0=alpha0, coefs=coefs, data=data,
+                   minus_log=minus_log)
 
 
 class _StateCollection(object):
@@ -1325,7 +1629,6 @@ class _StateCollection(object):
                 for state, idx in zip(self.states, idxs)
             )
         )
-
     @gcached()
     def order(self):
         return min([m.order for m in self])
@@ -1337,32 +1640,30 @@ def xr_weights_minkowski(deltas, m=20, dim="state"):
 
 
 class ExtrapWeightedModel(_StateCollection):
-    def predict(self, beta, order=None, xcoefs=None, order_name="order", cumsum=False):
+    def predict(self, alpha, order=None, order_name="order", cumsum=False, minus_log=None):
 
         if order is None:
             order = self.order
-        if xcoefs is None:
-            xcoefs = [None] * len(self)
-        assert len(xcoefs) == len(self)
 
         out = xr.concat(
             [
                 m.predict(
-                    beta, order=order, xcoefs=c, order_name=order_name, cumsum=cumsum
+                    alpha, order=order, order_name=order_name, cumsum=cumsum,
+                    minus_log=minus_log
                 )
-                for (m, c) in zip(self.states, xcoefs)
+                for m in self.states
             ],
             dim="state",
         )
 
-        w = xr_weights_minkowski(np.abs(out.dbeta))
+        w = xr_weights_minkowski(np.abs(out.dalpha))
         out = (out * w).sum("state") / w.sum("state")
         return out
 
 
 class InterpModel(_StateCollection):
     @gcached(prop=False)
-    def _default_coefs(self, order=None, order_name="porder"):
+    def xcoefs(self, order=None, order_name="porder", minus_log=None):
 
         if order is None:
             order = self.order
@@ -1380,11 +1681,11 @@ class InterpModel(_StateCollection):
         num = sp_factorial(np.arange(porder + 1))
 
         for istate, m in enumerate(self.states):
-            beta = m.beta0
+            alpha = m.alpha0
             for j in range(order + 1):
                 with np.errstate(divide="ignore"):
                     val = (
-                        (beta ** (power - j))
+                        (alpha ** (power - j))
                         * num
                         / sp_factorial(np.arange(porder + 1) - j)
                     )
@@ -1405,7 +1706,7 @@ class InterpModel(_StateCollection):
         )
 
         coefs = xr.concat(
-            [m._default_xcoefs(order, norm=False) for m in self.states], dim="state"
+            [m.xcoefs(order, norm=False, minus_log=minus_log) for m in self.states], dim="state"
         )
         if isinstance(coefs, xr.Dataset):
             coefs = xr.Dataset({k: xr.dot(mat_inv, v) for k, v in coefs.items()})
@@ -1414,43 +1715,43 @@ class InterpModel(_StateCollection):
 
         return coefs
 
-    def predict(self, beta, order=None, order_name="porder"):
+    def predict(self, alpha, order=None, order_name="porder", minus_log=None):
 
         if order is None:
             order = self.order
 
-        xcoefs = self._default_coefs(order, order_name)
-        beta = xrwrap_beta(beta)
+        xcoefs = self.xcoefs(order=order, order_name=order_name, minus_log=minus_log)
+        alpha = xrwrap_alpha(alpha)
 
         porder = len(xcoefs[order_name]) - 1
 
         p = xr.DataArray(np.arange(porder + 1), dims=order_name)
-        prefac = beta ** p
+        prefac = alpha ** p
 
         out = (prefac * xcoefs).sum(order_name)
         return out
 
 
 class PerturbModel(object):
-    def __init__(self, beta0, data):
+    def __init__(self, alpha0, data):
 
-        self.beta0 = beta0
+        self.alpha0 = alpha0
         self.data = data
 
-    def predict(self, beta):
+    def predict(self, alpha):
 
-        beta = xrwrap_beta(beta)
+        alpha = xrwrap_alpha(alpha)
         uv = self.data.uv
         xv = self.data.xv
 
-        beta0 = self.beta0
+        alpha0 = self.alpha0
 
         rec = self.data._rec
-        dbeta = beta - beta0
+        dalpha = alpha - alpha0
 
-        dbeta_uv = (-1.0) * dbeta * uv
-        dbeta_uv_diff = dbeta_uv - dbeta_uv.max(rec)
-        expvals = np.exp(dbeta_uv_diff)
+        dalpha_uv = (-1.0) * dalpha * uv
+        dalpha_uv_diff = dalpha_uv - dalpha_uv.max(rec)
+        expvals = np.exp(dalpha_uv_diff)
 
         num = xr.dot(expvals, xv, dims="rec") / len(xv[rec])
         den = expvals.mean("rec")
@@ -1459,13 +1760,13 @@ class PerturbModel(object):
 
     def resample(self, nrep, idx=None, **kws):
         return self.__class__(
-            beta0=self.beta0, data=self.data.resample(nrep=nrep, idx=idx, **kws)
+            alpha0=self.alpha0, data=self.data.resample(nrep=nrep, idx=idx, **kws)
         )
 
     @classmethod
-    def from_values(cls, beta0, uv, xv, **kws):
+    def from_values(cls, alpha0, uv, xv, **kws):
         data = Data(uv, xv, order=0, **kws)
-        return cls(beta0=beta0, data=data)
+        return cls(alpha0=alpha0, data=data)
 
 
 class MBARModel(_StateCollection):
@@ -1479,31 +1780,31 @@ class MBARModel(_StateCollection):
         super(MBARModel, self).__init__(states)
 
     @gcached(prop=False)
-    def _default_params(self, state_name="state", beta_name="beta"):
+    def _default_params(self, state_name="state", alpha_name="alpha"):
 
         # all xvalues:
         xv = xr.concat([m.data.xv for m in self], dim=state_name)
         uv = xr.concat([m.data.uv for m in self], dim=state_name)
-        beta0 = xrwrap_beta([m.beta0 for m in self], name=beta_name)
+        alpha0 = xrwrap_alpha([m.alpha0 for m in self], name=alpha_name)
 
         # make sure uv, xv in correct order
         rec = self[0].data._rec
         xv = xv.transpose(state_name, rec, ...)
         uv = uv.transpose(state_name, rec, ...)
 
-        # beta[beta] * uv[state, rec] = out[beta, state, rec]
-        Ukn = (beta0 * uv).values.reshape(len(self), -1)
+        # alpha[alpha] * uv[state, rec] = out[alpha, state, rec]
+        Ukn = (alpha0 * uv).values.reshape(len(self), -1)
         N = np.ones(len(self)) * len(xv["rec"])
         mbar_obj = mbar.MBAR(Ukn, N)
 
-        return uv, xv, beta0, mbar_obj
+        return uv, xv, alpha0, mbar_obj
 
-    def predict(self, beta):
-        beta = xrwrap_beta(beta)
-        if beta.ndim == 0:
-            beta = beta.expand_dims(beta.name)
+    def predict(self, alpha):
+        alpha = xrwrap_alpha(alpha)
+        if alpha.ndim == 0:
+            alpha = alpha.expand_dims(alpha.name)
 
-        uv, xv, beta0, mbar_obj = self._default_params("state", beta.name)
+        uv, xv, alpha0, mbar_obj = self._default_params("state", alpha.name)
 
         dims = xv.dims
         x = np.array(xv, order="c")
@@ -1512,15 +1813,15 @@ class MBARModel(_StateCollection):
         U = uv.values.reshape(-1)
 
         out = []
-        for b in beta.values:
+        for b in alpha.values:
             out.append(mbar_obj.computeMultipleExpectations(x_flat.T, b * U)[0])
 
         out = np.array(out)
         # reshape
         shape = (out.shape[0],) + x.shape[2:]
         out = xr.DataArray(
-            out.reshape(shape), dims=(beta.name,) + dims[2:]
-        ).assign_coords(beta=beta)
+            out.reshape(shape), dims=(alpha.name,) + dims[2:]
+        ).assign_coords(alpha=alpha)
 
         return out
 
@@ -1568,7 +1869,7 @@ class MBARModel(_StateCollection):
 #     xu_mean = (un[:, :, None, :] * x[:,None, :, :]).mean(axis=0)
 #     return u_mean, xu_mean
 
-# def _build_aves_xbeta(u, x, order=None):
+# def _build_aves_xalpha(u, x, order=None):
 #     x = np.array(x)
 #     u = np.array(u)
 
@@ -1603,7 +1904,7 @@ class MBARModel(_StateCollection):
 #     xu_mean = (un[:, None, :, None, :] * x[:, :, None, :, :]).mean(axis=0)
 #     return u_mean, xu_mean
 
-# def build_aves(u, x, order, xbeta=False, squeeze_rep=True):
+# def build_aves(u, x, order, xalpha=False, squeeze_rep=True):
 #     """
 #     Build averages
 
@@ -1612,13 +1913,13 @@ class MBARModel(_StateCollection):
 #     x : array-like
 #         shape=(nrec) or (nrec, nrep)
 #     u : array-like
-#         if xbeta is False, then
+#         if xalpha is False, then
 #         shape=(nrec,nval) or (nrec, nval, nrep)
-#         if xbeta is True, then
+#         if xalpha is True, then
 #         shape=(nrec,nderiv,nval) or (nrec, nderiv, nval, nrep)
 #     """
-#     if xbeta:
-#         func = _build_aves_xbeta
+#     if xalpha:
+#         func = _build_aves_xalpha
 #     else:
 #         func = _build_aves
 
