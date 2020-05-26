@@ -11,7 +11,6 @@ from .cached_decorators import gcached
 
 try:
     from pymbar import mbar
-
     _HAS_PYMBAR = True
 except ImportError:
     _HAS_PYMBAR = False
@@ -200,21 +199,21 @@ def build_aves(
 
 
 def build_aves_central(
-    uv,
-    xv,
-    order,
-    rec="rec",
-    moment="moment",
-    val="val",
-    rep="rep",
-    deriv="deriv",
-    skipna=False,
-    du_name=None,
-    dxdu_name=None,
-    xave_name=None,
-    xalpha=False,
-    merge=False,
-    transpose=False,
+        uv,
+        xv,
+        order,
+        rec="rec",
+        moment="moment",
+        val="val",
+        rep="rep",
+        deriv="deriv",
+        skipna=False,
+        du_name=None,
+        dxdu_name=None,
+        xave_name=None,
+        xalpha=False,
+        merge=False,
+        transpose=False,
 ):
     """
     build central moments from values uv, xv up to order `order`
@@ -481,7 +480,6 @@ class Data(_DataBase):
         return (self.u_selector, self.xu_selector)
 
 
-
 class DataCentral(_DataBase):
     """
     Hold uv/xv data and produce central momemnts
@@ -555,7 +553,6 @@ class DataCentral(_DataBase):
         return (self.xave_selector, self.du_selector, self.dxdu_selector)
 
 
-
 def factory_data(
     uv,
     xv,
@@ -621,13 +618,15 @@ def factory_data(
         **kws
     )
 
+
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
 
 @lru_cache(100)
 def _get_default_symbol(*args):
-    return sp.symbols(','.join(args))
+    return sp.symbols(",".join(args))
+
 
 @lru_cache(100)
 def _get_default_indexed(*args):
@@ -635,6 +634,7 @@ def _get_default_indexed(*args):
     if len(out) == 1:
         out = out[0]
     return out
+
 
 @lru_cache(100)
 def _get_default_function(*args):
@@ -656,7 +656,6 @@ class _Central_u_dxdu(object):
     u[i] = u({du}, {dxdu})
     """
 
-
     def __init__(self, use_u1=False, **kwargs):
         """
         Parameters
@@ -666,8 +665,8 @@ class _Central_u_dxdu(object):
         use_u1 : bool, default=False
             if True, substitue u[1] = u1
         """
-        self.k = _get_default_symbol('k')
-        for key in ['u','du']:
+        self.k = _get_default_symbol("k")
+        for key in ["u", "du"]:
             if key in kwargs:
                 val = kwargs[key]
             else:
@@ -675,7 +674,7 @@ class _Central_u_dxdu(object):
             setattr(self, key, val)
 
         if use_u1:
-            key = 'u1'
+            key = "u1"
             if key in kwargs:
                 val = kwargs[key]
             else:
@@ -684,7 +683,6 @@ class _Central_u_dxdu(object):
 
         else:
             self.u1 = self.u[1]
-
 
     @gcached(prop=False)
     def _get_ubar_of_dubar(self, n):
@@ -695,7 +693,8 @@ class _Central_u_dxdu(object):
             )
             .doit()
             .subs({self.du[0]: 1, self.du[1]: 0})
-            .simplify()
+            # .simplify()
+            .expand()
         )
         return expr
 
@@ -724,11 +723,10 @@ class _Central_xu_dxdu(object):
         self.u = factory_central_u_dxdu(use_u1=use_u1, **kwargs)
 
         # pointer to self.u attributes
-        for attr in ['u1', 'du', 'k']:
-            setattr(self, attr, getattr(self.u, attr)) 
+        for attr in ["u1", "du", "k"]:
+            setattr(self, attr, getattr(self.u, attr))
 
-
-        for key in ['x','dxdu']:
+        for key in ["x", "dxdu"]:
             if key in kwargs:
                 val = kwargs[key]
             else:
@@ -736,7 +734,7 @@ class _Central_xu_dxdu(object):
             setattr(self, key, val)
 
         if use_x1:
-            key = 'x1'
+            key = "x1"
             if key in kwargs:
                 val = kwargs[key]
             else:
@@ -748,15 +746,22 @@ class _Central_xu_dxdu(object):
 
     @gcached(prop=False)
     def _get_xubar_of_dxdubar(self, n):
-        expr = sp.Sum(
-            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
-            (self.k, 0, n),
-        ) + self.x1 * self.u[n]
-        return expr.doit().subs({self.dxdu[0]: 0}).expand().simplify()
+        expr = (
+            sp.Sum(
+                sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[self.k],
+                (self.k, 0, n),
+            )
+            + self.x1 * self.u[n]
+        )
+        return (
+            expr.doit()
+            .subs({self.dxdu[0]: 0})
+            .expand()
+            # .simplify()
+        )
 
     def __getitem__(self, n):
         return self._get_xubar_of_dxdubar(n)
-
 
 
 class _Central_xu_dxdu_xalpha(object):
@@ -775,11 +780,10 @@ class _Central_xu_dxdu_xalpha(object):
         self.u = factory_central_u_dxdu(use_u1=use_u1, **kwargs)
 
         # pointer to self.u attributes
-        for attr in ['u1', 'du', 'k']:
-            setattr(self, attr, getattr(self.u, attr)) 
+        for attr in ["u1", "du", "k"]:
+            setattr(self, attr, getattr(self.u, attr))
 
-
-        for key in ['x','dxdu']:
+        for key in ["x", "dxdu"]:
             if key in kwargs:
                 val = kwargs[key]
             else:
@@ -787,7 +791,7 @@ class _Central_xu_dxdu_xalpha(object):
             setattr(self, key, val)
 
         if use_x1:
-            key = 'x1'
+            key = "x1"
             if key in kwargs:
                 val = kwargs[key]
             else:
@@ -801,19 +805,28 @@ class _Central_xu_dxdu_xalpha(object):
         else:
             self.x1_func = lambda deriv: self.x[deriv, 1]
 
-    x1 = _get_default_indexed('x1')
+    x1 = _get_default_indexed("x1")
 
     @gcached(prop=False)
     def _get_xubar_of_dxdubar(self, deriv, n):
-        expr = sp.Sum(
-            sp.binomial(n, self.k) * self.u1 ** (n - self.k) * self.dxdu[deriv, self.k],
-            (self.k, 0, n),
-        ) + self.x1_func(deriv) * self.u[n]
-        return expr.doit().subs({self.dxdu[deriv, 0]: 0}).expand().simplify()
+        expr = (
+            sp.Sum(
+                sp.binomial(n, self.k)
+                * self.u1 ** (n - self.k)
+                * self.dxdu[deriv, self.k],
+                (self.k, 0, n),
+            )
+            + self.x1_func(deriv) * self.u[n]
+        )
+        return (
+            expr.doit()
+            .subs({self.dxdu[deriv, 0]: 0})
+            .expand()
+            # .simplify()
+        )
 
     def __getitem__(self, idx):
         return self._get_xubar_of_dxdubar(*idx)
-
 
 
 @lru_cache(5)
@@ -824,7 +837,6 @@ def factory_central_xu_dxdu(xalpha=False, use_u1=False, use_x1=True, **kwargs):
         cls = _Central_xu_dxdu
 
     return cls(use_u1=use_u1, use_x1=use_x1, **kwargs)
-
 
 
 def factory_central_u_xu(xalpha=False, use_u1=False, use_x1=True, **kwargs):
@@ -840,8 +852,8 @@ class _SymDerivBeta(object):
     Q = f / z
     """
 
-    b = _get_default_symbol('b')
-    f, z = _get_default_function('f', 'z')
+    b = _get_default_symbol("b")
+    f, z = _get_default_function("f", "z")
     Q = f(b) / z(b)
 
     # def __init__(self, **kwargs):
@@ -850,7 +862,6 @@ class _SymDerivBeta(object):
     #     self.f = f(self.b)
     #     self.z = z(self.b)
     #     self.Q = self.f / self.z
-
 
     @gcached(prop=False)
     def __getitem__(self, order):
@@ -871,18 +882,18 @@ class _SubsBeta(object):
     As constructed, u, xu can be symbols or something else (to sub in values)
     """
 
-    b = _get_default_symbol('b')
-    f, z = _get_default_function('f', 'z')
+    b = _get_default_symbol("b")
+    f, z = _get_default_function("f", "z")
     f = f(b)
     z = z(b)
 
     def __init__(self, u=None, xu=None):
 
-        f, z = _get_default_function('f', 'z')
-        self.b = _get_default_symbol('b')
+        f, z = _get_default_function("f", "z")
+        self.b = _get_default_symbol("b")
         self.f = f(self.b)
         self.z = z(self.b)
-        for key, val in zip(['u', 'xu'], [u, xu]):
+        for key, val in zip(["u", "xu"], [u, xu]):
             if val is None:
                 val = _get_default_indexed(key)
             setattr(self, key, val)
@@ -928,7 +939,7 @@ class _SubsBeta_xalpha(_SubsBeta):
     substitutions with beta dependencie
     """
 
-    k = _get_default_symbol('k')
+    k = _get_default_symbol("k")
 
     def _init_data(self):
         self._data = [[(self.f, self.xu[0, 0] * self.z)]]
@@ -949,12 +960,8 @@ class _SubsBeta_xalpha(_SubsBeta):
         # Note: sp.Sum doesn't work
         # right with user defined u/xu
         rhs = 0
-        for j in range(order+1):
-            rhs += (
-                (-1) ** j *
-                sp.binomial(order, j) *
-                self.xu[order-j, j]
-            )
+        for j in range(order + 1):
+            rhs += (-1) ** j * sp.binomial(order, j) * self.xu[order - j, j]
         rhs *= self.z
 
         # NOTE: This doesn't work for non-sympy xu
@@ -978,22 +985,44 @@ class _SubsBeta_xalpha(_SubsBeta):
         new.append((lhs, rhs))
         self._data.append(new)
 
+# class SubFinal(object):
+#     """
+#     x = SubsFinal(exprs, subs)
 
-class _SymSubs(object):
-    def __init__(self, funcs, subs,
+#     x[i] = exprs[i].subs(subs)
+
+#     """
+#     def __init__(self, exprs, subs):
+#         self.exprs = exprs
+#         self.subs = subs
+
+#     @gcached(prop=False)
+#     def __getitem__(self, order):
+#         return self.exprs[order].subs(self.subs)
+
+
+class SymSubs(object):
+    def __init__(self,
+                 funcs,
+                 subs=None,
                  subs_final=None,
+                 subs_all=None,
                  recursive=True,
-                 simplify=True,
-                 expand=False,
+                 simplify=False,
+                 expand=True,
     ):
+        """
+        perform substitution on stuff
+        """
+
         self.funcs = funcs
         self.subs = subs
         self.subs_final = subs_final
+        self.subs_all = subs_all
 
         self.recursive = recursive
         self.simplify = simplify
         self.expand = expand
-
 
     @gcached(prop=False)
     def __getitem__(self, order):
@@ -1008,6 +1037,9 @@ class _SymSubs(object):
 
         if self.subs_final is not None:
             func = func.subs(self.subs_final[order])
+
+        if self.subs_all is not None:
+            func = func.subs(self.subs_all)
 
         if self.simplify:
             func = func.simplify()
@@ -1024,29 +1056,29 @@ class _Lambdify(object):
         self.args = args
         self.opts = opts
 
-
     @gcached(prop=False)
     def __getitem__(self, order):
         return sp.lambdify(self.args, self.exprs[order], **self.opts)
 
     @classmethod
     def from_u_xu(cls, exprs, **opts):
-        u, xu = _get_default_indexed('u','xu')
+        u, xu = _get_default_indexed("u", "xu")
         args = (u, xu)
         return cls(exprs=exprs, args=(u, xu), **opts)
 
     @classmethod
     def from_du_dxdu(cls, exprs, xalpha=False, **opts):
         if xalpha:
-            x1 = _get_default_indexed('x1')
+            x1 = _get_default_indexed("x1")
         else:
-            x1 = _get_default_symbol('x1')
-        du, dxdu = _get_default_indexed('du', 'dxdu')
+            x1 = _get_default_symbol("x1")
+        du, dxdu = _get_default_indexed("du", "dxdu")
         return cls(exprs=exprs, args=(x1, du, dxdu), **opts)
 
 
 class _SymMinusLog(object):
-    X, dX = _get_default_indexed('X', 'dX')
+    X, dX = _get_default_indexed("X", "dX")
+
     @gcached(prop=False)
     def __getitem__(self, order):
 
@@ -1059,8 +1091,8 @@ class _SymMinusLog(object):
                 sp.factorial(k - 1) * (-1 / self.X[0]) ** k * sp.bell(order, k, self.dX)
             )
         # subber
-        subs = {self.dX[j] : self.X[j+1] for j in range(order+1)}
-        return expr.subs(subs).simplify()
+        subs = {self.dX[j]: self.X[j + 1] for j in range(order + 1)}
+        return expr.subs(subs).expand().simplify()
 
 
 @lru_cache(5)
@@ -1070,15 +1102,16 @@ def factory_minus_log():
 
 
 class Coefs(object):
-    def __init__(self, funcs):
+    def __init__(self, funcs, exprs=None):
         self.funcs = funcs
+        self.exprs = exprs
 
     def _apply_minus_log(self, X, order):
         func = factory_minus_log()
-        return [func[i](X) for i in range(order+1)]
+        return [func[i](X) for i in range(order + 1)]
 
     def coefs(self, *args, order, norm=True, minus_log=False):
-        out = [self.funcs[i](*args) for i in range(order+1)]
+        out = [self.funcs[i](*args) for i in range(order + 1)]
 
         if minus_log:
             out = self._apply_minus_log(X=out, order=order)
@@ -1087,18 +1120,18 @@ class Coefs(object):
             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
         return out
 
-    def xcoefs(self, data, order=None, norm=True, minus_log=False,
-               order_name='order'):
+    def xcoefs(self, data, order=None, norm=True, minus_log=False, order_name="order"):
         if order is None:
             order = data.order
-        out = self.coefs(*data._xcoefs_args, order=order, norm=norm, minus_log=minus_log)
+        out = self.coefs(
+            *data._xcoefs_args, order=order, norm=norm, minus_log=minus_log
+        )
         return xr.concat(out, dim=order_name)
 
     @classmethod
     def from_sympy(cls, exprs, args):
         funcs = _Lambdify(exprs, args=args)
-        return cls(funcs=funcs)
-
+        return cls(funcs=funcs, exprs=exprs)
 
 
 @lru_cache(5)
@@ -1117,13 +1150,9 @@ def factory_coefs_beta(xalpha=False, central=False):
         subs = cls()
         args = (subs.u, subs.xu)
 
-    exprs = _SymSubs(derivs, subs, recursive=False,
-                     simplify=True, expand=False)
+    exprs = SymSubs(derivs, subs, recursive=False, simplify=False, expand=True)
 
     return Coefs.from_sympy(exprs, args=args)
-
-
-
 
 
 ###############################################################################
@@ -1132,7 +1161,7 @@ def factory_coefs_beta(xalpha=False, central=False):
 # class _BaseIndex(object):
 #     """
 #     base class for index-able stuff
-#     """
+     """
 
 #     def __init__(self):
 #         self._data = {}
@@ -1164,8 +1193,6 @@ def factory_coefs_beta(xalpha=False, central=False):
 
 #     u = sp.IndexedBase("u")
 #     xu = sp.IndexedBase("xu")
-
-
 
 
 # class _SymDeriv(_BaseIndex, _BaseSym):
@@ -1336,8 +1363,6 @@ def factory_coefs_beta(xalpha=False, central=False):
 #                         self._data[key] = self._get_xubar_of_dxdubar(d, o)
 
 
-
-
 # class _LambdifyBase(_BaseIndex):
 #     def __init__(self, funcs, args=None, **opts):
 #         self.funcs = funcs
@@ -1357,7 +1382,6 @@ def factory_coefs_beta(xalpha=False, central=False):
 #         if args is None:
 #             args = (self.u, self.xu)
 #         super(_Lambdify, self).__init__(funcs=funcs, args=args, **opts)
-
 
 
 # # -Log(X)
@@ -1523,6 +1547,7 @@ def factory_coefs_beta(xalpha=False, central=False):
 #     else:
 #         return CoefsCentral(xbeta, minus_log=minus_log)
 
+
 class ExtrapModel(object):
     def __init__(self, alpha0, data, coefs, order=None, minus_log=False):
         self.alpha0 = alpha0
@@ -1537,39 +1562,40 @@ class ExtrapModel(object):
         self.minus_log = minus_log
         self.order = order
 
-
     @gcached(prop=False)
     def xcoefs(self, order=None, order_name="order", norm=True, minus_log=None):
         if minus_log is None:
             minus_log = self.minus_log
         if order is None:
             order = self.order
-        return self.coefs.xcoefs(self.data, order=order, order_name=order_name, norm=norm, minus_log=minus_log)
-
+        return self.coefs.xcoefs(
+            self.data,
+            order=order,
+            order_name=order_name,
+            norm=norm,
+            minus_log=minus_log,
+        )
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
 
     def predict(
-            self, alpha, order=None, order_name="order", cumsum=False,
-            minus_log=None
+        self, alpha, order=None, order_name="order", cumsum=False, minus_log=None
     ):
         if order is None:
             order = self.order
 
-        xcoefs = self.xcoefs(order=order, order_name=order_name, norm=True,
-                             minus_log=minus_log)
+        xcoefs = self.xcoefs(
+            order=order, order_name=order_name, norm=True, minus_log=minus_log
+        )
 
         alpha = xrwrap_alpha(alpha)
         dalpha = alpha - self.alpha0
         p = xr.DataArray(np.arange(order + 1), dims=order_name)
         prefac = dalpha ** p
 
-        out = (
-            (prefac * xcoefs.sel(**{order_name: prefac[order_name]}))
-            .assign_coords(
-                dalpha=dalpha, alpha0=self.alpha0
-            )
+        out = (prefac * xcoefs.sel(**{order_name: prefac[order_name]})).assign_coords(
+            dalpha=dalpha, alpha0=self.alpha0
         )
 
         if cumsum:
@@ -1589,7 +1615,7 @@ class ExtrapModel(object):
 
     @classmethod
     def from_values_beta(
-            cls, order, alpha0, uv, xv, xalpha=False, central=False, minus_log=False, **kws
+        cls, order, alpha0, uv, xv, xalpha=False, central=False, minus_log=False, **kws
     ):
         """
         build a model from beta extraploation from data
@@ -1601,8 +1627,9 @@ class ExtrapModel(object):
 
         coefs = factory_coefs_beta(xalpha=xalpha, central=central)
 
-        return cls(order=order, alpha0=alpha0, coefs=coefs, data=data,
-                   minus_log=minus_log)
+        return cls(
+            order=order, alpha0=alpha0, coefs=coefs, data=data, minus_log=minus_log
+        )
 
 
 class _StateCollection(object):
@@ -1629,6 +1656,7 @@ class _StateCollection(object):
                 for state, idx in zip(self.states, idxs)
             )
         )
+
     @gcached()
     def order(self):
         return min([m.order for m in self])
@@ -1640,7 +1668,9 @@ def xr_weights_minkowski(deltas, m=20, dim="state"):
 
 
 class ExtrapWeightedModel(_StateCollection):
-    def predict(self, alpha, order=None, order_name="order", cumsum=False, minus_log=None):
+    def predict(
+        self, alpha, order=None, order_name="order", cumsum=False, minus_log=None
+    ):
 
         if order is None:
             order = self.order
@@ -1648,8 +1678,11 @@ class ExtrapWeightedModel(_StateCollection):
         out = xr.concat(
             [
                 m.predict(
-                    alpha, order=order, order_name=order_name, cumsum=cumsum,
-                    minus_log=minus_log
+                    alpha,
+                    order=order,
+                    order_name=order_name,
+                    cumsum=cumsum,
+                    minus_log=minus_log,
                 )
                 for m in self.states
             ],
@@ -1706,7 +1739,8 @@ class InterpModel(_StateCollection):
         )
 
         coefs = xr.concat(
-            [m.xcoefs(order, norm=False, minus_log=minus_log) for m in self.states], dim="state"
+            [m.xcoefs(order, norm=False, minus_log=minus_log) for m in self.states],
+            dim="state",
         )
         if isinstance(coefs, xr.Dataset):
             coefs = xr.Dataset({k: xr.dot(mat_inv, v) for k, v in coefs.items()})
