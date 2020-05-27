@@ -58,7 +58,7 @@ class du_func(sp.Function):
 
 class dxdu_func(sp.Function):
     """
-    dxdu_func(beta, n, d) = <du**n * (x^(d) - <x^(d)>)> = dxdu[d, n]
+    dxdu_func(beta, n, d) = <du**n * (x^(d) - <x^(d)>)> = dxdu[n, d]
     or (if x != x(alpha))
     dxdu_func(beta, n) = <du**n * (x - <x>)>
     """
@@ -93,7 +93,7 @@ class dxdu_func(sp.Function):
             if deriv is None:
                 out = cls.dxdu[n]
             else:
-                out = cls.dxdu[deriv, n]
+                out = cls.dxdu[n, deriv]
         else:
             out = None
 
@@ -161,7 +161,7 @@ class xu_func(sp.Function):
     calculate derivatives of
     xu_func(beta, n) = <x * u**n> = xu[n]
     or (xalpha)
-    xu_func(beta, n, d) = <x^(d) * u**n> = xu[d, n]
+    xu_func(beta, n, d) = <x^(d) * u**n> = xu[n, d]
     """
 
     nargs = (2, 3)
@@ -187,7 +187,7 @@ class xu_func(sp.Function):
             if deriv is None:
                 out = cls.xu[n]
             else:
-                out = cls.xu[deriv, n]
+                out = cls.xu[n, deriv]
         else:
             out = None
         return out

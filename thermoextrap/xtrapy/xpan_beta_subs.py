@@ -133,7 +133,7 @@ class _Central_xu_dxdu_xalpha(object):
     """
     xu = _Central_xu_dxdu()
 
-    xu[n, i] = < d^n x / dalpha^n u**i>
+    xu[i, n] = < d^n x / dalpha^n u**i>
     """
 
     def __init__(self, use_u1=False, use_x1=True, **kwargs):
@@ -164,28 +164,28 @@ class _Central_xu_dxdu_xalpha(object):
 
             setattr(self, key, val)
 
-            # NOTE: because could be using x1[deriv] or x[deriv,1]
+            # NOTE: because could be using x1[deriv] or x[1, deriv]
             # use a function to wrap this behaviour.
             self.x1_func = lambda deriv: self.x1[deriv]
         else:
-            self.x1_func = lambda deriv: self.x[deriv, 1]
+            self.x1_func = lambda deriv: self.x[1, deriv]
 
     x1 = _get_default_indexed("x1")
 
     @gcached(prop=False)
-    def _get_xubar_of_dxdubar(self, deriv, n):
+    def _get_xubar_of_dxdubar(self, n, deriv):
         expr = (
             sp.Sum(
                 sp.binomial(n, self.k)
                 * self.u1 ** (n - self.k)
-                * self.dxdu[deriv, self.k],
+                * self.dxdu[self.k, deriv],
                 (self.k, 0, n),
             )
             + self.x1_func(deriv) * self.u[n]
         )
         return (
             expr.doit()
-            .subs({self.dxdu[deriv, 0]: 0})
+            .subs({self.dxdu[0, deriv]: 0})
             .expand()
             # .simplify()
         )
@@ -326,7 +326,7 @@ class _SubsBeta_xalpha(_SubsBeta):
         # right with user defined u/xu
         rhs = 0
         for j in range(order + 1):
-            rhs += (-1) ** j * sp.binomial(order, j) * self.xu[order - j, j]
+            rhs += (-1) ** j * sp.binomial(order, j) * self.xu[j, order - j]
         rhs *= self.z
 
         # NOTE: This doesn't work for non-sympy xu
