@@ -130,12 +130,12 @@ class DatasetSelector(object):
     Needed for calling sympy.lambdify functions
     """
 
-    def __init__(self, data, dims=None, deriv="deriv", moment="moment"):
+    def __init__(self, data, dims=None, moment="moment", deriv="deriv"):
 
         # Default dims
         if dims is None:
             if deriv in data.dims:
-                dims = [deriv, moment]
+                dims = [moment, deriv]
             else:
                 dims = [moment]
 
