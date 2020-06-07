@@ -21,14 +21,17 @@ def _get_cmom_single(w, x, moments, axis=0):
     data = np.array(data)
     return data
 
-def _get_data_single(nrec=100, moments=5, weighted=False):
+def _get_data_single(nrec=100, weighted=False):
     x = np.random.rand(nrec)
-
-    if weighted:
+    if weighted is None:
+        w = None
+    elif weighted:
         w = np.random.rand(nrec)
     else:
         w = np.ones_like(x)
     return w, x
+
+
 
 
 @pytest.mark.parametrize("nrec", [100])
@@ -36,8 +39,12 @@ def _get_data_single(nrec=100, moments=5, weighted=False):
 @pytest.mark.parametrize("weighted", [False, True])
 def test_StatsAccum_vals(nrec, moments, weighted):
     # unweighted
-    w, x = _get_data_single(nrec, moments, weighted)
-    data = _get_cmom_single(w, x, moments)
+    w, x = _get_data_single(nrec, weighted)
+    dataA = _get_cmom_single(w, x, moments)
+
+    data = central.central_moments(x, moments, weights=w, axis=0)
+    np.testing.assert_allclose(dataA, data)
+
 
     # push
     s = central.StatsAccum(moments=moments)
@@ -60,8 +67,11 @@ def test_StatsAccum_vals(nrec, moments, weighted):
 @pytest.mark.parametrize("weighted", [False, True])
 def test_StatsAccum_stats(nrec, moments, weighted):
     # unweighted
-    w, x = _get_data_single(nrec, moments, weighted)
-    data = _get_cmom_single(w, x, moments)
+    w, x = _get_data_single(nrec, weighted)
+    dataA = _get_cmom_single(w, x, moments)
+
+    data = central.central_moments(x, moments, w)
+    np.testing.assert_allclose(data, dataA)
 
     splits = [len(x) // 3, len(x) // 3 * 2]
 
@@ -167,10 +177,12 @@ def _get_cmom_vec(w, x, moments, axis=0):
     return data
 
 
-def _get_data_vec(shape, moments=5, weighted=False):
+def _get_data_vec(shape, weighted=False):
     x = np.random.rand(*shape)
 
-    if weighted:
+    if weighted is None:
+        w = None
+    elif weighted:
         w = np.random.rand(*shape)
     else:
         w = np.ones(shape)
@@ -188,7 +200,7 @@ def _get_data_vec(shape, moments=5, weighted=False):
 @pytest.mark.parametrize("weighted", [False, True])
 def test_StatsAccumVec_vals(dshape, axis, moments, weighted):
     # unweighted
-    wt, x = _get_data_vec(dshape, moments, weighted)
+    wt, x = _get_data_vec(dshape, weighted)
 
     # single weight
     slicer = [0] * wt.ndim
@@ -202,7 +214,11 @@ def test_StatsAccumVec_vals(dshape, axis, moments, weighted):
 
 
     for w in (wt, ws):
-        data = _get_cmom_vec(w, x, moments, axis=axis)
+        dataA = _get_cmom_vec(w, x, moments, axis=axis)
+        data = central.central_moments(x, moments, w, axis=axis)
+
+        np.testing.assert_allclose(data, dataA)
+
         s = central.StatsAccumVec(shape=shape, moments=moments)
         # push_vals
         s.push_vals(x, w, axis=axis)
@@ -223,7 +239,7 @@ def test_StatsAccumVec_vals(dshape, axis, moments, weighted):
 @pytest.mark.parametrize("weighted", [False, True])
 def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
     # unweighted
-    wt, x = _get_data_vec(dshape, moments, weighted)
+    wt, x = _get_data_vec(dshape, weighted)
 
     # single weight
     slicer = [0] * wt.ndim
@@ -240,6 +256,11 @@ def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
     xsplit = np.split(x, splits, axis)
 
     for w in (wt, ws):
+        dataA = _get_cmom_vec(w, x, moments, axis=axis)
+        data = central.central_moments(x, moments, w, axis=axis)
+
+        np.testing.assert_allclose(data, dataA)
+
 
         if w.ndim == 1:
             wsplit = np.split(w, splits)
@@ -248,10 +269,10 @@ def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
 
         datas = []
         for ww, xx in zip(wsplit, xsplit):
-            datas.append(_get_cmom_vec(ww, xx, moments, axis=axis))
+            datas.append(central.central_moments(xx, moments, ww, axis=axis))# _get_cmom_vec(ww, xx, moments, axis=axis))
         datas = np.array(datas)
 
-        data = _get_cmom_vec(w, x, moments, axis=axis)
+ 
 
         # factory
         s = central.StatsAccumVec.from_datas(datas, moments=moments, axis=0)
@@ -313,4 +334,8 @@ def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
         out = S[0].copy()
         out *= 2
         np.testing.assert_allclose(out.data, (S[0] + S[0]).data)
+
+
+
+
 

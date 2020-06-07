@@ -1,9 +1,170 @@
 from __future__ import absolute_import
+
 import numpy as np
 from numba import njit
 from scipy.special import binom
 
 from .cached_decorators import gcached
+
+
+def _my_broadcast(x, shape):
+    x = np.array(x)
+    if x.shape != shape:
+        x = np.broadcast(x, shape)
+    return x
+
+def _shape_insert_axis(shape, axis, new_size):
+    """
+    given shape, get new shape with size put in position axis
+    """
+    if axis < 0:
+        axis += len(shape) + 1
+        print(len(shape), axis)
+
+    shape = list(shape)
+    shape.insert(axis, new_size)
+    return tuple(shape)
+
+def _multi_broadcast(x, shape, axis):
+    # figure out
+    x = np.array(x)
+
+    # if array, and 1d with size same as shape[axis]
+    # broadcast from here
+    if (x.ndim == 1 and
+        x.ndim != len(shape) and
+        len(x) == shape[axis]):
+        # reshape for broadcasting
+        reshape = [1] * (len(shape) - 1)
+        reshape = _shape_insert_axis(reshape, axis, -1)
+        x = x.reshape(*reshape)
+
+    if x.shape != shape:
+        x = np.broadcast_to(x, shape)
+    if axis != 0:
+        x = np.rollaxis(x, axis, 0)
+    return x
+
+def central_moments(x, moments, weights=None, axis=0, out=None):
+    """
+    calculate central moments along axis
+    """
+
+    if weights is None:
+        weights = np.ones_like(x)
+
+    weights = np.array(weights)
+    x = np.array(x)
+
+    if weights.shape != x.shape:
+        # if 1d try to broadcast
+        if (weights.ndim == 1 and
+            weights.ndim != x.ndim and
+            len(weights) == x.shape[axis]):
+            shape = [1] * x.ndim
+            shape[axis] = -1
+            weights = weights.reshape(*shape)
+
+        # try to broadcast
+        weights = np.broadcast_to(weights, x.shape)
+
+    if axis < 0:
+        axis += x.ndim
+    if axis != 0:
+        x = np.rollaxis(x, axis, 0)
+        weights = np.rollaxis(weights, axis, 0)
+
+
+    shape = (moments+1,) + x.shape[1:]
+    if out is None:
+        out = np.empty(shape, dtype=x.dtype)
+    assert out.shape == shape
+
+
+    wsum = weights.sum(axis=0)
+    wsum_inv = 1.0 / wsum
+    xave = np.einsum('r...,r...->...', weights, x) * wsum_inv
+
+    shape = (-1,) + (1,) * (x.ndim)
+    p = np.arange(2, moments+1).reshape(*shape)
+
+    dx = (x[None,...] - xave) ** p
+
+    out[0, ...] = wsum
+    out[1, ...] = xave
+    out[2:, ...] = np.einsum('r..., mr...->m...', weights, dx) * wsum_inv
+    return out
+
+
+def central_comoments(x0, x1, moments, weights=None, axis=0, out=None):
+    """
+    calculate central co-moments (covariance, etc) along axis
+    """
+
+    if weights is None:
+        weights = np.ones_like(x0)
+
+    if isinstance(moments, int):
+        moments = (moments,) * 2
+
+    moments = tuple(moments)
+    assert len(moments) == 2
+
+
+    x0 = np.array(x0)
+    def _broadcast(w):
+        w = np.array(w)
+        if w.shape != x0.shape:
+            # if 1d try to broadcast
+            if (w.ndim == 1 and
+                w.ndim != x0.ndim and
+                len(w) == x0.shape[axis]):
+                shape = [1] * x0.ndim
+                shape[axis] = -1
+                w = w.reshape(*shape)
+            # try to broadcast
+            w = np.broadcast_to(w, x0.shape)
+        return w
+
+    weights = _broadcast(weights)
+    x1 = _broadcast(x1)
+
+    if axis < 0:
+        axis += x.ndim
+    if axis != 0:
+        x0 = np.rollaxis(x0, axis, 0)
+        x1 = np.rollaxis(x1, axis, 0)
+        weights = np.rollaxis(weights, axis, 0)
+
+
+    shape = tuple(x+1 for x in moments) + x0.shape[1:]
+    if out is None:
+        out = np.empty(shape, dtype=x0.dtype)
+    assert out.shape == shape
+
+    wsum = weights.sum(axis=0)
+    wsum_inv = 1.0 / wsum
+
+    x0ave = np.einsum('r...,r...->...', weights, x0) * wsum_inv
+    x1ave = np.einsum('r...,r...->...', weights, x1) * wsum_inv
+
+    shape = (-1,) + (1,) * (x0.ndim)
+    p0 = np.arange(0, moments[0]+1).reshape(*shape)
+    p1 = np.arange(0, moments[1]+1).reshape(*shape)
+
+    dx0 = (x0[None, ...] - x0ave) ** p0
+    dx1 = (x1[None, ...] - x1ave) ** p1
+
+    #return weights, dx0, dx1
+
+    #data = np.empty(tuple(x+1 for x in moments) + x0.shape[1:], dtype=x0.dtype)
+    out[...] = np.einsum('r...,ir...,jr...->ij...', weights, dx0, dx1) * wsum_inv
+
+    out[0,0, ...] = wsum
+    out[1,0, ...] = x0ave
+    out[0,1, ...] = x1ave
+
+    return out
 
 
 def myjit(func):
@@ -22,60 +183,6 @@ def _factory_numba_binomial(order):
         return bfac[n, k]
     return numba_binom
 _bfac = _factory_numba_binomial(10)
-
-
-
-# def central_from_vals(w, x, axis=0):
-#     shape = x.
-
-
-def _central_from_vals(data, W, X):
-    order = data.shape[0] - 1
-
-    wsum = W.sum(axis=0)
-    wsum_inv = 1.0 / wsum
-
-    xave = (W * X).sum(axis=0) * wsum_inv
-    dx = X - xave
-
-    p = np.arange(2, order+1)
-    dx = dx[:, None] ** p
-
-    data[0] = wsum
-    data[1] = xave
-
-
-    data[2:] =np.einsum('r,ri->i', W, dx) * wsum_inv
-    # (W[:, None] * (dx[:, None]) ** (np.arange(2, order + 1))).sum(
-    #     axis=0
-    # ) * wsum_inv
-
-
-def _central_from_vals_vec(data, W, X):
-    order = data.shape[0] - 1
-
-    wsum = W.sum(axis=0)
-    wsum_inv = 1.0 / wsum
-
-    xave = (W * X).sum(axis=0) * wsum_inv
-    dx = X - xave
-
-    data[0, ...] = wsum
-    data[1, ...] = xave
-
-    shape = (-1,) + (1,) * (data.ndim)
-    p = np.arange(2, order + 1).reshape(*shape)
-
-    dx = dx[None, ...] ** p
-    data[2:, ...] = np.einsum('r..., ir...->i...', W, dx) * wsum_inv
-
-
-    # data[2:, ...] = (
-    #     # (W[:, None, ...] * dx[:, None, ...] ** p)
-    #     (W[None, ...] * dx[None, ...] ** p).sum(axis=1)
-    #     * wsum_inv
-    # )
-
 
 @myjit
 def _push_val(data, w, x):
@@ -97,41 +204,6 @@ def _push_val(data, w, x):
         return
 
     for a in range(order, 2, -1):
-        # tmp = 0.0
-        # for b in range(0, a+1):
-        #     c = a - b
-
-        #     if c == 1:
-        #         continue
-        #     elif c == 0:
-        #         val =  (
-        #             (-1)**b * alpha**b * one_alpha +
-        #             one_alpha ** b * alpha
-        #         )
-
-        #     else:
-        #         val = (
-        #             (-1)**b * alpha**b * one_alpha * data[c]
-        #         )
-
-        #     tmp += _bfac(a, b) * delta**b * val
-        # Alternative
-        # c = 0
-        # b = a - c
-        # tmp = (
-        #     # bfac(a, b)
-        #     delta ** b
-        #     * ((-1) ** b * alpha ** b * one_alpha + one_alpha ** b * alpha)
-        # )
-
-        # for b in range(0, a - 1):
-        #     c = a - b
-        #     tmp += (
-        #         _bfac(a, b)
-        #         * delta ** b
-        #         * ((-1) ** b * alpha ** b * one_alpha * data[c])
-        #     )
-
         # c > 1
         tmp = 0.0
         delta_b = 1.0
@@ -174,7 +246,9 @@ def _push_stat(data, w, a, v):
     """
     w : weight
     a : average
-    v[i] : <dx**(i+2)> 
+    v[i] : <dx**(i+2)>
+
+    scale : parameter to rescale the weight
     """
     if w == 0:
         return
@@ -194,44 +268,6 @@ def _push_stat(data, w, a, v):
         return
 
     for a1 in range(order, 2, -1):
-        # tmp = 0.0
-        # for b in range(0, a1+1):
-        #     c = a1 - b
-
-        #     if c == 1:
-        #         continue
-        #     elif c == 0:
-        #         val =  (
-        #             (-1)**b * alpha**b * one_alpha +
-        #             one_alpha ** b * alpha
-        #         )
-
-        #     else:
-        #         val = (
-        #             (-1)**b * alpha**b * one_alpha * data[c] +
-        #             one_alpha ** b * alpha * v[c-2]
-        #         )
-
-        #     tmp += _bfac(a1, b) * delta**b * val
-        # Alternative
-        # c = 0
-        # b = a1 - c
-        # tmp = (
-        #     _bfac(a1, b)
-        #     * delta ** b
-        #     * ((-1) ** b * alpha ** b * one_alpha + one_alpha ** b * alpha)
-        # )
-
-        # for b in range(0, a1 - 1):
-        #     c = a1 - b
-        #     tmp += (
-        #         _bfac(a1, b)
-        #         * delta ** b
-        #         * (
-        #             (-1) ** b * alpha ** b * one_alpha * data[c]
-        #             + one_alpha ** b * alpha * v[c - 2]
-        #         )
-        #     )
         tmp = 0.0
         delta_b = 1.0
         alpha_b = 1.0
@@ -259,7 +295,6 @@ def _push_stat(data, w, a, v):
             delta * alpha * one_alpha * delta_b *
             (-minus_b * alpha_b + one_alpha_b)
         )
-
         data[a1] = tmp
 
     data[2] = v[0] * alpha + one_alpha * (data[2] + delta * incr)
@@ -271,18 +306,29 @@ def _push_stats(data, W, A, V):
     for s in range(ns):
         _push_stat(data, W[s], A[s], V[s, ...])
 
-
 @myjit
-def _push_stat_data(data, data_in):
+def _push_data(data, data_in):
     _push_stat(data, data_in[0], data_in[1], data_in[2:])
 
 
 @myjit
-def _push_stats_data(data, data_in):
+def _push_datas(data, data_in):
     ns = data_in.shape[0]
     for s in range(ns):
         _push_stat(data, data_in[s, 0], data_in[s, 1], data_in[s, 2:])
 
+@myjit
+def _push_data_scale(data, data_in, scale):
+    _push_stat(data, data_in[0] * scale, data_in[1], data_in[2:])
+
+@myjit
+def _push_datas_scale(data, data_in, scale):
+    ns = data_in.shape[0]
+    for s in range(ns):
+        _push_stat(data,
+                   data_in[s, 0] * scale[s, 0],
+                   data_in[s, 1],
+                   data_in[s, 2:])
 
 # Vector
 # Note: decided to change order from [value, moment] to [moment, value]
@@ -292,7 +338,6 @@ def _push_val_vec(data, w, x):
     nv = data.shape[1]
     for k in range(nv):
         _push_val(data[:, k], w[k], x[k])
-
 
 @myjit
 def _push_vals_vec(data, W, X):
@@ -321,64 +366,34 @@ def _push_stats_vec(data, W, A, V):
 
 
 @myjit
-def _push_stat_data_vec(data, data_in):
+def _push_data_vec(data, data_in):
     nv = data.shape[1]
     for k in range(nv):
-        _push_stat_data(data[:, k], data_in[:, k])
+        _push_data(data[:, k], data_in[:, k])
 
 
 @myjit
-def _push_stats_data_vec(data, Data_in):
+def _push_datas_vec(data, Data_in):
     ns = Data_in.shape[0]
     nv = data.shape[1]
     for s in range(ns):
         for k in range(nv):
-            _push_stat_data(data[:, k], Data_in[s, :, k])
+            _push_data(data[:, k], Data_in[s, :, k])
+
+@myjit
+def _push_data_scale_vec(data, data_in, scale):
+    nv = data.shape[1]
+    for k in range(nv):
+        _push_data(data[:, k], data_in[:, k], scale[k])
 
 
-
-
-
-def _my_broadcast(x, shape):
-    x = np.array(x)
-    if x.shape != shape:
-        x = np.broadcast(x, shape)
-    return x
-
-
-def _shape_insert_axis(shape, axis, new_size):
-    """
-    given shape, get new shape with size put in position axis
-    """
-    if axis < 0:
-        axis += len(shape) + 1
-        print(len(shape), axis)
-
-    shape = list(shape)
-    shape.insert(axis, new_size)
-    return tuple(shape)
-
-def _multi_broadcast(x, shape, axis):
-    # figure out
-    x = np.array(x)
-
-    # if array, and 1d with size same as shape[axis]
-    # broadcast from here
-    if (x.ndim == 1 and
-        x.ndim != len(shape) and
-        len(x) == shape[axis]):
-        # reshape for broadcasting
-        reshape = [1] * (len(shape) - 1)
-        reshape = _shape_insert_axis(reshape, axis, -1)
-        x = x.reshape(*reshape)
-
-    if x.shape != shape:
-        x = np.broadcast_to(x, shape)
-    if axis != 0:
-        x = np.rollaxis(x, axis, 0)
-    return x
-
-
+@myjit
+def _push_datas_scale_vec(data, Data_in, scale):
+    ns = Data_in.shape[0]
+    nv = data.shape[1]
+    for s in range(ns):
+        for k in range(nv):
+            _push_data(data[:, k], Data_in[s, :, k], scale[s, k])
 
 
 
@@ -395,7 +410,11 @@ class StatsAccumBase(object):
         dtype : data type
         """
 
+        if isinstance(moments, int):
+            moments = (moments,)
+
         self.moments = moments
+
         if shape is None:
             shape = ()
         self.shape = shape
@@ -404,30 +423,21 @@ class StatsAccumBase(object):
         self._init_subclass()
 
         self._data = np.zeros(self._data_shape, dtype=self.dtype)
-        self._datar = self._data.reshape(self._datar_shape)
-
-
+        self._data_flat = self._data.reshape(self._data_flat_shape)
 
 
     @gcached()
-    def _moments_tuple(self):
-        """tuple of moments"""
-        if isinstance(self.moments, tuple):
-            return self.moments
-        else:
-            return (self.moments,)
-    @gcached()
-    def _moment_shape(self):
+    def _moments_shape(self):
         """tuple of shape for moments"""
-        return tuple(x+1 for x in self._moments_tuple)
+        return tuple(x+1 for x in self.moments)
 
     @gcached()
-    def _moment_shape_var(self):
+    def _moments_shape_var(self):
         """shape of variance"""
-        return tuple(x-1 for x in self._moments_tuple)
+        return tuple(x-1 for x in self.moments)
 
     @gcached()
-    def _rshape(self):
+    def _shape_flat(self):
         if self.shape is ():
             return ()
         else:
@@ -435,28 +445,32 @@ class StatsAccumBase(object):
 
     @gcached()
     def _shape_var(self):
-        return self._moment_shape_var + self.shape
+        return self._moments_shape_var + self.shape
 
     @gcached()
-    def _rshape_var(self):
-        return self._moment_shape_var + self._rshape
+    def _shape_flat_var(self):
+        return self._moments_shape_var + self._shape_flat
 
     @gcached()
     def _data_shape(self):
         """shape of data"""
-        return self._moment_shape + self.shape
+        return self._moments_shape + self.shape
 
     @gcached()
-    def _datar_shape(self):
+    def _data_flat_shape(self):
         """shape of conformed data"""
-        return self._moment_shape + self._rshape
+        return self._moments_shape + self._shape_flat
 
 
     def __setstate__(self, state):
         self.__dict__ = state
         # make sure datar points to data
-        self._datar = self._data.reshape(self._datar_shape)
+        self._data_flat = self._data.reshape(self._data_flat_shape)
 
+
+    @property
+    def values(self):
+        return self._data
 
     @property
     def data(self):
@@ -472,9 +486,9 @@ class StatsAccumBase(object):
 
     def _reshape_flat(self, x, nrec=None):
         if nrec is None:
-            x = x.reshape(self._rshape)
+            x = x.reshape(self._shape_flat)
         else:
-            x = x.reshape(*((nrec,) + self._rshape))
+            x = x.reshape(*((nrec,) + self._shape_flat))
 
         if x.ndim == 0:
             x = x[()]
@@ -510,6 +524,7 @@ class StatsAccumBase(object):
         x = np.array(x)
 
         if broadcast:
+            shape = _shape_insert_axis(self.shape, axis, x.shape[axis])
             x = _multi_broadcast(x, shape, axis)
         else:
             if axis !=0:
@@ -527,7 +542,7 @@ class StatsAccumBase(object):
     def check_var(self, v):
         v = np.array(v)
         assert v.shape == self._shape_var
-        return v.reshape(self._rshape_var)
+        return v.reshape(self._shape_flat_var)
 
     def check_vars(self, v, axis=0):
         v = np.array(v)
@@ -535,12 +550,12 @@ class StatsAccumBase(object):
             v = np.rollaxis(v, axis, 0)
         assert v.shape[1:] == self._shape_var
         return v.reshape(
-            v.shape[:1] + self._rshape_var)
+            v.shape[:1] + self._shape_flat_var)
 
     def check_data(self, data):
         data = np.array(data)
         assert data.shape == self._data_shape
-        return data.reshape(self._datar_shape)
+        return data.reshape(self._data_flat_shape)
 
     def check_datas(self, datas, axis=0):
         datas = np.array(datas)
@@ -548,7 +563,7 @@ class StatsAccumBase(object):
             datas = np.rollaxis(datas, axis, 0)
         assert datas.shape[1:] == self._data_shape
         return datas.reshape(
-            datas.shape[:1] + self._datar_shape)
+            datas.shape[:1] + self._data_flat_shape)
 
     def zero(self):
         self._data.fill(0.0)
@@ -569,14 +584,14 @@ class StatsAccumBase(object):
 
     @gcached()
     def _weight_index(self):
-        index = [0] * len(self._moments_tuple)
+        index = [0] * len(self.moments)
         if self.ndim > 0:
             index += [...]
         return tuple(index)
 
     @gcached(prop=False)
     def _single_index(self, val):
-        dims = len(self._moments_tuple)
+        dims = len(self.moments)
         if dims ==0:
             index = (val,)
         else:
@@ -651,38 +666,38 @@ class StatsAccumBase(object):
         self._data[self._weight_index] *= scale
         return self
 
+    def push_data(self, data):
+        data = self.check_data(data)
+        self._push_data(self._data_flat, data)
+
+    def push_datas(self, datas, axis=0):
+        datas = self.check_datas(datas, axis)
+        self._push_datas(self._data_flat, datas)
+
 
 
 class _StatsAccum(StatsAccumBase):
     def push_val(self, x, w=None):
         xr = self.check_val(x)
         wr = self.check_weight(w)
-        self._push_val(self._datar, wr, xr)
+        self._push_val(self._data_flat, wr, xr)
 
     def push_vals(self, x, w=None, axis=0):
         xr = self.check_vals(x, axis)
         wr = self.check_weights(w, xr.shape[0], axis)
-        self._push_vals(self._datar, wr, xr)
+        self._push_vals(self._data_flat, wr, xr)
 
     def push_stat(self, a, v=0.0, w=None):
         ar = self.check_ave(a)
         vr = self.check_var(v)
         wr = self.check_weight(w)
-        self._push_stat(self._datar, wr, ar, vr)
+        self._push_stat(self._data_flat, wr, ar, vr)
 
     def push_stats(self, a, v=0.0, w=None, axis=0):
         ar = self.check_aves(a, axis)
         vr = self.check_vars(v, axis)
         wr = self.check_weights(w, ar.shape[0], axis)
-        self._push_stats(self._datar, wr, ar, vr)
-
-    def push_data(self, data):
-        data = self.check_data(data)
-        self._push_data(self._datar, data)
-
-    def push_datas(self, datas, axis=0):
-        datas = self.check_datas(datas, axis)
-        self._push_datas(self._datar, datas)
+        self._push_stats(self._data_flat, wr, ar, vr)
 
 
     # --------------------------------------------------
@@ -714,7 +729,7 @@ class _StatsAccum(StatsAccumBase):
         new = cls(shape=shape, dtype=data.dtype, moments=moments)
 
         datar = new.check_data(data)
-        new._datar[...] = datar
+        new._data_flat[...] = datar
         return new
 
     @classmethod
@@ -779,17 +794,7 @@ class _StatsAccum(StatsAccumBase):
 
 
 
-
-class StatsAccumVec(_StatsAccum):
-    def _init_subclass(self):
-        self._push_val = _push_val_vec
-        self._push_vals = _push_vals_vec
-        self._push_stat = _push_stat_vec
-        self._push_stats = _push_stats_vec
-
-        self._push_data = _push_stat_data_vec
-        self._push_datas = _push_stats_data_vec
-
+class _VecMixin(object):
     def reduce(self, axis=0):
         """
         create new object reduced along axis
@@ -804,12 +809,12 @@ class StatsAccumVec(_StatsAccum):
         shape = tuple(shape)
 
         Data = self.data
-        if Data.ndim == 2:
+        if Data.ndim == len(self.moments) +1:
             assert axis == 0
             Data = Data[..., None]
 
         # offset axis because first dim is for moments
-        axis += len(self._moments_tuple)
+        axis += len(self.moments)
 
         new = self.__class__.from_datas(Data, axis=axis, moments=self.moments)
         return new
@@ -831,6 +836,20 @@ class StatsAccumVec(_StatsAccum):
     #     return StatsArray.from_datas(Data=data, child=self.__class__, shape=shape)
 
 
+
+
+class StatsAccumVec(_StatsAccum, _VecMixin):
+    def _init_subclass(self):
+        self._push_val = _push_val_vec
+        self._push_vals = _push_vals_vec
+        self._push_stat = _push_stat_vec
+        self._push_stats = _push_stats_vec
+
+        self._push_data = _push_data_vec
+        self._push_datas = _push_datas_vec
+
+
+
 class StatsAccum(_StatsAccum):
     def _init_subclass(self):
         self._push_val = _push_val
@@ -838,18 +857,408 @@ class StatsAccum(_StatsAccum):
         self._push_stat = _push_stat
         self._push_stats = _push_stats
 
-        self._push_data = _push_stat_data
-        self._push_datas = _push_stats_data
+        self._push_data = _push_data
+        self._push_datas = _push_datas
+
+
+######################################################################
+# Covariance "stuff"
+######################################################################
+
+@myjit
+def _push_val_cov(data, w, x0, x1):
+
+    if w == 0.0:
+        return
+
+    order0 = data.shape[0] - 1
+    order1 = data.shape[1] - 1
+
+    data[0, 0] += w
+    alpha = w / data[0, 0]
+    one_alpha = 1.0 - alpha
+
+    delta0 = x0 - data[1, 0]
+    delta1 = x1 - data[0, 1]
+
+    incr0 = delta0 * alpha
+    incr1 = delta1 * alpha
+
+    data[1, 0] += incr0
+    data[0, 1] += incr1
+
+    a0_min = max(0, 2 - order1)
+    for a0 in range(order0, a0_min-1, -1):
+        a1_min = max(0, 2 - a0)
+        for a1 in range(order1, a1_min - 1, -1):
+            tmp = 0.0
+            delta0_b0 = 1.0
+            alpha_b0 = 1.0
+            minus_b0 = 1.0
+            one_alpha_b0 = 1.0
+            for b0 in range(0, a0+1):
+                c0 = a0 - b0
+                f0 = _bfac(a0, b0)
+
+                delta1_b1 = 1.0
+                alpha_bb = alpha_b0
+                minus_bb = minus_b0
+                one_alpha_bb = one_alpha_b0
+                for b1 in range(0, a1+1):
+                    c1 = a1 - b1
+                    cs = c0 + c1
+                    if cs == 0:
+                        tmp += delta0_b0 * delta1_b1  * (
+                            minus_bb * alpha_bb * one_alpha 
+                            + one_alpha_bb * alpha)
+                    elif cs != 1:
+                        tmp += (
+                            f0 * _bfac(a1, b1)
+                            * delta0_b0 * delta1_b1
+                            * (minus_bb * alpha_bb * one_alpha * data[c0,c1])
+                        )
+                    delta1_b1 *= delta1
+                    alpha_bb *= alpha
+                    one_alpha_bb *= one_alpha
+                    minus_bb *= -1
+
+                delta0_b0 *= delta0
+                alpha_b0 *= alpha
+                minus_b0 *= -1
+                one_alpha_b0 *= one_alpha
+
+            # This is slower
+            # tmp = 0.0
+            # for b0 in range(0, a0+1):
+            #     c0 = a0 - b0
+            #     if b0 == 0:
+            #         f0 = 1.0
+            #         delta0_b0 = 1.0
+            #         alpha_b0 = 1.0
+            #         minus_b0 = 1.0
+            #         one_alpha_b0 = 1.0
+            #     else:
+            #         f0 = _bfac(a0, b0)
+            #         delta0_b0 *= delta0
+            #         alpha_b0 *= alpha
+            #         minus_b0 *= -1
+            #         one_alpha_b0 *= one_alpha
+
+            #     for b1 in range(0, a1+1):
+            #         c1 = a1 - b1
+
+            #         if b1 == 0:
+            #             delta1_b1 = 1.0
+            #             alpha_bb = alpha_b0
+            #             minus_bb = minus_b0
+            #             one_alpha_bb = one_alpha_b0
+            #         else:
+            #             delta1_b1 *= delta1
+            #             alpha_bb *= alpha
+            #             one_alpha_bb *= one_alpha
+            #             minus_bb *= -1
+
+            #         cs = c0 + c1
+            #         if cs == 0:
+            #             tmp += delta0_b0 * delta1_b1  * (
+            #                 minus_bb * alpha_bb * one_alpha 
+            #                 + one_alpha_bb * alpha)
+            #         elif cs != 1:
+            #             tmp += (
+            #                 f0 * _bfac(a1, b1)
+            #                 * delta0_b0 * delta1_b1
+            #                 * (minus_bb * alpha_bb * one_alpha * data[c0,c1])
+            #             )
+            data[a0, a1] = tmp
+
+
+@myjit
+def _push_vals_cov(data, W, X1, X2):
+    ns = X1.shape[0]
+    for s in range(ns):
+        _push_val_cov(data, W[s], X1[s], X2[s])
+
+
+@myjit
+def _push_data_scale_cov(data, data_in, scale):
+
+    w = data_in[0, 0] * scale
+    if w == 0.0:
+        return
+
+    order0 = data.shape[0] - 1
+    order1 = data.shape[1] - 1
+
+    data[0, 0] += w
+    alpha = w / data[0, 0]
+    one_alpha = 1.0 - alpha
+
+    delta0 = data_in[1, 0] - data[1, 0]
+    delta1 = data_in[0, 1] - data[0, 1]
+
+    incr0 = delta0 * alpha
+    incr1 = delta1 * alpha
+
+    data[1, 0] += incr0
+    data[0, 1] += incr1
+
+    a0_min = max(0, 2 - order1)
+    for a0 in range(order0, a0_min-1, -1):
+        a1_min = max(0, 2 - a0)
+        for a1 in range(order1, a1_min - 1, -1):
+            # Alternative
+            tmp = 0.0
+            delta0_b0 = 1.0
+            alpha_b0 = 1.0
+            minus_b0 = 1.0
+            one_alpha_b0 = 1.0
+            for b0 in range(0, a0+1):
+                c0 = a0 - b0
+                f0 = _bfac(a0, b0)
+
+                delta1_b1 = 1.0
+                alpha_bb = alpha_b0
+                minus_bb = minus_b0
+                one_alpha_bb = one_alpha_b0
+                for b1 in range(0, a1+1):
+                    c1 = a1 - b1
+                    cs = c0 + c1
+                    if cs == 0:
+                        tmp += delta0_b0 * delta1_b1  * (
+                            minus_bb * alpha_bb * one_alpha
+                            + one_alpha_bb * alpha)
+                    elif cs != 1:
+                        tmp += (
+                            f0 * _bfac(a1, b1)
+                            * delta0_b0 * delta1_b1
+                            * (
+                                minus_bb * alpha_bb * one_alpha * data[c0,c1]
+                                + one_alpha_bb * alpha * data_in[c0, c1]
+                            )
+                        )
+                    delta1_b1 *= delta1
+                    alpha_bb *= alpha
+                    one_alpha_bb *= one_alpha
+                    minus_bb *= -1
+
+                delta0_b0 *= delta0
+                alpha_b0 *= alpha
+                minus_b0 *= -1
+                one_alpha_b0 *= one_alpha
+
+            data[a0, a1] = tmp
+
+
+@myjit
+def _push_data_cov(data, data_in):
+    _push_data_scale_cov(data, data_in, 1.0)
+
+@myjit
+def _push_datas_cov(data, datas):
+    ns = datas.shape[0]
+    for s in range(ns):
+        _push_data_scale_cov(data, datas[s], 1.0)
+
+def _push_datas_scale_cov(data, datas, scale):
+    ns = datas.shape[0]
+    for s in range(ns):
+        _push_data_scale_cov(data, datas[s], scale[s])
+
+
+
+# Vector
+@myjit
+def _push_val_cov_vec(data, w, x0, x1):
+    nv = data.shape[-1]
+    for k in range(nv):
+        _push_val_cov(data[..., k], w[k], x0[k], x1[k])
+
+
+@myjit
+def _push_vals_cov_vec(data, W, X0, X1):
+    nv = data.shape[-1]
+    ns = X0.shape[0]
+    for s in range(ns):
+        for k in range(nv):
+            _push_val_cov(data[...,k], W[s, k], X0[s, k], X1[s, k])
+
+@myjit
+def _push_data_cov_vec(data, data_in):
+    nv = data.shape[-1]
+    for k in range(nv):
+        _push_data_scale_cov(data[...,k], data_in[..., k], 1.0)
+
+@myjit
+def _push_datas_cov_vec(data, Datas):
+    nv = data.shape[-1]
+    ns = Datas.shape[0]
+    for s in range(ns):
+        for k in range(nv):
+            _push_data_scale_cov(data[..., k],
+                                 Datas[s, ..., k],
+                                 1.0)
+
+@myjit
+def _push_data_scale_cov_vec(data, data_in, scale):
+    nv = data.shape[-1]
+    for k in range(nv):
+        _push_data_scale_cov(data[...,k], data_in[..., k],
+                             scale[k])
+
+@myjit
+def _push_datas_scale_cov_vec(data, Datas, scale):
+    nv = data.shape[-1]
+    ns = Datas.shape[0]
+    for s in range(ns):
+        for k in range(nv):
+            _push_data_scale_cov(data[..., k],
+                                 Datas[s, ..., k],
+                                 scale[s, k])
+
+def _central_cov_from_vals(data, W, X0, X1):
+    order0 = data.shape[0] - 1
+    order1 = data.shape[1] - 1
+
+    wsum = W.sum(axis=0)
+    wsum_inv = 1.0 / wsum
+
+    x0ave = (W * X0).sum(axis=0) * wsum_inv
+    x1ave = (W * X1).sum(axis=0) * wsum_inv
+
+
+    dx0 = X0 - x0ave
+    dx1 = X1 - x1ave
+
+    p0 = np.arange(0, order0+1)
+    p1 = np.arange(0, order1+1)
+
+    dx0 = dx0[:, None, ...] ** p0
+    dx1 = dx1[:, None, ...] ** p1
+
+    # data[0] = wsum
+    # data[1] = xave
+
+    data[...] = np.einsum('r,ri...,rj...->ij...', W, dx0, dx1) * wsum_inv
+    data[0, 0] = wsum
+    data[1, 0] = x0ave
+    data[0, 1] = x1ave
+
+
+
+class _StatsAccumCov(StatsAccumBase):
+    def __init__(self, moments, shape=None, dtype=np.float):
+        if isinstance(moments, int):
+            moments = (moments,) * 2
+        moments = tuple(moments)
+        assert len(moments) == 2
+        super(_StatsAccumCov, self).__init__(moments=moments, shape=shape, dtype=dtype)
+
+
+
+    def push_val(self, x0, x1, w=None, broadcast=False):
+        x0 = self.check_val(x0)
+        x1 = self.check_val(x1, broadcast=broadcast)
+        w = self.check_weight(w)
+        self._push_val(self._data_flat, w, x0, x1)
+
+
+    def push_vals(self, x0, x1, w=None, axis=0, broadcast=False):
+        x0 = self.check_vals(x0, axis)
+        x1 = self.check_vals(x1, axis, broadcast)
+        w = self.check_weights(w, x0.shape[0], axis)
+        self._push_vals(self._data_flat, w, x0, x1)
+
+    # --------------------------------------------------
+    # constructors
+    # --------------------------------------------------
+    @classmethod
+    def from_vals(cls, x0, x1, w=None, axis=0, dtype=None, shape=None,
+                  broadcast=False,
+                  moments=2):
+
+        # get shape
+        if shape is None:
+            shape = list(x0.shape)
+            shape.pop(axis)
+            shape = tuple(shape)
+        if dtype is None:
+            dtype = x0.dtype
+
+        new = cls(shape=shape, dtype=dtype, moments=moments)
+        new.push_vals(x0=x0, x1=x1, axis=axis, w=w, broadcast=broadcast)
+        return new
+
+
+    @classmethod
+    def from_data(cls, data, shape=None, moments=None):
+
+        if moments is None:
+            moments = tuple(x - 1 for x in data.shape[:2])
+
+        if isinstance(moments, int):
+            moments = (moments,) * 2
+
+
+        assert data.shape[:2] == tuple(x+1 for x in moments)
+
+        if shape is None:
+            shape = data.shape[2:]
+
+        new = cls(shape=shape, dtype=data.dtype, moments=moments)
+        datar = new.check_data(data)
+        new._data_flat[...] = datar
+        return new
+
+    @classmethod
+    def from_datas(cls, datas, shape=None, axis=0, moments=None):
+        """
+        Data should have shape
+
+        [:, moment, ...] (axis=0)
+
+        [moment, axis, ...] (axis=1)
+
+        [moment, ..., axis, ...] (axis=n)
+        """
+
+        datas = np.array(datas)
+        if axis < 0:
+            axis += datas.ndim
+        if axis != 0:
+            datas = np.rollaxis(datas, axis, 0)
+
+        if moments is None:
+            moments = tuple(x-1 for x in datas.shape[1:3])
+
+        if isinstance(moments, int):
+            moments = (moments,) * 2
+
+        assert datas.shape[1:3] == tuple(x + 1 for x in moments)
+
+        if shape is None:
+            shape = datas.shape[3:]
+
+        new = cls(shape=shape, dtype=datas.dtype, moments=moments)
+        new.push_datas(datas=datas, axis=0)
+        return new
 
 
 
 
+class StatsAccumCov(_StatsAccumCov):
+    def _init_subclass(self):
+        self._push_val = _push_val_cov
+        self._push_vals = _push_vals_cov
+        self._push_data = _push_data_cov
+        self._push_datas = _push_datas_cov
 
 
-
-
-
-
+class StatsAccumCovVec(_StatsAccumCov, _VecMixin):
+    def _init_subclass(self):
+        self._push_val = _push_val_cov_vec
+        self._push_vals = _push_vals_cov_vec
+        self._push_data = _push_data_cov_vec
+        self._push_datas = _push_datas_cov_vec
 
 
 
@@ -1050,11 +1459,11 @@ class StatsAccum(_StatsAccum):
 
 #     def push_stat_data(self, data):
 #         data = self._check_data(data)
-#         self._push_stat_data(self._datar, data)
+#         self._push_data(self._datar, data)
 
 #     def push_stats_data(self, Data, axis=0):
 #         Data = self._check_datas(Data, axis)
-#         self._push_stats_data(self._datar, Data)
+#         self._push_datas(self._datar, Data)
 
 #     def _check_other(self, b):
 #         assert type(self) == type(b)
@@ -1252,8 +1661,8 @@ class StatsAccum(_StatsAccum):
 #         self._push_stat = _push_stat_vec
 #         self._push_stats = _push_stats_vec
 
-#         self._push_stat_data = _push_stat_data_vec
-#         self._push_stats_data = _push_stats_data_vec
+#         self._push_data = _push_data_vec
+#         self._push_datas = _push_datas_vec
 
 #     def to_array(self, axis=0):
 #         if axis < 0:
@@ -1282,355 +1691,14 @@ class StatsAccum(_StatsAccum):
 #         self._push_stat = _push_stat
 #         self._push_stats = _push_stats
 
-#         self._push_stat_data = _push_stat_data
-#         self._push_stats_data = _push_stats_data
+#         self._push_data = _push_data
+#         self._push_datas = _push_datas
 
 
 
 
 
-## Covariance
-@myjit
-def _get_moments(out, w, x1, x2):
 
-    nmom_u = out.shape[0] - 1
-    nmom_x = out.shape[1] - 1
-
-    out[0,0] += w
-    alpha = w / out[0, 0]
-
-    delta1 = x1 - out[1, 0]
-    delta2 = x2 - out[0, 1]
-
-    out[1, 0] += delta1 * alpha
-    out[0, 1] += delta2 * alpha
-
-
-    for a1 in range(nmom_u, -1, -1):
-        for a2 in range(nmom_x, -1, -1):
-            if a1 + a2 < 2:
-                continue
-
-            # because doing += later on
-            tmp = 0.0
-            # update out[i, j]
-            for b1 in range(0, a1+1):
-                c1 = a1 - b1
-                f1 = _bfac(a1, b1)
-
-                for b2 in range(0, a2+1):
-                    c2 = a2 - b2
-                    bb = b1 + b2
-
-                    if c1 + c2 == 1:
-                        # c1+c2 == 1
-                        # c = (1,0) or (0, 1)
-                        # M_{c1,c2} = 0
-                        continue
-
-                    elif c1 + c2 == 0:
-                        # => M_{0,0} = 1
-                        val = delta1**b1 * delta2**b2 * (
-                            (-1)**bb * alpha**bb * (1-alpha)
-                            + (1. - alpha)**bb * alpha)
-                    else:
-                        f2 = _bfac(a2, b2)
-                        val = (
-                            f1 * f2 * delta1**b1 * delta2**b2 * (
-                                (-1)**bb * alpha**bb * (1-alpha) *
-                                out[c1, c2] ))
-
-                    tmp += val
-            out[a1, a2] = tmp
-
-
-
-@myjit
-def _push_val_cov(data, w, x0, x1):
-
-    if w == 0.0:
-        return
-
-    order0 = data.shape[0] - 1
-    order1 = data.shape[1] - 1
-
-    data[0, 0] += w
-    alpha = w / data[0, 0]
-    one_alpha = 1.0 - alpha
-
-    delta0 = x0 - data[1, 0]
-    delta1 = x1 - data[0, 1]
-
-    incr0 = delta0 * alpha
-    incr1 = delta1 * alpha
-
-    data[1, 0] += incr0
-    data[0, 1] += incr1
-
-    a0_min = max(0, 2 - order1)
-    for a0 in range(order0, a0_min-1, -1):
-        # if a0 + order1 < 2:
-        #     continue
-        a1_min = max(0, 2 - a0)
-        for a1 in range(order1, a1_min - 1, -1):
-            # if a0 + a1 < 2:
-            #     continue
-            # tmp = 0.0
-            # for b0 in range(0, a0+1):
-            #     c0 = a0 - b0
-            #     f0 = _bfac(a0, b0)
-
-            #     for b1 in range(0, a1+1):
-            #         c1 = a1 - b1
-            #         bb = b0 + b1
-
-            #         if c0 + c1 == 1:
-            #             # c1+c2 == 1
-            #             # c = (1,0) or (0, 1)
-            #             # M_{c1,c2} = 0
-            #             continue
-
-            #         elif c0 + c1 == 0:
-            #             # => M_{0,0} = 1
-            #             val = delta0**b0 * delta1**b1 * (
-            #                 (-1)**bb * alpha**bb * (1-alpha)
-            #                 + (1. - alpha)**bb * alpha)
-            #         else:
-            #             f1 = _bfac(a1, b1)
-            #             val = (
-            #                 f0 * f1 * delta0**b0 * delta1**b1 * (
-            #                     (-1)**bb * alpha**bb * (1-alpha) *
-            #                     data[c0, c1] ))
-
-            #         tmp += val
-
-
-            # Alternative
-            tmp = 0.0
-            delta0_b0 = 1.0
-            alpha_b0 = 1.0
-            minus_b0 = 1.0
-            one_alpha_b0 = 1.0
-            for b0 in range(0, a0+1):
-                c0 = a0 - b0
-                f0 = _bfac(a0, b0)
-
-                delta1_b1 = 1.0
-                alpha_bb = alpha_b0
-                minus_bb = minus_b0
-                one_alpha_bb = one_alpha_b0
-                for b1 in range(0, a1+1):
-                    c1 = a1 - b1
-                    cs = c0 + c1
-                    if cs == 0:
-                        tmp += delta0_b0 * delta1_b1  * (
-                            minus_bb * alpha_bb * one_alpha 
-                            + one_alpha_bb * alpha)
-                    elif cs != 1:
-                        tmp += (
-                            f0 * _bfac(a1, b1)
-                            * delta0_b0 * delta1_b1
-                            * (minus_bb * alpha_bb * one_alpha * data[c0,c1])
-                        )
-                    delta1_b1 *= delta1
-                    alpha_bb *= alpha
-                    one_alpha_bb *= one_alpha
-                    minus_bb *= -1
-
-                delta0_b0 *= delta0
-                alpha_b0 *= alpha
-                minus_b0 *= -1
-                one_alpha_b0 *= one_alpha
-
-
-            # tmp = 0.0
-            # for b0 in range(0, a0+1):
-            #     c0 = a0 - b0
-            #     if b0 == 0:
-            #         f0 = 1.0
-            #         delta0_b0 = 1.0
-            #         alpha_b0 = 1.0
-            #         minus_b0 = 1.0
-            #         one_alpha_b0 = 1.0
-            #     else:
-            #         f0 = _bfac(a0, b0)
-            #         delta0_b0 *= delta0
-            #         alpha_b0 *= alpha
-            #         minus_b0 *= -1
-            #         one_alpha_b0 *= one_alpha
-
-            #     for b1 in range(0, a1+1):
-            #         c1 = a1 - b1
-
-            #         if b1 == 0:
-            #             delta1_b1 = 1.0
-            #             alpha_bb = alpha_b0
-            #             minus_bb = minus_b0
-            #             one_alpha_bb = one_alpha_b0
-            #         else:
-            #             delta1_b1 *= delta1
-            #             alpha_bb *= alpha
-            #             one_alpha_bb *= one_alpha
-            #             minus_bb *= -1
-
-            #         cs = c0 + c1
-            #         if cs == 0:
-            #             tmp += delta0_b0 * delta1_b1  * (
-            #                 minus_bb * alpha_bb * one_alpha 
-            #                 + one_alpha_bb * alpha)
-            #         elif cs != 1:
-            #             tmp += (
-            #                 f0 * _bfac(a1, b1)
-            #                 * delta0_b0 * delta1_b1
-            #                 * (minus_bb * alpha_bb * one_alpha * data[c0,c1])
-            #             )
-            data[a0, a1] = tmp
-
-
-@myjit
-def _push_vals_cov(data, W, X1, X2):
-    ns = X1.shape[0]
-    for s in range(ns):
-        _push_val_cov(data, W[s], X1[s], X2[s])
-
-
-@myjit
-def _push_data_cov(data, data_in):
-
-    w = data_in[0, 0]
-    if w == 0.0:
-        return
-
-    order0 = data.shape[0] - 1
-    order1 = data.shape[1] - 1
-
-    data[0, 0] += w
-    alpha = w / data[0, 0]
-    one_alpha = 1.0 - alpha
-
-    delta0 = data_in[1, 0] - data[1, 0]
-    delta1 = data_in[0, 1] - data[0, 1]
-
-    incr0 = delta0 * alpha
-    incr1 = delta1 * alpha
-
-    data[1, 0] += incr0
-    data[0, 1] += incr1
-
-    a0_min = max(0, 2 - order1)
-    for a0 in range(order0, a0_min-1, -1):
-        a1_min = max(0, 2 - a0)
-        for a1 in range(order1, a1_min - 1, -1):
-            # Alternative
-            tmp = 0.0
-            delta0_b0 = 1.0
-            alpha_b0 = 1.0
-            minus_b0 = 1.0
-            one_alpha_b0 = 1.0
-            for b0 in range(0, a0+1):
-                c0 = a0 - b0
-                f0 = _bfac(a0, b0)
-
-                delta1_b1 = 1.0
-                alpha_bb = alpha_b0
-                minus_bb = minus_b0
-                one_alpha_bb = one_alpha_b0
-                for b1 in range(0, a1+1):
-                    c1 = a1 - b1
-                    cs = c0 + c1
-                    if cs == 0:
-                        tmp += delta0_b0 * delta1_b1  * (
-                            minus_bb * alpha_bb * one_alpha
-                            + one_alpha_bb * alpha)
-                    elif cs != 1:
-                        tmp += (
-                            f0 * _bfac(a1, b1)
-                            * delta0_b0 * delta1_b1
-                            * (
-                                minus_bb * alpha_bb * one_alpha * data[c0,c1]
-                                + one_alpha_bb * alpha * data_in[c0, c1]
-                            )
-                        )
-                    delta1_b1 *= delta1
-                    alpha_bb *= alpha
-                    one_alpha_bb *= one_alpha
-                    minus_bb *= -1
-
-                delta0_b0 *= delta0
-                alpha_b0 *= alpha
-                minus_b0 *= -1
-                one_alpha_b0 *= one_alpha
-
-            data[a0, a1] = tmp
-
-
-@myjit
-def _push_datas_cov(data, datas):
-    ns = datas.shape[0]
-    for s in range(ns):
-        _push_data_cov(data, datas[s])
-
-
-# Vector
-@myjit
-def _push_val_cov_vec(data, w, x0, x1):
-    nv = data.shape[-1]
-    for k in range(nv):
-        _push_val_cov(data[..., k], w[k], x0[k], x1[k])
-
-
-@myjit
-def _push_vals_cov_vec(data, W, X0, X1):
-    nv = data.shape[-1]
-    ns = X0.shape[0]
-    for s in range(ns):
-        for k in range(nv):
-            _push_val_cov(data[...,k], W[s, k], X0[s, k], X1[s, k])
-
-@myjit
-def _push_data_cov_vec(data, data_in):
-    nv = data.shape[-1]
-    for k in range(nv):
-        _push_data_cov(data[...,k], data_in[..., k])
-
-
-@myjit
-def _push_datas_cov_vec(data, Datas):
-    nv = data.shape[-1]
-    ns = Datas.shape[0]
-    for s in range(ns):
-        for k in range(nv):
-            _push_data_cov(data[..., k], Datas[s, ..., k])
-
-
-
-def _central_cov_from_vals(data, W, X0, X1):
-    order0 = data.shape[0] - 1
-    order1 = data.shape[1] - 1
-
-    wsum = W.sum(axis=0)
-    wsum_inv = 1.0 / wsum
-
-    x0ave = (W * X0).sum(axis=0) * wsum_inv
-    x1ave = (W * X1).sum(axis=0) * wsum_inv
-
-
-    dx0 = X0 - x0ave
-    dx1 = X1 - x1ave
-
-    p0 = np.arange(0, order0+1)
-    p1 = np.arange(0, order1+1)
-
-    dx0 = dx0[:, None, ...] ** p0
-    dx1 = dx1[:, None, ...] ** p1
-
-    # data[0] = wsum
-    # data[1] = xave
-
-    data[...] = np.einsum('r,ri...,rj...->ij...', W, dx0, dx1) * wsum_inv
-    data[0, 0] = wsum
-    data[1, 0] = x0ave
-    data[0, 1] = x1ave
 
 
 
@@ -1719,32 +1787,27 @@ def _central_cov_from_vals(data, W, X0, X1):
 #         _push_stat_cov(data, W[s], A[s], V[s])
 
 
-class _StatsAccumCov(object):
-    def __init__(self, shape, dtype=np.float, nmom=(2, 2)):
-        self.nmom = nmom
-        self._nmom_shape = tuple(x + 1 for x in nmom)
-        self._nmom_var_shape = tuple(x - 1 for x in nmom)
+# class _StatsAccumCov(object):
+#     def __init__(self, shape, dtype=np.float, nmom=(2, 2)):
+#         self.nmom = nmom
+#         self._nmom_shape = tuple(x + 1 for x in nmom)
+#         self._nmom_var_shape = tuple(x - 1 for x in nmom)
 
-        self._shape = shape
-        self._shape_var = self._nmom_var_shape + self._shape
-        self._dtype = dtype
+#         self._shape = shape
+#         self._shape_var = self._nmom_var_shape + self._shape
+#         self._dtype = dtype
 
-        self._init_subclass()
+#         self._init_subclass()
 
-        self._data = np.empty(self._nmom_shape + self._shape, dtype=self._dtype)
+#         self._data = np.empty(self._nmom_shape + self._shape, dtype=self._dtype)
 
-        if getattr(self, "_shape_r", None) is None:
-            if self.shape is ():
-                self._shape_r = ()
-            else:
-                self._shape_r = (np.prod(self.shape),)
+#         if getattr(self, "_shape_r", None) is None:
+#             if self.shape is ():
+#                 self._shape_r = ()
+#             else:
+#                 self._shape_r = (np.prod(self.shape),)
 
-        if getattr(self, "_shape_var_r", None) is None:
-            self._shape_var_r = self._nmom_var_shape + self._shape_r
-        self._datar = self._data.reshape(self._nmom_shape + self._shape_r)
-        self.zero()
-
-
-    
-
-
+#         if getattr(self, "_shape_var_r", None) is None:
+#             self._shape_var_r = self._nmom_var_shape + self._shape_r
+#         self._datar = self._data.reshape(self._nmom_shape + self._shape_r)
+#         self.zero()
