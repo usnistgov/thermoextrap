@@ -425,6 +425,8 @@ class StatsAccumBase(object):
         self._data = np.zeros(self._data_shape, dtype=self.dtype)
         self._data_flat = self._data.reshape(self._data_flat_shape)
 
+    def _init_subclass(self):
+        pass
 
     @gcached()
     def _moments_shape(self):
@@ -799,7 +801,10 @@ class _VecMixin(object):
         """
         create new object reduced along axis
         """
+
         ndim = len(self.shape)
+        assert ndim > 0
+
         if axis < 0:
             axis += ndim
         assert axis >= 0 and axis <= ndim
@@ -838,27 +843,27 @@ class _VecMixin(object):
 
 
 
-class StatsAccumVec(_StatsAccum, _VecMixin):
+class StatsAccum(_StatsAccum, _VecMixin):
     def _init_subclass(self):
-        self._push_val = _push_val_vec
-        self._push_vals = _push_vals_vec
-        self._push_stat = _push_stat_vec
-        self._push_stats = _push_stats_vec
+        if self.shape == ():
+            self._push_val = _push_val
+            self._push_vals = _push_vals
+            self._push_stat = _push_stat
+            self._push_stats = _push_stats
 
-        self._push_data = _push_data_vec
-        self._push_datas = _push_datas_vec
+            self._push_data = _push_data
+            self._push_datas = _push_datas
+        else:
+            self._push_val = _push_val_vec
+            self._push_vals = _push_vals_vec
+            self._push_stat = _push_stat_vec
+            self._push_stats = _push_stats_vec
+
+            self._push_data = _push_data_vec
+            self._push_datas = _push_datas_vec
 
 
 
-class StatsAccum(_StatsAccum):
-    def _init_subclass(self):
-        self._push_val = _push_val
-        self._push_vals = _push_vals
-        self._push_stat = _push_stat
-        self._push_stats = _push_stats
-
-        self._push_data = _push_data
-        self._push_datas = _push_datas
 
 
 ######################################################################
@@ -927,49 +932,7 @@ def _push_val_cov(data, w, x0, x1):
                 minus_b0 *= -1
                 one_alpha_b0 *= one_alpha
 
-            # This is slower
-            # tmp = 0.0
-            # for b0 in range(0, a0+1):
-            #     c0 = a0 - b0
-            #     if b0 == 0:
-            #         f0 = 1.0
-            #         delta0_b0 = 1.0
-            #         alpha_b0 = 1.0
-            #         minus_b0 = 1.0
-            #         one_alpha_b0 = 1.0
-            #     else:
-            #         f0 = _bfac(a0, b0)
-            #         delta0_b0 *= delta0
-            #         alpha_b0 *= alpha
-            #         minus_b0 *= -1
-            #         one_alpha_b0 *= one_alpha
-
-            #     for b1 in range(0, a1+1):
-            #         c1 = a1 - b1
-
-            #         if b1 == 0:
-            #             delta1_b1 = 1.0
-            #             alpha_bb = alpha_b0
-            #             minus_bb = minus_b0
-            #             one_alpha_bb = one_alpha_b0
-            #         else:
-            #             delta1_b1 *= delta1
-            #             alpha_bb *= alpha
-            #             one_alpha_bb *= one_alpha
-            #             minus_bb *= -1
-
-            #         cs = c0 + c1
-            #         if cs == 0:
-            #             tmp += delta0_b0 * delta1_b1  * (
-            #                 minus_bb * alpha_bb * one_alpha 
-            #                 + one_alpha_bb * alpha)
-            #         elif cs != 1:
-            #             tmp += (
-            #                 f0 * _bfac(a1, b1)
-            #                 * delta0_b0 * delta1_b1
-            #                 * (minus_bb * alpha_bb * one_alpha * data[c0,c1])
-            #             )
-            data[a0, a1] = tmp
+           data[a0, a1] = tmp
 
 
 @myjit
@@ -1247,567 +1210,14 @@ class _StatsAccumCov(StatsAccumBase):
 
 class StatsAccumCov(_StatsAccumCov):
     def _init_subclass(self):
-        self._push_val = _push_val_cov
-        self._push_vals = _push_vals_cov
-        self._push_data = _push_data_cov
-        self._push_datas = _push_datas_cov
+        if self.shape == ():
+            self._push_val = _push_val_cov
+            self._push_vals = _push_vals_cov
+            self._push_data = _push_data_cov
+            self._push_datas = _push_datas_cov
+        else:
+            self._push_val = _push_val_cov_vec
+            self._push_vals = _push_vals_cov_vec
+            self._push_data = _push_data_cov_vec
+            self._push_datas = _push_datas_cov_vec
 
-
-class StatsAccumCovVec(_StatsAccumCov, _VecMixin):
-    def _init_subclass(self):
-        self._push_val = _push_val_cov_vec
-        self._push_vals = _push_vals_cov_vec
-        self._push_data = _push_data_cov_vec
-        self._push_datas = _push_datas_cov_vec
-
-
-
-
-
-
-
-
-# class _StatsAccum(object):
-#     def __init__(self, shape, dtype=np.float, nmom=2):
-
-#         self.nmom = nmom
-#         self._nmom_shape = (self.nmom + 1,)
-#         self._nmom_var_shape = (self.nmom - 1,)
-
-#         self._shape = shape
-#         self._shape_var = self._nmom_var_shape + self._shape
-#         self._dtype = dtype
-
-#         self._init_subclass()
-
-#         self._data = np.empty(self._nmom_shape + self._shape, dtype=self._dtype)
-
-#         if getattr(self, "_shape_r", None) is None:
-#             if self.shape is ():
-#                 self._shape_r = ()
-#             else:
-#                 self._shape_r = (np.prod(self.shape),)
-
-#         if getattr(self, "_shape_var_r", None) is None:
-#             self._shape_var_r = self._nmom_var_shape + self._shape_r
-
-#         self._datar = self._data.reshape(self._nmom_shape + self._shape_r)
-#         self.zero()
-
-
-#     # when unpickling, make sure self._datar points to same
-#     # underlieing array as self._data
-#     def __setstate__(self, state):
-#         self.__dict__ = state
-#         # make sure datar points to data
-#         self._datar = self._data.reshape(self._shape_var_r + self._nmom_shape)
-
-#     def _init_subclass(self):
-#         """any special subclass stuff here"""
-#         pass
-
-#     @property
-#     def data(self):
-#         return self._data
-
-#     @property
-#     def shape(self):
-#         """shape of input values"""
-#         return self._shape
-
-#     @property
-#     def shape_var(self):
-#         return self._shape_var
-
-#     @property
-#     def ndim(self):
-#         return len(self.shape)
-
-#     @property
-#     def ndim_var(self):
-#         return len(self.shape_var)
-
-#     @property
-#     def dtype(self):
-#         return self._dtype
-
-#     @property
-#     def _unit_weight(self):
-#         if not hasattr(self, "_unit_weight_val"):
-#             self._unit_weight_val = np.ones(self.shape)
-#         return self._unit_weight_val
-
-#     def _check_weight(self, w):
-#         if w is None:
-#             w = self._unit_weight
-#         if np.shape(w) != self.shape:
-#             w = np.broadcast_to(w, self.shape)
-#         return np.reshape(w, self._shape_r)
-
-#     def _check_weights(self, W, X, axis=0):
-#         shape = list(self.shape)
-#         shape.insert(axis, X.shape[axis])
-
-#         if W is None:
-#             W = self._unit_weight
-
-#         if W.ndim == 1 and W.ndim != X.ndim and len(W) == X.shape[axis]:
-#             # assume equal weight for each record
-#             rshape = [1] * X.ndim
-#             rshape[axis] = -1
-#             W = W.reshape(*rshape)
-
-
-#         if np.shape(W) != shape:
-#             W = np.broadcast_to(W, shape)
-#         if axis != 0:
-#             W = np.rollaxis(W, axis, 0)
-#         shaper = W.shape[:1] + self._shape_r
-#         return np.reshape(W, shaper)
-
-#     def _check_val(self, x):
-#         assert np.shape(x) == self.shape
-#         return np.reshape(x, self._shape_r)
-
-#     def _check_vals(self, X, axis=0):
-#         if axis != 0:
-#             X = np.rollaxis(X, axis, 0)
-#         assert np.shape(X)[1:] == self.shape
-#         shaper = X.shape[:1] + self._shape_r
-#         return np.reshape(X, shaper)
-
-#     def _check_ave(self, a):
-#         if a.shape != self.shape:
-#             a = np.broadcast_to(a, self.shape)
-#         return np.reshape(a, self._shape_r)
-
-#     def _check_aves(self, A, axis=0):
-#         if axis != 0:
-#             A = np.rollaxis(A, axis, 0)
-#         assert np.shape(A)[1:] == self.shape, "{}, {}".format(np.shape(A), self.shape)
-#         # if np.shape(A)[1:] != self.shape_var:
-#         #     new_shape = (A.shape[0], ) + self.shape_var
-#         #     A = np.broadcast_to(A, new_shape)
-#         shaper = A.shape[:1] + self._shape_r
-#         return np.reshape(A, shaper)
-
-#     def _check_var(self, v):
-#         if np.shape(v) != self.shape_var:
-#             v = np.broadcast_to(v, self.shape_var)
-#         return np.reshape(v, self._shape_var_r)
-
-#     def _check_vars(self, V, X, axis=0):
-#         shape = list(self.shape_var)
-#         shape.insert(axis, X.shape[axis])
-#         if np.shape(V) != shape:
-#             V = np.broadcast_to(V, shape)
-#         if axis != 0:
-#             V = np.rollaxis(V, axis, 0)
-#         shaper = V.shape[:1] + self._shape_var_r
-#         return np.reshape(V, shaper)
-
-#     def _check_data(self, data):
-#         shape = self._nmom_shape + self.shape
-#         if np.shape(data) != shape:
-#             raise ValueError("data must of have shape {}".format(shape))
-#         return np.reshape(data, self._datar.shape)
-
-#     def _check_datas(self, datas, axis=0):
-#         shape = self._data.shape
-#         if axis != 0:
-#             datas = np.rollaxis(datas, axis, 0)
-#         if np.shape(datas)[1:] != shape:
-#             raise ValueError(
-#                 "bad shape {} != {}, axis={}".format(datas.shape, shape, axis)
-#             )
-#         shaper = datas.shape[:1] + self._datar.shape
-#         return np.reshape(datas, shaper)
-
-#     def zero(self):
-#         self._data.fill(0.0)
-
-#     def zeros_like(self):
-#         """create zero object like self"""
-#         return self.__class__(shape=self.shape, dtype=self.dtype, nmom=self.nmom)
-
-#     def copy(self):
-#         new = self.__class__(shape=self.shape, dtype=self.dtype, nmom=self.nmom)
-#         new._data[...] = self._data[...]
-#         return new
-
-#     def push_val(self, x, w=None):
-#         xr = self._check_val(x)
-#         wr = self._check_weight(w)
-#         self._push_val(self._datar, wr, xr)
-
-#     def push_vals(self, X, W=None, axis=0):
-#         Xr = self._check_vals(X, axis)
-#         Wr = self._check_weights(W, X, axis)
-#         self._push_vals(self._datar, Wr, Xr)
-
-#     def push_stat(self, a, v=0.0, w=None):
-#         ar = self._check_ave(a)
-#         vr = self._check_var(v)
-#         wr = self._check_weight(w)
-#         self._push_stat(self._datar, wr, ar, vr)
-
-#     def push_stats(self, A, V=0.0, W=None, axis=0):
-#         Ar = self._check_aves(A, axis)
-#         Vr = self._check_vars(V, A, axis)
-#         Wr = self._check_weights(W, A, axis)
-#         self._push_stats(self._datar, Wr, Ar, Vr)
-
-#     def push_stat_data(self, data):
-#         data = self._check_data(data)
-#         self._push_data(self._datar, data)
-
-#     def push_stats_data(self, Data, axis=0):
-#         Data = self._check_datas(Data, axis)
-#         self._push_datas(self._datar, Data)
-
-#     def _check_other(self, b):
-#         assert type(self) == type(b)
-#         assert self.shape == b.shape
-
-#     def __iadd__(self, b):
-#         self._check_other(b)
-#         self.push_stat(w=b.weight(), a=b.mean(), v=b.cmom())
-#         return self
-
-#     def __add__(self, b):
-#         self._check_other(b)
-#         new = self.copy()
-#         new.push_stat(w=b.weight(), a=b.mean(), v=b.cmom())
-#         return new
-
-#     def __isub__(self, b):
-#         self._check_other(b)
-#         assert np.all(self.weight() >= b.weight())
-#         self.push_stat(w=-b.weight(), a=b.mean(), v=b.cmom())
-#         return self
-
-#     def __sub__(self, b):
-#         assert type(self) == type(b)
-#         assert np.all(self.weight() > b.weight())
-#         new = self.copy()
-#         new.push_stat(w=-b.weight(), a=b.mean(), v=b.cmom())
-#         return new
-
-#     def __mul__(self, scale):
-#         """
-#         new object with weights scaled by scale
-#         """
-#         scale = float(scale)
-#         new = self.copy()
-#         new._data[0] = new._data[0] * scale
-#         return new
-
-
-#     def __imul__(self, scale):
-#         scale = float(scale)
-#         self._data[0] = self._data[0] * scale
-#         return self
-
-#     def weight(self):
-#         return self._data[0]
-
-#     def mean(self):
-#         return self._data[1]
-
-#     def var(self, mom=2):
-#         if mom is None:
-#             mom = slice(2, None)
-#         out = self._data[mom]
-
-#     def cmom(self):
-#         return self._data[2:]
-
-#     def std(self):
-#         return np.sqrt(self._data[2])
-
-#     # --------------------------------------------------
-#     # constructors
-#     # --------------------------------------------------
-#     @classmethod
-#     def from_stat(cls, a=None, v=0.0, w=None, data=None, shape=None, nmom=2):
-#         """
-#         object from single weight, average, variance/covariance
-#         """
-
-#         if data is not None:
-#             w = data[0]
-#             a = data[1]
-#             v = data[2:]
-#         else:
-#             assert a is not None
-
-#         if shape is None:
-#             shape = a.shape
-#         new = cls(shape=shape, dtype=a.dtype, nmom=nmom)
-#         new.push_stat(w=w, a=a, v=v)
-#         return new
-
-#     @classmethod
-#     def from_stats(cls, A=None, V=0.0, W=None, Data=None, axis=0, shape=None, nmom=2):
-#         """
-#         object from several weights, averages, variances/covarainces along axis
-#         """
-
-#         if Data is not None:
-#             return cls.from_datas(Data, shape=shape, axis=axis, nmom=nmom)
-#         else:
-#             assert A is not None
-#             # get shape
-#             if shape is None:
-#                 shape = list(A.shape)
-#                 shape.pop(axis)
-#                 shape = tuple(shape)
-
-#             new = cls(shape=shape, dtype=A.dtype, nmom=nmom)
-#             new.push_stats(W=W, A=A, V=V, axis=axis)
-#             return new
-
-#     @classmethod
-#     def from_data(cls, data, shape=None, nmom=None):
-#         if nmom is None:
-#             nmom = data.shape[0] - 1
-#         assert data.shape[0] == nmom + 1
-
-#         if shape is None:
-#             shape = data.shape[1:]
-#         new = cls(shape=shape, dtype=data.dtype, nmom=nmom)
-
-#         # new.push_stat_data(data=data)
-#         # below is much faster
-#         datar = new._check_data(data)
-#         new._datar[...] = datar
-#         return new
-
-#     @classmethod
-#     def from_datas(cls, Data, shape=None, axis=0, nmom=None):
-#         """
-#         Data should have shape
-
-#         [:, moment, ...] (axis=0)
-
-#         [moment, axis, ...] (axis=1)
-
-#         [moment, ..., axis, ...] (axis=n)
-#         """
-
-#         Data = np.array(Data)
-#         if axis < 0:
-#             axis += Data.ndim
-
-#         if axis != 0:
-#             Data = np.rollaxis(Data, axis, 0)
-
-#         if nmom is None:
-#             nmom = Data.shape[1] - 1
-
-#         assert Data.shape[1] == nmom + 1
-
-#         if shape is None:
-#             shape = Data.shape[2:]
-
-#         new = cls(shape=shape, dtype=Data.dtype, nmom=nmom)
-#         new.push_stats_data(Data=Data, axis=0)
-#         return new
-
-#     @classmethod
-#     def from_vals(cls, X, W=None, axis=0, dtype=None, shape=None, nmom=2):
-
-#         # get shape
-#         if shape is None:
-#             shape = list(X.shape)
-#             shape.pop(axis)
-#             shape = tuple(shape)
-
-#         if dtype is None:
-#             dtype = X.dtype
-#         new = cls(shape=shape, dtype=dtype, nmom=nmom)
-#         new.push_vals(X, axis=axis, W=W)
-#         return new
-
-#     def reduce(self, axis=0):
-#         """
-#         create new object reduced along axis
-#         """
-#         ndim = len(self.shape)
-#         if axis < 0:
-#             axis += ndim
-#         assert axis >= 0 and axis <= ndim
-
-#         shape = list(self.shape)
-#         shape.pop(axis)
-#         shape = tuple(shape)
-
-#         Data = self.data
-#         if Data.ndim == 2:
-#             assert axis == 0
-#             Data = Data[..., None]
-
-#         # offset axis because first dim is for moments
-#         axis += 1
-
-#         new = self.__class__.from_datas(Data, axis=axis, nmom=self.nmom)
-#         return new
-
-
-# class StatsAccumVec(_StatsAccum):
-#     def _init_subclass(self):
-#         self._push_val = _push_val_vec
-#         self._push_vals = _push_vals_vec
-#         self._push_stat = _push_stat_vec
-#         self._push_stats = _push_stats_vec
-
-#         self._push_data = _push_data_vec
-#         self._push_datas = _push_datas_vec
-
-#     def to_array(self, axis=0):
-#         if axis < 0:
-#             axis += self.data.ndim
-
-#         data = self.data
-#         if axis != 0:
-#             data = np.rollaxis(data, axis, 0)
-
-#         if data.ndim == 2:
-#             # expand
-#             data = data[:, None, :]
-
-#         # data[rec, moment, ...]
-#         shape = data.shape[2:]
-#         return StatsArray.from_datas(Data=data, child=self.__class__, shape=shape)
-
-
-# class StatsAccum(_StatsAccum):
-#     def __init__(self, shape=(), dtype=np.float, nmom=2):
-#         super(StatsAccum, self).__init__(shape=(), dtype=dtype, nmom=nmom)
-
-#     def _init_subclass(self):
-#         self._push_val = _push_val
-#         self._push_vals = _push_vals
-#         self._push_stat = _push_stat
-#         self._push_stats = _push_stats
-
-#         self._push_data = _push_data
-#         self._push_datas = _push_datas
-
-
-
-
-
-
-
-
-
-
-
-# This doens't work because need data[n, 0], data[0, n]
-# @myjit
-# def _push_stat_cov(data, w, a, v):
-#     # data[0, 0] = weight
-#     # data[1, 0] = ave0
-#     # data[0, 1] = ave1
-#     # data[1:,1:] = var
-
-#     if w == 0.0:
-#         return
-
-#     order0 = data.shape[0] - 1
-#     order1 = data.shape[1] - 1
-
-#     data[0, 0] += w
-#     alpha = w / data[0, 0]
-#     one_alpha = 1.0 - alpha
-
-#     delta0 = a[0] - data[1, 0]
-#     delta1 = a[1] - data[0, 1]
-
-#     incr0 = delta0 * alpha
-#     incr1 = delta1 * alpha
-
-#     data[1, 0] += incr0
-#     data[0, 1] += incr1
-
-#     a0_min = max(0, 2 - order1)
-#     for a0 in range(order0, a0_min-1, -1):
-#         # if a0 + order1 < 2:
-#         #     continue
-
-#         a1_min = max(0, 2 - a0)
-#         for a1 in range(order1, a1_min - 1, -1):
-#             tmp = 0.0
-#             delta0_b0 = 1.0
-#             alpha_b0 = 1.0
-#             minus_b0 = 1.0
-#             one_alpha_b0 = 1.0
-#             for b0 in range(0, a0+1):
-#                 c0 = a0 - b0
-#                 f0 = _bfac(a0, b0)
-
-#                 delta1_b1 = 1.0
-#                 alpha_bb = alpha_b0
-#                 minus_bb = minus_b0
-#                 one_alpha_bb = one_alpha_b0
-#                 for b1 in range(0, a1+1):
-#                     c1 = a1 - b1
-#                     cs = c0 + c1
-#                     if cs == 0:
-#                         tmp += delta0_b0 * delta1_b1  * (
-#                             minus_bb * alpha_bb * one_alpha
-#                             + one_alpha_bb * alpha)
-#                     elif cs != 1:
-#                         tmp += (
-#                             f0 * _bfac(a1, b1)
-#                             * delta0_b0 * delta1_b1
-#                             * (
-#                                 minus_bb * alpha_bb * one_alpha * data[c0,c1]
-#                                 + one_alpha_bb * alpha * v[c0-1, c1-1]
-#                             )
-#                         )
-#                     delta1_b1 *= delta1
-#                     alpha_bb *= alpha
-#                     one_alpha_bb *= one_alpha
-#                     minus_bb *= -1
-
-#                 delta0_b0 *= delta0
-#                 alpha_b0 *= alpha
-#                 minus_b0 *= -1
-#                 one_alpha_b0 *= one_alpha
-
-#             data[a0, a1] = tmp
-
-
-# @myjit
-# def _push_stats_cov(data, W, A, V):
-#     ns = A.shape[0]
-#     for s in range(ns):
-#         _push_stat_cov(data, W[s], A[s], V[s])
-
-
-# class _StatsAccumCov(object):
-#     def __init__(self, shape, dtype=np.float, nmom=(2, 2)):
-#         self.nmom = nmom
-#         self._nmom_shape = tuple(x + 1 for x in nmom)
-#         self._nmom_var_shape = tuple(x - 1 for x in nmom)
-
-#         self._shape = shape
-#         self._shape_var = self._nmom_var_shape + self._shape
-#         self._dtype = dtype
-
-#         self._init_subclass()
-
-#         self._data = np.empty(self._nmom_shape + self._shape, dtype=self._dtype)
-
-#         if getattr(self, "_shape_r", None) is None:
-#             if self.shape is ():
-#                 self._shape_r = ()
-#             else:
-#                 self._shape_r = (np.prod(self.shape),)
-
-#         if getattr(self, "_shape_var_r", None) is None:
-#             self._shape_var_r = self._nmom_var_shape + self._shape_r
-#         self._datar = self._data.reshape(self._nmom_shape + self._shape_r)
-#         self.zero()

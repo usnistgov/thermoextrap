@@ -37,7 +37,7 @@ def _get_data_single(nrec=100, weighted=False):
 @pytest.mark.parametrize("nrec", [100])
 @pytest.mark.parametrize("moments", [5])
 @pytest.mark.parametrize("weighted", [False, True])
-def test_StatsAccum_vals(nrec, moments, weighted):
+def test_vals(nrec, moments, weighted):
     # unweighted
     w, x = _get_data_single(nrec, weighted)
     dataA = _get_cmom_single(w, x, moments)
@@ -65,7 +65,7 @@ def test_StatsAccum_vals(nrec, moments, weighted):
 @pytest.mark.parametrize("nrec", [100])
 @pytest.mark.parametrize("moments", [5])
 @pytest.mark.parametrize("weighted", [False, True])
-def test_StatsAccum_stats(nrec, moments, weighted):
+def test_stats(nrec, moments, weighted):
     # unweighted
     w, x = _get_data_single(nrec, weighted)
     dataA = _get_cmom_single(w, x, moments)
@@ -198,7 +198,7 @@ def _get_data_vec(shape, weighted=False):
 ])
 @pytest.mark.parametrize("moments", [5])
 @pytest.mark.parametrize("weighted", [False, True])
-def test_StatsAccumVec_vals(dshape, axis, moments, weighted):
+def test_vec_vals(dshape, axis, moments, weighted):
     # unweighted
     wt, x = _get_data_vec(dshape, weighted)
 
@@ -219,13 +219,13 @@ def test_StatsAccumVec_vals(dshape, axis, moments, weighted):
 
         np.testing.assert_allclose(data, dataA)
 
-        s = central.StatsAccumVec(shape=shape, moments=moments)
+        s = central.StatsAccum(shape=shape, moments=moments)
         # push_vals
         s.push_vals(x, w, axis=axis)
         np.testing.assert_allclose(s.data, data)
 
         # from vals
-        s = central.StatsAccumVec.from_vals(x, w, moments=moments, axis=axis)
+        s = central.StatsAccum.from_vals(x, w, moments=moments, axis=axis)
         np.testing.assert_allclose(s.data, data)
 
 
@@ -237,7 +237,7 @@ def test_StatsAccumVec_vals(dshape, axis, moments, weighted):
 ])
 @pytest.mark.parametrize("moments", [5])
 @pytest.mark.parametrize("weighted", [False, True])
-def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
+def test_vec_stats(dshape, axis, moments, weighted):
     # unweighted
     wt, x = _get_data_vec(dshape, weighted)
 
@@ -275,12 +275,12 @@ def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
  
 
         # factory
-        s = central.StatsAccumVec.from_datas(datas, moments=moments, axis=0)
+        s = central.StatsAccum.from_datas(datas, moments=moments, axis=0)
         np.testing.assert_allclose(s.data, data)
 
 
         # pushs
-        s = central.StatsAccumVec(moments=moments, shape=shape)
+        s = central.StatsAccum(moments=moments, shape=shape)
 
         for d in datas:
             s.push_stat(a=d[1], v=d[2:], w=d[0])
@@ -296,16 +296,16 @@ def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
 
 
         # addition
-        S = [central.StatsAccumVec.from_data(d, moments=moments) for d in datas]
+        S = [central.StatsAccum.from_data(d, moments=moments) for d in datas]
         out = S[0]
         for s in S[1:]:
             out = out + s
         np.testing.assert_allclose(out.data, data)
 
-        out = sum(S, central.StatsAccumVec(shape=shape, moments=moments))
+        out = sum(S, central.StatsAccum(shape=shape, moments=moments))
         np.testing.assert_allclose(out.data, data)
 
-        out = central.StatsAccumVec(shape=shape, moments=moments)
+        out = central.StatsAccum(shape=shape, moments=moments)
         for s in S:
             out += s
         np.testing.assert_allclose(out.data, data)
@@ -315,7 +315,7 @@ def test_StatsAccumVec_stats(dshape, axis, moments, weighted):
         np.testing.assert_allclose(out.data, datas[1])
 
         # iadd/isub
-        out = central.StatsAccumVec(shape=shape, moments=moments)
+        out = central.StatsAccum(shape=shape, moments=moments)
         out += S[0]
         np.testing.assert_allclose(out.data, S[0].data)
 

@@ -154,8 +154,6 @@ def test_StatsAccum_stats(nrec, moments, weighted):
 
 
 
-
-
 def _get_data_vec(shape, weighted=False):
     x0 = np.random.rand(*shape)
     x1 = np.random.rand(*shape)
@@ -172,9 +170,9 @@ def _get_data_vec(shape, weighted=False):
 
 @pytest.mark.parametrize("dshape,axis", [
     ((100,1), 0),
-    ((10, 10), 0),
-    ((10,10), 1),
-    ((20,)*3, 0), ((20,)*3, 1), ((20,)*3, 2)
+    ((100,10), 0),
+    ((10,100), 1),
+    ((100, 5, 5), 0), ((5, 100, 5), 1), ((5, 5, 100), 2)
 ])
 @pytest.mark.parametrize("moments", [5, (5, 5), (1, 1)])
 @pytest.mark.parametrize("weighted", [False, True])
@@ -197,20 +195,20 @@ def test_vec_vals(dshape, axis, moments, weighted):
     for w in (wt, ws):
         data = central.central_comoments(x0, x1, moments, w, axis=axis)
 
-        s = central.StatsAccumCovVec(shape=shape, moments=moments)
+        s = central.StatsAccumCov(shape=shape, moments=moments)
         # push_vals
         s.push_vals(x0, x1, w, axis=axis)
         np.testing.assert_allclose(s.data, data)
 
         # from vals
-        s = central.StatsAccumCovVec.from_vals(x0, x1, w, moments=moments, axis=axis)
+        s = central.StatsAccumCov.from_vals(x0, x1, w, moments=moments, axis=axis)
         np.testing.assert_allclose(s.data, data)
 
 @pytest.mark.parametrize("dshape,axis", [
     ((100,1), 0),
-    ((10, 10), 0),
-    ((10,10), 1),
-    ((20,)*3, 0), ((20,)*3, 1), ((20,)*3, 2)
+    ((100, 10), 0),
+    ((10,100), 1),
+    ((100, 5, 5), 0), ((5, 100, 5), 1), ((5, 5, 100), 2)
 ])
 @pytest.mark.parametrize("moments", [5, (5,5), (1,1)])
 @pytest.mark.parametrize("weighted", [False, True])
@@ -247,11 +245,11 @@ def test_Vec_stats(dshape, axis, moments, weighted):
 
  
         # factory
-        s = central.StatsAccumCovVec.from_datas(datas, moments=moments, axis=0)
+        s = central.StatsAccumCov.from_datas(datas, moments=moments, axis=0)
         np.testing.assert_allclose(s.data, data)
 
         # pushs
-        s = central.StatsAccumCovVec(moments=moments, shape=shape)
+        s = central.StatsAccumCov(moments=moments, shape=shape)
 
         for d in datas:
             s.push_data(d)
@@ -263,7 +261,7 @@ def test_Vec_stats(dshape, axis, moments, weighted):
 
 
         # addition
-        S = [central.StatsAccumCovVec.from_data(d, moments=moments) for d in datas]
+        S = [central.StatsAccumCov.from_data(d, moments=moments) for d in datas]
         out = S[0]
         for s in S[1:]:
             out = out + s
