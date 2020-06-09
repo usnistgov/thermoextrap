@@ -4,7 +4,7 @@ import numpy as np
 from numba import njit
 from scipy.special import binom
 
-from .cached_decorators import gcached
+from .cached_decorators import gcached, cached_clear
 
 
 def _my_broadcast(x, shape):
@@ -325,10 +325,15 @@ def _push_data_scale(data, data_in, scale):
 def _push_datas_scale(data, data_in, scale):
     ns = data_in.shape[0]
     for s in range(ns):
+        f = scale[s]
+        if f == 0:
+            continue
         _push_stat(data,
-                   data_in[s, 0] * scale[s, 0],
+                   data_in[s, 0] * f,
                    data_in[s, 1],
                    data_in[s, 2:])
+
+
 
 # Vector
 # Note: decided to change order from [value, moment] to [moment, value]
@@ -383,8 +388,9 @@ def _push_datas_vec(data, Data_in):
 @myjit
 def _push_data_scale_vec(data, data_in, scale):
     nv = data.shape[1]
-    for k in range(nv):
-        _push_data(data[:, k], data_in[:, k], scale[k])
+    if scale != 0:
+        for k in range(nv):
+            _push_data_scale(data[:, k], data_in[:, k], scale)
 
 
 @myjit
@@ -392,8 +398,11 @@ def _push_datas_scale_vec(data, Data_in, scale):
     ns = Data_in.shape[0]
     nv = data.shape[1]
     for s in range(ns):
+        f = scale[s]
+        if f == 0:
+            continue
         for k in range(nv):
-            _push_data(data[:, k], Data_in[s, :, k], scale[s, k])
+            _push_data_scale(data[:, k], Data_in[s, :, k], f)
 
 
 
@@ -401,7 +410,7 @@ class StatsAccumBase(object):
     """
     Base class for moments accumulation
     """
-    def __init__(self, moments, shape=None, dtype=np.float):
+    def __init__(self, moments, shape=None, dtype=None):
         """
         Parameters
         ----------
@@ -412,8 +421,10 @@ class StatsAccumBase(object):
 
         if isinstance(moments, int):
             moments = (moments,)
-
         self.moments = moments
+
+        if dtype is None:
+            dtype = np.float
 
         if shape is None:
             shape = ()
@@ -427,6 +438,11 @@ class StatsAccumBase(object):
 
     def _init_subclass(self):
         pass
+
+
+    def _moments_ndim(self):
+        """number of dimensions for moments"""
+        return len(self.moments)
 
     @gcached()
     def _moments_shape(self):
@@ -593,6 +609,33 @@ class StatsAccumBase(object):
 
     @gcached(prop=False)
     def _single_index(self, val):
+
+        # index with things like
+        # data[1,0 ,...]
+        # data[0,1 ,...]
+
+        # so build a total with indexer like
+        # data[indexer]
+        # with
+        # index = ([1,0],[0,1],...)
+
+        dims = len(self.moments)
+
+        if dims == 1:
+            index = [val]
+        else:
+            # this is a bit more complicated
+            index = [[0]*dims for _ in range(dims)]
+            for i in range(dims):
+                index[i][i] = val
+
+
+        if self.ndim > 0:
+            index += [...]
+
+        return tuple(index)
+
+
         dims = len(self.moments)
         if dims ==0:
             index = (val,)
@@ -616,6 +659,9 @@ class StatsAccumBase(object):
 
     def std(self):
         return np.sqrt(self.var(mom=2))
+
+    def cmom(self):
+        return self._data
 
 
     def _check_other(self, b):
@@ -721,21 +767,26 @@ class _StatsAccum(StatsAccumBase):
 
 
     @classmethod
-    def from_data(cls, data, shape=None, moments=None):
+    def from_data(cls, data, shape=None, moments=None, dtype=None):
         if moments is None:
             moments = data.shape[0] - 1
-        assert data.shape[0] == moments + 1
+        if isinstance(moments, int):
+            moments = (moments,)
+        assert data.shape[0] == moments[0] + 1
+
+        if dtype is None:
+            dtype = data.dtype
 
         if shape is None:
             shape = data.shape[1:]
-        new = cls(shape=shape, dtype=data.dtype, moments=moments)
+        new = cls(shape=shape, dtype=dtype, moments=moments)
 
         datar = new.check_data(data)
         new._data_flat[...] = datar
         return new
 
     @classmethod
-    def from_datas(cls, datas, shape=None, axis=0, moments=None):
+    def from_datas(cls, datas, shape=None, axis=0, moments=None, dtype=None):
         """
         Data should have shape
 
@@ -751,35 +802,37 @@ class _StatsAccum(StatsAccumBase):
             axis += datas.ndim
         if axis != 0:
             datas = np.rollaxis(datas, axis, 0)
-
         if moments is None:
             moments = datas.shape[1] - 1
+        if isinstance(moments, int):
+            moments = (moments,)
+        if dtype is None:
+            dtype = datas.dtype
 
-        assert datas.shape[1] == moments + 1
+        assert datas.shape[1] == moments[0] + 1
 
         if shape is None:
             shape = datas.shape[2:]
 
-        new = cls(shape=shape, dtype=datas.dtype, moments=moments)
+        new = cls(shape=shape, dtype=dtype, moments=moments)
         new.push_datas(datas=datas, axis=0)
         return new
 
 
     @classmethod
-    def from_stat(cls, a, v=0.0, w=None, shape=None, moments=2):
+    def from_stat(cls, a, v=0.0, w=None, shape=None, moments=2, dtype=None):
         """
         object from single weight, average, variance/covariance
         """
 
-
         if shape is None:
             shape = a.shape
-        new = cls(shape=shape, dtype=a.dtype, moments=moments)
+        new = cls(shape=shape, moments=moments, dtype=dtype)
         new.push_stat(w=w, a=a, v=v)
         return new
 
     @classmethod
-    def from_stats(cls, a, v=0.0, w=None, axis=0, shape=None, moments=2):
+    def from_stats(cls, a, v=0.0, w=None, axis=0, shape=None, moments=2, dtype=None):
         """
         object from several weights, averages, variances/covarainces along axis
         """
@@ -789,6 +842,10 @@ class _StatsAccum(StatsAccumBase):
             shape = list(A.shape)
             shape.pop(axis)
             shape = tuple(shape)
+
+        if dtype is None:
+            a = np.array(a)
+            dtype = a.dtype
 
         new = cls(shape=shape, dtype=A.dtype, moments=moments)
         new.push_stats(a=a, v=v, w=w, axis=axis)
@@ -932,7 +989,7 @@ def _push_val_cov(data, w, x0, x1):
                 minus_b0 *= -1
                 one_alpha_b0 *= one_alpha
 
-           data[a0, a1] = tmp
+            data[a0, a1] = tmp
 
 
 @myjit
@@ -1025,7 +1082,10 @@ def _push_datas_cov(data, datas):
 def _push_datas_scale_cov(data, datas, scale):
     ns = datas.shape[0]
     for s in range(ns):
-        _push_data_scale_cov(data, datas[s], scale[s])
+        f = scale[s]
+        if f == 0:
+            continue
+        _push_data_scale_cov(data, datas[s], f)
 
 
 
@@ -1064,20 +1124,24 @@ def _push_datas_cov_vec(data, Datas):
 @myjit
 def _push_data_scale_cov_vec(data, data_in, scale):
     nv = data.shape[-1]
-    for k in range(nv):
-        _push_data_scale_cov(data[...,k], data_in[..., k],
-                             scale[k])
+    if scale > 0:
+        for k in range(nv):
+            _push_data_scale_cov(data[...,k], data_in[..., k],
+                                 scale)
 
 @myjit
 def _push_datas_scale_cov_vec(data, Datas, scale):
     nv = data.shape[-1]
     ns = Datas.shape[0]
     for s in range(ns):
+        f = scale[s]
+        if f == 0:
+            continue
         for k in range(nv):
             _push_data_scale_cov(data[..., k],
                                  Datas[s, ..., k],
-                                 scale[s, k])
-
+                                 f)
+            
 def _central_cov_from_vals(data, W, X0, X1):
     order0 = data.shape[0] - 1
     order1 = data.shape[1] - 1
@@ -1109,11 +1173,12 @@ def _central_cov_from_vals(data, W, X0, X1):
 
 
 class _StatsAccumCov(StatsAccumBase):
-    def __init__(self, moments, shape=None, dtype=np.float):
+    def __init__(self, moments, shape=None, dtype=None):
         if isinstance(moments, int):
             moments = (moments,) * 2
         moments = tuple(moments)
         assert len(moments) == 2
+
         super(_StatsAccumCov, self).__init__(moments=moments, shape=shape, dtype=dtype)
 
 
@@ -1135,9 +1200,9 @@ class _StatsAccumCov(StatsAccumBase):
     # constructors
     # --------------------------------------------------
     @classmethod
-    def from_vals(cls, x0, x1, w=None, axis=0, dtype=None, shape=None,
+    def from_vals(cls, x0, x1, w=None, axis=0, shape=None,
                   broadcast=False,
-                  moments=2):
+                  moments=2, dtype=None):
 
         # get shape
         if shape is None:
@@ -1153,7 +1218,7 @@ class _StatsAccumCov(StatsAccumBase):
 
 
     @classmethod
-    def from_data(cls, data, shape=None, moments=None):
+    def from_data(cls, data, shape=None, moments=None, dtype=None):
 
         if moments is None:
             moments = tuple(x - 1 for x in data.shape[:2])
@@ -1161,19 +1226,21 @@ class _StatsAccumCov(StatsAccumBase):
         if isinstance(moments, int):
             moments = (moments,) * 2
 
-
         assert data.shape[:2] == tuple(x+1 for x in moments)
 
         if shape is None:
             shape = data.shape[2:]
 
-        new = cls(shape=shape, dtype=data.dtype, moments=moments)
+        if dtype is None:
+            dtype = data.dtype
+
+        new = cls(shape=shape, dtype=dtype, moments=moments)
         datar = new.check_data(data)
         new._data_flat[...] = datar
         return new
 
     @classmethod
-    def from_datas(cls, datas, shape=None, axis=0, moments=None):
+    def from_datas(cls, datas, shape=None, axis=0, moments=None, dtype=None):
         """
         Data should have shape
 
@@ -1201,10 +1268,62 @@ class _StatsAccumCov(StatsAccumBase):
         if shape is None:
             shape = datas.shape[3:]
 
-        new = cls(shape=shape, dtype=datas.dtype, moments=moments)
+        if dtype is None:
+            dtype = datas.dtype
+
+        new = cls(shape=shape, dtype=dtype, moments=moments)
         new.push_datas(datas=datas, axis=0)
         return new
 
+
+
+
+
+def weighted_var(x, w, axis=None, axis_sum=None, unbiased=True, **kwargs):
+    """
+    return the weighted variance over x with weight w
+
+    v = sum(w)**2/(sum(w)**2 - sum(w**2)) * sum(w * (x-mu)**2 )
+
+    Parameters
+    ----------
+    x : array
+        values to consider
+
+    w : array
+        weights 
+
+    axis : axis to average over
+
+    axis_sum : axis to sum over for  w,w**2
+
+    unbiased : bool (default True)
+    if True, then apply unbiased norm (like ddof=1)
+    else, apply biased norm (like ddof=0)
+
+
+    **kwargs : arguments to np.average
+
+    Returns
+    -------
+    Ave : weighted average
+        shape x with `axis` removed
+
+    Var : weighted variance 
+        shape x with `axis` removed
+    """
+
+    if axis_sum is None:
+        axis_sum = axis
+
+    m1 = np.average(x, weights=w, axis=axis, **kwargs)
+    m2 = np.average((x - m1)**2, weights=w, axis=axis, **kwargs)
+
+    if unbiased:
+        w1 = w.sum(axis=axis_sum)
+        w2 = (w * w).sum(axis=axis_sum)
+        m2 *= w1 * w1 / (w1 * w1 - w2)
+    return m1, m2
 
 
 
@@ -1220,4 +1339,629 @@ class StatsAccumCov(_StatsAccumCov):
             self._push_vals = _push_vals_cov_vec
             self._push_data = _push_data_cov_vec
             self._push_datas = _push_datas_cov_vec
+
+
+
+
+class StatsArray(object):
+    """
+    Collection of Accumulator objects
+    """
+
+    def __init__(self, moments, shape=None, dtype=np.float, child=None):
+        """
+        moments : int or tuple
+            moments to consider
+        shape : tuple, optional
+            shape of data
+        dtype : numpy dtype
+        child : Accumulator object, optional
+            if not specified, choose child class based on moments.
+            If moments is a scalar or length 1 tuple, child is StatsAccum object.
+            If moments is a length 2 tuple, child is a StatsAccumCov object
+        """
+
+        if isinstance(moments, int):
+            moments = (moments,)
+
+        assert isinstance(moments, tuple)
+
+        if child is None:
+            if len(moments) == 1:
+                child = StatsAccum
+            else:
+                child = StatsAccumCov
+
+        self._child = child
+        self._accum = child(shape=shape, moments=moments, dtype=dtype)
+        self.zero()
+
+    @property
+    def accum(self):
+        return self._accum
+
+    @property
+    def moments(self):
+        return self._accum.moments
+
+    @property
+    def dtype(self):
+        return self._accum.dtype
+
+
+    @property
+    def values(self):
+        return self._values
+
+    @values.setter
+    @cached_clear()
+    def values(self, values):
+        if not isinstance(values, list):
+            raise ValueError('trying to set list to non-list value')
+        self._values = values
+
+    @gcached()
+    def data(self):
+        return np.array(self._values)
+
+    def new_like(self):
+        return self.__class__(shape=self.accum.shape,
+                             child=self._child,
+                             dtype=self.dtype,
+                             moments=self.accum.moments)
+
+
+    @property
+    def _rolled_data(self):
+        # move first (record) dimension to after moments
+        axis = len(self.moments)
+        return np.rollaxis(self.data, 0, axis+1)
+
+
+    def __len__(self):
+        return len(self._values)
+
+    def __getitem__(self, idx):
+        new = self.new_like()
+
+        try:
+            y = self._values[idx]
+        except:
+            y = list(self.data[idx])
+        if not isinstance(y, list):
+            y = [y]
+
+        new._values = y
+        return new
+
+
+
+
+
+    def to_stats(self, indices=None):
+        data = self._rolled_data
+        if indices is None:
+            new = self._child.from_data(data,
+                                        moments=self.moments,
+                                        dtype=self.dtype)
+
+        else:
+            axis = len(self.moments)
+            shape = indices.shape + data.shape[axis+1:]
+            new = child(shape)
+            np.take(data, indices, axis=axis, out=new._data)
+        return new
+
+    def resample(self, indices):
+        data = self.data.take(indices, axis=0)
+        return StatsAccumVec.from_datas(data, axis=0)
+
+    def resample_and_reduce(self, freq, **kwargs):
+        """
+        for bootstrapping
+        """
+        data = self.data
+
+        data_new = resample_data(data, freq, **kwargs)
+
+        return self.__class__.from_datas(
+            data_new, shape=self._accum.shape, child=self._child, moments=self.moments)
+
+
+    def zero(self):
+        self.values = []
+        self.accum.zero()
+        # self._zero_cache()
+
+    @cached_clear()
+    def append(self, data):
+        self._values.append(data)
+
+
+    @cached_clear()
+    def push_stat(self, a, v=0.0, w=1.0):
+        s = self._child.from_stat(a=a, v=v, w=w)
+        self._values.append(s.data)
+
+    @cached_clear()
+    def push_stats(self, a, v=None, w=None):
+        if v is None:
+            v = np.zeros_like(a)
+        if w is None:
+            w = np.ones_like(a)
+        for (ww, aa, vv) in zip(w, a, v):
+            self.push_stat(a=aa, v=vv, w=ww)
+
+    @cached_clear()
+    def push_data(self, data):
+        assert data.shape == self._accum._data_shape
+        self._values.append(data)
+
+    @cached_clear()
+    def push_datas(self, datas, axis=0):
+        if axis != 0:
+            datas = np.rollaxis(datas, axis, 0)
+
+        assert datas.shape[1:] == self._accum._data_shape
+        for data in datas:
+            self._values.append(data)
+
+    @gcached()
+    def _weight_index(self):
+        return (slice(None),) + self._accum._weight_index
+
+    @gcached(prop=False)
+    def _single_index(self, val):
+        return (slice(None),) + self._accum._single_index(val)
+
+
+    def weight(self):
+        return self.data[self._weight_index]
+
+    def mean(self):
+        return self.data[self._single_index(1)]
+
+    def var(self):
+        return self.data[self._single_index(2)]
+
+    @property
+    def data_last(self):
+        return self._values[-1]
+
+    def mean_last(self):
+        return self.data_last[self.accum._single_index(1)]
+
+    def var_last(self):
+        return self.data_last[self.accum._single_index(2)]
+
+    def std_last(self):
+        return np.sqrt(self.var_last())
+
+    def weight_last(self):
+        return self.data_last[self.accum._weight_index]
+
+    def get_stat(self, stat_name='mean', *args, **kwargs):
+        return getattr(self, stat_name)(*args, **kwargs)
+
+    # @classmethod
+    # def from_stats(cls,
+    #                A=None,
+    #                V=None,
+    #                W=None,
+    #                Data=None,
+    #                child=None,
+    #                shape=(), nmom=2):
+    #     new = cls(child=child, shape=shape, nmom=nmom)
+    #     new.push_stats(A=A, V=V, W=W, Data=Data)
+    #     return new
+
+    @classmethod
+    def from_datas(cls, datas, moments, axis=0, shape=None, child=None, dtype=np.float):
+        if isinstance(moments, int):
+            moments = (moments,)
+
+        if axis != 0:
+            datas = np.rollaxis(datas, axis, 0)
+
+        if shape is None:
+            shape = datas.shape[len(moments)+1:]
+
+        new = cls(child=child, shape=shape, moments=moments, dtype=dtype)
+
+        new.values = list(datas)
+        return new
+
+    @gcached()
+    def cumdata(self):
+        cumdata = np.zeros((len(self),) + self.accum._data_shape)
+        self._accum.zero()
+        for i, data in enumerate(self.values):
+            self._accum.push_data(data)
+            cumdata[i, ...] = self._accum.data
+        return cumdata
+
+    def cummean(self):
+        return self.cumdata[self._single_index(1)]
+
+    def cumvar(self):
+        return self.cumdata[self._single_index(2)]
+
+    def cumstd(self):
+        return np.sqrt(self.cumvar())
+
+    def cumweight(self):
+        return self.cumdata[self._weight_index]
+
+    @property
+    def cumdata_last(self):
+        return self.cumdata[-1, ...]
+
+    def cummean_last(self):
+        return self.cumdata_last[self.accum._single_index(1)]
+
+    def cumvar_last(self):
+        return self.cumdata_last[self.accum._single_index(2)]
+
+    def cumstd_last(self):
+        return np.sqrt(self.cumvar_last())
+
+    def cumweight_last(self):
+        return self.cumdata_last[self.accum._weight_index]
+
+    @gcached()
+    def stats_list(self):
+        """
+        list of stats objects
+        """
+        return [
+            self._child.from_data(data=data,
+                                  shape=self.accum.shape,
+                                  moments=self.moments, dtype=self.dtype)
+            for data in self.values
+        ]
+
+
+    def block(self, block_size=None):
+        """
+        create a new stats array object from block averaging this one
+        """
+        new = self.new_like()
+        new.values = self.blockdata(block_size)
+        return new
+
+    @gcached(prop=False)
+    def blockdata(self, block_size):
+        blockdata = []
+
+        n = len(self)
+        if block_size is None:
+            block_size = n
+        if block_size > n:
+            block_size = n
+
+        for lb in range(0, len(self), block_size):
+            ub = lb + block_size
+            if ub > n:
+                break
+            self._accum.zero()
+            datas = self.data[lb:ub, ...]
+            self._accum.push_datas(datas)
+            blockdata.append(self._accum.data.copy())
+        return blockdata
+
+    def blockweight(self, block_size=None):
+        return self.blockdata(block_size)[self._weight_index]
+
+    def blockmean(self, block_size=None):
+        return self.blockdata(block_size)[self._single_index(1)]
+
+    def blockvar(self, block_size=None):
+        return self.blockdata(block_size)[self._single_index(2)]
+
+    def val_SEM(self, x, weighted, unbiased, norm):
+        """
+        find the standard error in the mean (SEM) of a value
+
+        Parameters
+        ----------
+        x : array
+            array (self.mean(), etc) to consider
+
+        weighted : bool
+            if True, use `weighted_var`
+            if False, use `np.var`
+
+        unbiased : bool
+            if True, use unbiased stats (e.g., ddof=1 for np.var)
+            if False, use biased stats (e.g., ddof=0 for np.var)
+
+        norm : bool
+            if True, scale var by x.shape[0], i.e., number of samples
+
+        Returns
+        -------
+        sem : standard error in mean 
+        """
+        if weighted:
+            v = weighted_var(x, w=self.weight(), axis=0, unbiased=unbiased)[-1]
+        else:
+            if unbiased:
+                ddof = 1
+            else:
+                ddof = 0
+
+            v = np.var(x, ddof=ddof, axis=0)
+        if norm:
+            v = v / x.shape[0]
+
+        return np.sqrt(v)
+
+    def mean_SEM(self, weighted=True, unbiased=True, norm=True):
+        """self.val_SEM with x=self.mean()"""
+        return self.val_SEM(self.mean(), weighted, unbiased, norm)
+
+    def __repr__(self):
+        return 'nsample: {}'.format(len(self))
+
+    def to_xarray(self,
+                  rec_dim='rec',
+                  meta_dims=None,
+                  mom_dims=None,
+                  rec_coords=None,
+                  meta_coords=None,
+                  mom_coords=None,
+                  **kwargs):
+        import xarray as xr
+
+
+        if meta_dims is None:
+            meta_dims = [
+                'dim_{}'.format(i) for i in range(len(self.accum.shape))
+            ]
+        else:
+            meta_dims = list(meta_dims)
+        assert len(meta_dims) == len(self.accum.shape)
+
+        if mom_dims is None:
+            mom_dims = [
+                'mom_{}'.format(i) for i in range(len(self.moments))
+            ]
+
+        if isinstance(mom_dims, str):
+            mom_dims = [mom_dims]
+
+
+        assert len(mom_dims) == len(self.accum.moments)
+
+        dims = [rec_dim] + mom_dims + meta_dims
+
+        coords = {}
+        coords.update(rec_coords or {})
+        coords.update(meta_coords or {})
+        coords.update(mom_coords or {})
+        return xr.DataArray(self.data, dims=dims, coords=coords, **kwargs)
+
+    @classmethod
+    def from_xarray(cls,
+                    data,
+                    rec_dim='rec',
+                    meta_dims=None,
+                    mom_dims=None,
+                    shape=None,
+                    moments=None,
+                    child=None,
+                    dtype=None,
+    ):
+        import xarray as xr
+
+        if mom_dims is None:
+            # try to infer moment dimensions
+            mom_dims = []
+            for k in sorted(data.dims):
+                if 'mom_' in k:
+                    mom_dims.append(k)
+
+        if isinstance(mom_dims, str):
+            mom_dims = [mom_dims]
+
+        if moments is None:
+            # infer moments
+            moments = []
+            for k in mom_dims:
+                moments.append(len(data[k])-1)
+            moments = tuple(moments)
+
+        assert len(moments) == len(mom_dims)
+
+        order = [rec_dim] + mom_dims
+        if meta_dims is not None:
+            if isinstance(meta_dims, str):
+                meta_dims = [meta_dims]
+            assert data.ndim == 1 + len(mom_dims) + len(meta_dims)
+            order += meta_dims
+        else:
+            order += [...]
+
+        data = data.transpose(*order)
+
+        return cls.from_datas(datas=data, moments=moments, axis=0, shape=shape,
+                              child=child, dtype=dtype)
+
+
+
+
+
+@njit
+def _randsamp_freq_out(freq):
+    nrep = freq.shape[0]
+    ndat = freq.shape[1]
+    for i in range(nrep):
+        for j in range(ndat):
+            index = np.random.randint(0, ndat)
+            freq[i, index] += 1
+
+
+@njit
+def _randsamp_freq_index(index, freq):
+    assert freq.shape == index.shape
+    nrep, ndat = freq.shape
+    for r in range(nrep):
+        for d in range(ndat):
+            idx = index[r, d]
+            freq[r, idx] += 1
+
+
+def randsamp_freq(size, nrep, index=None, transpose=False):
+    """
+    produce a random sample for bootstrapping
+
+    Parameters
+    ----------
+    size : int
+        data dimension size
+    nrep : int
+        number of replicates
+    index : array-like, optional
+        if passed, build frequency table based on this sampling
+    transpose: bool
+        see output
+
+
+    Returns
+    -------
+    output : frequency table
+        if not transpose: output.shape == (nrep, size)
+        if tranpose, output.shae = (size, nrep)
+    """
+
+    freq = np.zeros((nrep, size), dtype=np.int64)
+    if index is None:
+        _randsamp_freq_out(freq)
+
+    else:
+        assert index.shape == (nrep, size)
+        _randsamp_freq_index(index, freq)
+
+    if transpose:
+        freq = freq.T
+    return freq
+
+
+
+
+from functools import lru_cache
+from numba import prange
+
+@lru_cache(10)
+def _factory_resample(push_datas_scale, fastmath=True, parallel=False):
+
+    if parallel:
+        @njit(fastmath=fastmath, parallel=parallel)
+        def resample(data, freq, out):
+            nrep = freq.shape[0]
+            for irep in prange(nrep):
+                push_datas_scale(out[irep,...], data, freq[irep,...])
+
+    else:
+        @njit(fastmath=fastmath, parallel=parallel)
+        def resample(data, freq, out):
+            nrep = freq.shape[0]
+            for irep in range(nrep):
+                push_datas_scale(out[irep,...], data, freq[irep,...])
+
+    return resample
+
+
+def resample_data(data, freq, moments, fastmath=True, parallel=False, out=None):
+    """
+    resample data according to frequency table
+    """
+
+    nrep, ndat = freq.shape
+    assert len(data) == ndat
+
+
+    if isinstance(moments, int):
+        moments = (moments,)
+    shape = data.shape[len(moments)+1:]
+
+
+    # reshape data
+    out_shape = (nrep,) + data.shape[1:]
+    if out is None:
+        out = np.empty(out_shape, dtype=data.dtype)
+    assert out.shape == out_shape
+
+    data_reshape = data.shape[:len(moments) + 1]
+    out_reshape = out.shape[:len(moments) + 1]
+    if shape != ():
+        meta_reshape = (np.prod(shape),)
+        data_reshape += meta_reshape
+        out_reshape += meta_reshape
+
+    datar = data.reshape(data_reshape)
+    outr = out.reshape(out_reshape)
+
+
+
+    if len(moments) == 1:
+        if shape == ():
+            pusher = _push_datas_scale
+        else:
+            pusher = _push_datas_scale_vec
+
+    else:
+        if shape == ():
+            pusher = _push_datas_scale_cov
+        else:
+            pusher = _push_datas_scale_cov_vec
+
+    resample = _factory_resample(pusher, fastmath=fastmath, parallel=parallel)
+
+    outr[...] = 0.0
+
+    resample(datar, freq, outr)
+
+    return out
+
+
+
+def _resample_data(data, freq, out=None):
+    """
+    reduce data along axis=0 from freq table
+    """
+    data_shape = data.shape
+    assert data_shape[-1] == 3
+
+    ndim = data.ndim
+    assert ndim > 1
+
+    assert data_shape[0] == freq.shape[0]
+    nrep = freq.shape[-1]
+
+    out_shape = (nrep, ) + data_shape[1:]
+
+    if out is not None:
+        assert out.shape == out_shape
+    else:
+        out = np.zeros(out_shape)
+
+    if ndim == 2:
+        datar_shape = (data_shape[0], 1, data_shape[-1])
+    else:
+        datar_shape = (data_shape[0], np.prod(data_shape[1:-1], dtype=np.int),
+                       data_shape[-1])
+
+    outr_shape = (nrep, ) + datar_shape[1:]
+
+    #print(ndim, data.shape, datar_shape)
+
+    datar = data.reshape(datar_shape)
+    outr = out.reshape(outr_shape)
+
+    _resample(datar, freq, outr)
+
+    return out
+
+
 

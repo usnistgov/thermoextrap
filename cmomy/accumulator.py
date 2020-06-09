@@ -771,10 +771,14 @@ class StatsAccumCov(_StatsAccum):
 
 class StatsArray(object):
     def __init__(self, shape=(), child=None, dtype=np.float, nmom=2):
+
         if shape == ():
             child = StatsAccum
         else:
             assert child is not None, 'with shape, must specify child object'
+
+
+
         self._child = child
         self._accum = child(shape=shape, dtype=dtype, nmom=nmom)
         self.zero()
@@ -1303,7 +1307,6 @@ def _resample_data_mult(data, freq, nthread):
 
 # not totally sure why this is so much faster, but it is
 from numba import prange
-
 
 @njit(parallel=True)
 def _resample_data_parallel_numba(data, freq):

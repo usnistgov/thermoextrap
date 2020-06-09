@@ -192,13 +192,13 @@ def _get_data_vec(shape, weighted=False):
 
 @pytest.mark.parametrize("dshape,axis", [
     ((100,1), 0),
-    ((10, 10), 0),
-    ((10,10), 1),
-    ((20,)*3, 0), ((20,)*3, 1), ((20,)*3, 2)
+    ((100, 10), 0),
+    ((10,100), 1),
+    ((100, 5, 5), 0), ((5, 100, 5), 1), ((5,5,100), 2)
 ])
 @pytest.mark.parametrize("moments", [5])
 @pytest.mark.parametrize("weighted", [False, True])
-def test_vec_vals(dshape, axis, moments, weighted):
+def test_Vec_vals(dshape, axis, moments, weighted):
     # unweighted
     wt, x = _get_data_vec(dshape, weighted)
 
@@ -231,9 +231,9 @@ def test_vec_vals(dshape, axis, moments, weighted):
 
 @pytest.mark.parametrize("dshape,axis", [
     ((100,1), 0),
-    ((10, 10), 0),
-    ((10,10), 1),
-    ((20,)*3, 0), ((20,)*3, 1), ((20,)*3, 2)
+    ((100, 10), 0),
+    ((10,100), 1),
+    ((100, 5, 5), 0), ((5, 100, 5), 1), ((5, 5, 100), 2)
 ])
 @pytest.mark.parametrize("moments", [5])
 @pytest.mark.parametrize("weighted", [False, True])
