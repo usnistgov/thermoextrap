@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 # central moments single variable
-def _get_cmom_single(w, x, moments, axis=0):
+def _get_cmom_single(w, x, moments, axis=0, last=True):
     wsum = w.sum(axis)
     wsum_inv = 1.0 / wsum
 
@@ -19,6 +19,10 @@ def _get_cmom_single(w, x, moments, axis=0):
         data.append(y)
 
     data = np.array(data)
+
+    if last:
+        np.moveaxis(data, 0, -1)
+
     return data
 
 def _get_data_single(nrec=100, weighted=False):
@@ -145,7 +149,7 @@ def test_stats(nrec, moments, weighted):
 
 
 # central moments single variable
-def _get_cmom_vec(w, x, moments, axis=0):
+def _get_cmom_vec(w, x, moments, axis=0, last=True):
 
     if w.ndim == 1 and w.ndim != x.ndim and len(w) == x.shape[axis]:
         shape = [1] * x.ndim
@@ -174,6 +178,10 @@ def _get_cmom_vec(w, x, moments, axis=0):
         data.append(y)
 
     data = np.array(data)
+
+    if last:
+        data = np.moveaxis(data, 0, -1)
+
     return data
 
 
@@ -283,11 +291,11 @@ def test_vec_stats(dshape, axis, moments, weighted):
         s = central.StatsAccum(moments=moments, shape=shape)
 
         for d in datas:
-            s.push_stat(a=d[1], v=d[2:], w=d[0])
+            s.push_stat(a=d[...,1], v=d[...,2:], w=d[...,0])
         np.testing.assert_allclose(s.data, data)
 
         s.zero()
-        s.push_stats(a=datas[:, 1, ...], v=datas[:, 2:, ...], w=datas[:, 0, ...])
+        s.push_stats(a=datas[...,1], v=datas[...,2:], w=datas[...,0])
         np.testing.assert_allclose(s.data, data)
 
         s.zero()

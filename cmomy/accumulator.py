@@ -705,7 +705,7 @@ class _StatsAccum(object):
         if Data.ndim == 2:
             Data = Data[:, None, :]
 
-        new = self.__class__.from_datas(Data, axis=axis, nmom=nmom)
+        new = self.__class__.from_datas(Data, axis=axis, nmom=self.nmom)
         return new
 
 

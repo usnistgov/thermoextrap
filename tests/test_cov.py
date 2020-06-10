@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 # central moments single variable
-def _get_cmom_single(u, x, nu, nx):
+def _get_cmom_single(u, x, nu, nx, last=True):
     test = np.zeros((nu+1, nx+1))
     dx = x - x.mean()
     du = u - u.mean()
@@ -19,12 +19,13 @@ def _get_cmom_single(u, x, nu, nx):
                 other = (du**i * dx**j).mean()
             test[i, j] = other
 
+
     return test
 
 def _get_data_single(nrec=100, weighted=False):
     x0 = np.random.rand(nrec)
     x1 = np.random.rand(nrec)
-
+    
 
     if weighted is None:
         w = None
