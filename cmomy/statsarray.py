@@ -6,13 +6,13 @@ from __future__ import absolute_import
 import numpy as np
 
 from .cached_decorators import cached_clear, gcached
+
 from .utils import (
     _axis_expand_broadcast,
     _cached_ones,
     _my_broadcast,
     _shape_insert_axis,
 )
-
 
 from .central import StatsAccum, StatsAccumCov
 from .resample import (resample_data, resample_vals, randsamp_freq)

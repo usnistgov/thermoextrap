@@ -1,7 +1,6 @@
 """"
 Central moments/comoments routines
 """
-
 from __future__ import absolute_import
 
 import numpy as np
@@ -16,7 +15,7 @@ from .utils import (
 )
 
 from .pushers import factory_pushers_dict
-from .resample import (resample_data, resample_vals, randsamp_freq)
+from .resample import resample_data, resample_vals, randsamp_freq
 from . import convert
 
 ###############################################################################
@@ -161,8 +160,8 @@ class StatsAccumBase(object):
     """
     Base class for moments accumulation
     """
-    _moments_len = None
 
+    _moments_len = None
 
     def __init__(self, moments, shape=None, dtype=None, data=None):
         """
@@ -214,7 +213,7 @@ class StatsAccumBase(object):
         cov = self._moments_len == 2
         pushers = factory_pushers_dict(cov=cov, vec=vec)
         for k, v in pushers.items():
-            setattr(self, '_' + k, v)
+            setattr(self, "_" + k, v)
 
     @property
     def dtype(self):
@@ -589,8 +588,9 @@ class StatsAccumBase(object):
             func = convert.to_central_comoments
         data = func(raw)
 
-        return cls.from_data(data, moments=moments, shape=shape, dtype=dtype, copy=False)
-
+        return cls.from_data(
+            data, moments=moments, shape=shape, dtype=dtype, copy=False
+        )
 
     @classmethod
     def from_raws(cls, raws, moments=None, axis=0, shape=None, dtype=None):
@@ -599,10 +599,9 @@ class StatsAccumBase(object):
         elif cls._moments_len == 2:
             func = convert.to_central_comoments
         datas = func(raws)
-        return cls.from_datas(datas, axis=axis, moments=moments, shape=shape, dtype=dtype, copy=False)
-
-
-
+        return cls.from_datas(
+            datas, axis=axis, moments=moments, shape=shape, dtype=dtype, copy=False
+        )
 
     # Universal reducers
     def resample_and_reduce(self, freq, axis=None, **kwargs):
@@ -678,7 +677,6 @@ class StatsAccumBase(object):
 
 class StatsAccum(StatsAccumBase):
     _moments_len = 1
-
 
     def push_val(self, x, w=None):
         xr = self.check_val(x)
@@ -840,5 +838,3 @@ class StatsAccumCov(StatsAccumBase):
             **kwargs,
         )
         return cls.from_data(data, copy=False)
-
-
