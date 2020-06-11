@@ -1,5 +1,5 @@
 import cmomy.accumulator as accumulator
-import cmomy.accumulator_central as central
+import cmomy.central as central
 
 import numpy as np
 import pytest
@@ -342,8 +342,5 @@ def test_vec_stats(dshape, axis, moments, weighted):
         out = S[0].copy()
         out *= 2
         np.testing.assert_allclose(out.data, (S[0] + S[0]).data)
-
-
-
 
 

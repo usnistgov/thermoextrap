@@ -1,5 +1,5 @@
 import cmomy.accumulator as accumulator
-import cmomy.accumulator_central as central
+import cmomy.central as central
 
 import numpy as np
 import pytest
@@ -25,7 +25,6 @@ def _get_cmom_single(u, x, nu, nx, last=True):
 def _get_data_single(nrec=100, weighted=False):
     x0 = np.random.rand(nrec)
     x1 = np.random.rand(nrec)
-    
 
     if weighted is None:
         w = None
@@ -177,9 +176,19 @@ def _get_data_vec(shape, weighted=False):
 ])
 @pytest.mark.parametrize("moments", [5, (5, 5), (1, 1)])
 @pytest.mark.parametrize("weighted", [False, True])
-def test_vec_vals(dshape, axis, moments, weighted):
+@pytest.mark.parametrize('broadcast', [False, True])
+def test_vec_vals(dshape, axis, moments, weighted, broadcast):
     # unweighted
     wt, x0, x1 = _get_data_vec(dshape, weighted)
+
+    if broadcast:
+        index = [0] * x1.ndim
+        index[axis] = slice(None)
+        x1 = x1[tuple(index)]
+        x1b = central._axis_expand_broadcast(x1, x0.shape, axis, expand=True, roll=False, broadcast=True)
+    else:
+        x1b = None
+
 
     # single weight
     slicer = [0] * wt.ndim
@@ -192,18 +201,29 @@ def test_vec_vals(dshape, axis, moments, weighted):
     shape = tuple(shape)
 
 
-
     for w in (wt, ws):
-        data = central.central_comoments(x0, x1, moments, w, axis=axis)
+        data = central.central_comoments(x0, x1, moments, w, axis=axis, broadcast=broadcast)
+
+
 
         s = central.StatsAccumCov(shape=shape, moments=moments)
         # push_vals
-        s.push_vals(x0, x1, w, axis=axis)
+        s.push_vals(x0, x1, w, axis=axis, broadcast=broadcast)
         np.testing.assert_allclose(s.data, data)
 
         # from vals
-        s = central.StatsAccumCov.from_vals(x0, x1, w, moments=moments, axis=axis)
+        s = central.StatsAccumCov.from_vals(x0, x1, w, moments=moments, axis=axis, broadcast=broadcast)
         np.testing.assert_allclose(s.data, data)
+
+
+        # testing broadcasting
+        if x1b is not None:
+            tmp = central.central_comoments(x0, x1b, moments, w, axis=axis, broadcast=False)
+            np.testing.assert_allclose(tmp, data)
+
+            s = central.StatsAccumCov.from_vals(x0, x1b, w, moments=moments, axis=axis, broadcast=False)
+            np.testing.assert_allclose(s.data, data)
+
 
 @pytest.mark.parametrize("dshape,axis", [
     ((100,1), 0),
