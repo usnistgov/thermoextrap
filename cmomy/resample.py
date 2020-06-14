@@ -62,7 +62,7 @@ def randsamp_freq(nrep=None, size=None, indices=None, transpose=False):
         if tranpose, output.shae = (size, nrep)
     """
     if indices is not None:
-        indices = np.array(indices)
+        indices = np.asarray(indices, dtype=np.int64)
         if nrep is None:
             nrep = indices.shape[0]
         if size is None:
@@ -95,7 +95,10 @@ def _factory_resample(push_datas_scale, fastmath=True, parallel=False):
     return resample
 
 
-def resample_data(data, freq, moments, fastmath=True, axis=0, parallel=False, pusher=None, out=None):
+def resample_data(data, freq, moments, axis=0,
+                  dtype=None, order=None,
+                  fastmath=True, parallel=False,
+                  pusher=None, out=None):
     """
     resample data according to frequency table
 
@@ -112,6 +115,9 @@ def resample_data(data, freq, moments, fastmath=True, axis=0, parallel=False, pu
         axis to reduce along
     pusher : callable, optiona
         jitted function to perform scaled reduction
+    fastmath, parallel : bool
+        options for jitting pusher
+    dtype, order : options to np.asarray
     out : optional output
 
     Returns
@@ -125,8 +131,11 @@ def resample_data(data, freq, moments, fastmath=True, axis=0, parallel=False, pu
         moments = (moments,)
 
     # check inputs
-    data = np.array(data)
-    freq = np.array(freq)
+    data = np.asarray(data, dtype=dtype, order=order)
+    freq = np.asarray(freq, dtype=np.int64, order=order)
+
+    if dtype is None:
+        dtype = data.dtype
 
     nrep, ndat = freq.shape
     ndim = data.ndim - len(moments)
@@ -145,7 +154,7 @@ def resample_data(data, freq, moments, fastmath=True, axis=0, parallel=False, pu
     # output
     out_shape = (nrep,) + data.shape[1:]
     if out is None:
-        out = np.empty(out_shape, dtype=data.dtype)
+        out = np.empty(out_shape, dtype=dtype)
     assert out.shape == out_shape
 
     # resahpe
@@ -209,8 +218,11 @@ def _factory_resample_vals_cov(push_vals_scale, fastmath=True, parallel=False):
 
 
 
-def resample_vals(x, freq, moments, x1=None, axis=0, weights=None, broadcast=False,
-                  fastmath=True, parallel=False, pusher=None, out=None):
+def resample_vals(x, freq, moments, x1=None, axis=0, weights=None,
+                  broadcast=False,
+                  dtype=None, order=None,
+                  fastmath=True, parallel=False,
+                  pusher=None, out=None):
     """
     resample data according to frequency table
     """
@@ -231,17 +243,24 @@ def resample_vals(x, freq, moments, x1=None, axis=0, weights=None, broadcast=Fal
         assert len(moments) == 1
 
     # check input data
-    freq = np.array(freq)
-    x = np.array(x)
+    freq = np.asarray(freq, dtype=np.int64)
     nrep, ndat = freq.shape
+
+    x = np.asarray(x, dtype=dtype, order=order)
+    if dtype is None:
+        dtype = x.dtype
 
     if weights is None:
         weights = np.ones_like(x)
     else:
-        weights = _axis_expand_broadcast(weights, x.shape, axis, roll=False)
+        weights = _axis_expand_broadcast(weights, x.shape, axis,
+                                         roll=False,
+                                         dtype=dtype, order=order)
 
     if cov:
-        x1 = _axis_expand_broadcast(x1, x.shape, axis, roll=False, broadcast=broadcast)
+        x1 = _axis_expand_broadcast(x1, x.shape, axis, roll=False,
+                                    broadcast=broadcast,
+                                    dtype=dtype, order=order)
 
     if axis != 0:
         x = np.moveaxis(x, axis, 0)
@@ -255,7 +274,7 @@ def resample_vals(x, freq, moments, x1=None, axis=0, weights=None, broadcast=Fal
     shape = x.shape[1:]
     out_shape = (nrep,) + shape + moments_shape
     if out is None:
-        out = np.empty(out_shape, dtype=x.dtype)
+        out = np.empty(out_shape, dtype=dtype)
     assert out.shape == out_shape
 
     # reshape
@@ -277,18 +296,6 @@ def resample_vals(x, freq, moments, x1=None, axis=0, weights=None, broadcast=Fal
     if pusher is None:
         pusher = factory_pusher_vals_scale(cov=cov,
                                            vec=len(shape) > 0)
-        # if len(moments) == 1:
-        #     if shape == ():
-        #         pusher = _push_vals_scale
-        #     else:
-        #         pusher = _push_vals_scale_vec
-
-        # else:
-        #     if shape == ():
-        #         pusher = _push_vals_scale_cov
-        #     else:
-        #         pusher = _push_vals_scale_cov_vec
-
     # sample
     outr[...] = 0.0
     if cov:

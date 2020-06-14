@@ -6,16 +6,10 @@ from __future__ import absolute_import
 import numpy as np
 
 from .cached_decorators import cached_clear, gcached
-
-from .utils import (
-    _axis_expand_broadcast,
-    _cached_ones,
-    _my_broadcast,
-    _shape_insert_axis,
-)
-
 from .central import StatsAccum, StatsAccumCov
-from .resample import (resample_data, resample_vals, randsamp_freq)
+from .resample import randsamp_freq, resample_data, resample_vals
+from .utils import (_axis_expand_broadcast, _cached_ones, _my_broadcast,
+                    _shape_insert_axis)
 
 
 def weighted_var(x, w, axis=None, axis_sum=None, unbiased=True, **kwargs):
@@ -63,8 +57,6 @@ def weighted_var(x, w, axis=None, axis_sum=None, unbiased=True, **kwargs):
         w2 = (w * w).sum(axis=axis_sum)
         m2 *= w1 * w1 / (w1 * w1 - w2)
     return m1, m2
-
-
 
 
 class StatsArray(object):
@@ -255,7 +247,6 @@ class StatsArray(object):
 
         if axis != 0:
             datas = np.moveaxis(datas, axis, 0)
-
 
             shape = datas.shape[1 : -len(moments)]
 

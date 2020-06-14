@@ -495,51 +495,57 @@ def _push_datas_scale_cov_vec(data, Datas, scale):
             _push_data_scale_cov(data[k, ...], Datas[s, k, ...], f)
 
 
-_pushers_dict = {
-    'push_val':   _push_val,
-    'push_vals':  _push_vals,
-    'push_stat':  _push_stat,
-    'push_stats': _push_stats,
-    'push_data':  _push_data,
-    'push_datas': _push_datas,
-}
 
-_pushers_dict_vec = {
-    'push_val':   _push_val_vec,
-    'push_vals':  _push_vals_vec,
-    'push_stat':  _push_stat_vec,
-    'push_stats': _push_stats_vec,
-    'push_data':  _push_data_vec,
-    'push_datas': _push_datas_vec,
-}
+# named tuple for pushers
+from collections import namedtuple
 
+Pusher = namedtuple('Pusher',['val','vals','stat','stats', 'data','datas'])
 
-_pushers_dict_cov = {
-    'push_val':   _push_val_cov,
-    'push_vals':  _push_vals_cov,
-    'push_data':  _push_data_cov,
-    'push_datas': _push_datas_cov,
-}
+pusher_scalar = Pusher(
+    val=_push_val,
+    vals=_push_vals,
+    stat=_push_stat,
+    stats=_push_stats,
+    data=_push_data,
+    datas=_push_datas,
+)
 
-_pushers_dict_cov_vec = {
-    'push_val':   _push_val_cov_vec,
-    'push_vals':  _push_vals_cov_vec,
-    'push_data':  _push_data_cov_vec,
-    'push_datas': _push_datas_cov_vec,
-}
+pusher_vector = Pusher(
+    val=_push_val_vec,
+    vals=_push_vals_vec,
+    stat=_push_stat_vec,
+    stats=_push_stats_vec,
+    data=_push_data_vec,
+    datas=_push_datas_vec)
 
 
-def factory_pushers_dict(cov=False, vec=False):
+pusher_cov_scalar = Pusher(
+    val=_push_val_cov,
+    vals=_push_vals_cov,
+    stat=None,
+    stats=None,
+    data=_push_data_cov,
+    datas=_push_datas_cov)
+
+pusher_cov_vector  = Pusher(
+    val=_push_val_cov_vec,
+    vals=_push_vals_cov_vec,
+    stat=None,
+    stats=None,
+    data=_push_data_cov_vec,
+    datas=_push_datas_cov_vec)
+
+def factory_pushers(cov=False, vec=False):
     if cov:
         if vec:
-            return _pushers_dict_cov_vec
+            return pusher_cov_vector
         else:
-            return _pushers_dict_cov
+            return pusher_cov_scalar
     else:
         if vec:
-            return _pushers_dict_vec
+            return pusher_vector
         else:
-            return _pushers_dict
+            return pusher_scalar
 
 
 def factory_pusher_datas_scale(cov=False, vec=False):
@@ -568,3 +574,53 @@ def factory_pusher_vals_scale(cov=False, vec=False):
             return _push_vals_scale_vec
         else:
             return _push_vals_scale
+
+
+
+# _pushers_dict = {
+#     'push_val':   _push_val,
+#     'push_vals':  _push_vals,
+#     'push_stat':  _push_stat,
+#     'push_stats': _push_stats,
+#     'push_data':  _push_data,
+#     'push_datas': _push_datas,
+# }
+
+# _pushers_dict_vec = {
+#     'push_val':   _push_val_vec,
+#     'push_vals':  _push_vals_vec,
+#     'push_stat':  _push_stat_vec,
+#     'push_stats': _push_stats_vec,
+#     'push_data':  _push_data_vec,
+#     'push_datas': _push_datas_vec,
+# }
+
+
+# _pushers_dict_cov = {
+#     'push_val':   _push_val_cov,
+#     'push_vals':  _push_vals_cov,
+#     'push_data':  _push_data_cov,
+#     'push_datas': _push_datas_cov,
+# }
+
+# _pushers_dict_cov_vec = {
+#     'push_val':   _push_val_cov_vec,
+#     'push_vals':  _push_vals_cov_vec,
+#     'push_data':  _push_data_cov_vec,
+#     'push_datas': _push_datas_cov_vec,
+# }
+
+
+# def factory_pushers_dict(cov=False, vec=False):
+#     if cov:
+#         if vec:
+#             return _pushers_dict_cov_vec
+#         else:
+#             return _pushers_dict_cov
+#     else:
+#         if vec:
+#             return _pushers_dict_vec
+#         else:
+#             return _pushers_dict
+
+

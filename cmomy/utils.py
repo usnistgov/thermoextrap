@@ -23,8 +23,8 @@ def factory_binomial(order):
     return bfac
 
 
-def _my_broadcast(x, shape):
-    x = np.array(x)
+def _my_broadcast(x, shape, dtype=None, order=None):
+    x = np.asarray(x, dtype=dtype, order=order)
     if x.shape != shape:
         x = np.broadcast(x, shape)
     return x
@@ -43,13 +43,15 @@ def _shape_insert_axis(shape, axis, new_size):
     return tuple(shape)
 
 
-def _axis_expand_broadcast(x, shape, axis, expand=True, roll=True, broadcast=True):
+def _axis_expand_broadcast(x, shape, axis,
+                           expand=True, roll=True, broadcast=True,
+                           dtype=None, order=None):
     """
     broadcast x to shape.  If x is 1d, and shape is n-d, but len(x) is same
     as shape[axis], broadcast x across all dimensions
     """
 
-    x = np.array(x)
+    x = np.asarray(x, dtype=dtype, order=order)
 
     # if array, and 1d with size same as shape[axis]
     # broadcast from here

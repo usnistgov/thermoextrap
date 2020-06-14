@@ -9,7 +9,7 @@ from numba import njit
 from .utils import factory_binomial
 from .options import OPTIONS
 
-_bfac = factory_binomial(OPTIONS['nmax'])
+_bfac = factory_binomial(OPTIONS["nmax"])
 
 
 @njit
@@ -157,7 +157,7 @@ def _raw_to_central_comoments(raw, central):
                     c[n, m] = tmp
 
 
-def _convert_moments(data, axis, target_axis, func, out=None):
+def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=None):
     if isinstance(axis, int):
         axis = (axis,)
     if isinstance(target_axis, int):
@@ -168,7 +168,7 @@ def _convert_moments(data, axis, target_axis, func, out=None):
 
     assert len(axis) == len(target_axis)
 
-    data = np.array(data)
+    data = np.asarray(data, dtype=dtype, order=order)
     if out is None:
         out = np.zeros_like(data)
     else:
@@ -182,11 +182,11 @@ def _convert_moments(data, axis, target_axis, func, out=None):
         data_r = data
         out_r = out
 
-    shape = data_r.shape[:-len(axis)]
+    shape = data_r.shape[: -len(axis)]
     if shape == ():
-        reshape = (1,) + data_r.shape[-len(axis):]
+        reshape = (1,) + data_r.shape[-len(axis) :]
     else:
-        reshape = (np.prod(shape),) + data_r.shape[-len(axis):]
+        reshape = (np.prod(shape),) + data_r.shape[-len(axis) :]
 
     data_r = data_r.reshape(reshape)
     out_r = out_r.reshape(reshape)
@@ -195,7 +195,7 @@ def _convert_moments(data, axis, target_axis, func, out=None):
     return out
 
 
-def to_raw_moments(central, axis=-1, raw=None):
+def to_raw_moments(x, axis=-1, dtype=None, order=None, out=None):
     """
     convert central moments to raw moments
     """
@@ -203,52 +203,68 @@ def to_raw_moments(central, axis=-1, raw=None):
         axis = -1
 
     return _convert_moments(
-        data=central, axis=axis, target_axis=-1, func=_central_to_raw_moments, out=raw
-    )
-
-
-def to_central_moments(raw, axis=-1, central=None):
-    """
-    convert central moments to raw moments
-    """
-
-    if axis is None:
-        axis = -1
-
-    return _convert_moments(
-        data=raw, axis=axis, target_axis=-1, func=_raw_to_central_moments, out=central
-    )
-
-
-def to_raw_comoments(central, axis=[-2, -1], raw=None):
-    """
-    convert central moments to raw moments
-    """
-
-    if axis is None:
-        axis = [-2, -1]
-
-    return _convert_moments(
-        data=central,
+        data=x,
         axis=axis,
-        target_axis=[-2, -1],
-        func=_central_to_raw_comoments,
-        out=raw,
+        target_axis=-1,
+        func=_central_to_raw_moments,
+        dtype=dtype,
+        order=order,
+        out=out,
     )
 
 
-def to_central_comoments(raw, axis=[-2, -1], central=None):
+def to_central_moments(x, axis=-1, dtype=None, order=None, out=None):
+    """
+    convert central moments to raw moments
+    """
+
+    if axis is None:
+        axis = -1
+
+    return _convert_moments(
+        data=x,
+        axis=axis,
+        target_axis=-1,
+        func=_raw_to_central_moments,
+        dtype=dtype,
+        order=order,
+        out=out,
+    )
+
+
+def to_raw_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
+    """
+    convert central moments to raw moments
+    """
+
+    if axis is None:
+        axis = (-2, -1)
+
+    return _convert_moments(
+        data=x,
+        axis=axis,
+        target_axis=(-2, -1),
+        func=_central_to_raw_comoments,
+        dtype=dtype,
+        order=order,
+        out=out,
+    )
+
+
+def to_central_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
     """
     convert raw comoments to central comoments
     """
 
     if axis is None:
-        axis = [-2, -1]
+        axis = (-2, -1)
 
     return _convert_moments(
-        data=raw,
+        data=x,
         axis=axis,
-        target_axis=[-2, -1],
+        target_axis=(-2, -1),
         func=_raw_to_central_comoments,
-        out=central,
+        dtype=dtype,
+        order=order,
+        out=out,
     )

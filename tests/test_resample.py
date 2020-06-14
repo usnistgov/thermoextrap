@@ -79,7 +79,8 @@ def test_resample_data(shape, axis, nrep, moments, weighted):
     ref = accumulator.resample_data(d[..., :3], freq.T, parallel=False)
 
 
-    out = central.resample_data(data, freq, moments, parallel=False, axis=axis)
+    out = central.resample_data(data, freq, moments,
+                                parallel=False, axis=axis)
     # only test against ref up to 3rd order
     np.testing.assert_allclose(ref, out[..., :3])
 
@@ -186,7 +187,7 @@ def test_resample_vals_cov(shape, axis, nrep, moments, weighted):
     np.testing.assert_allclose(data, out)
 
     # factory
-    s = central.StatsAccumCov.from_resample_vals(x0=x, x1=x1, freq=freq, w=weights, moments=moments, axis=axis, parallel=False)
+    s = central.StatsAccumCov.from_resample_vals(x0=x, x1=x1, freq=freq, w=weights, moments=moments, axis=axis, resample_kws=dict(parallel=False))
     np.testing.assert_allclose(s.data, out)
 
 

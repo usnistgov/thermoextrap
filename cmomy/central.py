@@ -14,14 +14,16 @@ from .utils import (
     _shape_insert_axis,
 )
 
-from .pushers import factory_pushers_dict
+from .pushers import factory_pushers
 from .resample import resample_data, resample_vals, randsamp_freq
 from . import convert
 
 ###############################################################################
 # central moments/comoments routines
 ###############################################################################
-def central_moments(x, moments, weights=None, axis=0, last=True, out=None):
+def central_moments(
+    x, moments, weights=None, axis=0, last=True, dtype=None, order=None, out=None
+):
     """
     calculate central moments along axis
 
@@ -40,6 +42,7 @@ def central_moments(x, moments, weights=None, axis=0, last=True, out=None):
     last : bool, default=True
         if True, put moments as last dimension.
         Otherwise, moments will be in first dimension
+    dtype, order : options to np.asarray
     out : array
         if present, use this for output data
         Needs to have shape of either (moments,) + shape or shape + (moments,)
@@ -54,11 +57,16 @@ def central_moments(x, moments, weights=None, axis=0, last=True, out=None):
         output[...,0] is the total weight (or count), output[...,1] is the mean
         value of x, output[...,n] with n>1 is the nth central moment
     """
-    x = np.array(x)
+    x = np.asarray(x, dtype=dtype, order=order)
+    if dtype is None:
+        dtype = x.dtype
+
     if weights is None:
         weights = np.ones_like(x)
     else:
-        weights = _axis_expand_broadcast(weights, x.shape, axis, roll=False)
+        weights = _axis_expand_broadcast(
+            weights, x.shape, axis, roll=False, dtype=dtype, order=order
+        )
 
     if axis < 0:
         axis += x.ndim
@@ -68,7 +76,7 @@ def central_moments(x, moments, weights=None, axis=0, last=True, out=None):
 
     shape = (moments + 1,) + x.shape[1:]
     if out is None:
-        out = np.empty(shape, dtype=x.dtype)
+        out = np.empty(shape, dtype=dtype)
     else:
         if out.shape != shape:
             # try rolling
@@ -94,7 +102,16 @@ def central_moments(x, moments, weights=None, axis=0, last=True, out=None):
 
 
 def central_comoments(
-    x0, x1, moments, weights=None, axis=0, last=True, broadcast=False, out=None
+    x0,
+    x1,
+    moments,
+    weights=None,
+    axis=0,
+    last=True,
+    broadcast=False,
+    dtype=None,
+    order=None,
+    out=None,
 ):
     """
     calculate central co-moments (covariance, etc) along axis
@@ -106,12 +123,20 @@ def central_comoments(
     moments = tuple(moments)
     assert len(moments) == 2
 
-    x0 = np.array(x0)
-    x1 = _axis_expand_broadcast(x1, x0.shape, axis, roll=False, broadcast=broadcast)
+    x0 = np.asarray(x0, dtype=dtype, order=order)
+    if dtype is None:
+        dtype = x0.dtype
+
+    x1 = _axis_expand_broadcast(
+        x1, x0.shape, axis, roll=False, broadcast=broadcast, dtype=dtype, order=order
+    )
+
     if weights is None:
         weights = np.ones_like(x0)
     else:
-        weights = _axis_expand_broadcast(weights, x0.shape, axis, roll=False)
+        weights = _axis_expand_broadcast(
+            weights, x0.shape, axis, roll=False, dtype=dtype, order=order
+        )
 
     if axis < 0:
         axis += x.ndim
@@ -122,7 +147,7 @@ def central_comoments(
 
     shape = tuple(x + 1 for x in moments) + x0.shape[1:]
     if out is None:
-        out = np.empty(shape, dtype=x0.dtype)
+        out = np.empty(shape, dtype=dtype)
     else:
         if out.shape != shape:
             # try moving axis
@@ -156,12 +181,21 @@ def central_comoments(
 ###############################################################################
 # Classes
 ###############################################################################
+
 class StatsAccumBase(object):
     """
     Base class for moments accumulation
     """
 
-    _moments_len = None
+    _moments_len = 1
+    __slots__ = (
+        "shape",
+        "moments",
+        "_cache",
+        "_data",
+        "_data_flat",
+        "_push",
+    )
 
     def __init__(self, moments, shape=None, dtype=None, data=None):
         """
@@ -211,14 +245,13 @@ class StatsAccumBase(object):
     def _init_subclass(self):
         vec = len(self.shape) > 0
         cov = self._moments_len == 2
-        pushers = factory_pushers_dict(cov=cov, vec=vec)
-        for k, v in pushers.items():
-            setattr(self, "_" + k, v)
+        self._push = factory_pushers(cov=cov, vec=vec)
 
     @property
     def dtype(self):
         return self._data.dtype
 
+    # shape attributes
     def _moments_ndim(self):
         """number of dimensions for moments"""
         return len(self.moments)
@@ -258,11 +291,12 @@ class StatsAccumBase(object):
         """shape of conformed data"""
         return self._shape_flat + self._moments_shape
 
-    def __setstate__(self, state):
-        self.__dict__ = state
-        # make sure datar points to data
-        self._data_flat = self._data.reshape(self._data_flat_shape)
+    # def __setstate__(self, state):
+    #     self.__dict__ = state
+    #     # make sure datar points to data
+    #     self._data_flat = self._data.reshape(self._data_flat_shape)
 
+    # useful accessors
     @property
     def values(self):
         return self._data
@@ -275,9 +309,17 @@ class StatsAccumBase(object):
     def ndim(self):
         return len(self.shape)
 
+    def __array__(self, dtype=None):
+        return np.asarray(self._data, dtype=dtype)
+
+    # not sure I want to actually implements this
+    # could lead to all sorts of issues applying
+    # ufuncs to underlying data
+    # def __array_wrap__(self, obj, context=None):
+    #     return self, obj, context
+
     @property
     def _unit_weight(self):
-        # return np.ones(self.shape, dtype=self.dtype)
         return _cached_ones(self.shape, dtype=self.dtype)
 
     # utilities
@@ -309,7 +351,7 @@ class StatsAccumBase(object):
 
     @classmethod
     def _datas_axis_to_first(cls, datas, axis):
-        datas = np.array(datas)
+        datas = np.asarray(datas)
         ndim = datas.ndim - cls._moments_len
         if axis < 0:
             axis += ndim
@@ -345,30 +387,39 @@ class StatsAccumBase(object):
             w = _my_broadcast(w, self.shape)
         return self._reshape_flat(w)
 
-    def check_weights(self, w, nrec, axis=0):
+    def check_weights(self, w, target, axis=0):
         if w is None:
             w = self._unit_weight
             w = w.reshape(_shape_insert_axis(w.shape, axis, 1))
 
-        shape = _shape_insert_axis(self.shape, axis, nrec)
-        w = _axis_expand_broadcast(w, shape, axis)
-        return self._reshape_flat(w, nrec)
+        #shape = _shape_insert_axis(self.shape, axis, nrec)
+        w = _axis_expand_broadcast(w, target.shape, axis, dtype=self.dtype)
+
+        assert w.shape == (target.shape[axis],) + self.shape
+        return self._reshape_flat(w, w.shape[0])
 
     def check_val(self, x, broadcast=False):
-        x = np.array(x)
+        x = np.asarray(x, dtype=self.dtype)
         if broadcast:
-            x = np.broadcast_to(x.shape)
+            x = _my_broadcast(x, self.shape)
         assert x.shape == self.shape
         return self._reshape_flat(x)
 
-    def check_vals(self, x, axis=0, target_shape=None):
+    def check_vals(self, x, axis=0, target=None):
 
-        if target_shape is None:
+        if target is None:
+            x = np.asarray(x, dtype=self.dtype)
             if axis != 0:
                 x = np.moveaxis(x, axis, 0)
         else:
             x = _axis_expand_broadcast(
-                x, shape=target_shape, axis=axis, expand=True, broadcast=True, roll=True
+                x,
+                shape=target.shape,
+                axis=axis,
+                expand=True,
+                broadcast=True,
+                roll=True,
+                dtype=self.dtype,
             )
 
         assert x.shape[1:] == self.shape
@@ -381,24 +432,24 @@ class StatsAccumBase(object):
         return self.check_vals(a)
 
     def check_var(self, v):
-        v = np.array(v)
+        v = np.asarray(v, dtype=self.dtype)
         assert v.shape == self._shape_var
         return v.reshape(self._shape_flat_var)
 
-    def check_vars(self, v, axis=0):
-        v = np.array(v)
+    def check_vars(self, v, target, axis=0):
+        v = np.asarray(v, dtype=self.dtype)
         if axis != 0:
             v = np.moveaxis(v, axis, 0)
-        assert v.shape[1:] == self._shape_var
+        assert v.shape == (target.shape[axis],) + self._shape_var
         return v.reshape(v.shape[:1] + self._shape_flat_var)
 
     def check_data(self, data):
-        data = np.array(data)
+        data = np.asarray(data, dtype=self.dtype)
         assert data.shape == self._data_shape
         return data.reshape(self._data_flat_shape)
 
     def check_datas(self, datas, axis=0):
-        datas = np.array(datas)
+        datas = np.asarray(datas, dtype=self.dtype)
         if axis != 0:
             datas = np.moveaxis(datas, axis, 0)
         assert datas.shape[1:] == self._data_shape
@@ -408,21 +459,16 @@ class StatsAccumBase(object):
         self._data.fill(0.0)
 
     # create similar objects
+    def new_like(self, data=None):
+        return type(self)(moments=self.moments, shape=self.shape, dtype=self.dtype, data=data)
+
     def zeros_like(self):
         """create zero object like self"""
-        return self.__class__(moments=self.moments, shape=self.shape, dtype=self.dtype)
+        return self.new_like(data=None)
 
-    def new_like(self):
-        return self.zeros_like()
 
     def copy(self):
-        new = self.__class__(
-            shape=self.shape,
-            dtype=self.dtype,
-            moments=self.moments,
-            data=self._data.copy(),
-        )
-        return new
+        return self.new_like(data=self.values.copy())
 
     ##################################################
     # indexing routines
@@ -458,19 +504,19 @@ class StatsAccumBase(object):
         return tuple(index)
 
     def weight(self):
-        return self._data[self._weight_index]
+        return self.values[self._weight_index]
 
     def mean(self):
-        return self._data[self._single_index(1)]
+        return self.values[self._single_index(1)]
 
     def var(self):
-        return self._data[self._single_index(2)]
+        return self.values[self._single_index(2)]
 
     def std(self):
         return np.sqrt(self.var(mom=2))
 
     def cmom(self):
-        return self._data
+        return self.values
 
     def _check_other(self, b):
         """check other object"""
@@ -522,16 +568,21 @@ class StatsAccumBase(object):
     # Universal pushers
     def push_data(self, data):
         data = self.check_data(data)
-        self._push_data(self._data_flat, data)
+        self._push.data(self._data_flat, data)
 
     def push_datas(self, datas, axis=0):
         datas = self.check_datas(datas, axis)
-        self._push_datas(self._data_flat, datas)
+        self._push.datas(self._data_flat, datas)
 
     # Universal factory methods
     @classmethod
-    def from_data(cls, data, moments=None, shape=None, dtype=None, copy=True):
-        data = np.array(data)
+    def from_data(cls, data, moments=None, shape=None, dtype=None, copy=True,
+                  verify=True,
+                  *args, **kwargs):
+
+        if verify:
+            data = np.asarray(data, dtype=dtype)
+
         if shape is None:
             shape = data.shape[: -cls._moments_len]
         moments = cls._check_moments(moments, data.shape)
@@ -543,10 +594,10 @@ class StatsAccumBase(object):
         if copy:
             data = data.copy()
 
-        return cls(shape=shape, dtype=dtype, moments=moments, data=data)
+        return cls(shape=shape, dtype=dtype, moments=moments, data=data, *args, **kwargs)
 
     @classmethod
-    def from_datas(cls, datas, moments=None, axis=0, shape=None, dtype=None):
+    def from_datas(cls, datas, moments=None, axis=0, shape=None, dtype=None, *args, **kwargs):
         """
         Data should have shape
 
@@ -554,7 +605,7 @@ class StatsAccumBase(object):
 
         [..., moment, axis] (axis == -1)
         """
-
+    
         datas, axis = cls._datas_axis_to_first(datas, axis)
         if shape is None:
             shape = datas.shape[1 : -cls._moments_len]
@@ -565,7 +616,7 @@ class StatsAccumBase(object):
         if dtype is None:
             dtype = datas.dtype
 
-        new = cls(shape=shape, dtype=dtype, moments=moments)
+        new = cls(shape=shape, dtype=dtype, moments=moments, *args, **kwargs)
         new.push_datas(datas=datas, axis=0)
         return new
 
@@ -581,7 +632,7 @@ class StatsAccumBase(object):
         return func(self.data)
 
     @classmethod
-    def from_raw(cls, raw, moments=None, shape=None, dtype=None):
+    def from_raw(cls, raw, moments=None, shape=None, dtype=None, *args, **kwargs):
         if cls._moments_len == 1:
             func = convert.to_central_moments
         elif cls._moments_len == 2:
@@ -589,36 +640,42 @@ class StatsAccumBase(object):
         data = func(raw)
 
         return cls.from_data(
-            data, moments=moments, shape=shape, dtype=dtype, copy=False
+            data, moments=moments, shape=shape, dtype=dtype, copy=False,
+            *args, **kwargs
         )
 
     @classmethod
-    def from_raws(cls, raws, moments=None, axis=0, shape=None, dtype=None):
+    def from_raws(cls, raws, moments=None, axis=0, shape=None, dtype=None, *args, **kwargs):
         if cls._moments_len == 1:
             func = convert.to_central_moments
         elif cls._moments_len == 2:
             func = convert.to_central_comoments
         datas = func(raws)
         return cls.from_datas(
-            datas, axis=axis, moments=moments, shape=shape, dtype=dtype, copy=False
+            datas, axis=axis, moments=moments, shape=shape, dtype=dtype, copy=False,
+            *args, **kwargs
         )
 
     # Universal reducers
-    def resample_and_reduce(self, freq, axis=None, **kwargs):
+    def resample_and_reduce(self, freq, axis=None, resample_kws=None, *args, **kwargs):
         self._raise_if_scalar()
         axis = self._wrap_axis(axis)
-        data = resample_data(self.data, freq, moments=self.moments, axis=axis, **kwargs)
-        return self.__class__.from_data(data, moments=self.moments, copy=False)
+        if resample_kws is None:
+            resample_kws = {}
 
-    def reduce(self, axis=0):
+        data = resample_data(self.data, freq, moments=self.moments, axis=axis,
+                             **resample_kws)
+        return type(self).from_data(data, moments=self.moments, copy=False, *args, **kwargs)
+
+    def reduce(self, axis=0, *args, **kwargs):
         """
         create new object reducealong axis
         """
         self._raise_if_scalar()
         axis = self._wrap_axis(axis)
-        return self.__class__.from_datas(self.data, axis=axis, moments=self.moments)
+        return type(self).from_datas(self.data, axis=axis, moments=self.moments, *args, **kwargs)
 
-    def resample(self, indices, axis=0, roll=True):
+    def resample(self, indices, axis=0, roll=True, *args, **kwargs):
         """
         create a new object sampled from index
 
@@ -645,18 +702,18 @@ class StatsAccumBase(object):
             axis = 0
 
         out = np.take(data, indices, axis=axis)
-        return self.__class__.from_data(out, moments=self.moments, copy=False)
+        return type(self).from_data(out, moments=self.moments, copy=False, *args, **kwargs)
 
-    def reshape(self, shape, copy=True):
+    def reshape(self, shape, copy=True, *args, **kwargs):
         """
         create a new object with reshaped data
         """
         self._raise_if_scalar()
         new_shape = shape + self._moments_shape
-        data = self.data.reshape(new_shape)
-        return self.__class__.from_data(data, moments=self.moments, copy=copy)
+        data = self._data.reshape(new_shape)
+        return type(self).from_data(data, moments=self.moments, copy=copy, *args, **kwargs)
 
-    def moveaxis(self, source, destination, copy=True):
+    def moveaxis(self, source, destination, copy=True, *args, **kwargs):
         """
         move axis from source to destination
         """
@@ -672,39 +729,38 @@ class StatsAccumBase(object):
         source = _check_val(source)
         destination = _check_val(destination)
         data = np.moveaxis(self.data, source, destination)
-        return self.__class__.from_data(data, moments=self.moments, copy=copy)
+        return type(self).from_data(data, moments=self.moments, copy=copy, *args, **kwargs)
 
 
-class StatsAccum(StatsAccumBase):
-    _moments_len = 1
 
+class _StatsAccumMixin(object):
     def push_val(self, x, w=None):
         xr = self.check_val(x)
         wr = self.check_weight(w)
-        self._push_val(self._data_flat, wr, xr)
+        self._push.val(self._data_flat, wr, xr)
 
     def push_vals(self, x, w=None, axis=0):
         xr = self.check_vals(x, axis)
-        wr = self.check_weights(w, xr.shape[0], axis)
-        self._push_vals(self._data_flat, wr, xr)
+        wr = self.check_weights(w, x, axis)
+        self._push.vals(self._data_flat, wr, xr)
 
     def push_stat(self, a, v=0.0, w=None):
         ar = self.check_ave(a)
         vr = self.check_var(v)
         wr = self.check_weight(w)
-        self._push_stat(self._data_flat, wr, ar, vr)
+        self._push.stat(self._data_flat, wr, ar, vr)
 
     def push_stats(self, a, v=0.0, w=None, axis=0):
         ar = self.check_aves(a, axis)
-        vr = self.check_vars(v, axis)
-        wr = self.check_weights(w, ar.shape[0], axis)
-        self._push_stats(self._data_flat, wr, ar, vr)
+        vr = self.check_vars(v, a, axis)
+        wr = self.check_weights(w, a, axis)
+        self._push.stats(self._data_flat, wr, ar, vr)
 
     # --------------------------------------------------
     # constructors
     # --------------------------------------------------
     @classmethod
-    def from_vals(cls, x, w=None, axis=0, moments=2, shape=None, dtype=None):
+    def from_vals(cls, x, w=None, axis=0, moments=2, shape=None, dtype=None, *args, **kwargs):
         # get shape
         if shape is None:
             shape = list(x.shape)
@@ -712,23 +768,23 @@ class StatsAccum(StatsAccumBase):
             shape = tuple(shape)
         if dtype is None:
             dtype = x.dtype
-        new = cls(shape=shape, dtype=dtype, moments=moments)
+        new = cls(shape=shape, dtype=dtype, moments=moments, *args, **kwargs)
         new.push_vals(x, axis=axis, w=w)
         return new
 
     @classmethod
-    def from_stat(cls, a, v=0.0, w=None, moments=2, shape=None, dtype=None):
+    def from_stat(cls, a, v=0.0, w=None, moments=2, shape=None, dtype=None, *args, **kwargs):
         """
         object from single weight, average, variance/covariance
         """
         if shape is None:
             shape = a.shape
-        new = cls(shape=shape, moments=moments, dtype=dtype)
+        new = cls(shape=shape, moments=moments, dtype=dtype, *args, **kwargs)
         new.push_stat(w=w, a=a, v=v)
         return new
 
     @classmethod
-    def from_stats(cls, a, v=0.0, w=None, axis=0, moments=2, shape=None, dtype=None):
+    def from_stats(cls, a, v=0.0, w=None, axis=0, moments=2, shape=None, dtype=None, *args, **kwargs):
         """
         object from several weights, averages, variances/covarainces along axis
         """
@@ -739,64 +795,56 @@ class StatsAccum(StatsAccumBase):
             shape.pop(axis)
             shape = tuple(shape)
 
-        if dtype is None:
-            a = np.array(a)
-            dtype = a.dtype
-
-        new = cls(shape=shape, dtype=A.dtype, moments=moments)
+        new = cls(shape=shape, dtype=dtype, moments=moments, *args, **kwargs)
         new.push_stats(a=a, v=v, w=w, axis=axis)
         return new
 
     @classmethod
     def from_resample_vals(
-        cls, x, freq, w=None, axis=0, moments=2, dtype=None, **kwargs
+            cls, x, freq, w=None, axis=0, moments=2, dtype=None, resample_kws=None,
+            *args, **kwargs
     ):
         if isinstance(moments, int):
             moments = (moments,)
+        if resample_kws is None:
+            resample_kws = {}
+
         data = resample_vals(
-            x=x, freq=freq, moments=moments, axis=axis, weights=w, **kwargs
+            x=x, freq=freq, moments=moments, axis=axis, weights=w, **resample_kws
         )
-        return cls.from_data(data, copy=False)
+        return cls.from_data(data, copy=False, *args, **kwargs)
 
 
-class StatsAccumCov(StatsAccumBase):
-    _moments_len = 2
+class StatsAccum(StatsAccumBase, _StatsAccumMixin):
+    _moments_len = 1
 
-    # def _init_subclass(self):
-    #     if self.shape == ():
-    #         self._push_val = _push_val_cov
-    #         self._push_vals = _push_vals_cov
-    #         self._push_data = _push_data_cov
-    #         self._push_datas = _push_datas_cov
-    #     else:
-    #         self._push_val = _push_val_cov_vec
-    #         self._push_vals = _push_vals_cov_vec
-    #         self._push_data = _push_data_cov_vec
-    #         self._push_datas = _push_datas_cov_vec
 
+class _StatsAccumCovMixin(object):
     def push_val(self, x0, x1, w=None, broadcast=False):
         x0 = self.check_val(x0)
         x1 = self.check_val(x1, broadcast=broadcast)
         w = self.check_weight(w)
-        self._push_val(self._data_flat, w, x0, x1)
+        self._push.val(self._data_flat, w, x0, x1)
 
     def push_vals(self, x0, x1, w=None, axis=0, broadcast=False):
         if broadcast:
-            target_shape = x0.shape
+            target = x0
         else:
-            target_shape = None
+            target = None
 
+        w = self.check_weights(w, x0, axis)
         x0 = self.check_vals(x0, axis)
-        x1 = self.check_vals(x1, axis, target_shape)
-        w = self.check_weights(w, x0.shape[0], axis)
-        self._push_vals(self._data_flat, w, x0, x1)
+        x1 = self.check_vals(x1, axis, target)
+
+        self._push.vals(self._data_flat, w, x0, x1)
 
     # --------------------------------------------------
     # constructors
     # --------------------------------------------------
     @classmethod
     def from_vals(
-        cls, x0, x1, w=None, axis=0, shape=None, broadcast=False, moments=2, dtype=None
+            cls, x0, x1, w=None, axis=0, shape=None, broadcast=False, moments=2, dtype=None, *args, **kwargs
+
     ):
 
         # get shape
@@ -807,7 +855,7 @@ class StatsAccumCov(StatsAccumBase):
         if dtype is None:
             dtype = x0.dtype
 
-        new = cls(shape=shape, dtype=dtype, moments=moments)
+        new = cls(shape=shape, dtype=dtype, moments=moments, *args, **kwargs)
         new.push_vals(x0=x0, x1=x1, axis=axis, w=w, broadcast=broadcast)
         return new
 
@@ -822,10 +870,14 @@ class StatsAccumCov(StatsAccumBase):
         dtype=None,
         broadcast=False,
         moments=2,
-        **kwargs,
+        resample_kws=None,
+        *args, **kwargs
     ):
         if isinstance(moments, int):
             moments = (moments,) * cls._moments_len
+
+        if resample_kws is None:
+            resample_kws = {}
 
         data = resample_vals(
             x=x0,
@@ -835,6 +887,12 @@ class StatsAccumCov(StatsAccumBase):
             broadcast=broadcast,
             axis=axis,
             weights=w,
-            **kwargs,
+            **resample_kws,
         )
-        return cls.from_data(data, copy=False)
+        return cls.from_data(data, copy=False, *args, **kwargs)
+
+
+
+class StatsAccumCov(StatsAccumBase, _StatsAccumCovMixin):
+    _moments_len = 2
+
