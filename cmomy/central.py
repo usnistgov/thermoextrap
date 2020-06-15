@@ -229,7 +229,6 @@ class StatsAccumBase(object):
         if shape is None:
             shape = ()
         self.shape = shape
-        self._init_subclass()
 
         # data
         if data is None:
@@ -242,10 +241,12 @@ class StatsAccumBase(object):
         self._data = data
         self._data_flat = self._data.reshape(self._data_flat_shape)
 
-    def _init_subclass(self):
+        # setup pushers
         vec = len(self.shape) > 0
         cov = self._moments_len == 2
         self._push = factory_pushers(cov=cov, vec=vec)
+
+
 
     @property
     def dtype(self):
@@ -371,7 +372,9 @@ class StatsAccumBase(object):
                 message = "not implemented for scalar"
             raise ValueError(message)
 
-    def _reshape_flat(self, x, nrec=None):
+    def _reshape_flat(self, x, nrec=None, shape_flat=None):
+        if shape_flat is None:
+            shape_flat = self._shape_flat
         if nrec is None:
             x = x.reshape(self._shape_flat)
         else:
@@ -380,12 +383,97 @@ class StatsAccumBase(object):
             x = x[()]
         return x
 
-    def check_weight(self, w):
+    def _asarray(self, val):
+        return np.asarray(val)
+
+    def _get_target_shape(self, nrec=None, axis=None, data=False):
+        """
+        return shape of targert object array
+        """
+        shape = self.shape
+        if data:
+            shape += self._moments_shape
+
+        if axis is not None:
+            shape = _shape_insert_axis(shape, axis, nrec)
+        return shape
+
+
+    # attempt at making checking/verifying more straight forward
+    # could make this a bit better
+    def _verify_value(self,
+                      x,
+                      target,
+                      axis=None,
+                      broadcast=False,
+                      expand=False,
+                      shape_flat=None,
+    ):
+        """
+        verify input values
+
+        Parameters
+        ----------
+        x : array
+        target : tuple or array
+            If tuple, this is the target shape to be used to Make target.
+            If array, this is the target array
+        Optinal target that has already been rolled.  If this is passed, and
+        x will be broadcast/expanded, can expand to this shape without the need
+        to reorder, 
+        """
+
+
+        if isinstance(target, tuple):
+            # target is the target shape
+            target_shape = target
+            target_output = x
+
+        else:
+            # get target_shape from target
+            target_shape = target.shape
+            target_output = None
+
+        x = self._asarray(x)
+        x = _axis_expand_broadcast(x, target_shape, axis,
+                                   verify=False,
+                                   expand=expand, broadcast=broadcast,
+                                   dtype=self.dtype, roll=False)
+
+        # check shape:
+        assert x.shape == target_shape
+
+
+        if axis is not None:
+            if axis != 0:
+                x = np.moveaxis(x, axis, 0)
+
+        if shape_flat is not None:
+            x = x.reshape(shape_flat)
+
+        if x.ndim == 0:
+            x = x[()]
+
+        if target_output is None:
+            return x, target_output
+        else:
+            return x
+
+    def check_weight(self, w):#, target):
         if w is None:
             w = self._unit_weight
         else:
             w = _my_broadcast(w, self.shape)
         return self._reshape_flat(w)
+        # if w is None:
+        #     w = self._unit_weight
+        # return self._verify_value(
+        #     w,
+        #     target=target,
+        #     axis=None, broadcast=True,
+        #     shape_flat=self._shape_flat
+
+        # )
 
     def check_weights(self, w, target, axis=0):
         if w is None:

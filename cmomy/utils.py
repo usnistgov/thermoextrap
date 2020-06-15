@@ -44,14 +44,19 @@ def _shape_insert_axis(shape, axis, new_size):
 
 
 def _axis_expand_broadcast(x, shape, axis,
-                           expand=True, roll=True, broadcast=True,
+                           verify=True,
+                           expand=True,
+                           broadcast=True,
+                           roll=True,
                            dtype=None, order=None):
     """
     broadcast x to shape.  If x is 1d, and shape is n-d, but len(x) is same
     as shape[axis], broadcast x across all dimensions
     """
 
-    x = np.asarray(x, dtype=dtype, order=order)
+    if verify is True:
+        x = np.asarray(x, dtype=dtype, order=order)
+
 
     # if array, and 1d with size same as shape[axis]
     # broadcast from here
