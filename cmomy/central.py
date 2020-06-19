@@ -4,7 +4,6 @@ Central moments/comoments routines
 from __future__ import absolute_import
 
 import numpy as np
-
 from .cached_decorators import gcached
 
 from .utils import (
@@ -128,7 +127,8 @@ def central_comoments(
         dtype = x0.dtype
 
     x1 = _axis_expand_broadcast(
-        x1, x0.shape, axis, roll=False, broadcast=broadcast, dtype=dtype, order=order
+        x1, x0.shape, axis, roll=False, broadcast=broadcast,expand=broadcast,
+        dtype=dtype, order=order
     )
 
     if weights is None:
@@ -139,7 +139,7 @@ def central_comoments(
         )
 
     if axis < 0:
-        axis += x.ndim
+        axis += x0.ndim
     if axis != 0:
         x0 = np.moveaxis(x0, axis, 0)
         x1 = np.moveaxis(x1, axis, 0)
@@ -181,6 +181,7 @@ def central_comoments(
 ###############################################################################
 # Classes
 ###############################################################################
+
 
 class StatsAccumBase(object):
     """
@@ -245,8 +246,6 @@ class StatsAccumBase(object):
         vec = len(self.shape) > 0
         cov = self._moments_len == 2
         self._push = factory_pushers(cov=cov, vec=vec)
-
-
 
     @property
     def dtype(self):
@@ -393,21 +392,15 @@ class StatsAccumBase(object):
         shape = self.shape
         if data:
             shape += self._moments_shape
-
         if axis is not None:
             shape = _shape_insert_axis(shape, axis, nrec)
         return shape
 
-
     # attempt at making checking/verifying more straight forward
     # could make this a bit better
-    def _verify_value(self,
-                      x,
-                      target,
-                      axis=None,
-                      broadcast=False,
-                      expand=False,
-                      shape_flat=None,
+    def _verify_value(
+            self, x, target=None, axis=None, broadcast=False, expand=False, shape_flat=None,
+            other=None,
     ):
         """
         verify input values
@@ -420,8 +413,26 @@ class StatsAccumBase(object):
             If array, this is the target array
         Optinal target that has already been rolled.  If this is passed, and
         x will be broadcast/expanded, can expand to this shape without the need
-        to reorder, 
+        to reorder,
         """
+
+        x = self._asarray(x)
+
+        if isinstance(target, str):
+            if target == "val":
+                target = self.shape
+            elif target == "vals":
+                target = _shape_insert_axis(self.shape, axis, x.shape[axis])
+            elif target == "data":
+                target = self._data_shape
+            elif target == "datas":
+                if axis < 0:
+                    axis += self.ndim - self._moments_len
+                target = _shape_insert_axis(self._data_shape, axis, x.shape[axis])
+            elif target == 'var':
+                target = self._shape_var
+            elif target == 'vars':
+                target = _shape_insert_axis(self._shape_var, axis, other.shape[axis])
 
 
         if isinstance(target, tuple):
@@ -434,126 +445,121 @@ class StatsAccumBase(object):
             target_shape = target.shape
             target_output = None
 
-        x = self._asarray(x)
-        x = _axis_expand_broadcast(x, target_shape, axis,
-                                   verify=False,
-                                   expand=expand, broadcast=broadcast,
-                                   dtype=self.dtype, roll=False)
+        x = _axis_expand_broadcast(
+            x,
+            target_shape,
+            axis,
+            verify=False,
+            expand=expand,
+            broadcast=broadcast,
+            dtype=self.dtype,
+            roll=False,
+        )
 
         # check shape:
-        assert x.shape == target_shape
+        assert x.shape == target_shape, f'x.shape = {x.shape} not equal target_shape={target_shape}'
 
-
+        # move axis
         if axis is not None:
             if axis != 0:
                 x = np.moveaxis(x, axis, 0)
+            nrec = (x.shape[0],)
+        else:
+            nrec = ()
 
         if shape_flat is not None:
-            x = x.reshape(shape_flat)
+            x = x.reshape(nrec + shape_flat)
 
         if x.ndim == 0:
             x = x[()]
 
         if target_output is None:
-            return x, target_output
-        else:
             return x
-
-    def check_weight(self, w):#, target):
-        if w is None:
-            w = self._unit_weight
         else:
-            w = _my_broadcast(w, self.shape)
-        return self._reshape_flat(w)
-        # if w is None:
-        #     w = self._unit_weight
-        # return self._verify_value(
-        #     w,
-        #     target=target,
-        #     axis=None, broadcast=True,
-        #     shape_flat=self._shape_flat
+            return x, target_output
 
-        # )
+
+    def check_weight(self, w, target):
+        if w is None:
+            w = 1.0
+        return self._verify_value(
+            w, target=target, axis=None, broadcast=True, expand=True,
+            shape_flat=self._shape_flat
+        )
 
     def check_weights(self, w, target, axis=0):
         if w is None:
-            w = self._unit_weight
-            w = w.reshape(_shape_insert_axis(w.shape, axis, 1))
+            w = 1.0
+        return self._verify_value(
+            w,
+            target=target,
+            axis=axis,
+            broadcast=True,
+            expand=True,
+            shape_flat=self._shape_flat,
+        )
 
-        #shape = _shape_insert_axis(self.shape, axis, nrec)
-        w = _axis_expand_broadcast(w, target.shape, axis, dtype=self.dtype)
+    def check_val(self, x, target, broadcast=False):
+        return self._verify_value(
+            x,
+            target=target,
+            broadcast=broadcast,
+            expand=False,
+            shape_flat=self._shape_flat,
+        )
 
-        assert w.shape == (target.shape[axis],) + self.shape
-        return self._reshape_flat(w, w.shape[0])
+    def check_vals(self, x, target, axis=0, broadcast=False):
+        return self._verify_value(
+            x,
+            target=target,
+            axis=axis,
+            broadcast=broadcast,
+            expand=broadcast,
+            shape_flat=self._shape_flat,
+        )
 
-    def check_val(self, x, broadcast=False):
-        x = np.asarray(x, dtype=self.dtype)
-        if broadcast:
-            x = _my_broadcast(x, self.shape)
-        assert x.shape == self.shape
-        return self._reshape_flat(x)
+    def check_var(self, v, broadcast=False):
+        return self._verify_value(
+            v,
+            target='var', #self._shape_var,
+            broadcast=broadcast,
+            expand=False,
+            shape_flat=self._shape_flat_var,
+        )[0]
 
-    def check_vals(self, x, axis=0, target=None):
-
-        if target is None:
-            x = np.asarray(x, dtype=self.dtype)
-            if axis != 0:
-                x = np.moveaxis(x, axis, 0)
-        else:
-            x = _axis_expand_broadcast(
-                x,
-                shape=target.shape,
-                axis=axis,
-                expand=True,
-                broadcast=True,
-                roll=True,
-                dtype=self.dtype,
-            )
-
-        assert x.shape[1:] == self.shape
-        return self._reshape_flat(x, x.shape[0])
-
-    def check_ave(self, a):
-        return self.check_val(a)
-
-    def check_aves(self, a, axis=0):
-        return self.check_vals(a)
-
-    def check_var(self, v):
-        v = np.asarray(v, dtype=self.dtype)
-        assert v.shape == self._shape_var
-        return v.reshape(self._shape_flat_var)
-
-    def check_vars(self, v, target, axis=0):
-        v = np.asarray(v, dtype=self.dtype)
-        if axis != 0:
-            v = np.moveaxis(v, axis, 0)
-        assert v.shape == (target.shape[axis],) + self._shape_var
-        return v.reshape(v.shape[:1] + self._shape_flat_var)
+    def check_vars(self, v, target, axis=0, broadcast=False):
+        return self._verify_value(
+            v,
+            target='vars',
+            axis=axis,
+            broadcast=broadcast,
+            expand=broadcast,
+            shape_flat=self._shape_flat_var,
+            other=target,
+        )[0]
 
     def check_data(self, data):
-        data = np.asarray(data, dtype=self.dtype)
-        assert data.shape == self._data_shape
-        return data.reshape(self._data_flat_shape)
+        return self._verify_value(
+            data, target="data", shape_flat=self._data_flat_shape
+        )[0]
 
     def check_datas(self, datas, axis=0):
-        datas = np.asarray(datas, dtype=self.dtype)
-        if axis != 0:
-            datas = np.moveaxis(datas, axis, 0)
-        assert datas.shape[1:] == self._data_shape
-        return datas.reshape(datas.shape[:1] + self._data_flat_shape)
+        return self._verify_value(
+            datas, target="datas", axis=axis, shape_flat=self._data_flat_shape
+        )[0]
 
     def zero(self):
         self._data.fill(0.0)
 
     # create similar objects
     def new_like(self, data=None):
-        return type(self)(moments=self.moments, shape=self.shape, dtype=self.dtype, data=data)
+        return type(self)(
+            moments=self.moments, shape=self.shape, dtype=self.dtype, data=data
+        )
 
     def zeros_like(self):
         """create zero object like self"""
         return self.new_like(data=None)
-
 
     def copy(self):
         return self.new_like(data=self.values.copy())
@@ -664,9 +670,17 @@ class StatsAccumBase(object):
 
     # Universal factory methods
     @classmethod
-    def from_data(cls, data, moments=None, shape=None, dtype=None, copy=True,
-                  verify=True,
-                  *args, **kwargs):
+    def from_data(
+        cls,
+        data,
+        moments=None,
+        shape=None,
+        dtype=None,
+        copy=True,
+        verify=True,
+        *args,
+        **kwargs,
+    ):
 
         if verify:
             data = np.asarray(data, dtype=dtype)
@@ -682,10 +696,14 @@ class StatsAccumBase(object):
         if copy:
             data = data.copy()
 
-        return cls(shape=shape, dtype=dtype, moments=moments, data=data, *args, **kwargs)
+        return cls(
+            shape=shape, dtype=dtype, moments=moments, data=data, *args, **kwargs
+        )
 
     @classmethod
-    def from_datas(cls, datas, moments=None, axis=0, shape=None, dtype=None, *args, **kwargs):
+    def from_datas(
+        cls, datas, moments=None, axis=0, shape=None, dtype=None, *args, **kwargs
+    ):
         """
         Data should have shape
 
@@ -693,7 +711,7 @@ class StatsAccumBase(object):
 
         [..., moment, axis] (axis == -1)
         """
-    
+
         datas, axis = cls._datas_axis_to_first(datas, axis)
         if shape is None:
             shape = datas.shape[1 : -cls._moments_len]
@@ -728,20 +746,27 @@ class StatsAccumBase(object):
         data = func(raw)
 
         return cls.from_data(
-            data, moments=moments, shape=shape, dtype=dtype, copy=False,
-            *args, **kwargs
+            data, moments=moments, shape=shape, dtype=dtype, copy=False, *args, **kwargs
         )
 
     @classmethod
-    def from_raws(cls, raws, moments=None, axis=0, shape=None, dtype=None, *args, **kwargs):
+    def from_raws(
+        cls, raws, moments=None, axis=0, shape=None, dtype=None, *args, **kwargs
+    ):
         if cls._moments_len == 1:
             func = convert.to_central_moments
         elif cls._moments_len == 2:
             func = convert.to_central_comoments
         datas = func(raws)
         return cls.from_datas(
-            datas, axis=axis, moments=moments, shape=shape, dtype=dtype, copy=False,
-            *args, **kwargs
+            datas,
+            axis=axis,
+            moments=moments,
+            shape=shape,
+            dtype=dtype,
+            copy=False,
+            *args,
+            **kwargs,
         )
 
     # Universal reducers
@@ -751,9 +776,12 @@ class StatsAccumBase(object):
         if resample_kws is None:
             resample_kws = {}
 
-        data = resample_data(self.data, freq, moments=self.moments, axis=axis,
-                             **resample_kws)
-        return type(self).from_data(data, moments=self.moments, copy=False, *args, **kwargs)
+        data = resample_data(
+            self.data, freq, moments=self.moments, axis=axis, **resample_kws
+        )
+        return type(self).from_data(
+            data, moments=self.moments, copy=False, *args, **kwargs
+        )
 
     def reduce(self, axis=0, *args, **kwargs):
         """
@@ -761,7 +789,9 @@ class StatsAccumBase(object):
         """
         self._raise_if_scalar()
         axis = self._wrap_axis(axis)
-        return type(self).from_datas(self.data, axis=axis, moments=self.moments, *args, **kwargs)
+        return type(self).from_datas(
+            self.values, axis=axis, moments=self.moments, *args, **kwargs
+        )
 
     def resample(self, indices, axis=0, roll=True, *args, **kwargs):
         """
@@ -790,7 +820,9 @@ class StatsAccumBase(object):
             axis = 0
 
         out = np.take(data, indices, axis=axis)
-        return type(self).from_data(out, moments=self.moments, copy=False, *args, **kwargs)
+        return type(self).from_data(
+            out, moments=self.moments, copy=False, *args, **kwargs
+        )
 
     def reshape(self, shape, copy=True, *args, **kwargs):
         """
@@ -799,7 +831,9 @@ class StatsAccumBase(object):
         self._raise_if_scalar()
         new_shape = shape + self._moments_shape
         data = self._data.reshape(new_shape)
-        return type(self).from_data(data, moments=self.moments, copy=copy, *args, **kwargs)
+        return type(self).from_data(
+            data, moments=self.moments, copy=copy, *args, **kwargs
+        )
 
     def moveaxis(self, source, destination, copy=True, *args, **kwargs):
         """
@@ -817,38 +851,41 @@ class StatsAccumBase(object):
         source = _check_val(source)
         destination = _check_val(destination)
         data = np.moveaxis(self.data, source, destination)
-        return type(self).from_data(data, moments=self.moments, copy=copy, *args, **kwargs)
-
+        return type(self).from_data(
+            data, moments=self.moments, copy=copy, *args, **kwargs
+        )
 
 
 class _StatsAccumMixin(object):
     def push_val(self, x, w=None):
-        xr = self.check_val(x)
-        wr = self.check_weight(w)
+        xr, target = self.check_val(x, 'val')
+        wr = self.check_weight(w, target)
         self._push.val(self._data_flat, wr, xr)
 
     def push_vals(self, x, w=None, axis=0):
-        xr = self.check_vals(x, axis)
-        wr = self.check_weights(w, x, axis)
+        xr, target = self.check_vals(x, axis=axis, target='vals')
+        wr = self.check_weights(w, target=target, axis=axis)
         self._push.vals(self._data_flat, wr, xr)
 
-    def push_stat(self, a, v=0.0, w=None):
-        ar = self.check_ave(a)
-        vr = self.check_var(v)
-        wr = self.check_weight(w)
+    def push_stat(self, a, v=0.0, w=None, broadcast=True):
+        ar, target = self.check_val(a, target='val')
+        vr = self.check_var(v, broadcast=broadcast)
+        wr = self.check_weight(w, target=target)
         self._push.stat(self._data_flat, wr, ar, vr)
 
-    def push_stats(self, a, v=0.0, w=None, axis=0):
-        ar = self.check_aves(a, axis)
-        vr = self.check_vars(v, a, axis)
-        wr = self.check_weights(w, a, axis)
+    def push_stats(self, a, v=0.0, w=None, axis=0, broadcast=True):
+        ar, target = self.check_vals(a, target='vals', axis=axis)
+        vr = self.check_vars(v, target=target, axis=axis, broadcast=broadcast)
+        wr = self.check_weights(w, target=target, axis=axis)
         self._push.stats(self._data_flat, wr, ar, vr)
 
     # --------------------------------------------------
     # constructors
     # --------------------------------------------------
     @classmethod
-    def from_vals(cls, x, w=None, axis=0, moments=2, shape=None, dtype=None, *args, **kwargs):
+    def from_vals(
+        cls, x, w=None, axis=0, moments=2, shape=None, dtype=None, *args, **kwargs
+    ):
         # get shape
         if shape is None:
             shape = list(x.shape)
@@ -861,7 +898,9 @@ class _StatsAccumMixin(object):
         return new
 
     @classmethod
-    def from_stat(cls, a, v=0.0, w=None, moments=2, shape=None, dtype=None, *args, **kwargs):
+    def from_stat(
+        cls, a, v=0.0, w=None, moments=2, shape=None, dtype=None, *args, **kwargs
+    ):
         """
         object from single weight, average, variance/covariance
         """
@@ -872,7 +911,18 @@ class _StatsAccumMixin(object):
         return new
 
     @classmethod
-    def from_stats(cls, a, v=0.0, w=None, axis=0, moments=2, shape=None, dtype=None, *args, **kwargs):
+    def from_stats(
+        cls,
+        a,
+        v=0.0,
+        w=None,
+        axis=0,
+        moments=2,
+        shape=None,
+        dtype=None,
+        *args,
+        **kwargs,
+    ):
         """
         object from several weights, averages, variances/covarainces along axis
         """
@@ -889,8 +939,16 @@ class _StatsAccumMixin(object):
 
     @classmethod
     def from_resample_vals(
-            cls, x, freq, w=None, axis=0, moments=2, dtype=None, resample_kws=None,
-            *args, **kwargs
+        cls,
+        x,
+        freq,
+        w=None,
+        axis=0,
+        moments=2,
+        dtype=None,
+        resample_kws=None,
+        *args,
+        **kwargs,
     ):
         if isinstance(moments, int):
             moments = (moments,)
@@ -909,21 +967,15 @@ class StatsAccum(StatsAccumBase, _StatsAccumMixin):
 
 class _StatsAccumCovMixin(object):
     def push_val(self, x0, x1, w=None, broadcast=False):
-        x0 = self.check_val(x0)
-        x1 = self.check_val(x1, broadcast=broadcast)
-        w = self.check_weight(w)
+        x0, target = self.check_val(x0, target='val', broadcast=False)
+        x1 = self.check_val(x1, target=target, broadcast=broadcast)
+        w = self.check_weight(w, target=target)
         self._push.val(self._data_flat, w, x0, x1)
 
     def push_vals(self, x0, x1, w=None, axis=0, broadcast=False):
-        if broadcast:
-            target = x0
-        else:
-            target = None
-
-        w = self.check_weights(w, x0, axis)
-        x0 = self.check_vals(x0, axis)
-        x1 = self.check_vals(x1, axis, target)
-
+        x0, target = self.check_vals(x0, target='vals', axis=axis)
+        w = self.check_weights(w, target=target, axis=axis)
+        x1 = self.check_vals(x1, target=target, axis=axis, broadcast=broadcast)
         self._push.vals(self._data_flat, w, x0, x1)
 
     # --------------------------------------------------
@@ -931,8 +983,17 @@ class _StatsAccumCovMixin(object):
     # --------------------------------------------------
     @classmethod
     def from_vals(
-            cls, x0, x1, w=None, axis=0, shape=None, broadcast=False, moments=2, dtype=None, *args, **kwargs
-
+        cls,
+        x0,
+        x1,
+        w=None,
+        axis=0,
+        shape=None,
+        broadcast=False,
+        moments=2,
+        dtype=None,
+        *args,
+        **kwargs,
     ):
 
         # get shape
@@ -959,7 +1020,8 @@ class _StatsAccumCovMixin(object):
         broadcast=False,
         moments=2,
         resample_kws=None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         if isinstance(moments, int):
             moments = (moments,) * cls._moments_len
@@ -980,7 +1042,5 @@ class _StatsAccumCovMixin(object):
         return cls.from_data(data, copy=False, *args, **kwargs)
 
 
-
 class StatsAccumCov(StatsAccumBase, _StatsAccumCovMixin):
     _moments_len = 2
-
