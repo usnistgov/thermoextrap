@@ -174,6 +174,95 @@ class RecursiveInterp:
         self.uData.append(uData2)
       return
 
+  def sequentialTrain(self, Btrain, verbose=False):
+    """Trains sequentially without recursion. List of state point values is provided and
+training happens just on those without adding points.
+    """
+
+    #Check for overlap in self.edgeB and Btrain and merge as needed
+    for Bval in Btrain:
+      if Bval not in self.edgeB:
+        self.edgeB = np.hstack((self.edgeB, [Bval]))
+    self.edgeB = np.sort(self.edgeB)
+
+    #Set self.modelParams and self.modelParamErrs to empty lists
+    #Will recompute all in case have new intervals
+    self.modelParams = []
+    self.modelParamErrs = []
+
+    #Loop over pairs of edge points
+    for i in range(len(self.edgeB) - 1):
+      B1 = Btrain[i]
+      B2 = Btrain[i+1]
+
+      if verbose:
+        print('\nInterpolating from points %f and %f'%(B1, B2))
+
+      #Generate data somehow if not provided
+      try:
+        xData1 = self.xData[i]
+        uData1 = self.uData[i]
+        if xData1 is None:
+          xData1, uData1 = self.getData(B1)
+          self.xData[i] = xData1
+          self.uData[i] = uData1
+      except IndexError:
+        xData1, uData1 = self.getData(B1)
+        self.xData.append(xData1)
+        self.uData.append(uData1)
+      try:
+        xData2 = self.xData[i+1]
+        uData2 = self.uData[i+1]
+        if xData2 is None:
+          xData2, uData2 = self.getData(B2)
+          self.xData[i+1] = xData2
+          self.uData[i+1] = uData2
+      except IndexError:
+        xData2, uData2 = self.getData(B2)
+        self.xData.append(xData2)
+        self.uData.append(uData2)
+
+      #And format data for training interpolation models
+      xData = np.array([xData1, xData2])
+      uData = np.array([uData1, uData2])
+
+      #Train the model and get parameters we want to use for THIS interpolation
+      #Have to save parameters because want to use SAME data when bootstrapping
+      #So part of saving parameters is updating the data that's used in the model
+      thisParams = self.model.train([B1, B2], xData, uData, saveParams=True)
+
+      if verbose:
+        #Check if need more data to extrapolate from (just report info on this)
+        Bvals = np.linspace(B1, B2, num=50)
+        predictVals = self.model.predict(Bvals, order=self.maxOrder)
+        bootErr = self.model.bootstrap(Bvals, order=self.maxOrder)
+        #Be careful to catch /0.0
+        relErr = np.zeros(bootErr.shape)
+        for i in range(bootErr.shape[0]):
+          for j in range(bootErr.shape[1]):
+            if abs(predictVals[i,j]) == 0.0:
+              #If value is exactly zero, either really unlucky
+              #Or inherently no error because it IS zero - assume this
+              relErr[i,j] = 0.0
+            else:
+              relErr[i,j] = bootErr[i,j] / abs(predictVals[i,j])
+
+        #Checking maximum over both tested interior state points AND observable values
+        #(if observable is a vector, use element with maximum error
+        checkInd = np.unravel_index(np.argmax(relErr), relErr.shape)
+        checkVal = relErr[checkInd]
+        print('Maximum bootstrapped error within interval: %f'%checkVal)
+        print('At point: %f'%Bvals[checkInd[0]])
+
+      #Add in parameters for this region
+      #Appending should work because code will always go with lower interval first
+      self.modelParams.append(self.model.params)
+      #And also append uncertainties by bootstrapping
+      self.modelParamErrs.append(self.model.bootstrap(None))
+      #Also add this data to what we save - hopefully have enough memory
+
+    return
+
   def predict(self, B):
     """Makes a prediction using the trained piecewise model.
        Note that the function will not produce output if asked to extrapolate outside
