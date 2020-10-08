@@ -1,5 +1,8 @@
 # Thermodynamic Extrapolation/Interpolation Library
-This repository contains code used and described in the paper "Extrapolation and interpolation strategies for efficiently estimating structural observables as a function of temperature and density."
+This repository contains code used and described in:
+
+Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
+
 If you find this code useful in producing published works, please provide an appropriate citation.
 
 Code included here can be used to perform thermodynamic extrapolation and interpolation of observables calculated from molecular simulations.
