@@ -322,7 +322,21 @@ class SymSubs(object):
 
 
 class Lambdify(object):
+    """
+    create python function from list of sympy expression
+    """
     def __init__(self, exprs, args=None, **opts):
+        """
+        Parameters
+        ----------
+        exprs : array-like
+            array of sympy expressions to lambdify
+        args : array-like
+            array of sympy symbols which will be in args of the resulting function
+        opts : dict
+            extra arguments to sympy.lambdify
+        """
+
         self.exprs = exprs
         self.args = args
         self.opts = opts
@@ -333,12 +347,14 @@ class Lambdify(object):
 
     @classmethod
     def from_u_xu(cls, exprs, **opts):
+        """factory for u/xu args"""
         u, xu = _get_default_indexed("u", "xu")
         args = (u, xu)
         return cls(exprs=exprs, args=(u, xu), **opts)
 
     @classmethod
     def from_du_dxdu(cls, exprs, xalpha=False, **opts):
+        """factory for du/dxdu args"""
         if xalpha:
             x1 = _get_default_indexed("x1")
         else:
@@ -349,6 +365,7 @@ class Lambdify(object):
 
 # -log<X>
 class SymMinusLog(object):
+    """class to take -log(X)"""
     X, dX = _get_default_indexed("X", "dX")
 
     @gcached(prop=False)
@@ -374,7 +391,18 @@ def factory_minus_log():
 
 
 class Coefs(object):
+    """class to handle coefficients in taylor expansion"""
     def __init__(self, funcs, exprs=None):
+        """
+        Parameters
+        ----------
+        funcs : array-like
+            array of functions.
+            funcs[n] is the nth derivative of function
+        exprs : array-like, optional
+            optional placeholder for sympy expressions corresponding to the
+            lambdified functions in `funcs`
+        """
         self.funcs = funcs
         self.exprs = exprs
 
@@ -384,7 +412,6 @@ class Coefs(object):
 
     def coefs(self, *args, order, norm=True, minus_log=False):
         out = [self.funcs[i](*args) for i in range(order + 1)]
-
         if minus_log:
             out = self._apply_minus_log(X=out, order=order)
 
@@ -407,6 +434,9 @@ class Coefs(object):
 
 
 class ExtrapModel(object):
+    """
+    apply taylor series extrapolation
+    """
     def __init__(self, alpha0, data, coefs, order=None, minus_log=False, alpha_name='alpha'):
         self.alpha0 = alpha0
         self.data = data
