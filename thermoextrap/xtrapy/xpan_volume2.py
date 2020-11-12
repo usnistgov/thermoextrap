@@ -12,7 +12,7 @@ import sympy as sp
 
 from .cached_decorators import gcached
 from .core import _get_default_symbol, _get_default_indexed
-from .core import DataBase, DatasetSelector
+from .core import DataTemplateValues, DatasetSelector
 from .core import SymSubs, Coefs
 from .core import ExtrapModel, PerturbModel
 

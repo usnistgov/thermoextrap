@@ -11,7 +11,12 @@ import sympy as sp
 
 from .cached_decorators import gcached
 from .core import _get_default_symbol, _get_default_indexed
-from .core import DataBase, DatasetSelector
+from .core import (
+    DataTemplateValues,
+    DatasetSelector,
+    DataStatsCov,
+    DataStatsCovVals,
+)
 from .core import SymSubs, Coefs
 from .core import ExtrapModel, PerturbModel
 
@@ -419,7 +424,7 @@ def build_aves_dxdu(
         return xave, duave, dxduave
 
 
-class Data(DataBase):
+class Data(DataTemplateValues):
     """
     Class to hold uv/xv data
     """
@@ -470,7 +475,7 @@ class Data(DataBase):
         return (self.u_selector, self.xu_selector)
 
 
-class DataCentral(DataBase):
+class DataCentral(DataTemplateValues):
     """
     Hold uv/xv data and produce central momemnts
 
@@ -546,7 +551,6 @@ class DataCentral(DataBase):
 ###############################################################################
 # Factory functions
 ###############################################################################
-
 
 def factory_data(
     uv,
@@ -639,7 +643,16 @@ def factory_coefs(xalpha=False, central=False):
 
 
 def factory_extrapmodel(
-        order, alpha0, uv, xv, xalpha=False, central=False, minus_log=False, alpha_name='beta', **kws
+    alpha0,
+    order=None,
+    data=None,
+    uv=None,
+    xv=None,
+    xalpha=False,
+    central=False,
+    minus_log=False,
+    alpha_name="beta",
+    **kws
 ):
     """
     factory function to create Extrapolation model for beta expanssion
@@ -650,6 +663,8 @@ def factory_extrapmodel(
         maximum order
     alpha0 : float
         reference value of alpha (beta)
+    data : Data object
+
     uv, xv : array-like
         values for u and x
     xalpha : bool, default=False
@@ -667,17 +682,25 @@ def factory_extrapmodel(
     -------
     extrapmodel : ExtrapModel object
     """
-    data = factory_data(
-        uv=uv, xv=xv, order=order, central=central, xalpha=xalpha, **kws
-    )
+
+    if data is None:
+        data = factory_data(
+            uv=uv, xv=xv, order=order, central=central, xalpha=xalpha, **kws
+        )
+
+
     coefs = factory_coefs(xalpha=xalpha, central=central)
     return ExtrapModel(
-        alpha0=alpha0, data=data, coefs=coefs, order=order, minus_log=minus_log,
-        alpha_name=alpha_name
+        alpha0=alpha0,
+        data=data,
+        coefs=coefs,
+        order=data.order,
+        minus_log=minus_log,
+        alpha_name=alpha_name,
     )
 
 
-def factory_perturbmodel(alpha0, uv, xv, alpha_name='beta', **kws):
+def factory_perturbmodel(alpha0, uv, xv, alpha_name="beta", **kws):
     """
     factory function to create PerturbModel for beta expansion
 
