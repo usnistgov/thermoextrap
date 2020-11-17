@@ -38,7 +38,7 @@ def central_moments(
         weights will be reshaped and broadcast against x
     axis : int, default=0
         axis to reduce along
-    last : bool, default=True
+    last : bool, aaefault=True
         if True, put moments as last dimension.
         Otherwise, moments will be in first dimension
     dtype, order : options to np.asarray
@@ -127,8 +127,14 @@ def central_comoments(
         dtype = x0.dtype
 
     x1 = _axis_expand_broadcast(
-        x1, x0.shape, axis, roll=False, broadcast=broadcast,expand=broadcast,
-        dtype=dtype, order=order
+        x1,
+        x0.shape,
+        axis,
+        roll=False,
+        broadcast=broadcast,
+        expand=broadcast,
+        dtype=dtype,
+        order=order,
     )
 
     if weights is None:
@@ -181,8 +187,6 @@ def central_comoments(
 ###############################################################################
 # Classes
 ###############################################################################
-
-
 class StatsAccumBase(object):
     """
     Base class for moments accumulation
@@ -399,8 +403,14 @@ class StatsAccumBase(object):
     # attempt at making checking/verifying more straight forward
     # could make this a bit better
     def _verify_value(
-            self, x, target=None, axis=None, broadcast=False, expand=False, shape_flat=None,
-            other=None,
+        self,
+        x,
+        target=None,
+        axis=None,
+        broadcast=False,
+        expand=False,
+        shape_flat=None,
+        other=None,
     ):
         """
         verify input values
@@ -429,11 +439,10 @@ class StatsAccumBase(object):
                 if axis < 0:
                     axis += self.ndim - self._moments_len
                 target = _shape_insert_axis(self._data_shape, axis, x.shape[axis])
-            elif target == 'var':
+            elif target == "var":
                 target = self._shape_var
-            elif target == 'vars':
+            elif target == "vars":
                 target = _shape_insert_axis(self._shape_var, axis, other.shape[axis])
-
 
         if isinstance(target, tuple):
             # target is the target shape
@@ -457,7 +466,9 @@ class StatsAccumBase(object):
         )
 
         # check shape:
-        assert x.shape == target_shape, f'x.shape = {x.shape} not equal target_shape={target_shape}'
+        assert (
+            x.shape == target_shape
+        ), f"x.shape = {x.shape} not equal target_shape={target_shape}"
 
         # move axis
         if axis is not None:
@@ -478,13 +489,16 @@ class StatsAccumBase(object):
         else:
             return x, target_output
 
-
     def check_weight(self, w, target):
         if w is None:
             w = 1.0
         return self._verify_value(
-            w, target=target, axis=None, broadcast=True, expand=True,
-            shape_flat=self._shape_flat
+            w,
+            target=target,
+            axis=None,
+            broadcast=True,
+            expand=True,
+            shape_flat=self._shape_flat,
         )
 
     def check_weights(self, w, target, axis=0):
@@ -521,7 +535,7 @@ class StatsAccumBase(object):
     def check_var(self, v, broadcast=False):
         return self._verify_value(
             v,
-            target='var', #self._shape_var,
+            target="var",  # self._shape_var,
             broadcast=broadcast,
             expand=False,
             shape_flat=self._shape_flat_var,
@@ -530,7 +544,7 @@ class StatsAccumBase(object):
     def check_vars(self, v, target, axis=0, broadcast=False):
         return self._verify_value(
             v,
-            target='vars',
+            target="vars",
             axis=axis,
             broadcast=broadcast,
             expand=broadcast,
@@ -607,10 +621,22 @@ class StatsAccumBase(object):
         return self.values[self._single_index(2)]
 
     def std(self):
-        return np.sqrt(self.var(mom=2))
+        return np.sqrt(self.var())
 
     def cmom(self):
-        return self.values
+        """central moments"""
+        out = self.data.copy()
+        # zeroth central moment
+        out[self._weight_index] = 1
+        # first central moment
+        out[self._single_index(1)] = 0
+        return out
+
+    def rmom(self):
+        """raw moments"""
+        out = self.to_raw()
+        out[self._weight_index] = 1
+        return out
 
     def _check_other(self, b):
         """check other object"""
@@ -770,12 +796,45 @@ class StatsAccumBase(object):
         )
 
     # Universal reducers
-    def resample_and_reduce(self, freq, axis=None, resample_kws=None, *args, **kwargs):
+    def resample_and_reduce(
+        self,
+        freq=None,
+        indices=None,
+        nrep=None,
+        axis=None,
+        resample_kws=None,
+        *args,
+        **kwargs,
+    ):
+        """
+        bootstrap resample and reduce
+
+        Parameter
+        ----------
+        freq : array-like, shape=(nrep, nrec), optional
+            frequence table.  freq[i, j] is the weight of the jth record to the ith replicate
+        indices : array-like, shape=(nrep, nrec), optional
+            resampling array.  idx[i, j] is the record index of the original array to place in new sample[i, j].
+            if specified, create freq array from idx
+        nrep : int, optional
+            if specified, create idx array with this number of replicates 
+        axis : int, Default=0
+            axis to resample and reduce along
+        resample_kws : dict
+            extra arguments to resample.resample_and_reduce
+        args : tuple
+            extra positional arguments to from_data method
+        kwargs : dict
+            extra key-word arguments to from_data method
+        """
         self._raise_if_scalar()
         axis = self._wrap_axis(axis)
         if resample_kws is None:
             resample_kws = {}
 
+        freq = randsamp_freq(
+            nrep=nrep, indices=indices, freq=freq, size=self.shape[axis], check=True
+        )
         data = resample_data(
             self.data, freq, moments=self.moments, axis=axis, **resample_kws
         )
@@ -791,6 +850,49 @@ class StatsAccumBase(object):
         axis = self._wrap_axis(axis)
         return type(self).from_datas(
             self.values, axis=axis, moments=self.moments, *args, **kwargs
+        )
+
+    def block(self, block_size=None, axis=None, *args, **kwargs):
+        """
+        block average reduction
+
+        Parameters
+        ----------
+        block_size : int
+            number of consecutive records to combine
+        axis : int, default=0
+            axis to reduce along
+        args : tuple
+            extra positional arguments to `from_datas` method
+        kwargs : dict
+            extral key word arguments to `from_datas` method
+        """
+
+        self._raise_if_scalar()
+
+        axis = self._wrap_axis(axis)
+        data = self.data
+
+        # move axis to first
+        if axis != 0:
+            data = np.swapaxes(data, axis, 0)
+
+        n = data.shape[0]
+
+        if block_size is None:
+            block_size = n
+            nblock = 1
+
+        else:
+            nblock = n // block_size
+
+        new_shape = (nblock, block_size) + data.shape[1:]
+        datas = data[: (nblock * block_size), ...].reshape(
+            (nblock, block_size) + data.shape[1:]
+        )
+
+        return type(self).from_datas(
+            datas=datas, axis=1, moments=self.moments, *args, **kwargs
         )
 
     def resample(self, indices, axis=0, roll=True, *args, **kwargs):
@@ -858,23 +960,23 @@ class StatsAccumBase(object):
 
 class _StatsAccumMixin(object):
     def push_val(self, x, w=None):
-        xr, target = self.check_val(x, 'val')
+        xr, target = self.check_val(x, "val")
         wr = self.check_weight(w, target)
         self._push.val(self._data_flat, wr, xr)
 
     def push_vals(self, x, w=None, axis=0):
-        xr, target = self.check_vals(x, axis=axis, target='vals')
+        xr, target = self.check_vals(x, axis=axis, target="vals")
         wr = self.check_weights(w, target=target, axis=axis)
         self._push.vals(self._data_flat, wr, xr)
 
     def push_stat(self, a, v=0.0, w=None, broadcast=True):
-        ar, target = self.check_val(a, target='val')
+        ar, target = self.check_val(a, target="val")
         vr = self.check_var(v, broadcast=broadcast)
         wr = self.check_weight(w, target=target)
         self._push.stat(self._data_flat, wr, ar, vr)
 
     def push_stats(self, a, v=0.0, w=None, axis=0, broadcast=True):
-        ar, target = self.check_vals(a, target='vals', axis=axis)
+        ar, target = self.check_vals(a, target="vals", axis=axis)
         vr = self.check_vars(v, target=target, axis=axis, broadcast=broadcast)
         wr = self.check_weights(w, target=target, axis=axis)
         self._push.stats(self._data_flat, wr, ar, vr)
@@ -941,7 +1043,9 @@ class _StatsAccumMixin(object):
     def from_resample_vals(
         cls,
         x,
-        freq,
+        freq=None,
+        indices=None,
+        nrep=None,
         w=None,
         axis=0,
         moments=2,
@@ -950,6 +1054,11 @@ class _StatsAccumMixin(object):
         *args,
         **kwargs,
     ):
+
+        freq = randsamp_freq(
+            nrep=nrep, freq=freq, indices=indices, size=x.shape[axis], check=True,
+        )
+
         if isinstance(moments, int):
             moments = (moments,)
         if resample_kws is None:
@@ -967,13 +1076,13 @@ class StatsAccum(StatsAccumBase, _StatsAccumMixin):
 
 class _StatsAccumCovMixin(object):
     def push_val(self, x0, x1, w=None, broadcast=False):
-        x0, target = self.check_val(x0, target='val', broadcast=False)
+        x0, target = self.check_val(x0, target="val", broadcast=False)
         x1 = self.check_val(x1, target=target, broadcast=broadcast)
         w = self.check_weight(w, target=target)
         self._push.val(self._data_flat, w, x0, x1)
 
     def push_vals(self, x0, x1, w=None, axis=0, broadcast=False):
-        x0, target = self.check_vals(x0, target='vals', axis=axis)
+        x0, target = self.check_vals(x0, target="vals", axis=axis)
         w = self.check_weights(w, target=target, axis=axis)
         x1 = self.check_vals(x1, target=target, axis=axis, broadcast=broadcast)
         self._push.vals(self._data_flat, w, x0, x1)
@@ -1013,7 +1122,9 @@ class _StatsAccumCovMixin(object):
         cls,
         x0,
         x1,
-        freq,
+        freq=None,
+        indices=None,
+        nrep=None,
         w=None,
         axis=0,
         dtype=None,
@@ -1028,6 +1139,10 @@ class _StatsAccumCovMixin(object):
 
         if resample_kws is None:
             resample_kws = {}
+
+        freq = randsamp_freq(
+            nrep=nrep, indices=indices, freq=freq, size=x0.shape[axis], check=True
+        )
 
         data = resample_vals(
             x=x0,

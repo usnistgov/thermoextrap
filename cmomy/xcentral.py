@@ -12,11 +12,10 @@ from .cached_decorators import gcached, cached_clear
 
 
 ###############################################################################
-# central moments/comoments routines
+# central moments/comoments routine
 ###############################################################################
 def xcentral_moments(
-        x, moments, weights=None, axis=0, last=True,
-        moments_dims=None,
+    x, moments, weights=None, axis=0, last=True, moments_dims=None,
 ):
     """
     calculate central moments along axis
@@ -55,12 +54,10 @@ def xcentral_moments(
     assert isinstance(x, xr.DataArray)
 
     if moments_dims is None:
-        moments_dims = ('mom_0',)
+        moments_dims = ("mom_0",)
     if isinstance(moments_dims, str):
         moments_dims = (moments_dims,)
     assert len(moments_dims) == 1
-
-
 
     if weights is None:
         weights = xr.ones_like(x)
@@ -75,15 +72,14 @@ def xcentral_moments(
     wsum = weights.sum(dim=dim)
     wsum_inv = 1.0 / wsum
 
-
     xave = xr.dot(weights, x, dims=dim) * wsum_inv
 
-    p = xr.DataArray(np.arange(0, moments+1), dims=moments_dims)
+    p = xr.DataArray(np.arange(0, moments + 1), dims=moments_dims)
     dx = (x - xave) ** p
     out = xr.dot(weights, dx, dims=dim) * wsum_inv
 
-    out.loc[{moments_dims[0] : 0}] = wsum
-    out.loc[{moments_dims[0] : 1}] = xave
+    out.loc[{moments_dims[0]: 0}] = wsum
+    out.loc[{moments_dims[0]: 1}] = xave
 
     if last:
         out = out.transpose(..., *moments_dims)
@@ -127,14 +123,13 @@ def xcentral_comoments(
         assert x1.shape == x0.shape
         assert x0.dims == x1.dims
 
-
     if isinstance(axis, int):
         dim = x0.dims[axis]
     else:
         dim = axis
 
     if moments_dims is None:
-        moments_dims = ['mom_0','mom_1']
+        moments_dims = ["mom_0", "mom_1"]
     assert len(moments_dims) == 2
 
     wsum = weights.sum(dim=dim)
@@ -142,20 +137,14 @@ def xcentral_comoments(
 
     x = (x0, x1)
 
-    xave = [
-        xr.dot(weights, xx, dims=dim) * wsum_inv
-        for xx in x
-    ]
+    xave = [xr.dot(weights, xx, dims=dim) * wsum_inv for xx in x]
 
     p = [
-        xr.DataArray(np.arange(0, mom+1), dims=dim)
+        xr.DataArray(np.arange(0, mom + 1), dims=dim)
         for mom, dim in zip(moments, moments_dims)
     ]
 
-    dx = [
-        (xx - xxave) ** pp
-        for xx, xxave, pp in zip(x, xave, p)
-    ]
+    dx = [(xx - xxave) ** pp for xx, xxave, pp in zip(x, xave, p)]
 
     out = xr.dot(weights, dx[0], dx[1], dims=dim) * wsum_inv
 
@@ -164,10 +153,9 @@ def xcentral_comoments(
     out.loc[{moments_dims[0]: 0, moments_dims[1]: 1}] = xave[1]
 
     if last:
-        out = out.transpose(...,*moments_dims)
+        out = out.transpose(..., *moments_dims)
 
     return out
-
 
 
 def _attributes_from_xr(da, dim=None, moments_dims=None, **kws):
@@ -227,6 +215,41 @@ def _wrap_like(da, x):
     )
 
 
+
+def _order_like(template, *others):
+    """
+    given dimensions, order in same manner
+    """
+
+    if not isinstance(template, xr.DataArray):
+        out = others
+
+    else:
+        dims = template.dims
+
+        key_map = {dim: i for i, dim in enumerate(dims)}
+        key = lambda x: key_map[x]
+
+        out = []
+        for other in others:
+            if isinstance(other, xr.DataArray):
+                # reorder
+                order = sorted(other.dims, key=key)
+
+                x = other.transpose(*order)
+            else:
+                x = other
+
+            out.append(x)
+
+    if len(out) == 1:
+        out = out[0]
+
+    return out
+
+
+
+
 class xStatsAccumBase(StatsAccumBase):
     __slots__ = "_xdata"
 
@@ -276,7 +299,6 @@ class xStatsAccumBase(StatsAccumBase):
                 dims = [f"dim_{i}" for i in range(self.ndim)]
             dims = tuple(dims)
 
-
             if len(dims) == self.ndim + self._moments_len:
                 # assume dims has all the dimensions for data and moments
                 dims_total = dims
@@ -287,6 +309,8 @@ class xStatsAccumBase(StatsAccumBase):
                     moments_dims = [f"mom_{i}" for i in range(self._moments_len)]
                 assert len(moments_dims) == self._moments_len
                 dims_total = dims + tuple(moments_dims)
+            else:
+                raise ValueError('bad dims {}, moment_dims {}'.format(dims, moments_dims))
 
             assert len(dims_total) == self.ndim + self._moments_len
 
@@ -329,7 +353,6 @@ class xStatsAccumBase(StatsAccumBase):
     def sizes(self):
         return self._xdata.sizes
 
-
     def _wrap_xarray_method(self, _method, *args, **kwargs):
         xdata = getattr(self._xdata, _method)(*args, **kwargs)
         # Use new like to create a new thin wrapper
@@ -338,61 +361,93 @@ class xStatsAccumBase(StatsAccumBase):
         return self.new_like(data=xdata)
 
     def assign_coords(self, coords=None, **coords_kwargs):
-        return self._wrap_xarray_method('assign_coords', coords=coords, **coords_kwargs)
+        return self._wrap_xarray_method("assign_coords", coords=coords, **coords_kwargs)
 
     def assign_attrs(self, *args, **kwargs):
-        return self._wrap_xarray_method('assign_attrs', *args, **kwargs)
+        return self._wrap_xarray_method("assign_attrs", *args, **kwargs)
 
-    def rename(self, new_name_ord_dict=None, **names):
-        return self._wrap_xarray_method('rename', new_name_or_dict=new_name_ord_dict, **names)
+    def rename(self, new_name_or_name_dict=None, **names):
+        return self._wrap_xarray_method(
+            "rename", new_name_or_name_dict=new_name_or_name_dict, **names
+        )
 
-    def _wrap_xarray_method_from_data(self, _method,
-                                      _data_copy=False,
-                                      _data_order=False,
-                                      _data_kws=None, *args, **kwargs):
+    def _wrap_xarray_method_from_data(
+        self,
+        _method,
+        _data_copy=False,
+        _data_order=False,
+        _data_kws=None,
+        *args,
+        **kwargs,
+    ):
 
         xdata = getattr(self._xdata, _method)(*args, **kwargs)
         if _data_order:
             xdata = xdata.transpose(..., *self._dims_mom)
         if _data_kws is None:
             _data_kws = {}
-        _data_kws.setdefault('copy', _data_copy)
-        _data_kws.setdefault('copy', _data_copy)
+        _data_kws.setdefault("copy", _data_copy)
+        _data_kws.setdefault("copy", _data_copy)
 
         return type(self).from_data(data=xdata, **_data_kws)
 
+    def stack(
+        self,
+        dimensions=None,
+        _data_copy=False,
+        _data_kws=None,
+        _data_order=True,
+        **dimensions_kwargs,
+    ):
+        return self._wrap_xarray_method_from_data(
+            "stack",
+            _data_copy=_data_copy,
+            _data_kws=_data_kws,
+            _data_order=_data_order,
+            **dimensions_kwargs,
+        )
 
-    def stack(self, dimensions=None, _data_copy=False, _data_kws=None, _data_order=True,
-              **dimensions_kwargs):
-        return self._wrap_xarray_method_from_data('stack',
-                                                  _data_copy=_data_copy,
-                                                  _data_kws=_data_kws,
-                                                  _data_order=_data_order,
-                                                  **dimensions_kwargs)
+    def sel(
+        self,
+        indexers=None,
+        method=None,
+        tolerance=None,
+        drop=False,
+        _data_kws=None,
+        _data_copy=False,
+        _data_order=False,
+        **indexers_kws,
+    ):
+        return self._wrap_xarray_method_from_data(
+            "sel",
+            _data_copy=_data_copy,
+            _data_kws=_data_kws,
+            _data_order=_data_order,
+            indexers=indexers,
+            method=method,
+            tolerance=tolerance,
+            drop=drop,
+            **indexers_kws,
+        )
 
-
-    def sel(self, indexers=None, method=None, tolerance=None, drop=False,
-            _data_kws=None, _data_copy=False, _data_order=False, **indexers_kws):
-        return self._wrap_xarray_method_from_data('sel',
-                                                  _data_copy=_data_copy,
-                                                  _data_kws=_data_kws,
-                                                  _data_order=_data_order,
-                                                  indexers=indexers,
-                                                  method=method,
-                                                  tolerance=tolerance,
-                                                  drop=drop,
-                                                  **indexers_kws)
-
-    def isel(self, indexers=None, drop=False,
-            _data_kws=None, _data_copy=False, _data_order=False, **indexers_kws):
-        return self._wrap_xarray_method_from_data('isel',
-                                                  _data_copy=_data_copy,
-                                                  _data_kws=_data_kws,
-                                                  _data_order=_data_order,
-                                                  indexers=indexers,
-                                                  drop=drop,
-                                                  **indexers_kws)
-
+    def isel(
+        self,
+        indexers=None,
+        drop=False,
+        _data_kws=None,
+        _data_copy=False,
+        _data_order=False,
+        **indexers_kws,
+    ):
+        return self._wrap_xarray_method_from_data(
+            "isel",
+            _data_copy=_data_copy,
+            _data_kws=_data_kws,
+            _data_order=_data_order,
+            indexers=indexers,
+            drop=drop,
+            **indexers_kws,
+        )
 
     @gcached()
     def _template(self):
@@ -422,12 +477,31 @@ class xStatsAccumBase(StatsAccumBase):
     def _zeros_like_val(self):
         return xr.zeros_like(self._template)
 
-
     def new_like(self, data=None):
+        """
+        create new object like self
+
+        Parameters
+        ----------
+        data : array-like, optional
+            if passed, then this will be the data of the new object
+
+        Returns
+        -------
+        output : xStats object
+            same type as `self`
+        """
+
         return type(self)(
-            moments=self.moments, shape=self.shape, dtype=self.dtype, data=data,
-            coords=self.coords, dims=self.dims, attrs=self.attrs, name=self.name,
-            indexes=self.indexes
+            moments=self.moments,
+            shape=self.shape,
+            dtype=self.dtype,
+            data=data,
+            coords=self.coords,
+            dims=self.dims,
+            attrs=self.attrs,
+            name=self.name,
+            indexes=self.indexes,
         )
 
     def _xverify_value(
@@ -453,7 +527,9 @@ class xStatsAccumBase(StatsAccumBase):
             # no broadcast in this cast
             target_dims = target
 
-            target_shape = tuple(x.sizes[k] if k == dim else self.sizes[k]  for k in target_dims)
+            target_shape = tuple(
+                x.sizes[k] if k == dim else self.sizes[k] for k in target_dims
+            )
 
             # make sure in correct order
             x = x.transpose(*target_dims)
@@ -499,7 +575,6 @@ class xStatsAccumBase(StatsAccumBase):
                     x = xr.DataArray(x, dims=dim).broadcast_like(target)
                     values = x.values
 
-
         # check shape
         assert values.shape == target_shape
 
@@ -539,6 +614,187 @@ class xStatsAccumBase(StatsAccumBase):
                 shape_flat=shape_flat,
             )
 
+    # have to do some special stuff for mean/var
+    # due to xarray special indexing
+    def _single_index_selector(
+        self, val, dim_combined="variable", coords_combined=None, select=True
+    ):
+        idxs = self._single_index(val)[-self._moments_len :]
+        if coords_combined is None:
+            coords_combined = self._dims_mom
+
+        selector = {
+            dim: (
+                idx if self._moments_len == 1
+                else xr.DataArray(idx, dims=dim_combined)
+            )
+            for dim, idx in zip(self._dims_mom, idxs)
+        }
+        if select:
+            out = self.values.isel(**selector)
+            if self._moments_len > 1:
+                out = out.assign_coords(
+                    **{dim_combined: list(coords_combined)}
+                )
+            return out
+        else:
+            return selector
+
+        return selector
+
+    # have to do some special stuff for mean/var
+    # due to xarray special indexing
+    def mean(self, dim_combined="variable", coords_combined=None):
+        return self._single_index_selector(
+            val=1, dim_combined=dim_combined, coords_combined=coords_combined
+        )
+
+    def var(self, dim_combined="variable", coords_combined=None):
+        return self._single_index_selector(
+            val=2, dim_combined=dim_combined, coords_combined=coords_combined
+        )
+
+    def cmom(self):
+        return self._wrap_like(super(xStatsAccumBase, self).cmom())
+
+    def rmom(self):
+        return self._wrap_like(super(xStatsAccumBase, self).rmom())
+
+
+    # def mean(self, dim_combined="variable", coords_combined=None):
+    #     idxs = self._single_index(1)[-self._moments_len :]
+
+    #     if coords_combined is None:
+    #         coords_combined = self._dims_mom
+
+    #     selector = {
+    #         dim: xr.DataArray(idx, dims=dim_combined)
+    #         for dim, idx in zip(self._dims_mom, idxs)
+    #     }
+    #     return self.values.isel(**selector)
+
+    # def var(self, dim_combined="variable", coords_combined=None):
+    #     idxs = self._single_index(2)[-self._moments_len :]
+
+    # def block1(self, block_size, axis=None, *args, **kwargs):
+
+    #     self._raise_if_scalar()
+
+    #     axis = self._wrap_axis(axis)
+    #     dim = self.dims[axis]
+
+    #     da = self.values
+
+    #     n = da.sizes[dim]
+
+    #     if block_size is None:
+    #         block_size = n
+    #         nblock = 1
+    #     else:
+    #         nblock = n // block_size
+
+    #     da = da.isel(**{dim: slice(None, nblock * block_size, None)})
+
+    #     z = '_tmp_{}'.format(dim)
+    #     b = '{}_block'.format(dim)
+    #     datas = (
+    #         da
+    #         .isel(**{dim : slice(None, nblock * block_size, None)})
+    #         .rename({dim : z})
+    #         .assign_coords(
+    #             **{
+    #                 dim: (z, np.repeat(np.arange(nblock), block_size)),
+    #                 b:   (z, np.tile(np.arange(block_size), nblock))
+    #             }
+    #         )
+    #         .set_index({z: (dim, b)})
+    #         .unstack(z)
+    #         .transpose(*(b,) + da.dims)
+    #     )
+
+    #     del datas[dim], datas[b]
+
+    #     return type(self).from_datas(
+    #         datas=datas, axis=b,
+    #         moments=self.moments, *args, **kwargs
+    #     )
+
+    def block(self, block_size, axis=None, *args, **kwargs):
+        """
+
+        block average along an axis
+
+        Parameters
+        ----------
+        block_size : int
+            size of blocks to average over
+        axis : str or int, default=0
+            axis/dimension to block average over
+        args : tuple
+            positional arguments to StatsAccumBase.block
+        kwargs : dict
+            key-word arguments to StatsAccumBase.block
+        """
+
+
+        self._raise_if_scalar()
+        axis = self._wrap_axis(axis)
+        dim = self.dims[axis]
+
+        template = self.values.isel(**{dim: 0})
+
+        kwargs["dims"] = (dim,) + template.dims
+
+        # properties after creation
+        for k in ["coords", "attrs", "name", "indexes"]:
+            kwargs[k] = getattr(template, k)
+
+        return super(xStatsAccumBase, self).block(
+            block_size=block_size, axis=axis, **kwargs
+        )
+
+    def resample_and_reduce(
+        self,
+        freq=None,
+        indices=None,
+        nrep=None,
+        axis=None,
+        dim_rep="rep",
+        resample_kws=None,
+        **kwargs,
+    ):
+        """
+        bootstrap resample and reduce
+
+
+        Parameters
+        ----------
+        dim_rep : str, default='rep'
+            dimension name for resampled
+            if 'dims' is not passed in kwargs, then reset dims
+            with replicate dimension having name 'dim_rep',
+            and all other dimensions have the same names as
+            the parent object
+        """
+
+        if "dims" in kwargs:
+            # passed explicit dims, so just use these.
+            # NOTE, don't do anything special in this case
+            pass
+        else:
+            axis = self._wrap_axis(axis)
+            dims = list(self.values.dims)
+            kwargs["dims"] = [dim_rep] + dims[:axis] + dims[axis + 1 :]
+
+        return super(xStatsAccumBase, self).resample_and_reduce(
+            freq=freq,
+            indices=indices,
+            nrep=nrep,
+            axis=axis,
+            resample_kws=resample_kws,
+            **kwargs,
+        )
+
     @classmethod
     def from_data(
         cls,
@@ -554,6 +810,16 @@ class xStatsAccumBase(StatsAccumBase):
         name=None,
         moments_dims=None,
     ):
+        """
+        object from data array
+
+
+        Parameters
+        ----------
+        dims : tuple, optional
+            dimension names for resulting object
+        """
+
 
         kws = _attributes_from_xr(
             data,
@@ -591,6 +857,13 @@ class xStatsAccumBase(StatsAccumBase):
         name=None,
         moments_dims=None,
     ):
+        """
+        Parameters
+        ----------
+        dims : tuple, optional
+            dimension names.
+            Note that this does not include the dimension reduced over.
+        """
 
         kws, axis, values = _check_xr_input(
             datas,
@@ -601,14 +874,14 @@ class xStatsAccumBase(StatsAccumBase):
             coords=coords,
             indexes=indexes,
             name=name,
-        ) 
+        )
 
         return super(xStatsAccumBase, cls).from_datas(
             datas=values, moments=moments, axis=axis, shape=shape, dtype=dtype, **kws
         )
 
     def to_raw(self):
-        return self._wrap_like(self.to_raw())
+        return self._wrap_like(super(xStatsAccumBase, self).to_raw())
 
     @classmethod
     def from_raw(
@@ -624,7 +897,12 @@ class xStatsAccumBase(StatsAccumBase):
         name=None,
         moments_dims=None,
     ):
-
+        """
+        Parameters
+        ----------
+        dims : tuple, optional
+            dimension names
+        """
         kws, _, values = _check_xr_input(
             raw,
             axis=None,
@@ -657,7 +935,7 @@ class xStatsAccumBase(StatsAccumBase):
     ):
 
         kws, axis, values = _check_xr_input(
-            raw,
+            raws,
             axis=axis,
             moments_dims=moments_dims,
             dims=dims,
@@ -670,7 +948,6 @@ class xStatsAccumBase(StatsAccumBase):
         super(xStatsAccumBase, cls).from_raws(
             values, moments=moments, axis=axis, shape=shape, dtype=dtype, **kws
         )
-
 
     def _wrap_axis(self, axis, default=0, ndim=None):
         # if isinstance(axis, str):
@@ -717,7 +994,7 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
             name=name,
         )
 
-        #return kws, axis, values
+        # return kws, axis, values
 
         return super(xStatsAccum, cls).from_vals(
             x, w=w, axis=axis, moments=moments, shape=shape, dtype=dtype, **kws
@@ -792,10 +1069,13 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
     def from_resample_vals(
         cls,
         x,
-        freq,
+        freq=None,
+        indices=None,
+        nrep=None,
         w=None,
         axis=0,
         moments=2,
+        dim_rep='rep',
         dtype=None,
         resample_kws=None,
         dims=None,
@@ -817,9 +1097,19 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
             name=name,
         )
 
+        if kws['dims'] is not None:
+            kws['dims'] = (dim_rep,) + tuple(kws['dims'])
+
+
+        # reorder
+        w = _order_like(x, w)
+
+
         return super(xStatsAccum, cls).from_resample_vals(
             x=x,
             freq=freq,
+            indices=indices,
+            nrep=nrep,
             w=w,
             axis=axis,
             moments=moments,
@@ -827,7 +1117,6 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
             resample_kws=resample_kws,
             **kws,
         )
-
 
     def transpose(self, *dims, transpose_coords=None, copy=False, **kws):
 
@@ -839,21 +1128,54 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
         dims = tuple(dims) + self._dims_mom
 
         values = (
-            self.values
-            .transpose(*dims, transpose_coords=transpose_coords)
+            self.values.transpose(*dims, transpose_coords=transpose_coords)
             # make sure moments are last
-            #.transpose(...,*self._dims_mom)
+            # .transpose(...,*self._dims_mom)
         )
 
         return type(self).from_data(values, copy=copy, **kws)
 
 
-        
-
-
-
 class xStatsAccumCov(xStatsAccumBase, _StatsAccumCovMixin):
     _moments_len = 2
+
+    # def _single_index_selector(
+    #     self, val, dim_combined="variable", coords_combined=None, select=True
+    # ):
+    #     idxs = self._single_index(1)[-self._moments_len :]
+    #     if coords_combined is None:
+    #         coords_combined = self._dims_mom
+
+    #     selector = {
+    #         dim: xr.DataArray(idx, dims=dim_combined)
+    #         for dim, idx in zip(self._dims_mom, idxs)
+    #     }
+    #     if select:
+    #         return self.values.isel(**selector).assign_coords(
+    #             **{dim_combined: list(coords_combined)}
+    #         )
+    #     else:
+    #         return selector
+
+    #     return selector
+
+    # # have to do some special stuff for mean/var
+    # # due to xarray special indexing
+    # def mean(self, dim_combined="variable", coords_combined=None):
+    #     return self._single_index_selector(
+    #         val=1, dim_combined=dim_combined, coords_combined=coords_combined
+    #     )
+
+    # def var(self, dim_combined="variable", coords_combined=None):
+    #     return self._single_index_selector(
+    #         val=2, dim_combined=dim_combined, coords_combined=coords_combined
+    #     )
+
+    # def cmom(self):
+    #     return self._wrap_like(super(xStatsAccumCov, self).cmom())
+
+    # def rmom(self):
+    #     return self._wrap_like(super(xStatsAccumCov, self).rmom())
 
     @classmethod
     def from_vals(
@@ -902,10 +1224,13 @@ class xStatsAccumCov(xStatsAccumBase, _StatsAccumCovMixin):
         cls,
         x0,
         x1,
-        freq,
+        freq=None,
+        indices=None,
+        nrep=None,
         w=None,
         axis=0,
         moments=2,
+        dim_rep='rep',
         broadcast=False,
         dtype=None,
         resample_kws=None,
@@ -928,10 +1253,17 @@ class xStatsAccumCov(xStatsAccumBase, _StatsAccumCovMixin):
             name=name,
         )
 
+        if kws['dims'] is not None:
+            kws['dims'] = (dim_rep,) + tuple(kws['dims'])
+
+        x1, w = _order_like(x0, x1, w)
+
         return super(xStatsAccumCov, cls).from_resample_vals(
             x0=x0,
             x1=x1,
             freq=freq,
+            indices=indices,
+            nrep=nrep,
             w=w,
             axis=axis,
             moments=moments,
@@ -940,3 +1272,6 @@ class xStatsAccumCov(xStatsAccumBase, _StatsAccumCovMixin):
             resample_kws=resample_kws,
             **kws,
         )
+
+
+

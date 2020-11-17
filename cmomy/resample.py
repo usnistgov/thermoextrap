@@ -38,46 +38,89 @@ def _randsamp_freq_indices(indices, freq):
             freq[r, idx] += 1
 
 
-def randsamp_freq(nrep=None, size=None, indices=None, transpose=False):
+def randsamp_freq(nrep=None, size=None, indices=None, transpose=False, freq=None, check=False):
     """
     produce a random sample for bootstrapping
 
     Parameters
     ----------
-    size : int
+    size : int, optional
         data dimension size
-    nrep : int
-        number of replicates
+    freq : array-like, shape=(nrep, size), optional
+        if passed, use this frequency array.
+        overides size
+    indices : array-like, shape=(nrep, size), optional
+        if passed and `freq` is `None`, construct frequency
+        array from this indices array
+
+    nrep : int, optional
+        if `freq` and `indices` are `None`, construct
+        sample with this number of repititions
     indices : array-like, optional
         if passed, build frequency table based on this sampling.
         shape = (nrep, ndat)
-    transpose: bool
+    freq : array-like, optional
+        if passed, use this frequency array
+    transpose : bool
         see output
-
+    check : bool, default=False
+        if `check` is `True`, then check `freq` and `indices` against `size` and `nrep`
 
     Returns
     -------
     output : frequency table
         if not transpose: output.shape == (nrep, size)
         if tranpose, output.shae = (size, nrep)
+
     """
-    if indices is not None:
-        indices = np.asarray(indices, dtype=np.int64)
-        if nrep is None:
-            nrep = indices.shape[0]
-        if size is None:
-            size = indices.shape[1]
-        if indices.shape != (nrep, size):
-            raise ValueError('passed indices shape {indices.shape} doesn not match {(nrep, size)}')
 
-    elif nrep is None or size is None:
-        raise ValueError('must specify nrep and size or indices')
+    def _array_check(x, name=''):
+        x = np.asarray(x, dtype=np.int64)
+        if check:
+            if nrep is not None:
+                if x.shape[0] != nrep:
+                    raise ValueError('{} has wrong nrep'.format(name))
 
-    freq = np.zeros((nrep, size), dtype=np.int64)
-    if indices is None:
-        _randsamp_freq_out(freq)
-    else:
+            assert size is not None
+            if x.shape[1] != size:
+                raise ValueError('{} has wrong size'.format(name))
+        return x
+
+
+
+    if freq is not None:
+        freq = _array_check(freq, 'freq')
+
+    elif indices is not None:
+        indices = _array_check(indices, 'indices')
+        freq = np.zeros(indices.shape, dtype=np.int64)
         _randsamp_freq_indices(indices, freq)
+
+    elif nrep is not None and size is not None:
+        freq = np.zeros((nrep, size), dtype=np.int64)
+        _randsamp_freq_out(freq)
+
+    else:
+        raise ValueError('must specify freq, indices, or nrep and size')
+
+
+    # if indices is not None:
+    #     indices = np.asarray(indices, dtype=np.int64)
+    #     if nrep is None:
+    #         nrep = indices.shape[0]
+    #     if size is None:
+    #         size = indices.shape[1]
+    #     if indices.shape != (nrep, size):
+    #         raise ValueError('passed indices shape {indices.shape} doesn not match {(nrep, size)}')
+
+    # elif nrep is None or size is None:
+    #     raise ValueError('must specify nrep and size or indices')
+
+    # freq = np.zeros((nrep, size), dtype=np.int64)
+    # if indices is None:
+    #     _randsamp_freq_out(freq)
+    # else:
+    #     _randsamp_freq_indices(indices, freq)
 
     if transpose:
         freq = freq.T
