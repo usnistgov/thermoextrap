@@ -15,8 +15,6 @@ def myjit(func):
     """
     return njit(inline="always", fastmath=True)(func)
 
-
-
 def factory_binomial(order):
     irange = np.arange(order + 1)
     bfac = np.array([binom(i, irange) for i in irange])
