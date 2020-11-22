@@ -172,7 +172,7 @@ class StatsArray(object):
 
     @cached_clear()
     def append(self, data):
-        assert data.shape == self._accum._data_shape
+        assert data.shape == self._accum.shape_data
         self._values.append(data)
 
     @cached_clear()
@@ -191,7 +191,7 @@ class StatsArray(object):
 
     @cached_clear()
     def push_data(self, data, copy=False):
-        assert data.shape == self._accum._data_shape
+        assert data.shape == self._accum.shape_data
         if copy:
             data = data.copy()
         self._values.append(data)
@@ -200,7 +200,7 @@ class StatsArray(object):
     def push_datas(self, datas, axis=0):
         if axis != 0:
             datas = np.moveaxis(datas, axis, 0)
-        assert datas.shape[1:] == self._accum._data_shape
+        assert datas.shape[1:] == self._accum.shape_data
         for data in datas:
             self._values.append(data)
 
@@ -293,7 +293,7 @@ class StatsArray(object):
 
     @gcached()
     def cumdata(self):
-        cumdata = np.zeros((len(self),) + self.accum._data_shape)
+        cumdata = np.zeros((len(self),) + self.accum.shape_data)
         self._accum.zero()
         for i, data in enumerate(self.values):
             self._accum.push_data(data)

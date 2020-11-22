@@ -57,11 +57,11 @@ def test_vals(nrec, moments, weighted):
         np.testing.assert_allclose(data, dataA)
 
 
-    s = central.StatsAccumCov(moments)
+    s = central.StatsAccumCov.zeros(mom=moments)
     s.push_vals(x0, x1, w)
     np.testing.assert_allclose(s.data, data)
 
-    s = central.StatsAccumCov.from_vals(x0=x0, x1=x1, w=w, moments=moments)
+    s = central.StatsAccumCov.from_vals(x=x0, y=x1, w=w, mom=moments)
     np.testing.assert_allclose(s.data, data)
 
 
@@ -98,11 +98,11 @@ def test_StatsAccum_stats(nrec, moments, weighted):
     datas = np.array(datas)
 
     # factory
-    s = central.StatsAccumCov.from_datas(datas, moments=moments)
+    s = central.StatsAccumCov.from_datas(datas, mom=moments)
     np.testing.assert_allclose(s.data, data)
 
     # pushs
-    s = central.StatsAccumCov(moments=moments)
+    s = central.StatsAccumCov.zeros(mom=moments)
 
     for d in datas:
         s.push_data(d)
@@ -113,16 +113,16 @@ def test_StatsAccum_stats(nrec, moments, weighted):
     np.testing.assert_allclose(s.data, data)
 
     # addition
-    S = [central.StatsAccumCov.from_data(d, moments=moments) for d in datas]
+    S = [central.StatsAccumCov.from_data(d, mom=moments) for d in datas]
     out = S[0]
     for s in S[1:]:
         out = out + s
     np.testing.assert_allclose(out.data, data)
 
-    out = sum(S, central.StatsAccumCov(moments=moments))
+    out = sum(S, central.StatsAccumCov.zeros(mom=moments))
     np.testing.assert_allclose(out.data, data)
 
-    out = central.StatsAccumCov(moments=moments)
+    out = central.StatsAccumCov.zeros(mom=moments)
     for s in S:
         out += s
     np.testing.assert_allclose(out.data, data)
@@ -132,7 +132,7 @@ def test_StatsAccum_stats(nrec, moments, weighted):
     np.testing.assert_allclose(out.data, datas[1])
 
     # iadd/isub
-    out = central.StatsAccumCov(moments=moments)
+    out = central.StatsAccumCov.zeros(mom=moments)
     out += S[0]
     np.testing.assert_allclose(out.data, S[0].data)
 
@@ -148,7 +148,7 @@ def test_StatsAccum_stats(nrec, moments, weighted):
     np.testing.assert_allclose(out1.data, out2.data)
 
     # imul
-    out = central.StatsAccumCov.from_vals(x0s[0], x1s[0], ws[0], moments=moments)
+    out = central.StatsAccumCov.from_vals(x0s[0], x1s[0], ws[0], mom=moments)
     out *= 2
     np.testing.assert_allclose(out.data, (S[0] + S[0]).data)
 
@@ -206,13 +206,13 @@ def test_vec_vals(dshape, axis, moments, weighted, broadcast):
 
 
 
-        s = central.StatsAccumCov(shape=shape, moments=moments)
+        s = central.StatsAccumCov.zeros(shape=shape, mom=moments)
         # push_vals
         s.push_vals(x0, x1, w, axis=axis, broadcast=broadcast)
         np.testing.assert_allclose(s.data, data)
 
         # from vals
-        s = central.StatsAccumCov.from_vals(x0, x1, w, moments=moments, axis=axis, broadcast=broadcast)
+        s = central.StatsAccumCov.from_vals(x0, x1, w, mom=moments, axis=axis, broadcast=broadcast)
         np.testing.assert_allclose(s.data, data)
 
 
@@ -221,7 +221,7 @@ def test_vec_vals(dshape, axis, moments, weighted, broadcast):
             tmp = central.central_comoments(x0, x1b, moments, w, axis=axis, broadcast=False)
             np.testing.assert_allclose(tmp, data)
 
-            s = central.StatsAccumCov.from_vals(x0, x1b, w, moments=moments, axis=axis, broadcast=False)
+            s = central.StatsAccumCov.from_vals(x0, x1b, w, mom=moments, axis=axis, broadcast=False)
             np.testing.assert_allclose(s.data, data)
 
 
@@ -266,11 +266,11 @@ def test_Vec_stats(dshape, axis, moments, weighted):
 
  
         # factory
-        s = central.StatsAccumCov.from_datas(datas, moments=moments, axis=0)
+        s = central.StatsAccumCov.from_datas(datas, mom=moments, axis=0)
         np.testing.assert_allclose(s.data, data)
 
         # pushs
-        s = central.StatsAccumCov(moments=moments, shape=shape)
+        s = central.StatsAccumCov.zeros(mom=moments, shape=shape)
 
         for d in datas:
             s.push_data(d)
@@ -282,7 +282,7 @@ def test_Vec_stats(dshape, axis, moments, weighted):
 
 
         # addition
-        S = [central.StatsAccumCov.from_data(d, moments=moments) for d in datas]
+        S = [central.StatsAccumCov.from_data(d, mom=moments) for d in datas]
         out = S[0]
         for s in S[1:]:
             out = out + s

@@ -543,7 +543,7 @@ class StatsAccumBase(object):
         return axis
 
     @classmethod
-    def _check_moments(cls, moments, shape=None):
+    def _check_mom(cls, moments, shape=None):
         if moments is None:
             if shape is not None:
                 moments = tuple(x - 1 for x in shape[-cls._moments_len :])

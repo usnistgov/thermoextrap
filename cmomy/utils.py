@@ -73,6 +73,41 @@ def _axis_expand_broadcast(x, shape, axis,
 
 
 
-@lru_cache(maxsize=20)
+@lru_cache(maxsize=5)
 def _cached_ones(shape, dtype=None):
     return np.ones(shape, dtype=dtype)
+
+
+
+def verify_value(x,
+                 target_shape,
+                 verify=None,
+                 axis=None,
+                 nrec=None,
+):
+    """
+    given an array `x` verify that it conforms to a target shape
+
+    Parameters
+    ----------
+    x: array-like
+        array to consider
+    verify: callable, optional
+        if present, `x = verify(x)`.  For example, can pass
+        verify=numpy.asarray
+
+    target_shape: tuple
+
+
+    axis: int, optional
+        if specified, then this is the axis that will be reduced over.  This axis will be moved to the first axis of the output
+    broadcast: bool, default=False
+        if True, then broadcast to target shape
+
+    nrec: int, optional
+        number of records.  That is, x.shape[axis]
+        Pass this to perform a check on sizes.
+
+    """
+    pass 
+
