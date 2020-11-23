@@ -58,10 +58,10 @@ def test_vals(nrec, moments, weighted):
 
 
     s = central.StatsAccumCov.zeros(mom=moments)
-    s.push_vals(x0, x1, w)
+    s.push_vals((x0, x1), w=w)
     np.testing.assert_allclose(s.data, data)
 
-    s = central.StatsAccumCov.from_vals(x=x0, y=x1, w=w, mom=moments)
+    s = central.StatsAccumCov.from_vals(x=(x0, x1), w=w, mom=moments)
     np.testing.assert_allclose(s.data, data)
 
 
@@ -148,7 +148,7 @@ def test_StatsAccum_stats(nrec, moments, weighted):
     np.testing.assert_allclose(out1.data, out2.data)
 
     # imul
-    out = central.StatsAccumCov.from_vals(x0s[0], x1s[0], ws[0], mom=moments)
+    out = central.StatsAccumCov.from_vals((x0s[0], x1s[0]), ws[0], mom=moments)
     out *= 2
     np.testing.assert_allclose(out.data, (S[0] + S[0]).data)
 
@@ -208,11 +208,11 @@ def test_vec_vals(dshape, axis, moments, weighted, broadcast):
 
         s = central.StatsAccumCov.zeros(shape=shape, mom=moments)
         # push_vals
-        s.push_vals(x0, x1, w, axis=axis, broadcast=broadcast)
+        s.push_vals((x0, x1), w=w, axis=axis, broadcast=broadcast)
         np.testing.assert_allclose(s.data, data)
 
         # from vals
-        s = central.StatsAccumCov.from_vals(x0, x1, w, mom=moments, axis=axis, broadcast=broadcast)
+        s = central.StatsAccumCov.from_vals((x0, x1), w, mom=moments, axis=axis, broadcast=broadcast)
         np.testing.assert_allclose(s.data, data)
 
 
@@ -221,7 +221,7 @@ def test_vec_vals(dshape, axis, moments, weighted, broadcast):
             tmp = central.central_comoments(x0, x1b, moments, w, axis=axis, broadcast=False)
             np.testing.assert_allclose(tmp, data)
 
-            s = central.StatsAccumCov.from_vals(x0, x1b, w, mom=moments, axis=axis, broadcast=False)
+            s = central.StatsAccumCov.from_vals((x0, x1b), w, mom=moments, axis=axis, broadcast=False)
             np.testing.assert_allclose(s.data, data)
 
 

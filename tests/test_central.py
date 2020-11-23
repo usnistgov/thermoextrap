@@ -53,12 +53,12 @@ def test_vals(nrec, moments, weighted):
     # push
     s = central.StatsAccum.zeros(mom=moments)
     for ww, xx in zip(w, x):
-        s.push_val(xx, ww)
+        s.push_val(xx, w=ww)
     np.testing.assert_allclose(s.data, data)
 
     # push_vals
     s.zero()
-    s.push_vals(x, w)
+    s.push_vals(x, w=w)
     np.testing.assert_allclose(s.data, data)
 
     # from vals
@@ -229,7 +229,7 @@ def test_Vec_vals(dshape, axis, moments, weighted):
 
         s = central.StatsAccum.zeros(shape=shape, mom=moments)
         # push_vals
-        s.push_vals(x, w, axis=axis)
+        s.push_vals(x, w=w, axis=axis)
         np.testing.assert_allclose(s.data, data)
 
         # from vals

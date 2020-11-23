@@ -261,7 +261,9 @@ def _factory_resample_vals_cov(push_vals_scale, fastmath=True, parallel=False):
 
 
 
-def resample_vals(x, freq, mom, y=None, axis=0, w=None,
+def resample_vals(x, freq, mom,
+                  axis=0, w=None,
+                  mom_len=1,
                   broadcast=False,
                   dtype=None, order=None,
                   fastmath=True, parallel=False,
@@ -270,20 +272,19 @@ def resample_vals(x, freq, mom, y=None, axis=0, w=None,
     resample data according to frequency table
     """
 
-    # are we doing covariance?
+    if mom_len == 1:
+        y = None
+    elif mom_len == 2:
+        x, y = x
+    else:
+        raise ValueError('only mom_len <= 2 supported')
+
     cov = y is not None
 
     if isinstance(mom, int):
-        if not cov:
-            mom = (mom,)
-        else:
-            mom = (mom,) * 2
+        mom = (mom,) * mom_len
+    assert len(mom) == mom_len
     mom_shape = tuple(x + 1 for x in mom)
-
-    if cov:
-        assert len(mom) == 2
-    else:
-        assert len(mom) == 1
 
     # check input data
     freq = np.asarray(freq, dtype=np.int64)
@@ -292,18 +293,17 @@ def resample_vals(x, freq, mom, y=None, axis=0, w=None,
     x = np.asarray(x, dtype=dtype, order=order)
     if dtype is None:
         dtype = x.dtype
-
     if w is None:
         w = np.ones_like(x)
     else:
         w = _axis_expand_broadcast(w, x.shape, axis,
-                                         roll=False,
-                                         dtype=dtype, order=order)
+                                   roll=False,
+                                   dtype=dtype, order=order)
 
     if cov:
         y = _axis_expand_broadcast(y, x.shape, axis, roll=False,
-                                    broadcast=broadcast,
-                                    dtype=dtype, order=order)
+                                   broadcast=broadcast,
+                                   dtype=dtype, order=order)
 
     if axis != 0:
         x = np.moveaxis(x, axis, 0)

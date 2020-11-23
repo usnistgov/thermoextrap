@@ -123,7 +123,7 @@ def test_to_raw_comoments(shape, axis, moments, weighted):
     np.testing.assert_allclose(raw, r)
 
 
-    s = central.StatsAccumCov.from_vals(x, x1,mom=moments, w=weights, axis=axis)
+    s = central.StatsAccumCov.from_vals(x=(x, x1), mom=moments, w=weights, axis=axis)
     r2 = np.moveaxis(s.to_raw().data, [-2, -1], [0, 1])
     np.testing.assert_allclose(raw, r2)
 
