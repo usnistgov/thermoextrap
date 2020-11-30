@@ -270,6 +270,12 @@ def _push_val_cov(data, w, x0, x1):
     incr0 = delta0 * alpha
     incr1 = delta1 * alpha
 
+    # NOTE: decided to force order > 1
+    # otherwise, this is just normal variance
+    # if order0 > 0:
+    #     data[1, 0] += incr0
+    # if order1 > 0:
+    #     data[0, 1] += incr1
     data[1, 0] += incr0
     data[0, 1] += incr1
 
@@ -356,6 +362,11 @@ def _push_data_scale_cov(data, data_in, scale):
     incr0 = delta0 * alpha
     incr1 = delta1 * alpha
 
+    # NOTE : decided to force all orders >0
+    # if order0 > 0:
+    #     data[1, 0] += incr0
+    # if order1 > 0:
+    #     data[0, 1] += incr1
     data[1, 0] += incr0
     data[0, 1] += incr1
 

@@ -6,9 +6,8 @@ from __future__ import absolute_import
 import numpy as np
 import xarray as xr
 
-from .central import StatsAccumBase, _StatsAccumMixin, _StatsAccumCovMixin
+from .central import StatsAccumBase, StatsAccum, StatsAccumCov
 from .cached_decorators import gcached, cached_clear
-
 
 
 ###############################################################################
@@ -88,14 +87,7 @@ def xcentral_moments(
 
 
 def xcentral_comoments(
-    x,
-    y,
-    mom,
-    w=None,
-    axis=0,
-    last=True,
-    broadcast=False,
-    dims_mom=None,
+    x, y, mom, w=None, axis=0, last=True, broadcast=False, dims_mom=None,
 ):
     """
     calculate central co-mom (covariance, etc) along axis
@@ -140,8 +132,7 @@ def xcentral_comoments(
     xave = [xr.dot(w, xx, dims=dim) * wsum_inv for xx in x]
 
     p = [
-        xr.DataArray(np.arange(0, mom + 1), dims=dim)
-        for mom, dim in zip(mom, dims_mom)
+        xr.DataArray(np.arange(0, mom + 1), dims=dim) for mom, dim in zip(mom, dims_mom)
     ]
 
     dx = [(xx - xxave) ** pp for xx, xxave, pp in zip(x, xave, p)]
@@ -206,14 +197,12 @@ def _wrap_like(da, x):
     """
     wrap x with xarray like da
     """
-
     x = np.asarray(x)
     assert x.shape == da.shape
 
     return xr.DataArray(
         x, dims=da.dims, coords=da.coords, name=da.name, indexes=da.name
     )
-
 
 
 def _order_like(template, *others):
@@ -248,89 +237,54 @@ def _order_like(template, *others):
     return out
 
 
-
-
 class xStatsAccumBase(StatsAccumBase):
     __slots__ = "_xdata"
 
-    def __init__(self, data):
-        if not isinstance(data, xr.DataArray):
-            raise ValueError(must supply xarray.DataArray)
+    # def __init__(self, data,
+    #              dims=None,
+    #              coords=None,
+    #              attrs=None,
+    #              indexes=None,
+    #              dims_mom=None
+    # ):
+    #     if not isinstance(data, xr.DataArray):
+    #         raise ValueError("must supply xarray.DataArray")
+    #     self._xdata = data
+    #     super(xStatsAccumBase, self).__init__(data.data)
+
+    def __init__(
+        self,
+        data,
+        dims=None,
+        coords=None,
+        attrs=None,
+        name=None,
+        indexes=None,
+        dims_mom=None,
+        **kws
+    ):
+
+        if isinstance(data, xr.DataArray):
+            if dims_mom is None:
+                dims_mom = data.dims[-self._mom_len :]
+            else:
+                if isinstance(dims_mom, str):
+                    dims_mom = [dims_mom]
+                assert len(dims_mom) == self._mom_len
+                order = (...,) + tuple(dims_mom)
+
+                if data.dims != order:
+                    data = data.transpose(*order)
+            self._xdata = data
+
+        else:
+            data = self._wrap_data_with_xr(data=data, dims=dims, coords=coords, attrs=attrs, name=name, indexes=indexes, dims_mom=dims_mom)
 
         self._xdata = data
-        super(xStatsAccumBase, self).__init__(data.data)
+        # TODO: data.data or data.values?
+        super(xStatsAccumBase, self).__init__(data=data.data)
 
 
-    # def __init__(
-    #     self,
-    #     mom,
-    #     shape=None,
-    #     dtype=None,
-    #     data=None,
-    #     dims=None,
-    #     coords=None,
-    #     attrs=None,
-    #     name=None,
-    #     indexes=None,
-    #     dims_mom=None,
-    # ):
-
-    #     if isinstance(data, xr.DataArray):
-    #         if dims_mom is None:
-    #             dims_mom = data.dims[-self._mom_len :]
-    #         else:
-    #             if isinstance(dims_mom, str):
-    #                 dims_mom = [dims_mom]
-    #             assert len(dims_mom) == self._mom_len
-
-    #             order = (...,) + tuple(dims_mom)
-    #             data = data.transpose(*order)
-
-    #         # use this then
-    #         super(xStatsAccumBase, self).__init__(
-    #             mom=mom, shape=shape, dtype=dtype, data=data.values
-    #         )
-    #         self._xdata = data
-
-    #     else:
-    #         # build up
-    #         super(xStatsAccumBase, self).__init__(
-    #             mom=mom, shape=shape, dtype=dtype, data=data
-    #         )
-
-    #         # dims
-    #         if dims is not None:
-    #             if isinstance(dims, str):
-    #                 dims = [dims]
-    #         else:
-    #             # default dims
-    #             dims = [f"dim_{i}" for i in range(self.ndim)]
-    #         dims = tuple(dims)
-
-    #         if len(dims) == self.ndim + self._mom_len:
-    #             # assume dims has all the dimensions for data and mom
-    #             dims_total = dims
-
-    #         elif len(dims) == self.ndim:
-    #             if dims_mom is None:
-    #                 # default mom dims
-    #                 dims_mom = [f"mom_{i}" for i in range(self._mom_len)]
-    #             assert len(dims_mom) == self._mom_len
-    #             dims_total = dims + tuple(dims_mom)
-    #         else:
-    #             raise ValueError('bad dims {}, moment_dims {}'.format(dims, dims_mom))
-
-    #         assert len(dims_total) == self.ndim + self._mom_len
-
-    #         # xarray object
-    #         self._xdata = xr.DataArray(
-    #             self._data,
-    #             dims=dims_total,
-    #             coords=coords,
-    #             attrs=attrs,
-    #             name=name,
-    #             indexes=indexes,
-    #         )
 
     @property
     def values(self):
@@ -361,8 +315,178 @@ class xStatsAccumBase(StatsAccumBase):
     def sizes(self):
         return self._xdata.sizes
 
+    ###########################################################################
+    # SECTION: top level creation/copy/new
+    ###########################################################################
+    @gcached()
+    def _template_val(self):
+        """template for values part of data"""
+        return self._xdata[self._weight_index]
+
+    # def _wrap_like_template(self, x):
+    #     return _wrap_like(self._template_val, x)
+
+    def _wrap_like(self, x):
+        return _wrap_like(self._xdata, x)
+
+    @gcached()
+    def _dims_val(self):
+        """dim names of values"""
+        return self.dims[: -self._mom_len]
+
+    @gcached()
+    def _dims_mom(self):
+        """dim names of mom"""
+        return self.dims[-self._mom_len :]
+
+    @property
+    def _one_like_val(self):
+        return xr.ones_like(self._template_val)
+
+    @property
+    def _zeros_like_val(self):
+        return xr.zeros_like(self._template_val)
+
+    def new_like(
+            self, data=None, verify=False, check=False, copy=False, copy_kws=None, **kws
+    ):
+        """
+        create new object like self, with new data
 
 
+        Parameters
+        ----------
+        data : array-like, optional
+            data for new object
+        verify : bool, default=False
+            if True, pass data through np.asarray
+        check : bool, default=True
+            if True, then check that data has same total shape as self
+        copy : bool, default=False
+            if True, perform copy of data
+        *args, **kwargs : extra arguments
+            arguments to data.copy
+        """
+
+        if data is None:
+            data = xr.zeros_like(self._xdata)
+
+        else:
+            if verify:
+                if not isinstance(data, xr.DataArray):
+                    data = self._wrap_like(data)
+
+            if check:
+                assert data.shape == self.shape_tot
+                data.dims == self.dims
+
+            if copy:
+                if copy_kws is None:
+                    copy_kws = {}
+                data = data.copy(**copy_kws)
+        return type(self)(data=data, **kws)
+
+    @classmethod
+    def _wrap_data_with_xr(
+        cls,
+        data,
+        dims=None,
+        coords=None,
+        attrs=None,
+        name=None,
+        indexes=None,
+        dims_mom=None,
+    ):
+        """
+        given an array x, wrap with appropriate stuff
+        for an xarray
+        """
+
+        ndim = data.ndim
+        if dims is not None:
+            if isinstance(dims, str):
+                dims = [dims]
+        else:
+            dims = [f"dim_{i}" for i in range(ndim - cls._mom_len)]
+        dims = tuple(dims)
+
+        if len(dims) == ndim:
+            dims_total = dims
+        elif len(dims) == ndim - cls._mom_len:
+            if dims_mom is None:
+                # default mom dims
+                dims_mom = [f"mom_{i}" for i in range(cls._mom_len)]
+            elif isinstance(dims_mom, str):
+                dims_mom = [dims_mom]
+
+            assert len(dims_mom) == cls._mom_len
+            dims_total = dims + tuple(dims_mom)
+        else:
+            raise ValueError("bad dims {}, moment_dims {}".format(dims, dims_mom))
+
+        # xarray object
+        return xr.DataArray(
+            data,
+            dims=dims_total,
+            coords=coords,
+            attrs=attrs,
+            name=name,
+            indexes=indexes,
+        )
+
+    def zeros_like(self, *args, **kwargs):
+        return self.new_like(data=xr.zeros_like(self._xdata, *args, **kwargs))
+
+    @classmethod
+    def zeros(
+        cls,
+        mom=None,
+        shape=None,
+        shape_tot=None,
+        dtype=None,
+        zeros_kws=None,
+        dims=None,
+        coords=None,
+        attrs=None,
+        name=None,
+        indexes=None,
+        dims_mom=None,
+        **kws,
+    ):
+        """
+        create a new base object
+
+        Parameters
+        ----------
+        shape_tot : tuple, optional
+            if passed, create object with this total shape
+        mom : int or tuple
+            moments.  if integer, then moments will be (mom,) * cls._mom_len
+        shape : tuple, optional
+            shape of values, excluding moments.  For example, if considering the average of
+            observations `x`, then shape = x.shape.  
+            if not passed, then assume shape = ()
+        dtype : nunpy dtype, default=float
+        kwargs : dict
+            extra arguments to numpy.zeros
+
+        Returns
+        -------
+        object : instance of class `cls`
+
+        Notes
+        -----
+        the resulting total shape of data is shape + (mom + 1)
+        """
+
+        return super(xStatsAccumBase, cls).zeros(
+            mom=mom, shape=shape, shape_tot=shape_tot, dtype=dtype, zeros_kws=zeros_kws,
+            dims=dims, coords=coords, attrs=attrs, name=name, indexes=indexes, dims_mom=dims_mom, **kws)
+
+
+    ###########################################################################
+    # xarray specific methods
+    ###########################################################################
     def _wrap_xarray_method(self, _method, *args, **kwargs):
         xdata = getattr(self._xdata, _method)(*args, **kwargs)
         return self.new_like(data=xdata)
@@ -456,76 +580,9 @@ class xStatsAccumBase(StatsAccumBase):
             **indexers_kws,
         )
 
-    @gcached()
-    def _template_val(self):
-        """template for values part of data"""
-        return self._xdata[self._weight_index]
-
-    # def _wrap_like_template(self, x):
-    #     return _wrap_like(self._template_val, x)
-
-    def _wrap_like(self, x):
-        return _wrap_like(self._xdata, x)
-
-    @gcached()
-    def _dims_val(self):
-        """dim names of values"""
-        return self.dims[: -self._mom_len]
-
-    @gcached()
-    def _dims_mom(self):
-        """dim names of mom"""
-        return self.dims[-self._mom_len :]
-
-    @property
-    def _one_like_val(self):
-        return xr.ones_like(self._template_val)
-
-    @property
-    def _zeros_like_val(self):
-        return xr.zeros_like(self._template_val)
-
-    def new_like(self,
-                 data=None,
-                 verify=False,
-                 check=False,
-                 copy=False, *args, **kwargs):
-        """
-        create new object like self, with new data
-
-
-        Parameters
-        ----------
-        data : array-like, optional
-            data for new object
-        verify : bool, default=False
-            if True, pass data through np.asarray
-        check : bool, default=True
-            if True, then check that data has same total shape as self
-        copy : bool, default=False
-            if True, perform copy of data
-        *args, **kwargs : extra arguments
-            arguments to data.copy
-        """
-
-        if data is None:
-            data = xr.zeros_like(self._data)
-
-        else:
-            if verify:
-                if not isinstance(data, xr.DataArray):
-                    data = self._wrap_like(data)
-
-            if check:
-                assert data.shape == self.shape_tot
-                data.dims == self.dims
-
-            if copy:
-                data = data.copy(*args, **kwargs)
-
-        return type(self)(data=data)
-
-
+    ###########################################################################
+    # Push/verify
+    ###########################################################################
     def _xverify_value(
         self, x, target=None, dim=None, broadcast=False, expand=False, shape_flat=None
     ):
@@ -599,7 +656,6 @@ class xStatsAccumBase(StatsAccumBase):
 
         # check shape
         assert values.shape == target_shape
-
         if dim is None:
             nrec = ()
         else:
@@ -636,8 +692,6 @@ class xStatsAccumBase(StatsAccumBase):
                 shape_flat=shape_flat,
             )
 
-    # have to do some special stuff for mean/var
-    # due to xarray special indexing
     def _single_index_selector(
         self, val, dim_combined="variable", coords_combined=None, select=True
     ):
@@ -646,18 +700,13 @@ class xStatsAccumBase(StatsAccumBase):
             coords_combined = self._dims_mom
 
         selector = {
-            dim: (
-                idx if self._mom_len == 1
-                else xr.DataArray(idx, dims=dim_combined)
-            )
+            dim: (idx if self._mom_len == 1 else xr.DataArray(idx, dims=dim_combined))
             for dim, idx in zip(self._dims_mom, idxs)
         }
         if select:
             out = self.values.isel(**selector)
             if self._mom_len > 1:
-                out = out.assign_coords(
-                    **{dim_combined: list(coords_combined)}
-                )
+                out = out.assign_coords(**{dim_combined: list(coords_combined)})
             return out
         else:
             return selector
@@ -683,64 +732,6 @@ class xStatsAccumBase(StatsAccumBase):
         return self._wrap_like(super(xStatsAccumBase, self).rmom())
 
 
-    # def mean(self, dim_combined="variable", coords_combined=None):
-    #     idxs = self._single_index(1)[-self._mom_len :]
-
-    #     if coords_combined is None:
-    #         coords_combined = self._dims_mom
-
-    #     selector = {
-    #         dim: xr.DataArray(idx, dims=dim_combined)
-    #         for dim, idx in zip(self._dims_mom, idxs)
-    #     }
-    #     return self.values.isel(**selector)
-
-    # def var(self, dim_combined="variable", coords_combined=None):
-    #     idxs = self._single_index(2)[-self._mom_len :]
-
-    # def block1(self, block_size, axis=None, *args, **kwargs):
-
-    #     self._raise_if_scalar()
-
-    #     axis = self._wrap_axis(axis)
-    #     dim = self.dims[axis]
-
-    #     da = self.values
-
-    #     n = da.sizes[dim]
-
-    #     if block_size is None:
-    #         block_size = n
-    #         nblock = 1
-    #     else:
-    #         nblock = n // block_size
-
-    #     da = da.isel(**{dim: slice(None, nblock * block_size, None)})
-
-    #     z = '_tmp_{}'.format(dim)
-    #     b = '{}_block'.format(dim)
-    #     datas = (
-    #         da
-    #         .isel(**{dim : slice(None, nblock * block_size, None)})
-    #         .rename({dim : z})
-    #         .assign_coords(
-    #             **{
-    #                 dim: (z, np.repeat(np.arange(nblock), block_size)),
-    #                 b:   (z, np.tile(np.arange(block_size), nblock))
-    #             }
-    #         )
-    #         .set_index({z: (dim, b)})
-    #         .unstack(z)
-    #         .transpose(*(b,) + da.dims)
-    #     )
-
-    #     del datas[dim], datas[b]
-
-    #     return type(self).from_datas(
-    #         datas=datas, axis=b,
-    #         mom=self.mom, *args, **kwargs
-    #     )
-
     def block(self, block_size, axis=None, *args, **kwargs):
         """
 
@@ -757,7 +748,6 @@ class xStatsAccumBase(StatsAccumBase):
         kwargs : dict
             key-word arguments to StatsAccumBase.block
         """
-
 
         self._raise_if_scalar()
         axis = self._wrap_axis(axis)
@@ -841,7 +831,6 @@ class xStatsAccumBase(StatsAccumBase):
         dims : tuple, optional
             dimension names for resulting object
         """
-
 
         kws = _attributes_from_xr(
             data,
@@ -984,10 +973,6 @@ class xStatsAccumBase(StatsAccumBase):
                 axis=axis, default=default, ndim=ndim
             )
 
-
-class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
-    _mom_len = 1
-
     @classmethod
     def from_vals(
         cls,
@@ -1005,6 +990,47 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
         dims_mom=None,
     ):
 
+        x0 = x if cls._mom_len == 1 else x[0]
+        kws, axis, values = _check_xr_input(
+            x0,
+            axis=axis,
+            dims_mom=dims_mom,
+            dims=dims,
+            attrs=attrs,
+            coords=coords,
+            indexes=indexes,
+            name=name,
+        )
+
+        return super(xStatsAccumBase, cls).from_vals(
+            x, w=w, axis=axis, mom=mom, shape=shape, dtype=dtype, **kws
+        )
+
+    @classmethod
+    def from_resample_vals(
+        cls,
+        x,
+        freq=None,
+        indices=None,
+        nrep=None,
+        w=None,
+        axis=0,
+        mom=2,
+        dim_rep="rep",
+        dtype=None,
+        resample_kws=None,
+        dims=None,
+        attrs=None,
+        coords=None,
+        indexes=None,
+        name=None,
+        dims_mom=None,
+    ):
+        if cls._mom_len == 1:
+            ys = ()
+        else:
+            x, *ys = x
+
         kws, axis, values = _check_xr_input(
             x,
             axis=axis,
@@ -1016,11 +1042,30 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
             name=name,
         )
 
-        # return kws, axis, values
+        if kws["dims"] is not None:
+            kws["dims"] = (dim_rep,) + tuple(kws["dims"])
 
-        return super(xStatsAccum, cls).from_vals(
-            x, w=w, axis=axis, mom=mom, shape=shape, dtype=dtype, **kws
+        # reorder
+        w = _order_like(x, w)
+        if ys:
+            ys = _order_like(x, *ys)
+        x = (x,) + ys
+
+        return super(xStatsAccumBase, cls).from_resample_vals(
+            x=x,
+            freq=freq,
+            indices=indices,
+            nrep=nrep,
+            w=w,
+            axis=axis,
+            mom=mom,
+            dtype=dtype,
+            resample_kws=resample_kws,
+            **kws,
         )
+
+
+class xStatsAccum(xStatsAccumBase, StatsAccum):
 
     @classmethod
     def from_stat(
@@ -1087,61 +1132,7 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
             a=a, v=v, w=w, axis=axis, mom=mom, shape=shape, dtype=dtype, **kws
         )
 
-    @classmethod
-    def from_resample_vals(
-        cls,
-        x,
-        freq=None,
-        indices=None,
-        nrep=None,
-        w=None,
-        axis=0,
-        mom=2,
-        dim_rep='rep',
-        dtype=None,
-        resample_kws=None,
-        dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
-        dims_mom=None,
-    ):
-
-        kws, axis, values = _check_xr_input(
-            x,
-            axis=axis,
-            dims_mom=dims_mom,
-            dims=dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
-        )
-
-        if kws['dims'] is not None:
-            kws['dims'] = (dim_rep,) + tuple(kws['dims'])
-
-
-        # reorder
-        w = _order_like(x, w)
-
-
-        return super(xStatsAccum, cls).from_resample_vals(
-            x=x,
-            freq=freq,
-            indices=indices,
-            nrep=nrep,
-            w=w,
-            axis=axis,
-            mom=mom,
-            dtype=dtype,
-            resample_kws=resample_kws,
-            **kws,
-        )
-
     def transpose(self, *dims, transpose_coords=None, copy=False, **kws):
-
         # make sure dims are last
         dims = list(dims)
         for k in self._dims_mom:
@@ -1158,7 +1149,7 @@ class xStatsAccum(xStatsAccumBase, _StatsAccumMixin):
         return type(self).from_data(values, copy=copy, **kws)
 
 
-class xStatsAccumCov(xStatsAccumBase, _StatsAccumCovMixin):
+class xStatsAccumCov(xStatsAccumBase, StatsAccumCov):
     _mom_len = 2
 
     # def _single_index_selector(
@@ -1199,101 +1190,98 @@ class xStatsAccumCov(xStatsAccumBase, _StatsAccumCovMixin):
     # def rmom(self):
     #     return self._wrap_like(super(xStatsAccumCov, self).rmom())
 
-    @classmethod
-    def from_vals(
-        cls,
-        x,
-        y,
-        w=None,
-        axis=0,
-        mom=2,
-        broadcast=False,
-        shape=None,
-        dtype=None,
-        dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
-        dims_mom=None,
-    ):
+    # @classmethod
+    # def from_vals(
+    #     cls,
+    #     x,
+    #     y,
+    #     w=None,
+    #     axis=0,
+    #     mom=2,
+    #     broadcast=False,
+    #     shape=None,
+    #     dtype=None,
+    #     dims=None,
+    #     attrs=None,
+    #     coords=None,
+    #     indexes=None,
+    #     name=None,
+    #     dims_mom=None,
+    # ):
 
-        kws, axis, values = _check_xr_input(
-            x,
-            axis=axis,
-            dims_mom=dims_mom,
-            dims=dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
-        )
+    #     kws, axis, values = _check_xr_input(
+    #         x,
+    #         axis=axis,
+    #         dims_mom=dims_mom,
+    #         dims=dims,
+    #         attrs=attrs,
+    #         coords=coords,
+    #         indexes=indexes,
+    #         name=name,
+    #     )
 
-        return super(xStatsAccumCov, cls).from_vals(
-            x=x,
-            y=y,
-            w=w,
-            axis=axis,
-            mom=mom,
-            broadcast=broadcast,
-            shape=shape,
-            dtype=dtype,
-            **kws,
-        )
+    #     return super(xStatsAccumCov, cls).from_vals(
+    #         x=x,
+    #         y=y,
+    #         w=w,
+    #         axis=axis,
+    #         mom=mom,
+    #         broadcast=broadcast,
+    #         shape=shape,
+    #         dtype=dtype,
+    #         **kws,
+    #     )
 
-    @classmethod
-    def from_resample_vals(
-        cls,
-        x,
-        y,
-        freq=None,
-        indices=None,
-        nrep=None,
-        w=None,
-        axis=0,
-        mom=2,
-        dim_rep='rep',
-        broadcast=False,
-        dtype=None,
-        resample_kws=None,
-        dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
-        dims_mom=None,
-    ):
+    # @classmethod
+    # def from_resample_vals(
+    #     cls,
+    #     x,
+    #     y,
+    #     freq=None,
+    #     indices=None,
+    #     nrep=None,
+    #     w=None,
+    #     axis=0,
+    #     mom=2,
+    #     dim_rep="rep",
+    #     broadcast=False,
+    #     dtype=None,
+    #     resample_kws=None,
+    #     dims=None,
+    #     attrs=None,
+    #     coords=None,
+    #     indexes=None,
+    #     name=None,
+    #     dims_mom=None,
+    # ):
 
-        kws, axis, values = _check_xr_input(
-            x,
-            axis=axis,
-            dims_mom=dims_mom,
-            dims=dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
-        )
+    #     kws, axis, values = _check_xr_input(
+    #         x,
+    #         axis=axis,
+    #         dims_mom=dims_mom,
+    #         dims=dims,
+    #         attrs=attrs,
+    #         coords=coords,
+    #         indexes=indexes,
+    #         name=name,
+    #     )
 
-        if kws['dims'] is not None:
-            kws['dims'] = (dim_rep,) + tuple(kws['dims'])
+    #     if kws["dims"] is not None:
+    #         kws["dims"] = (dim_rep,) + tuple(kws["dims"])
 
-        y, w = _order_like(x, y, w)
+    #     y, w = _order_like(x, y, w)
 
-        return super(xStatsAccumCov, cls).from_resample_vals(
-            x=x,
-            y=y,
-            freq=freq,
-            indices=indices,
-            nrep=nrep,
-            w=w,
-            axis=axis,
-            mom=mom,
-            broadcast=broadcast,
-            dtype=dtype,
-            resample_kws=resample_kws,
-            **kws,
-        )
-
-
-
+    #     return super(xStatsAccumCov, cls).from_resample_vals(
+    #         x=x,
+    #         y=y,
+    #         freq=freq,
+    #         indices=indices,
+    #         nrep=nrep,
+    #         w=w,
+    #         axis=axis,
+    #         mom=mom,
+    #         broadcast=broadcast,
+    #         dtype=dtype,
+    #         resample_kws=resample_kws,
+    #         **kws,
+    #     )
