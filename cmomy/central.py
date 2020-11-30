@@ -20,42 +20,14 @@ from . import convert
 ###############################################################################
 # central mom/comoments routines
 ###############################################################################
-def central_moments(
+def _central_moments(
     x, mom, w=None, axis=0, last=True, dtype=None, order=None, out=None
 ):
-    """
-    calculate central mom along axis
+    """calculate central mom along axis"""
 
-    Parameters
-    ----------
-    x : array-like
-        input data
-    mom : int
-        number of moments to calculate
-    w : array-like, optional
-        Weights. If passed, should be able to broadcast to `x`. An exception is if
-        w is a 1d array with len(w) == x.shape[axis]. In this case,
-        w will be reshaped and broadcast against x
-    axis : int, default=0
-        axis to reduce along
-    last : bool, aaefault=True
-        if True, put mom as last dimension.
-        Otherwise, mom will be in first dimension
-    dtype, order : options to np.asarray
-    out : array
-        if present, use this for output data
-        Needs to have shape of either (mom,) + shape or shape + (mom,)
-        where shape is the shape of x with axis removed
+    if isinstance(mom, tuple):
+        mom = mom[0]
 
-    Returns
-    -------
-    output : array
-        array of shape shape + (mom+1,) or (mom+1,) + shape depending on
-        value of `last`, where `shape` is the shape of `x` with axis removed,
-        i.e., shape=x.shape[:axis] + x.shape[axis+1:]. Assuming `last is True`,
-        output[...,0] is the total weight (or count), output[...,1] is the mean
-        value of x, output[...,n] with n>1 is the nth central moment
-    """
     x = np.asarray(x, dtype=dtype, order=order)
     if dtype is None:
         dtype = x.dtype
@@ -100,9 +72,8 @@ def central_moments(
     return out
 
 
-def central_comoments(
+def _central_comoments(
     x,
-    y,
     mom,
     w=None,
     axis=0,
@@ -112,15 +83,17 @@ def central_comoments(
     order=None,
     out=None,
 ):
-    """
-    calculate central co-mom (covariance, etc) along axis
-    """
+    """calculate central co-mom (covariance, etc) along axis"""
 
     if isinstance(mom, int):
         mom = (mom,) * 2
 
     mom = tuple(mom)
     assert len(mom) == 2
+
+    # change x to tuple of inputs
+    assert isinstance(x, tuple) and len(x) == 2
+    x, y = x
 
     x = np.asarray(x, dtype=dtype, order=order)
     if dtype is None:
@@ -185,6 +158,65 @@ def central_comoments(
     if last:
         out = np.moveaxis(out, [0, 1], [-2, -1])
     return out
+
+
+
+
+def central_moments(
+        x, mom, w=None, axis=0, last=True, dtype=None, order=None, out=None,
+        broadcast=False
+):
+    """
+    calculate central moments or comoments along axis
+
+    Parameters
+    ----------
+    x : array-like or tuple of array-like
+        if calculating moments, then this is the input array.
+        if calculating comoments, then pass in tuple of values of form (x, y)
+    mom : int or tuple
+        number of moments to calculate.  If tuple, then this specifies that
+        comoments will be calculated.
+    w : array-like, optional
+        Weights. If passed, should be able to broadcast to `x`. An exception is if
+        w is a 1d array with len(w) == x.shape[axis]. In this case,
+        w will be reshaped and broadcast against x
+    axis : int, default=0
+        axis to reduce along
+    last : bool, aaefault=True
+        if True, put mom as last dimension.
+        Otherwise, mom will be in first dimension
+    dtype, order : options to np.asarray
+    broadcast : bool, default=False
+        if True and calculating comoments, then the x[1] will be broadcast against x[0].
+    out : array
+        if present, use this for output data
+        Needs to have shape of either (mom,) + shape or shape + (mom,)
+        where shape is the shape of x with axis removed
+
+    Returns
+    -------
+    output : array
+        array of shape=shape + mom_shape or mom_shape + shape depending on
+        value of `last`, where `shape` is the shape of `x` with axis removed,
+        i.e., shape=x.shape[:axis] + x.shape[axis+1:], and `mom_shape` is the shape of the
+        moment part, either (mom+1,) or (mom0+1, mom1+1).  Assuming `last is True`,
+        output[...,0] is the total weight (or count), output[...,1] is the mean
+        value of x, output[...,n] with n>1 is the nth central moment.
+    """
+
+    if isinstance(mom, int):
+        mom = (mom,)
+
+    kws = dict(x=x, mom=mom, w=w, axis=axis, last=last, dtype=dtype, order=order, out=out)
+    if len(mom) == 1:
+        func = _central_moments
+    else:
+        func = _central_comoments
+        kws['broadcast'] = broadcast
+
+    return func(**kws)
+
 
 
 ###############################################################################

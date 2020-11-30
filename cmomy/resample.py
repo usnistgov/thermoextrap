@@ -263,7 +263,7 @@ def _factory_resample_vals_cov(push_vals_scale, fastmath=True, parallel=False):
 
 def resample_vals(x, freq, mom,
                   axis=0, w=None,
-                  mom_len=1,
+                  mom_len=None,
                   broadcast=False,
                   dtype=None, order=None,
                   fastmath=True, parallel=False,
@@ -271,6 +271,16 @@ def resample_vals(x, freq, mom,
     """
     resample data according to frequency table
     """
+
+
+    if isinstance(mom, int):
+        mom = (mom,) * 1
+    assert isinstance(mom, tuple)
+
+    if mom_len is None:
+        mom_len = len(mom)
+    assert len(mom) == mom_len
+    mom_shape = tuple(x + 1 for x in mom)
 
     if mom_len == 1:
         y = None
@@ -280,11 +290,6 @@ def resample_vals(x, freq, mom,
         raise ValueError('only mom_len <= 2 supported')
 
     cov = y is not None
-
-    if isinstance(mom, int):
-        mom = (mom,) * mom_len
-    assert len(mom) == mom_len
-    mom_shape = tuple(x + 1 for x in mom)
 
     # check input data
     freq = np.asarray(freq, dtype=np.int64)

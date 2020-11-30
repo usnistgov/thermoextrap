@@ -211,20 +211,24 @@ class Data(object):
 
     @gcached()
     def data_test(self):
-        if self.cov:
-            return central.central_comoments(
-                x=self.x[0],
-                y=self.x[1],
-                mom=self.mom,
-                w=self.w,
-                axis=self.axis,
-                last=True,
-                broadcast=self.broadcast,
-            )
-        else:
-            return central.central_moments(
-                x=self.x, mom=self.mom, w=self.w, axis=self.axis, last=True
-            )
+
+        return central.central_moments(
+            x=self.x, mom=self.mom, w=self.w, axis=self.axis, last=True, broadcast=self.broadcast)
+
+        # if self.cov:
+        #     return central.central_comoments(
+        #         x=self.x[0],
+        #         y=self.x[1],
+        #         mom=self.mom,
+        #         w=self.w,
+        #         axis=self.axis,
+        #         last=True,
+        #         broadcast=self.broadcast,
+        #     )
+        # else:
+        #     return central.central_moments(
+        #         x=self.x, mom=self.mom, w=self.w, axis=self.axis, last=True
+        #     )
 
     @gcached()
     def s(self):
@@ -353,22 +357,26 @@ class Data(object):
 
     @gcached()
     def datar_test(self):
-        if self.cov:
-            return central.central_comoments(
-                x=self.xr[0],
-                y=self.xr[1],
-                mom=self.mom,
-                w=self.wr,
-                axis=1,
-                broadcast=self.broadcast
-            )
-        else:
-            return central.central_moments(
-                x=self.xr,
-                mom=self.mom,
-                w=self.wr,
-                axis=1,
-            )
+        return central.central_moments(
+            x=self.xr, mom=self.mom, w=self.wr, axis=1, broadcast=self.broadcast
+        )
+
+        # if self.cov:
+        #     return central.central_comoments(
+        #         x=self.xr[0],
+        #         y=self.xr[1],
+        #         mom=self.mom,
+        #         w=self.wr,
+        #         axis=1,
+        #         broadcast=self.broadcast
+        #     )
+        # else:
+        #     return central.central_moments(
+        #         x=self.xr,
+        #         mom=self.mom,
+        #         w=self.wr,
+        #         axis=1,
+        #     )
 
 
 
