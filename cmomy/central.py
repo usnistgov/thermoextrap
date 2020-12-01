@@ -161,7 +161,6 @@ def _central_comoments(
 
 
 
-
 def central_moments(
         x, mom, w=None, axis=0, last=True, dtype=None, order=None, out=None,
         broadcast=False
@@ -229,8 +228,6 @@ class StatsAccumBase(object):
 
     _mom_len = 1
     __slots__ = (
-        #        "shape",
-        #        "moments",
         "_cache",
         "_data",
         "_data_flat",
@@ -1092,28 +1089,6 @@ class StatsAccumBase(object):
                 message = "not implemented for scalar"
             raise ValueError(message)
 
-    # unused
-    # def _reshape_flat(self, x, nrec=None, shape_flat=None):
-    #     if shape_flat is None:
-    #         shape_flat = self.shape_val_flat
-    #     if nrec is None:
-    #         x = x.reshape(self.shape_val_flat)
-    #     else:
-    #         x = x.reshape(*((nrec,) + self.shape_val_flat))
-    #     if x.ndim == 0:
-    #         x = x[()]
-    #     return x
-
-    # def _get_target_shape(self, nrec=None, axis=None, data=False):
-    #     """
-    #     return shape of targert object array
-    #     """
-    #     shape = self.shape
-    #     if data:
-    #         shape += self.shape_mom
-    #     if axis is not None:
-    #         shape = _shape_insert_axis(shape, axis, nrec)
-    #     return shape
 
     # Universal reducers
     def resample_and_reduce(

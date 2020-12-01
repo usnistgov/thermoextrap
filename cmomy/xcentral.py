@@ -982,6 +982,7 @@ class xStatsAccumBase(StatsAccumBase):
         mom=2,
         shape=None,
         dtype=None,
+        broadcast=False,
         dims=None,
         attrs=None,
         coords=None,
@@ -1003,7 +1004,9 @@ class xStatsAccumBase(StatsAccumBase):
         )
 
         return super(xStatsAccumBase, cls).from_vals(
-            x, w=w, axis=axis, mom=mom, shape=shape, dtype=dtype, **kws
+            x, w=w, axis=axis, mom=mom, shape=shape, dtype=dtype,
+            broadcast=broadcast,
+            **kws
         )
 
     @classmethod
@@ -1018,6 +1021,7 @@ class xStatsAccumBase(StatsAccumBase):
         mom=2,
         dim_rep="rep",
         dtype=None,
+        broadcast=False,
         resample_kws=None,
         dims=None,
         attrs=None,
@@ -1060,6 +1064,7 @@ class xStatsAccumBase(StatsAccumBase):
             axis=axis,
             mom=mom,
             dtype=dtype,
+            broadcast=broadcast,
             resample_kws=resample_kws,
             **kws,
         )
