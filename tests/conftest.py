@@ -1,9 +1,11 @@
 
 import numpy as np
+import xarray as xr
 import pytest
 
 from cmomy.cached_decorators import gcached
 import cmomy.central as central
+import cmomy.xcentral as xcentral
 
 
 def _get_cmom(w, x, moments, axis=0, last=True):
@@ -113,12 +115,20 @@ class Data(object):
         if isinstance(self.mom, tuple) and len(self.mom) == 2:
             return True
 
-    @gcached()
-    def cls(self):
+    @property
+    def mom_len(self):
         if self.cov:
-            return central.StatsAccumCov
+            return 2
         else:
-            return central.StatsAccum
+            return 1
+
+    @property
+    def broadcast(self):
+        return self.style == "broadcast"
+
+    @property
+    def cls(self):
+        return central.StatsAccum
 
     @gcached()
     def shape_val(self):
@@ -189,9 +199,6 @@ class Data(object):
     def X(self):
         return self.split_data[1]
 
-    @property
-    def broadcast(self):
-        return self.style == "broadcast"
 
     @gcached()
     def data_fix(self):
@@ -211,30 +218,16 @@ class Data(object):
 
     @gcached()
     def data_test(self):
-
         return central.central_moments(
             x=self.x, mom=self.mom, w=self.w, axis=self.axis, last=True, broadcast=self.broadcast)
 
-        # if self.cov:
-        #     return central.central_comoments(
-        #         x=self.x[0],
-        #         y=self.x[1],
-        #         mom=self.mom,
-        #         w=self.w,
-        #         axis=self.axis,
-        #         last=True,
-        #         broadcast=self.broadcast,
-        #     )
-        # else:
-        #     return central.central_moments(
-        #         x=self.x, mom=self.mom, w=self.w, axis=self.axis, last=True
-        #     )
 
     @gcached()
     def s(self):
         s = self.cls.zeros(shape=self.shape_val, mom=self.mom)
         s.push_vals(x=self.x, w=self.w, axis=self.axis, broadcast=self.broadcast)
         return s
+
 
     @gcached()
     def S(self):
@@ -244,12 +237,6 @@ class Data(object):
             )
             for ww, xx in zip(self.W, self.X)
         ]
-
-    # @gcached()
-    # def sfix(self):
-    #     return self.cls.from_vals(
-    #         x=self.x, w=self.w, axis=self.axis, mom=self.mom, broadcast=self.broadcast
-    #     )
 
     @property
     def values(self):
@@ -288,7 +275,6 @@ class Data(object):
         return raw
 
 
-
     @gcached()
     def indices(self):
         ndat = self.xdata.shape[self.axis]
@@ -302,7 +288,7 @@ class Data(object):
 
 
     @gcached()
-    def xr_data(self):
+    def xdata_resamp(self):
         xdata = self.xdata
 
         if self.axis != 0:
@@ -315,7 +301,7 @@ class Data(object):
         )
 
     @gcached()
-    def yr_data(self):
+    def ydata_resamp(self):
         ydata = self.ydata
 
         if self.style == 'broadcast':
@@ -330,15 +316,15 @@ class Data(object):
             )
 
     @property
-    def xr(self):
+    def x_resamp(self):
         if self.cov:
-            return (self.xr_data, self.yr_data)
+            return (self.xdata_resamp, self.ydata_resamp)
         else:
-            return self.xr_data
+            return self.xdata_resamp
 
 
     @gcached()
-    def wr(self):
+    def w_resamp(self):
         w = self.w
 
         if self.style is None:
@@ -356,27 +342,103 @@ class Data(object):
 
 
     @gcached()
-    def datar_test(self):
+    def data_test_resamp(self):
         return central.central_moments(
-            x=self.xr, mom=self.mom, w=self.wr, axis=1, broadcast=self.broadcast
+            x=self.x_resamp, mom=self.mom, w=self.w_resamp, axis=1, broadcast=self.broadcast
         )
 
-        # if self.cov:
-        #     return central.central_comoments(
-        #         x=self.xr[0],
-        #         y=self.xr[1],
-        #         mom=self.mom,
-        #         w=self.wr,
-        #         axis=1,
-        #         broadcast=self.broadcast
-        #     )
-        # else:
-        #     return central.central_moments(
-        #         x=self.xr,
-        #         mom=self.mom,
-        #         w=self.wr,
-        #         axis=1,
-        #     )
+
+
+    # xcentral specific stuff
+    @property
+    def cls_xr(self):
+        return xcentral.xStatsAccum
+
+
+    @gcached()
+    def s_xr(self):
+        return self.cls_xr.from_vals(
+            x=self.x, w=self.w, axis=self.axis, mom=self.mom, broadcast=self.broadcast
+        )
+
+
+    @gcached()
+    def xdata_xr(self):
+        dims = [f'dim_{i}' for i in range(len(self.shape)-1)]
+        dims.insert(self.axis, 'rec')
+        return xr.DataArray(self.xdata, dims=dims)
+
+
+    @gcached()
+    def ydata_xr(self):
+        if self.style is None or self.style == 'total':
+            dims = self.xdata_xr.dims
+        else:
+            dims = 'rec'
+
+        return xr.DataArray(self.ydata, dims=dims)
+
+    @gcached()
+    def w_xr(self):
+        if self.style is None:
+            return None
+        elif self.style == 'broadcast':
+            dims = 'rec'
+        else:
+            dims = self.xdata_xr.dims
+
+        return xr.DataArray(self.w, dims=dims)
+
+
+    @property
+    def x_xr(self):
+        if self.cov:
+            return (self.xdata_xr, self.ydata_xr)
+        else:
+            return self.xdata_xr
+
+
+    @gcached()
+    def data_test_xr(self):
+        return xcentral.xcentral_moments(x=self.x_xr, mom=self.mom, axis='rec', w=self.w_xr, broadcast=self.broadcast)
+
+
+    @gcached()
+    def s_xr(self):
+        # return self.cls_xr.from_vals(x=self.x_xr, w=self.w_xr, axis='rec', mom=self.mom, broadcast=self.broadcast)
+        return self.cls_xr.from_vals(x=self.x, w=self.w, axis=self.axis, mom=self.mom, broadcast=self.broadcast)
+
+
+
+    @gcached()
+    def W_xr(self):
+        if isinstance(self.w_xr, xr.DataArray):
+            dims = self.w_xr.dims
+            return [xr.DataArray(_, dims=dims) for _ in self.W]
+        else:
+            return self.W
+
+    @gcached()
+    def X_xr(self):
+        xdims = self.xdata_xr.dims
+
+        if self.cov:
+            ydims = self.ydata_xr.dims
+
+            return [(xr.DataArray(x, dims=xdims),
+                     xr.DataArray(y, dims=ydims))
+                    for x, y in self.X]
+        else:
+            return [xr.DataArray(x, dims=xdims)
+                    for x in self.X]
+
+
+    @gcached()
+    def S_xr(self):
+        return [
+            self.cls_xr.from_vals(x=x, w=w, axis=self.axis, mom=self.mom, broadcast=self.broadcast)
+            for w, x, in zip(self.W, self.X)
+        ]
 
 
 
@@ -385,7 +447,6 @@ class Data(object):
 
 
 # Fixutre
-
 def get_params():
     i = -1
     for shape, axis in [(20, 0), ((20, 2, 3), 0), ((2, 20, 3), 1), ((2, 3, 20), 2)]:

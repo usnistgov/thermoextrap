@@ -4,151 +4,253 @@ import pytest
 
 from cmomy.cached_decorators import gcached
 import cmomy.central as central
+import cmomy.xcentral as xcentral
+
+import xarray as xr
+
+# specific xcentral stuff
+
+def xtest(a, b):
+    xr.testing.assert_allclose(a, b.transpose(*a.dims))
 
 
 
-# Tests
 def test_fix_test(other):
-    np.testing.assert_allclose(other.data_fix, other.data_test)
-
-
+    np.testing.assert_allclose(other.data_test_xr, other.data_fix)
 
 def test_s(other):
-    other.test_values(other.s.values)
+    xtest(other.data_test_xr, other.s_xr.values)
 
-def test_push(other):
-    s, x, w, axis, broadcast = other.unpack("s", "x", "w", "axis", "broadcast",)
-    t = s.zeros_like()
-    t.push_vals(x, w=w, axis=axis, broadcast=broadcast)
-    other.test_values(t.values)
 
+
+
+import random
+def scramble_xr(x):
+    if isinstance(x, tuple):
+        return tuple(scramble_xr(_) for _ in x)
+
+    elif isinstance(x, xr.DataArray):
+        order = list(x.dims)
+        random.shuffle(order)
+        return x.transpose(*order)
+    else:
+        return x
 
 
 
 def test_create(other):
-    t = other.cls.zeros(mom=other.mom, shape=other.shape_val)
+    t = xcentral.xStatsAccum.zeros(mom=other.mom, shape=other.shape_val)
+
+    # from array
     t.push_vals(other.x, w=other.w, axis=other.axis, broadcast=other.broadcast)
-    other.test_values(t.values)
+    xtest(other.data_test_xr, t.values)
+
+    # from xarray
+    t.zero()
+    t.push_vals(
+        x=scramble_xr(other.x_xr),
+        w=scramble_xr(other.w_xr),
+        axis='rec',
+        broadcast=other.broadcast
+    )
+    xtest(other.data_test_xr, t.values)
+
+
 
 
 def test_from_vals(other):
-    t = other.cls.from_vals(
-        x=other.x, w=other.w, axis=other.axis, mom=other.mom, broadcast=other.broadcast
+    t = xcentral.xStatsAccum.from_vals(x=other.x, w=other.w, mom=other.mom, axis=other.axis, broadcast=other.broadcast)
+    xtest(other.data_test_xr, t.values)
+
+
+    t = xcentral.xStatsAccum.from_vals(
+        x=scramble_xr(other.x_xr),
+        w=scramble_xr(other.w_xr),
+        axis='rec', mom=other.mom, broadcast=other.broadcast
     )
-    other.test_values(t.values)
+    xtest(other.data_test_xr, t.values)
 
 
 def test_push_val(other):
     if other.axis == 0 and other.style == "total":
-        t = other.s.zeros_like()
         if other.s._mom_len == 1:
             print("do_push_val")
+            t = other.s_xr.zeros_like()
             for ww, xx in zip(other.w, other.x):
                 t.push_val(x=xx, w=ww, broadcast=other.broadcast)
-            other.test_values(t.values)
+            xtest(other.data_test_xr, t.values)
+
+            t.zero()
+            for ww, xx in zip(other.w_xr, other.x_xr):
+                t.push_val(x=scramble_xr(xx), w=scramble_xr(ww), broadcast=other.broadcast)
+            xtest(other.data_test_xr, t.values)
 
 
 def test_push_vals_mult(other):
-    t = other.s.zeros_like()
-    for ww, xx, s in zip(other.W, other.X, other.S):
+    t = other.s_xr.zeros_like()
+    for ww, xx in zip(other.W, other.X):
         t.push_vals(x=xx, w=ww, axis=other.axis, broadcast=other.broadcast)
-    other.test_values(t.values)
+    xtest(other.data_test_xr, t.values)
+
+    t.zero()
+    for ww, xx in zip(other.W_xr, other.X_xr):
+        t.push_vals(
+            x=scramble_xr(xx), w=scramble_xr(ww),
+            axis='rec', broadcast=other.broadcast
+        )
+    xtest(other.data_test_xr, t.values)
 
 
 def test_combine(other):
-    t = other.s.zeros_like()
-    for s in other.S:
-        t.push_data(s.values)
-    other.test_values(t.values)
+    t = other.s_xr.zeros_like()
+    for s in other.S_xr:
+        t.push_data(scramble_xr(s.values))
+    xtest(other.data_test_xr, t.values)
 
 
 def test_from_datas(other):
-    datas = np.array([s.values for s in other.S])
-    t = other.cls.from_datas(datas, mom=other.mom)
-    other.test_values(t.values)
+
+    datas = xr.concat([s.values for s in other.S_xr], dim='rec')
+    datas = scramble_xr(datas).transpose(*(...,) + other.s_xr.dims_mom)
+    t = other.cls_xr.from_datas(datas, mom=other.mom, axis='rec')
+    xtest(other.data_test_xr, t.values)
 
 
 def test_push_datas(other):
-    datas = np.array([s.values for s in other.S])
-    t = other.s.zeros_like()
-    t.push_datas(datas)
-    other.test_values(t.values)
+    datas = xr.concat([s.values for s in other.S_xr], dim='rec')
+
+    datas = scramble_xr(datas).transpose(*(...,) + other.s_xr.dims_mom)
 
 
-def test_push_stat(other):
-    if other.s._mom_len == 1:
-
-        t = other.s.zeros_like()
-        for s in other.S:
-            t.push_stat(s.mean(), v=s.values[..., 2:], w=s.weight())
-        other.test_values(t.values)
+    t = other.s_xr.zeros_like()
+    t.push_datas(datas, axis='rec')
+    xtest(other.data_test_xr, t.values)
 
 
-def test_from_stat(other):
-    if other.s._mom_len == 1:
-        t = other.cls.from_stat(
-            a=other.s.mean(),
-            v=other.s.values[..., 2:],
-            w=other.s.weight(),
-            mom=other.mom,
-        )
-        other.test_values(t.values)
+# def test_push_stat(other):
+#     if other.s._mom_len == 1:
+
+#         t = other.s_xr.zeros_like()
+#         for s in other.S_xr:
+#             t.push_stat(s.mean(), v=s.values[..., 2:], w=s.weight())
+#         xtest(other.data_test_xr, t.values)
 
 
-def test_from_stats(other):
-    if other.s._mom_len == 1:
-        t = other.s.zeros_like()
-        t.push_stats(
-            a=np.array([s.mean() for s in other.S]),
-            v=np.array([s.values[..., 2:] for s in other.S]),
-            w=np.array([s.weight() for s in other.S]),
-            axis=0,
-        )
-        other.test_values(t.values)
+# def test_from_stat(other):
+#     if other.s._mom_len == 1:
+#         t = other.cls.from_stat(
+#             a=other.s.mean(),
+#             v=other.s.values[..., 2:],
+#             w=other.s.weight(),
+#             mom=other.mom,
+#         )
+#         other.test_values(t.values)
+
+
+# def test_from_stats(other):
+#     if other.s._mom_len == 1:
+#         t = other.s.zeros_like()
+#         t.push_stats(
+#             a=np.array([s.mean() for s in other.S]),
+#             v=np.array([s.values[..., 2:] for s in other.S]),
+#             w=np.array([s.weight() for s in other.S]),
+#             axis=0,
+#         )
+#         other.test_values(t.values)
 
 
 def test_add(other):
-    t = other.s.zeros_like()
-    for s in other.S:
+    t = other.s_xr.zeros_like()
+    for s in other.S_xr:
         t = t + s
-    other.test_values(t.values)
+    xtest(other.data_test_xr, t.values)
 
 
 def test_sum(other):
-    t = sum(other.S, other.s.zeros_like())
-    other.test_values(t.values)
-
+    t = sum(other.S_xr, other.s_xr.zeros_like())
+    xtest(other.data_test_xr, t.values)
 
 def test_iadd(other):
-    t = other.s.zeros_like()
-    for s in other.S:
+    t = other.s_xr.zeros_like()
+    for s in other.S_xr:
         t += s
-    other.test_values(t.values)
+    xtest(other.data_test_xr, t.values)
 
 
 def test_sub(other):
-    t = other.s - sum(other.S[1:], other.s.zeros_like())
-    np.testing.assert_allclose(t.values, other.S[0].values)
+    t = other.s_xr - sum(other.S_xr[1:], other.s_xr.zeros_like())
+    xtest(t.values, other.S_xr[0].values)
 
 
 def test_isub(other):
-    t = other.s.copy()
-    for s in other.S[1:]:
+    t = other.s_xr.copy()
+    for s in other.S_xr[1:]:
         t -= s
-    np.testing.assert_allclose(t.values, other.S[0].values)
+    xtest(t.values, other.S_xr[0].values)
 
 
 def test_mult(other):
-    s = other.s
+    s = other.s_xr
 
-    np.testing.assert_allclose(
+    xtest(
         (s * 2).values,
         (s + s).values
     )
 
     t = s.copy()
     t *= 2
-    np.testing.assert_allclose(t.values, (s+s).values)
+    xtest(t.values, (s+s).values)
+
+
+
+def test_resample_and_reduce(other):
+
+    ndim = len(other.shape_val)
+
+    if ndim > 0:
+
+        for axis in range(ndim):
+
+            ndat = other.shape_val[axis]
+            nrep = 10
+
+            idx = np.random.choice(ndat, (nrep, ndat), replace=True)
+
+
+            t0 = other.s.resample_and_reduce(indices=idx, axis=axis)
+
+            dim = 'dim_{}'.format(axis)
+            t1 = other.s_xr.resample_and_reduce(indices=idx, axis=dim, dim_rep='hello')
+
+            np.testing.assert_allclose(t0.data, t1.data)
+
+
+            # check dims
+            dims = list(other.s_xr.values.dims)
+            dims.pop(axis)
+            dims = tuple(['hello'] + dims)
+            assert t1.values.dims == dims
+
+
+            # resample
+            tr = other.s.resample(idx, axis=axis)
+
+            # note: tx may be in different order than tr
+            tx = other.s_xr.isel(**{dim: xr.DataArray(idx, dims=['hello', dim])})
+
+            np.testing.assert_allclose(
+                tr.data, tx.transpose('hello',dim,...).data)
+
+            # # check dims
+            # assert tx.dims == ('hello', ) + other.s_xr.values.dims
+
+            # reduce
+            tx = tx.reduce(dim)
+            xtest(t1.values, tx.values)
+
+
+
+
 
 
 

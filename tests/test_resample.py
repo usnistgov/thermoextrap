@@ -20,7 +20,7 @@ def test_resample_vals(other):
             broadcast=other.broadcast,
         )
 
-        np.testing.assert_allclose(datar, other.datar_test)
+        np.testing.assert_allclose(datar, other.data_test_resamp)
 
 
 
@@ -35,7 +35,7 @@ def test_stats_resample_vals(other):
             axis=other.axis,
             broadcast=other.broadcast,
         )
-        np.testing.assert_allclose(t.data, other.datar_test)
+        np.testing.assert_allclose(t.data, other.data_test_resamp)
 
         # test based on indices
         t = other.cls.from_resample_vals(
@@ -46,7 +46,7 @@ def test_stats_resample_vals(other):
             axis=other.axis,
             broadcast=other.broadcast,
         )
-        np.testing.assert_allclose(t.data, other.datar_test)
+        np.testing.assert_allclose(t.data, other.data_test_resamp)
 
 
 
@@ -67,7 +67,7 @@ def test_resample_data(other):
             if axis != 0:
                 data = np.rollaxis(data, axis, 0)
             data = np.take(data, idx, axis=0)
-            data_ref = other.cls.from_datas(data, axis=1)
+            data_ref = other.cls.from_datas(data, mom_len=other.mom_len, axis=1)
 
 
             t = other.s.resample_and_reduce(freq=freq, axis=axis)
