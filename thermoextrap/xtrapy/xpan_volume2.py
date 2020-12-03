@@ -103,7 +103,7 @@ class DataSpecial(Data):
         self.ndim = ndim
 
     @property
-    def _xcoefs_args(self):
+    def xcoefs_args(self):
         return (self.u_selector, self.xu_selector, self.volume, self.beta, self.ndim)
 
 
