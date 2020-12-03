@@ -11,12 +11,13 @@ import sympy as sp
 
 from .cached_decorators import gcached
 from .core import _get_default_symbol, _get_default_indexed
-from .core import (
-    DataTemplateValues,
-    DatasetSelector,
-    DataStatsCov,
-    DataStatsCovVals,
+from .data import (
+    DataValues,
+    DataValuesCentral,
+    DataCentralMoments,
+    DataCentralMomentsVals,
 )
+from .data import resample_indicies
 from .core import SymSubs, Coefs
 from .core import ExtrapModel, PerturbModel
 
@@ -238,320 +239,8 @@ class SymDerivBeta(object):
 
 
 ###############################################################################
-# Data
-###############################################################################
-def build_aves_xu(
-    uv,
-    xv,
-    order,
-    rec="rec",
-    moment="moment",
-    val="val",
-    rep="rep",
-    deriv="deriv",
-    skipna=False,
-    u_name=None,
-    xu_name=None,
-    xalpha=False,
-    merge=False,
-    transpose=False,
-):
-    """
-    build averages from values uv, xv up to order `order`
-
-    Parameters
-    ----------
-    moment : dimension with moment order
-    deriv : dimension with derivative order
-
-    skipna : bool, default=False
-        if True, then handle nan values correctly.  Note that skipna=True
-        can drastically slow down the calculations
-
-    """
-
-    assert isinstance(uv, xr.DataArray)
-    assert isinstance(xv, (xr.DataArray, xr.Dataset))
-
-    u_order = (moment, ...)
-    if xalpha:
-        x_order = (deriv,) + u_order
-    else:
-        x_order = u_order
-
-    # do averageing
-
-    # this is faster is some cases then the
-    # simplier
-    u = []
-    xu = []
-
-    uave = uv.mean(rec, skipna=skipna)
-    xave = xv.mean(rec, skipna=skipna)
-    for i in range(order + 1):
-        if i == 0:
-            # <u**0>
-            u.append(xr.ones_like(uave))
-            # <x * u**0> = <x>
-            xu.append(xave)
-
-        elif i == 1:
-            u_n = uv.copy()
-            xu_n = xv * uv
-
-            u.append(uave)
-            xu.append(xu_n.mean(rec, skipna=skipna))
-        else:
-            u_n *= uv
-            xu_n *= uv
-            u.append(u_n.mean(rec, skipna=skipna))
-            xu.append(xu_n.mean(rec, skipna=skipna))
-
-    u = xr.concat(u, dim=moment)
-    xu = xr.concat(xu, dim=moment)
-
-    # simple, but sometimes slow....
-    # nvals = xr.DataArray(np.arange(order + 1), dims=[moment])
-    # un = uv**nvals
-    # u = (un).mean(rec, skipna=skipna)
-    # xu = (un * xv).mean(rec, skipna=skipna)
-
-    if transpose:
-        u = u.trapsose(*u_order)
-        xu = xu.transpose(*x_order)
-
-    if u_name is not None:
-        u = u.rename(u_name)
-
-    if xu_name is not None and isinstance(xu, xr.DataArray):
-        xu = xu.rename(xu_name)
-
-    if merge:
-        return xr.merge((u, xu))
-    else:
-        return u, xu
-
-
-def build_aves_dxdu(
-    uv,
-    xv,
-    order,
-    rec="rec",
-    moment="moment",
-    val="val",
-    rep="rep",
-    deriv="deriv",
-    skipna=False,
-    du_name=None,
-    dxdu_name=None,
-    xave_name=None,
-    xalpha=False,
-    merge=False,
-    transpose=False,
-):
-    """
-    build central moments from values uv, xv up to order `order`
-
-    Parameters
-    ----------
-    moment : dimension with moment order
-    deriv : dimension with derivative order
-
-    skipna : bool, default=False
-        if True, then handle nan values correctly.  Note that skipna=True
-        can drastically slow down the calculations
-
-    """
-
-    assert isinstance(uv, xr.DataArray)
-    assert isinstance(xv, (xr.DataArray, xr.Dataset))
-
-    u_order = (moment, ...)
-    if xalpha:
-        x_order = (deriv,) + u_order
-    else:
-        x_order = u_order
-
-    xave = xv.mean(rec, skipna=skipna)
-    uave = uv.mean(rec, skipna=skipna)
-
-    # i=0
-    # <du**0> = 1
-    # <dx * du**0> = 0
-    duave = []
-    dxduave = []
-    du = uv - uave
-
-    for i in range(order + 1):
-        if i == 0:
-            # <du ** 0> = 1
-            # <dx * du**0> = 0
-            duave.append(xr.ones_like(uave))
-            dxduave.append(xr.zeros_like(xave))
-
-        elif i == 1:
-            # <du**1> = 0
-            # (dx * du**1> = ...
-
-            du_n = du.copy()
-            dxdu_n = (xv - xave) * du
-            duave.append(xr.zeros_like(uave))
-            dxduave.append(dxdu_n.mean(rec, skipna=skipna))
-
-        else:
-            du_n *= du
-            dxdu_n *= du
-            duave.append(du_n.mean(rec, skipna=skipna))
-            dxduave.append(dxdu_n.mean(rec, skipna=skipna))
-
-    duave = xr.concat(duave, dim=moment)
-    dxduave = xr.concat(dxduave, dim=moment)
-
-    if transpose:
-        duave = duave.transpose(*u_order)
-        dxduave = dxduave.transpoe(*x_order)
-
-    if du_name is not None:
-        duave = duave.rename(du_name)
-    if dxdu_name is not None and isinstance(dxduave, xr.DataArray):
-        dxduave = dxduave.rename(dxdu_name)
-    if xave_name is not None and isinstance(xave, xr.DataArray):
-        xave = xave.renamae(xave_name)
-
-    if merge:
-        return xr.merge((xave, duave, dxduave))
-    else:
-        return xave, duave, dxduave
-
-
-class Data(DataTemplateValues):
-    """
-    Class to hold uv/xv data
-    """
-
-    @gcached(prop=False)
-    def _mean(self, skipna=None):
-        if skipna is None:
-            skipna = self.skipna
-
-        return build_aves_xu(
-            uv=self.uv,
-            xv=self.xv,
-            order=self.order,
-            skipna=skipna,
-            xalpha=self.xalpha,
-            rep=self._rep,
-            rec=self._rec,
-            val=self._val,
-            moment=self._moment,
-            deriv=self._deriv,
-            **self._kws
-        )
-
-    @gcached()
-    def u(self):
-        out = self._mean()[0]
-        if self.compute:
-            out = out.compute()
-        return out
-
-    @gcached()
-    def xu(self):
-        out = self._mean()[1]
-        if self.compute:
-            out = out.compute()
-        return out
-
-    @gcached()
-    def u_selector(self):
-        return DatasetSelector(self.u, deriv=self._deriv, moment=self._moment)
-
-    @gcached()
-    def xu_selector(self):
-        return DatasetSelector(self.xu, deriv=self._deriv, moment=self._moment)
-
-    @property
-    def _xcoefs_args(self):
-        return (self.u_selector, self.xu_selector)
-
-
-class DataCentral(DataTemplateValues):
-    """
-    Hold uv/xv data and produce central momemnts
-
-    Attributes:
-    xave : DataArray or Dataset
-        <xv>
-    du : DataArray
-        <(u-<u>)**moment>
-    dxdu : DataArray
-        <(x-<x>) * (u-<u>)**moment>
-    """
-
-    @gcached(prop=False)
-    def _mean(self, skipna=None):
-        if skipna is None:
-            skipna = self.skipna
-
-        return build_aves_dxdu(
-            uv=self.uv,
-            xv=self.xv,
-            order=self.order,
-            skipna=skipna,
-            xalpha=self.xalpha,
-            rep=self._rep,
-            rec=self._rec,
-            val=self._val,
-            moment=self._moment,
-            deriv=self._deriv,
-            **self._kws
-        )
-
-    @gcached()
-    def xave(self):
-        out = self._mean()[0]
-        if self.compute:
-            out = out.compute()
-        return out
-
-    @gcached()
-    def du(self):
-        out = self._mean()[1]
-        if self.compute:
-            out = out.compute()
-        return out
-
-    @gcached()
-    def dxdu(self):
-        out = self._mean()[2]
-        if self.compute:
-            out = out.compute()
-        return out
-
-    @gcached()
-    def du_selector(self):
-        return DatasetSelector(self.du, deriv=self._deriv, moment=self._moment)
-
-    @gcached()
-    def dxdu_selector(self):
-        return DatasetSelector(self.dxdu, deriv=self._deriv, moment=self._moment)
-
-    @gcached()
-    def xave_selector(self):
-        if self.xalpha:
-            return DatasetSelector(self.xave, dims=[self._deriv])
-        else:
-            return self.xave
-
-    @property
-    def _xcoefs_args(self):
-        return (self.xave_selector, self.du_selector, self.dxdu_selector)
-
-
-###############################################################################
 # Factory functions
 ###############################################################################
-
 def factory_data(
     uv,
     xv,
@@ -560,10 +249,10 @@ def factory_data(
     skipna=False,
     xalpha=False,
     rec="rec",
-    moment="moment",
+    mom_u="mom_u",
     val="val",
     rep="rep",
-    deriv="deriv",
+    deriv=None,
     chunk=None,
     compute=None,
     **kws
@@ -578,12 +267,12 @@ def factory_data(
     xv : array-like
         observable values
     order : int
-        highest moment to calculate
+        highest mom_u to calculate
     skipna : bool, default=False
         if True, skip `np.nan` values in creating averages.
         Can make some "big" calculations slow
-    rec, moment, val, rep, deriv : str
-        names of record (i.e. time), moment, value, replicate,
+    rec, mom_u, val, rep, deriv : str
+        names of record (i.e. time), mom_u, value, replicate,
         and derivative (with respect to alpha)
     chunk : int or dict, optional
         If specified, perform chunking on resulting uv, xv arrays.
@@ -598,17 +287,20 @@ def factory_data(
     """
 
     if central:
-        cls = DataCentral
+        cls = DataValuesCentral
     else:
-        cls = Data
-    return cls(
+        cls = DataValues
+
+    if xalpha and deriv is None:
+        raise ValueError("if xalpha, must pass string name of derivative")
+
+    return cls.from_vals(
         uv=uv,
         xv=xv,
         order=order,
         skipna=skipna,
-        xalpha=xalpha,
         rec=rec,
-        moment=moment,
+        mom_u=mom_u,
         val=val,
         rep=rep,
         deriv=deriv,
@@ -644,33 +336,32 @@ def factory_coefs(xalpha=False, central=False):
 
 def factory_extrapmodel(
     alpha0,
+    data,
+    xalpha=None,
+    central=None,
     order=None,
-    data=None,
-    uv=None,
-    xv=None,
-    xalpha=False,
-    central=False,
     minus_log=False,
     alpha_name="beta",
-    **kws
 ):
     """
-    factory function to create Extrapolation model for beta expanssion
+    factory function to create Extrapolation model for beta expansion
 
     Parameters
     ----------
-    order : int
-        maximum order
     alpha0 : float
         reference value of alpha (beta)
     data : Data object
-
-    uv, xv : array-like
-        values for u and x
-    xalpha : bool, default=False
-        Whether or not x = func(alpha)
-    central : bool, default=False
+        data object to consider.
+        See data.AbstractData
+    order : int, optional
+        maximum order.
+        If not specified, infer from `data`
+    xalpha : bool, optional
+        Whether or not x = func(alpha).
+        If not specified, infer from `data`
+    central : bool, optional
         Whether or not to use central moments
+        If not specified, infer from `data`
     minus_log : bool, default=False
         Wheter or not we are expanding x = -log <x>
     alpha_name, str, default='beta'
@@ -683,18 +374,23 @@ def factory_extrapmodel(
     extrapmodel : ExtrapModel object
     """
 
-    if data is None:
-        data = factory_data(
-            uv=uv, xv=xv, order=order, central=central, xalpha=xalpha, **kws
-        )
+    if xalpha is None:
+        xalpha = data.xalpha
+    if central is None:
+        central = data.central
+    if order is None:
+        order = data.order
 
+    assert xalpha == data.xalpha
+    assert central == data.central
+    assert order <= data.order
 
     coefs = factory_coefs(xalpha=xalpha, central=central)
     return ExtrapModel(
         alpha0=alpha0,
         data=data,
         coefs=coefs,
-        order=data.order,
+        order=order,
         minus_log=minus_log,
         alpha_name=alpha_name,
     )
@@ -719,5 +415,5 @@ def factory_perturbmodel(alpha0, uv, xv, alpha_name="beta", **kws):
     -------
     perturbmodel : PerturbModel object
     """
-    data = Data(uv=uv, xv=xv, order=0, **kws)
+    data = factory_data(uv=uv, xv=xv, order=0, central=False, **kws)
     return PerturbModel(alpha0=alpha0, data=data, alpha_name=alpha_name)
