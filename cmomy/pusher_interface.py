@@ -2,8 +2,8 @@ import numpy as np
 from .pushers import factory_pushers
 
 def verify_value(x,
-                 shape_val,
-                 shape_mom=None,
+                 val_shape,
+                 mom_shape=None,
                  axis=None,
                  nrec=None,
                  expand=False,
@@ -20,9 +20,9 @@ def verify_value(x,
     ----------
     x: array-like
         array to consider
-    shape_val : tuple
+    val_shape : tuple
         shape of value part of target
-    shape_mom : tuple, optional
+    mom_shape : tuple, optional
         shape of moment part of target.  If None, then target shape
         excludes moments
     verify: callable, optional
@@ -43,7 +43,7 @@ def verify_value(x,
     if verify:
         x = np.asarray(x, dtype=dtype, order=order)
 
-    ndim = len(shape_val)
+    ndim = len(val_shape)
     axis = np.core.numeric.normalize_axis_index(axis, ndim+1)
 
     if shape is None or shape_flat is None:
@@ -58,9 +58,9 @@ def verify_value(x,
             shape_flat = (nrec,) + shape_flat
 
 
-        if shape_mom is not None:
-            shape = shape + shape_mom
-            shape_flat = shape_flat + shape_mom
+        if mom_shape is not None:
+            shape = shape + mom_shape
+            shape_flat = shape_flat + mom_shape
 
 
     if expand:
@@ -95,36 +95,36 @@ def verify_value(x,
 #              broadcast=False,
 #              data=None,
 #              data_flat=None,
-#              shape_val=None,
+#              val_shape=None,
 # ):
 
 
 #     if isinstance(mom, int):
 #         mom = (mom,)
-#     ndim_mom = len(mom)
-#     assert ndim_mom in (1, 2)
-#     shape_mom = tuple(x+1 for x in mom)
+#     mom_ndim = len(mom)
+#     assert mom_ndim in (1, 2)
+#     mom_shape = tuple(x+1 for x in mom)
 
 
-#     if ndim_mom == 1:
+#     if mom_ndim == 1:
 #         x = (x,)
 
 #     if verify:
 #         x = (np.asarray(_) for _ in x)
 
-#     if shape_val is None:
-#         shape_val = x[0].shape
+#     if val_shape is None:
+#         val_shape = x[0].shape
 
-#     if shape_val == ():
-#         shape_val_flat = ()
+#     if val_shape == ():
+#         val_shape_flat = ()
 #     else:
-#         shape_val_flat = (np.prod(shape_val), )
+#         val_shape_flat = (np.prod(val_shape), )
 
-#     shape = shape_val + shape_mom
-#     shape_flat = shape_val_flat + shape_mom
+#     shape = val_shape + mom_shape
+#     shape_flat = val_shape_flat + mom_shape
 
 #     # verify x[0]
-#     x = verify_value(x, shape_val=shape_val, shape_mom=)
+#     x = verify_value(x, val_shape=val_shape, mom_shape=)
 
 
 

@@ -39,7 +39,7 @@ def scramble_xr(x):
 
 
 def test_create(other):
-    t = xcentral.xStatsAccum.zeros(mom=other.mom, shape_val=other.shape_val)
+    t = xcentral.xCentralMoments.zeros(mom=other.mom, val_shape=other.val_shape)
 
     # from array
     t.push_vals(other.x, w=other.w, axis=other.axis, broadcast=other.broadcast)
@@ -59,11 +59,11 @@ def test_create(other):
 
 
 def test_from_vals(other):
-    t = xcentral.xStatsAccum.from_vals(x=other.x, w=other.w, mom=other.mom, axis=other.axis, broadcast=other.broadcast)
+    t = xcentral.xCentralMoments.from_vals(x=other.x, w=other.w, mom=other.mom, axis=other.axis, broadcast=other.broadcast)
     xtest(other.data_test_xr, t.values)
 
 
-    t = xcentral.xStatsAccum.from_vals(
+    t = xcentral.xCentralMoments.from_vals(
         x=scramble_xr(other.x_xr),
         w=scramble_xr(other.w_xr),
         axis='rec', mom=other.mom, broadcast=other.broadcast
@@ -73,7 +73,7 @@ def test_from_vals(other):
 
 def test_push_val(other):
     if other.axis == 0 and other.style == "total":
-        if other.s._ndim_mom == 1:
+        if other.s._mom_ndim == 1:
             print("do_push_val")
             t = other.s_xr.zeros_like()
             for ww, xx in zip(other.w, other.x):
@@ -111,7 +111,7 @@ def test_combine(other):
 def test_from_datas(other):
 
     datas = xr.concat([s.values for s in other.S_xr], dim='rec')
-    datas = scramble_xr(datas).transpose(*(...,) + other.s_xr.dims_mom)
+    datas = scramble_xr(datas).transpose(*(...,) + other.s_xr.mom_dims)
     t = other.cls_xr.from_datas(datas, mom=other.mom, axis='rec')
     xtest(other.data_test_xr, t.values)
 
@@ -119,7 +119,7 @@ def test_from_datas(other):
 def test_push_datas(other):
     datas = xr.concat([s.values for s in other.S_xr], dim='rec')
 
-    datas = scramble_xr(datas).transpose(*(...,) + other.s_xr.dims_mom)
+    datas = scramble_xr(datas).transpose(*(...,) + other.s_xr.mom_dims)
 
 
     t = other.s_xr.zeros_like()
@@ -128,7 +128,7 @@ def test_push_datas(other):
 
 
 # def test_push_stat(other):
-#     if other.s._ndim_mom == 1:
+#     if other.s._mom_ndim == 1:
 
 #         t = other.s_xr.zeros_like()
 #         for s in other.S_xr:
@@ -137,7 +137,7 @@ def test_push_datas(other):
 
 
 # def test_from_stat(other):
-#     if other.s._ndim_mom == 1:
+#     if other.s._mom_ndim == 1:
 #         t = other.cls.from_stat(
 #             a=other.s.mean(),
 #             v=other.s.values[..., 2:],
@@ -148,7 +148,7 @@ def test_push_datas(other):
 
 
 # def test_from_stats(other):
-#     if other.s._ndim_mom == 1:
+#     if other.s._mom_ndim == 1:
 #         t = other.s.zeros_like()
 #         t.push_stats(
 #             a=np.array([s.mean() for s in other.S]),
@@ -205,13 +205,13 @@ def test_mult(other):
 
 def test_resample_and_reduce(other):
 
-    ndim = len(other.shape_val)
+    ndim = len(other.val_shape)
 
     if ndim > 0:
 
         for axis in range(ndim):
 
-            ndat = other.shape_val[axis]
+            ndat = other.val_shape[axis]
             nrep = 10
 
             idx = np.random.choice(ndat, (nrep, ndat), replace=True)
@@ -220,7 +220,7 @@ def test_resample_and_reduce(other):
             t0 = other.s.resample_and_reduce(indices=idx, axis=axis)
 
             dim = 'dim_{}'.format(axis)
-            t1 = other.s_xr.resample_and_reduce(indices=idx, axis=dim, dim_rep='hello')
+            t1 = other.s_xr.resample_and_reduce(indices=idx, axis=dim, rep_dim='hello')
 
             np.testing.assert_allclose(t0.data, t1.data)
 

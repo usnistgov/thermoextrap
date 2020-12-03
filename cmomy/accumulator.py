@@ -349,7 +349,7 @@ def weighted_var(x, w, axis=None, axis_sum=None, unbiased=True, **kwargs):
     return m1, m2
 
 
-class _StatsAccum(object):
+class _CentralMoments(object):
 
     def __init__(self, shape, dtype=np.float, nmom=2):
         self._shape = shape
@@ -709,7 +709,7 @@ class _StatsAccum(object):
         return new
 
 
-class StatsAccumVec(_StatsAccum):
+class CentralMomentsVec(_CentralMoments):
     def _init_subclass(self):
         self._push_val = _push_val_vec
         self._push_vals = _push_vals_vec
@@ -734,12 +734,12 @@ class StatsAccumVec(_StatsAccum):
 
         shape = data.shape[1:-1]
         return StatsArray.from_datas(
-            Data=data, child=StatsAccumVec, shape=shape, nmom=self.nmom)
+            Data=data, child=CentralMomentsVec, shape=shape, nmom=self.nmom)
 
 
-class StatsAccum(_StatsAccum):
+class CentralMoments(_CentralMoments):
     def __init__(self, shape=(), dtype=np.float, nmom=2):
-        super(StatsAccum, self).__init__(shape=(), dtype=dtype, nmom=nmom)
+        super(CentralMoments, self).__init__(shape=(), dtype=dtype, nmom=nmom)
 
     def _init_subclass(self):
         self._push_val = _push_val
@@ -751,7 +751,7 @@ class StatsAccum(_StatsAccum):
         self._push_stats_data = _push_stats_data
 
 
-class StatsAccumCov(_StatsAccum):
+class CentralMomentsCov(_CentralMoments):
     def _init_subclass(self):
         self._push_val = _push_val_cov
         self._push_vals = _push_vals_cov
@@ -773,7 +773,7 @@ class StatsArray(object):
     def __init__(self, shape=(), child=None, dtype=np.float, nmom=2):
 
         if shape == ():
-            child = StatsAccum
+            child = CentralMoments
         else:
             assert child is not None, 'with shape, must specify child object'
 
@@ -793,21 +793,21 @@ class StatsArray(object):
         #     data = self.data
         # else:
         #     data = self.data[subset]
-        # return StatsAccumVec.from_data(data=data)
+        # return CentralMomentsVec.from_data(data=data)
 
         # this is faster
         data = self.data
         if indices is None:
-            new = StatsAccumVec.from_data(data=data)
+            new = CentralMomentsVec.from_data(data=data)
         else:
             shape = indices.shape + data.shape[1:-1]
-            new = StatsAccumVec(shape=shape)
+            new = CentralMomentsVec(shape=shape)
             np.take(self.data, indices, axis=0, out=new._data)
         return new
 
     def resample(self, indices, axis=0):
         data = self.data.take(indices, axis=0)
-        return StatsAccumVec.from_datas(data, axis=0)
+        return CentralMomentsVec.from_datas(data, axis=0)
 
     def resample_and_reduce(self, freq, **kwargs):
         """

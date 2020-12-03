@@ -43,7 +43,7 @@ def test_resample_vals(shape, axis, nrep, moments, weighted):
     np.testing.assert_allclose(data, out)
 
     # factory
-    s = central.StatsAccum.from_resample_vals(x=x, freq=freq, mom=moments, axis=axis, w=weights)
+    s = central.CentralMoments.from_resample_vals(x=x, freq=freq, mom=moments, axis=axis, w=weights)
     np.testing.assert_allclose(s.data, out)
 
 
@@ -86,7 +86,7 @@ def test_resample_data(shape, axis, nrep, moments, weighted):
 
 
     # resample_and_reduce
-    s = central.StatsAccum.from_vals(x, mom=moments, w=weights, axis=0)
+    s = central.CentralMoments.from_vals(x, mom=moments, w=weights, axis=0)
     sr = s.resample_and_reduce(freq, axis=axis)
     np.testing.assert_allclose(out, sr.data)
 
@@ -127,7 +127,7 @@ def test_resample_data_against_vals(shape, axis, nrep, moments, weighted):
     ref = central.resample_vals(x, freq, moments, w=weights, axis=axis)
 
     # create singleton dataset
-    s = central.StatsAccum.from_vals(x=xx, w=ww, axis=0, mom=moments)
+    s = central.CentralMoments.from_vals(x=xx, w=ww, axis=0, mom=moments)
 
     # resample
     out = central.resample_data(s.data, freq, moments, axis=axis)
@@ -185,12 +185,12 @@ def test_resample_vals_cov(shape, axis, nrep, moments, weighted):
     freq = central.randsamp_freq(nrep, ndat, indices=idx)
     out = central.resample_vals(x=(x, x1), freq=freq, mom=moments,
                                 axis=axis, w=weights,
-                                ndim_mom=2,
+                                mom_ndim=2,
                                 parallel=False)
     np.testing.assert_allclose(data, out)
 
     # factory
-    s = central.StatsAccumCov.from_resample_vals(x=(x, x1), freq=freq, w=weights, mom=moments, axis=axis, resample_kws=dict(parallel=False))
+    s = central.CentralMomentsCov.from_resample_vals(x=(x, x1), freq=freq, w=weights, mom=moments, axis=axis, resample_kws=dict(parallel=False))
     np.testing.assert_allclose(s.data, out)
 
 
@@ -234,7 +234,7 @@ def test_resample_data_cov(shape, axis, nrep, moments, weighted):
     np.testing.assert_allclose(ref0, out[..., :3, 0])
     np.testing.assert_allclose(ref1, out[..., 0, :3])
 
-    s = central.StatsAccumCov.from_vals(x=(x, x1),  mom=moments, w=weights, axis=0)
+    s = central.CentralMomentsCov.from_vals(x=(x, x1),  mom=moments, w=weights, axis=0)
     sr = s.resample_and_reduce(freq, axis=axis)
     np.testing.assert_allclose(out, sr.data)
 
@@ -272,10 +272,10 @@ def test_resample_data_against_vals_cov(shape, axis, nrep, moments, weighted):
     # first do a resampling of values
     ndat = x.shape[axis]
     freq = central.randsamp_freq(nrep, ndat)
-    ref = central.resample_vals((x, x1), freq, moments, ndim_mom=2, w=weights, axis=axis)
+    ref = central.resample_vals((x, x1), freq, moments, mom_ndim=2, w=weights, axis=axis)
 
     # create singleton dataset
-    s = central.StatsAccumCov.from_vals(x=(xx,xx1), w=ww, axis=0, mom=moments)
+    s = central.CentralMomentsCov.from_vals(x=(xx,xx1), w=ww, axis=0, mom=moments)
 
     # resample
     out = central.resample_data(s.data, freq, moments, axis=axis)

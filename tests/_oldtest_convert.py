@@ -32,7 +32,7 @@ def test_to_raw_moments(shape, axis, moments, weighted):
     np.testing.assert_allclose(raw, r)
 
 
-    s = central.StatsAccum.from_vals(x, mom=moments, w=weights, axis=axis)
+    s = central.CentralMoments.from_vals(x, mom=moments, w=weights, axis=axis)
 
     r2 = np.moveaxis(s.to_raw().data, -1, 0)
     np.testing.assert_allclose(raw, r2)
@@ -76,7 +76,7 @@ def test_to_central_moments(shape, axis, moments, weighted):
 
 
     _raw = np.moveaxis(raw, 0, -1)
-    s = central.StatsAccum.from_raw(_raw, mom=moments)
+    s = central.CentralMoments.from_raw(_raw, mom=moments)
     c2 = np.moveaxis(s.data, -1, 0)
     np.testing.assert_allclose(cen, c2)
 
@@ -123,7 +123,7 @@ def test_to_raw_comoments(shape, axis, moments, weighted):
     np.testing.assert_allclose(raw, r)
 
 
-    s = central.StatsAccumCov.from_vals(x=(x, x1), mom=moments, w=weights, axis=axis)
+    s = central.CentralMomentsCov.from_vals(x=(x, x1), mom=moments, w=weights, axis=axis)
     r2 = np.moveaxis(s.to_raw().data, [-2, -1], [0, 1])
     np.testing.assert_allclose(raw, r2)
 
@@ -169,7 +169,7 @@ def test_to_central_comoments(shape, axis, moments, weighted):
 
 
     _raw = np.moveaxis(raw, [0,1], [-2, -1])
-    s = central.StatsAccumCov.from_raw(_raw, mom=moments)
+    s = central.CentralMomentsCov.from_raw(_raw, mom=moments)
     c2 = np.moveaxis(s.data, [-2, -1], [0,1])
     np.testing.assert_allclose(cen, c2)
 

@@ -116,7 +116,7 @@ class Data(object):
             return True
 
     @property
-    def ndim_mom(self):
+    def mom_ndim(self):
         if self.cov:
             return 2
         else:
@@ -128,13 +128,13 @@ class Data(object):
 
     @property
     def cls(self):
-        return central.StatsAccum
+        return central.CentralMoments
 
     @gcached()
-    def shape_val(self):
-        shape_val = list(self.shape)
-        shape_val.pop(self.axis)
-        return tuple(shape_val)
+    def val_shape(self):
+        val_shape = list(self.shape)
+        val_shape.pop(self.axis)
+        return tuple(val_shape)
 
     def _get_data(self, style=None):
         if style is None or style == "total":
@@ -224,7 +224,7 @@ class Data(object):
 
     @gcached()
     def s(self):
-        s = self.cls.zeros(shape_val=self.shape_val, mom=self.mom)
+        s = self.cls.zeros(val_shape=self.val_shape, mom=self.mom)
         s.push_vals(x=self.x, w=self.w, axis=self.axis, broadcast=self.broadcast)
         return s
 
@@ -352,7 +352,7 @@ class Data(object):
     # xcentral specific stuff
     @property
     def cls_xr(self):
-        return xcentral.xStatsAccum
+        return xcentral.xCentralMoments
 
 
     @gcached()

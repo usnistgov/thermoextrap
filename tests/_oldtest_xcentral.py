@@ -52,7 +52,7 @@ def test_vals(nrec, moments, weighted):
 
 
     # push
-    s = xcentral.xStatsAccum.zeros(mom=moments)
+    s = xcentral.xCentralMoments.zeros(mom=moments)
     for ww, xx in zip(w, x):
         s.push_val(xx, w=ww)
     np.testing.assert_allclose(s.data, data)
@@ -63,7 +63,7 @@ def test_vals(nrec, moments, weighted):
     np.testing.assert_allclose(s.data, data)
 
     # from vals
-    s = xcentral.xStatsAccum.from_vals(x, w, mom=moments)
+    s = xcentral.xCentralMoments.from_vals(x, w, mom=moments)
     np.testing.assert_allclose(s.data, data)
 
 
@@ -90,11 +90,11 @@ def test_vals(nrec, moments, weighted):
 #     datas = np.array(datas)
 
 #     # factory
-#     s = central.StatsAccum.from_datas(datas, mom=moments)
+#     s = central.CentralMoments.from_datas(datas, mom=moments)
 #     np.testing.assert_allclose(s.data, data)
 
 #     # pushs
-#     s = central.StatsAccum.zeros(mom=moments)
+#     s = central.CentralMoments.zeros(mom=moments)
 
 #     for d in datas:
 #         s.push_stat(a=d[1], v=d[2:], w=d[0])
@@ -109,16 +109,16 @@ def test_vals(nrec, moments, weighted):
 #     np.testing.assert_allclose(s.data, data)
 
 #     # addition
-#     S = [central.StatsAccum.from_data(d, mom=moments) for d in datas]
+#     S = [central.CentralMoments.from_data(d, mom=moments) for d in datas]
 #     out = S[0]
 #     for s in S[1:]:
 #         out = out + s
 #     np.testing.assert_allclose(out.data, data)
 
-#     out = sum(S, central.StatsAccum.zeros(mom=moments))
+#     out = sum(S, central.CentralMoments.zeros(mom=moments))
 #     np.testing.assert_allclose(out.data, data)
 
-#     out = central.StatsAccum.zeros(mom=moments)
+#     out = central.CentralMoments.zeros(mom=moments)
 #     for s in S:
 #         out += s
 #     np.testing.assert_allclose(out.data, data)
@@ -128,7 +128,7 @@ def test_vals(nrec, moments, weighted):
 #     np.testing.assert_allclose(out.data, datas[1])
 
 #     # iadd/isub
-#     out = central.StatsAccum.zeros(mom=moments)
+#     out = central.CentralMoments.zeros(mom=moments)
 #     out += S[0]
 #     np.testing.assert_allclose(out.data, S[0].data)
 
@@ -144,7 +144,7 @@ def test_vals(nrec, moments, weighted):
 #     np.testing.assert_allclose(out1.data, out2.data)
 
 #     # imul
-#     out = central.StatsAccum.from_vals(xs[0], ws[0], mom=moments)
+#     out = central.CentralMoments.from_vals(xs[0], ws[0], mom=moments)
 #     out *= 2
 #     np.testing.assert_allclose(out.data, (S[0] + S[0]).data)
 
@@ -228,13 +228,13 @@ def test_vals(nrec, moments, weighted):
 
 #         np.testing.assert_allclose(data, dataA)
 
-#         s = central.StatsAccum.zeros(shape=shape, mom=moments)
+#         s = central.CentralMoments.zeros(shape=shape, mom=moments)
 #         # push_vals
 #         s.push_vals(x, w=w, axis=axis)
 #         np.testing.assert_allclose(s.data, data)
 
 #         # from vals
-#         s = central.StatsAccum.from_vals(x, w, mom=moments, axis=axis)
+#         s = central.CentralMoments.from_vals(x, w, mom=moments, axis=axis)
 #         np.testing.assert_allclose(s.data, data)
 
 
@@ -284,12 +284,12 @@ def test_vals(nrec, moments, weighted):
  
 
 #         # factory
-#         s = central.StatsAccum.from_datas(datas, mom=moments, axis=0)
+#         s = central.CentralMoments.from_datas(datas, mom=moments, axis=0)
 #         np.testing.assert_allclose(s.data, data)
 
 
 #         # pushs
-#         s = central.StatsAccum.zeros(mom=moments, shape=shape)
+#         s = central.CentralMoments.zeros(mom=moments, shape=shape)
 
 #         for d in datas:
 #             s.push_stat(a=d[...,1], v=d[...,2:], w=d[...,0])
@@ -305,16 +305,16 @@ def test_vals(nrec, moments, weighted):
 
 
 #         # addition
-#         S = [central.StatsAccum.from_data(d, mom=moments) for d in datas]
+#         S = [central.CentralMoments.from_data(d, mom=moments) for d in datas]
 #         out = S[0]
 #         for s in S[1:]:
 #             out = out + s
 #         np.testing.assert_allclose(out.data, data)
 
-#         out = sum(S, central.StatsAccum.zeros(shape=shape, mom=moments))
+#         out = sum(S, central.CentralMoments.zeros(shape=shape, mom=moments))
 #         np.testing.assert_allclose(out.data, data)
 
-#         out = central.StatsAccum.zeros(shape=shape, mom=moments)
+#         out = central.CentralMoments.zeros(shape=shape, mom=moments)
 #         for s in S:
 #             out += s
 #         np.testing.assert_allclose(out.data, data)
@@ -324,7 +324,7 @@ def test_vals(nrec, moments, weighted):
 #         np.testing.assert_allclose(out.data, datas[1])
 
 #         # iadd/isub
-#         out = central.StatsAccum.zeros(shape=shape, mom=moments)
+#         out = central.CentralMoments.zeros(shape=shape, mom=moments)
 #         out += S[0]
 #         np.testing.assert_allclose(out.data, S[0].data)
 

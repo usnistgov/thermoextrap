@@ -182,13 +182,13 @@ def test_push_moments(shape, axis, style, mom):
 
 
     if isinstance(mom, int):
-        cls = central.StatsAccum
+        cls = central.CentralMoments
 
         data_test = central.central_moments(x=x, mom=mom, w=w, axis=axis, last=True)
         np.testing.assert_allclose(data_test,
                                    _get_cmom(w=w, x=x, moments=mom, axis=axis, last=True))
     else:
-        cls = central.StatsAccumCov
+        cls = central.CentralMomentsCov
         data_test = central.central_comoments(x=x[0], y=x[1], mom=mom, w=w,
                                               axis=axis, last=True, broadcast=broadcast)
 
@@ -334,7 +334,7 @@ def test_push_moments(shape, axis, style, mom):
 #     dshape.pop(axis)
 #     dshape = tuple(dshape)
 
-#     cls = central.StatsAccumCov
+#     cls = central.CentralMomentsCov
 #     s = cls.from_vals((x,y), w=w, axis=axis, broadcast=broadcast, mom=mom)
 #     np.testing.assert_allclose(s.data, data_test)
 
@@ -371,7 +371,7 @@ def test_push_moments(shape, axis, style, mom):
 #         np.testing.assert_allclose(_s.values, _test)
 #         S.append(_s)
 
-#     # StatsAccum
+#     # CentralMoments
 #     s = cls.zeros(mom=mom, shape=dshape)
 
 #     _basic_push_tests(cls=cls, w=w, x=(x, y), data_test=data_test, dshape=dshape, W=W, X=X,

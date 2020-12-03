@@ -37,7 +37,7 @@ def test_to_central_moments(other):
 
 def test_from_raws(other):
     raws = np.array([s.to_raw() for s in other.S])
-    t = other.cls.from_raws(raws, ndim_mom=other.ndim_mom, axis=0)
+    t = other.cls.from_raws(raws, mom_ndim=other.mom_ndim, axis=0)
     np.testing.assert_allclose(t.values, other.values)
 
 

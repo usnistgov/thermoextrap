@@ -226,39 +226,43 @@ def central_moments(
 ###############################################################################
 # Classes
 ###############################################################################
-class StatsAccum(object):
+class CentralMoments(object):
     """
     Base class for moments accumulation
     """
 
     __slots__ = (
-        "_ndim_mom",
+        "_mom_ndim",
         "_cache",
         "_data",
         "_data_flat",
         "_push",
     )
 
-    def __init__(self, data, ndim_mom=1, **kws):
+    def __init__(self, data, mom_ndim=1):
         """
         Parameters
         ----------
         data : numpy data array
-            data should have the shape `shape_val + shape_mom`
-            where `shape_val` is the shape of a single observation,
-            and shape_mom is the shape of the moments
+            data should have the shape `val_shape + mom_shape`
+            where `val_shape` is the shape of a single observation,
+            and mom_shape is the shape of the moments
+        mom_ndim : int, {1, 2}
+            number of dimensions of moments.
+            * 1 : central moments of single variable
+            * 2 : central comoments of two variables
         **kws : dict
             optional arguments to be used in subclasses
         """
 
-        if ndim_mom not in (1, 2):
+        if mom_ndim not in (1, 2):
             raise ValueError(
-                "ndim_mom must be either 1 (for central moments)"
+                "mom_ndim must be either 1 (for central moments)"
                 "or 2 (for central comoments)"
             )
-        self._ndim_mom = ndim_mom
+        self._mom_ndim = mom_ndim
 
-        if data.ndim < self.ndim_mom:
+        if data.ndim < self.mom_ndim:
             raise ValueError("not enough dimensions in data")
 
         self._data = data
@@ -267,21 +271,21 @@ class StatsAccum(object):
         if not all([x > 0 for x in self.mom]):
             raise ValueError("All moments must positive")
 
-        self._data_flat = self._data.reshape(self.shape_tot_flat)
+        self._data_flat = self._data.reshape(self.shape_flat)
 
         # setup pushers
-        vec = len(self.shape_val) > 0
-        cov = self.ndim_mom == 2
+        vec = len(self.val_shape) > 0
+        cov = self.mom_ndim == 2
         self._push = factory_pushers(cov=cov, vec=vec)
 
     @property
     def values(self):
-        """accessor to underlying central moments"""
+        """accessor to underlying central moments data"""
         return self._data
 
     @property
     def data(self):
-        """accessor to numpy/dask underlying data
+        """accessor to numpy underlying data
 
         By convention data has the following meaning for the moments indexes
 
@@ -294,77 +298,80 @@ class StatsAccum(object):
         return self._data
 
     @property
-    def ndim_mom(self):
-        """length of moment part
-        if `ndim_mom` == 1, then single variable moments
-        if `ndim_mom` == 2, then co-moments
-        """
-        return self._ndim_mom
-
-    @property
-    def shape_val(self):
-        """shape, less moments dimensions"""
-        return self._data.shape[: -self.ndim_mom]
-
-    @property
-    def ndim_val(self):
-        return len(self.shape_val)
-
-
-    @property
-    def shape_mom(self):
-        """shape of moments part"""
-        return self._data.shape[-self.ndim_mom :]
-
-    @property
-    def shape_val_flat(self):
-        """shape of values part flattened"""
-        if self.shape_val == ():
-            return ()
-        else:
-            return (np.prod(self.shape_val),)
-
-    @property
-    def shape_tot(self):
-        """Shape of vals + moment axis.
-        That is, shape of self.data
-        """
+    def shape(self):
+        """self.data.shape"""
         return self._data.shape
 
     @property
-    def shape_tot_flat(self):
-        return self.shape_val_flat + self.shape_mom
+    def ndim(self):
+        """self.data.ndim"""
+        return self._data.ndim
 
     @property
-    def shape_mom_var(self):
+    def dtype(self):
+        return self._data.dtype
+
+    @property
+    def mom(self):
+        """number of moments for each variable"""
+        return tuple(x - 1 for x in self.mom_shape)
+
+    @property
+    def mom_shape(self):
+        """shape of moments part"""
+        return self._data.shape[-self.mom_ndim :]
+
+    @property
+    def mom_ndim(self):
+        """length of moment part
+        if `mom_ndim` == 1, then single variable moments
+        if `mom_ndim` == 2, then co-moments
+        """
+        return self._mom_ndim
+
+    @property
+    def val_shape(self):
+        """shape, less moments dimensions"""
+        return self._data.shape[: -self.mom_ndim]
+
+    @property
+    def val_ndim(self):
+        return len(self.val_shape)
+
+    @property
+    def val_shape_flat(self):
+        """shape of values part flattened"""
+        if self.val_shape == ():
+            return ()
+        else:
+            return (np.prod(self.val_shape),)
+
+    @property
+    def shape_flat(self):
+        return self.val_shape_flat + self.mom_shape
+
+    @property
+    def mom_shape_var(self):
         """shape of moment part of variance"""
         return tuple(x - 1 for x in self.mom)
 
     # variance shape
     @property
-    def shape_tot_var(self):
+    def shape_var(self):
         """total variance shape"""
-        return self.shape_val + self.shape_mom_var
+        return self.val_shape + self.mom_shape_var
 
     @property
-    def shape_tot_flat_var(self):
-        return self.shape_val_flat + self.shape_mom_var
+    def shape_flat_var(self):
+        return self.val_shape_flat + self.mom_shape_var
 
-    @property
-    def mom(self):
-        """number of moments for each variable"""
-        return tuple(x - 1 for x in self.shape_mom)
-
-    @property
-    def dtype(self):
-        return self._data.dtype
 
     # I think this is for pickling
     # probably don't need it anymore
     # def __setstate__(self, state):
     #     self.__dict__ = state
     #     # make sure datar points to data
-    #     self._data_flat = self._data.reshape(self.shape_tot_flat)
+    #     self._data_flat = self._data.reshape(self.shape_flat)
 
     # not sure I want to actually implements this
     # could lead to all sorts of issues applying
@@ -373,7 +380,7 @@ class StatsAccum(object):
     #     return self, obj, context
 
     def __repr__(self):
-        s = "<StatsAccum(shape_val={}, mom={})>\n".format(self.shape_val, self.mom)
+        s = "<CentralMoments(val_shape={}, mom={})>\n".format(self.val_shape, self.mom)
         return s + repr(self.values)
 
     def __array__(self, dtype=None):
@@ -410,13 +417,13 @@ class StatsAccum(object):
                 data = np.asarray(data, dtype=self.dtype)
 
             if check:
-                assert data.shape == self.shape_tot
+                assert data.shape == self.shape
 
             if copy:
                 if copy_kws is None:
                     copy_kws = {}
                 data = data.copy(**copy_kws)
-        return type(self)(data=data, ndim_mom=self.ndim_mom, **kws)
+        return type(self)(data=data, mom_ndim=self.mom_ndim, **kws)
 
     def zeros_like(self, zeros_kws=None, **kws):
         """create new object empty object like self"""
@@ -434,9 +441,9 @@ class StatsAccum(object):
     def zeros(
         cls,
         mom=None,
-        shape_val=None,
-        ndim_mom=None,
-        shape_tot=None,
+        val_shape=None,
+        mom_ndim=None,
+        shape=None,
         dtype=None,
         zeros_kws=None,
         **kws,
@@ -449,15 +456,15 @@ class StatsAccum(object):
             moments.
             if integer, or length one tuple, then moments of single variable.
             if tuple of length 2, then comoments of two variables.
-        shape_val : tuple, optional
+        val_shape : tuple, optional
             shape of values, excluding moments.  For example, if considering the average of
-            observations `x`, then `shape_val = x.shape`
-            if not passed, then assume shape_val = ()
-        shape_tot : tuple, optional
+            observations `x`, then `val_shape = x.shape`
+            if not passed, then assume val_shape = ()
+        shape : tuple, optional
             if passed, create object with this total shape
-        ndim_mom : int {1, 2}, optional
+        mom_ndim : int {1, 2}, optional
             number of variables.  
-            if pass `shape_tot`, then must pass ndim_mom
+            if pass `shape`, then must pass mom_ndim
         dtype : nunpy dtype, default=float
         zeros_kws : dict
         extra arguments to `np.zeros`
@@ -476,31 +483,31 @@ class StatsAccum(object):
         if zeros_kws is None:
             zeros_kws = {}
 
-        if shape_tot is None:
+        if shape is None:
             assert mom is not None
             if isinstance(mom, int):
                 mom = (mom,)
-            if ndim_mom is None:
-                ndim_mom = len(mom)
-            assert len(mom) == ndim_mom
+            if mom_ndim is None:
+                mom_ndim = len(mom)
+            assert len(mom) == mom_ndim
 
-            if shape_val is None:
-                shape_val = ()
-            elif isinstance(shape_val, int):
-                shape_val = (shape_val,)
-            shape_tot = shape_val + tuple(x + 1 for x in mom)
+            if val_shape is None:
+                val_shape = ()
+            elif isinstance(val_shape, int):
+                val_shape = (val_shape,)
+            shape = val_shape + tuple(x + 1 for x in mom)
 
         else:
-            assert ndim_mom is not None
+            assert mom_ndim is not None
 
         if dtype is None:
             dtype = np.float
 
         if zeros_kws is None:
             zeros_kws = {}
-        data = np.zeros(shape=shape_tot, dtype=dtype, **zeros_kws)
+        data = np.zeros(shape=shape, dtype=dtype, **zeros_kws)
 
-        return cls(data=data, ndim_mom=ndim_mom, **kws)
+        return cls(data=data, mom_ndim=mom_ndim, **kws)
 
     ###########################################################################
     # SECTION: Access to underlying statistics
@@ -508,7 +515,7 @@ class StatsAccum(object):
     @gcached()
     def _weight_index(self):
         index = [0] * len(self.mom)
-        if self.ndim_val > 0:
+        if self.val_ndim > 0:
             index = [...] + index
         return tuple(index)
 
@@ -525,7 +532,7 @@ class StatsAccum(object):
             for i in range(dims):
                 index[i][i] = val
 
-        if self.ndim_val > 0:
+        if self.val_ndim > 0:
             index = [...] + index
 
         return tuple(index)
@@ -560,9 +567,9 @@ class StatsAccum(object):
         out[...,0,0] = weight
         out[...,i0,i1] =  <x0**i0 * x1**i1 * ...>
         """
-        if self.ndim_mom == 1:
+        if self.mom_ndim == 1:
             func = convert.to_raw_moments
-        elif self.ndim_mom == 2:
+        elif self.mom_ndim == 2:
             func = convert.to_raw_comoments
         return func(self.data)
 
@@ -611,21 +618,21 @@ class StatsAccum(object):
 
         if isinstance(target, str):
             if target == "val":
-                target = self.shape_val
+                target = self.val_shape
             elif target == "vals":
-                target = _shape_insert_axis(self.shape_val, axis, x.shape[axis])
+                target = _shape_insert_axis(self.val_shape, axis, x.shape[axis])
             elif target == "data":
-                target = self.shape_tot
+                target = self.shape
             elif target == "datas":
                 # make sure axis in limits
-                axis = normalize_axis_index(axis, self.ndim_val+1)
+                axis = normalize_axis_index(axis, self.val_ndim+1)
                 # if axis < 0:
-                #     axis += self.ndim - self.ndim_mom
-                target = _shape_insert_axis(self.shape_tot, axis, x.shape[axis])
+                #     axis += self.ndim - self.mom_ndim
+                target = _shape_insert_axis(self.shape, axis, x.shape[axis])
             elif target == "var":
-                target = self.shape_tot_var
+                target = self.shape_var
             elif target == "vars":
-                target = _shape_insert_axis(self.shape_tot_var, axis, other.shape[axis])
+                target = _shape_insert_axis(self.shape_var, axis, other.shape[axis])
 
         if isinstance(target, tuple):
             target_shape = target
@@ -679,7 +686,7 @@ class StatsAccum(object):
             axis=None,
             broadcast=True,
             expand=True,
-            shape_flat=self.shape_val_flat,
+            shape_flat=self.val_shape_flat,
         )
 
     def check_weights(self, w, target, axis=0):
@@ -691,7 +698,7 @@ class StatsAccum(object):
             axis=axis,
             broadcast=True,
             expand=True,
-            shape_flat=self.shape_val_flat,
+            shape_flat=self.val_shape_flat,
         )
 
     def check_val(self, x, target, broadcast=False):
@@ -700,7 +707,7 @@ class StatsAccum(object):
             target=target,
             broadcast=broadcast,
             expand=False,
-            shape_flat=self.shape_val_flat,
+            shape_flat=self.val_shape_flat,
         )
 
     def check_vals(self, x, target, axis=0, broadcast=False):
@@ -710,16 +717,16 @@ class StatsAccum(object):
             axis=axis,
             broadcast=broadcast,
             expand=broadcast,
-            shape_flat=self.shape_val_flat,
+            shape_flat=self.val_shape_flat,
         )
 
     def check_var(self, v, broadcast=False):
         return self._verify_value(
             v,
-            target="var",  # self.shape_tot_var,
+            target="var",  # self.shape_var,
             broadcast=broadcast,
             expand=False,
-            shape_flat=self.shape_tot_flat_var,
+            shape_flat=self.shape_flat_var,
         )[0]
 
     def check_vars(self, v, target, axis=0, broadcast=False):
@@ -729,17 +736,17 @@ class StatsAccum(object):
             axis=axis,
             broadcast=broadcast,
             expand=broadcast,
-            shape_flat=self.shape_tot_flat_var,
+            shape_flat=self.shape_flat_var,
             other=target,
         )[0]
 
     def check_data(self, data):
         return self._verify_value(
-            data, target="data", shape_flat=self.shape_tot_flat)[0]
+            data, target="data", shape_flat=self.shape_flat)[0]
 
     def check_datas(self, datas, axis=0):
         return self._verify_value(
-            datas, target="datas", axis=axis, shape_flat=self.shape_tot_flat
+            datas, target="datas", axis=axis, shape_flat=self.shape_flat
         )[0]
 
     def fill(self, value=0):
@@ -756,7 +763,7 @@ class StatsAccum(object):
 
         Parameters
         ----------
-        data : array-like, shape=self.shape_tot
+        data : array-like, shape=self.shape
             array storing moment information
         Returns
         -------
@@ -776,7 +783,7 @@ class StatsAccum(object):
         Parameters
         ----------
         datas : array-like
-            this should have shape like `(nrec,) + self.shape_tot`
+            this should have shape like `(nrec,) + self.shape`
             if `axis=0`, where `nrec` is the number of data objects to sum.
         axis : int, default=0
             axis to reduce along
@@ -795,9 +802,9 @@ class StatsAccum(object):
         Parameters
         ----------
         x : array-like or tuple of arrays
-            if `self.ndim_mom` == 1, then this is the value to consider
-            if `self.ndim_mom` == 2, then x = (x0, x1)
-            `x.shape == self.shape_val`
+            if `self.mom_ndim` == 1, then this is the value to consider
+            if `self.mom_ndim` == 2, then x = (x0, x1)
+            `x.shape == self.val_shape`
 
         w : int, float, array-like, optional
             optional weight of each sample
@@ -809,10 +816,10 @@ class StatsAccum(object):
         self
         """
 
-        if self.ndim_mom == 1:
+        if self.mom_ndim == 1:
             ys = ()
         else:
-            assert len(x) == self.ndim_mom
+            assert len(x) == self.mom_ndim
             x, *ys = x
 
         xr, target = self.check_val(x, "val")
@@ -828,9 +835,9 @@ class StatsAccum(object):
         Parameters
         ----------
         x : array-like or tuple of arrays
-            if `self.ndim_mom` == 1, then this is the value to consider
-            if `self.ndim_mom` == 2, then x = (x0, x1)
-            `x.shape[:axis] + x.shape[axis+1:] == self.shape_val`
+            if `self.mom_ndim` == 1, then this is the value to consider
+            if `self.mom_ndim` == 2, then x = (x0, x1)
+            `x.shape[:axis] + x.shape[axis+1:] == self.val_shape`
 
         w : int, float, array-like, optional
             optional weight of each sample
@@ -839,10 +846,10 @@ class StatsAccum(object):
         broadcast : bool, default = False
             If true, do smart broadcasting for `x[1:]`
         """
-        if self.ndim_mom == 1:
+        if self.mom_ndim == 1:
             ys = ()
         else:
-            assert len(x) == self.ndim_mom
+            assert len(x) == self.mom_ndim
             x, *ys = x
 
         xr, target = self.check_vals(x, axis=axis, target="vals")
@@ -860,8 +867,8 @@ class StatsAccum(object):
     def _check_other(self, b):
         """check other object"""
         assert type(self) == type(b)
-        assert self.ndim_mom == b.ndim_mom
-        assert self.shape_tot == b.shape_tot
+        assert self.mom_ndim == b.mom_ndim
+        assert self.shape == b.shape
 
     def __iadd__(self, b):
         self._check_other(b)
@@ -914,43 +921,43 @@ class StatsAccum(object):
     # SECTION: Constructors
     ###########################################################################
     @classmethod
-    def _check_mom(cls, moments, ndim_mom, shape=None):
+    def _check_mom(cls, moments, mom_ndim, shape=None):
         """check moments for correct shape
-        if moments is None, infer from shape[-ndim_mom:]
+        if moments is None, infer from shape[-mom_ndim:]
         if integer, convert to tuple
         """
 
         if moments is None:
             if shape is not None:
-                if ndim_mom is None:
-                    raise ValueError("must speficy either moments or shape and ndim_mom")
-                moments = tuple(x - 1 for x in shape[-ndim_mom:])
+                if mom_ndim is None:
+                    raise ValueError("must speficy either moments or shape and mom_ndim")
+                moments = tuple(x - 1 for x in shape[-mom_ndim:])
             else:
                 raise ValueError("must specify moments")
 
         if isinstance(moments, int):
-            if ndim_mom is None:
-                ndim_mom = 1
-            moments = (moments,) * ndim_mom
+            if mom_ndim is None:
+                mom_ndim = 1
+            moments = (moments,) * mom_ndim
 
         else:
             moments = tuple(moments)
-            if ndim_mom is None:
-                ndim_mom = len(moments)
+            if mom_ndim is None:
+                mom_ndim = len(moments)
 
-        assert len(moments) == ndim_mom
+        assert len(moments) == mom_ndim
         return moments
 
     @staticmethod
-    def _datas_axis_to_first(datas, axis, ndim_mom):
+    def _datas_axis_to_first(datas, axis, mom_ndim):
         """move axis to first first position"""
         # NOTE: removinvg this. should be handles elsewhere
         # datas = np.asarray(datas)
-        # ndim = datas.ndim - ndim_mom
+        # ndim = datas.ndim - mom_ndim
         # if axis < 0:
         #     axis += ndim
         # assert 0 <= axis < ndim
-        axis = normalize_axis_index(axis, datas.ndim - ndim_mom)
+        axis = normalize_axis_index(axis, datas.ndim - mom_ndim)
         if axis != 0:
             datas = np.moveaxis(datas, axis, 0)
         return datas, axis
@@ -960,7 +967,7 @@ class StatsAccum(object):
         if axis is None:
             axis = default
         if ndim is None:
-            ndim = self.ndim_val
+            ndim = self.val_ndim
 
         axis = normalize_axis_index(axis, ndim)
         # if axis < 0:
@@ -969,7 +976,7 @@ class StatsAccum(object):
         return axis
 
     @classmethod
-    def _ndim_mom_from_mom(cls, mom):
+    def _mom_ndim_from_mom(cls, mom):
         if isinstance(mom, int):
             return 1
         elif isinstance(mom, tuple):
@@ -978,22 +985,22 @@ class StatsAccum(object):
             raise ValueError("mom must be int or tuple")
 
     @classmethod
-    def _choose_ndim_mom(cls, mom, ndim_mom):
+    def _choose_mom_ndim(cls, mom, mom_ndim):
         if mom is not None:
-            ndim_mom = cls._ndim_mom_from_mom(mom)
+            mom_ndim = cls._mom_ndim_from_mom(mom)
 
-        if ndim_mom is None:
-            raise ValueError("must specify ndim_mom or mom")
+        if mom_ndim is None:
+            raise ValueError("must specify mom_ndim or mom")
 
-        return ndim_mom
+        return mom_ndim
 
     @classmethod
     def from_data(
         cls,
         data,
-        ndim_mom=None,
+        mom_ndim=None,
         mom=None,
-        shape_val=None,
+        val_shape=None,
         copy=True,
         copy_kws=None,
         verify=True,
@@ -1005,19 +1012,19 @@ class StatsAccum(object):
 
         If pass `mom` and `shape`, make sure data conforms to this
 
-        must pass either ndim_mom or mom
+        must pass either mom_ndim or mom
         """
 
-        ndim_mom = cls._choose_ndim_mom(mom, ndim_mom)
+        mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
         if verify:
             data = np.asarray(data, dtype=dtype)
 
-        if shape_val is None:
-            shape_val = data.shape[:-ndim_mom]
-        mom = cls._check_mom(mom, ndim_mom, data.shape)
+        if val_shape is None:
+            val_shape = data.shape[:-mom_ndim]
+        mom = cls._check_mom(mom, mom_ndim, data.shape)
 
-        if data.shape != shape_val + tuple(x + 1 for x in mom):
+        if data.shape != val_shape + tuple(x + 1 for x in mom):
             raise ValueError(f"{data.shape} does not conform to {shape} and {moments}")
 
         if copy:
@@ -1025,62 +1032,62 @@ class StatsAccum(object):
                 copy_kws = {}
             data = data.copy(**copy_kws)
 
-        return cls(data=data, ndim_mom=ndim_mom, **kws)
+        return cls(data=data, mom_ndim=mom_ndim, **kws)
 
     @classmethod
     def from_datas(
         cls,
         datas,
-        ndim_mom=None,
-        axis=0,
+        mom_ndim=None,
+        axis=0, 
         mom=None,
-        shape_val=None,
+        val_shape=None,
         dtype=None,
         verify=True,
         **kws,
     ):
         """
-        Data should have shape_val
+        Data should have val_shape
 
         [..., moments] (axis!= -1)
 
         [..., moment, axis] (axis == -1)
         """
 
-        ndim_mom = cls._choose_ndim_mom(mom, ndim_mom)
+        mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
         if verify:
             datas = np.asarray(datas, dtype=dtype)
-        datas, axis = cls._datas_axis_to_first(datas, axis, ndim_mom)
+        datas, axis = cls._datas_axis_to_first(datas, axis, mom_ndim)
 
-        if shape_val is None:
-            shape_val = datas.shape[1:-ndim_mom]
+        if val_shape is None:
+            val_shape = datas.shape[1:-mom_ndim]
 
-        mom = cls._check_mom(mom, ndim_mom, datas.shape)
-        assert datas.shape[1:] == shape_val + tuple(x + 1 for x in mom)
+        mom = cls._check_mom(mom, mom_ndim, datas.shape)
+        assert datas.shape[1:] == val_shape + tuple(x + 1 for x in mom)
 
         if dtype is None:
             dtype = datas.dtype
 
         return (
-            cls.zeros(shape_tot=datas.shape[1:], ndim_mom=ndim_mom, dtype=dtype, **kws)
+            cls.zeros(shape=datas.shape[1:], mom_ndim=mom_ndim, dtype=dtype, **kws)
             .push_datas(datas=datas, axis=0)
         )
 
     @classmethod
     def from_vals(
-        cls, x, w=None, axis=0, mom=2, shape_val=None, dtype=None, broadcast=False, **kws
+        cls, x, w=None, axis=0, mom=2, val_shape=None, dtype=None, broadcast=False, **kws
     ):
 
-        ndim_mom = cls._ndim_mom_from_mom(mom)
-        x0 = x if ndim_mom == 1 else x[0]
-        if shape_val is None:
-            shape_val = _shape_reduce(x0.shape, axis)
+        mom_ndim = cls._mom_ndim_from_mom(mom)
+        x0 = x if mom_ndim == 1 else x[0]
+        if val_shape is None:
+            val_shape = _shape_reduce(x0.shape, axis)
         if dtype is None:
             dtype = x0.dtype
 
         return (
-            cls.zeros(shape_val=shape_val, mom=mom, dtype=dtype, **kws)
+            cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws)
             .push_vals(x=x, axis=axis, w=w, broadcast=broadcast)
         )
 
@@ -1100,9 +1107,9 @@ class StatsAccum(object):
         **kws,
     ):
 
-        ndim_mom = cls._ndim_mom_from_mom(mom)
+        mom_ndim = cls._mom_ndim_from_mom(mom)
 
-        x0 = x if ndim_mom == 1 else x[0]
+        x0 = x if mom_ndim == 1 else x[0]
         freq = randsamp_freq(
             nrep=nrep, freq=freq, indices=indices, size=x0.shape[axis], check=True,
         )
@@ -1116,50 +1123,49 @@ class StatsAccum(object):
             mom=mom,
             axis=axis,
             w=w,
-            ndim_mom=ndim_mom,
+            mom_ndim=mom_ndim,
             **resample_kws,
             broadcast=broadcast,
         )
-        return cls.from_data(data, ndim_mom=ndim_mom, copy=False, **kws)
+        return cls.from_data(data, mom_ndim=mom_ndim, copy=False, **kws)
 
     @classmethod
-    def from_raw(cls, raw, ndim_mom=None, mom=None, shape_val=None, dtype=None, **kws):
+    def from_raw(cls, raw, mom_ndim=None, mom=None, val_shape=None, dtype=None, **kws):
         """create object from raw
 
-        must specify either `ndim_mom` or `mom`
+        must specify either `mom_ndim` or `mom`
         """
 
-        ndim_mom = cls._choose_ndim_mom(mom, ndim_mom)
+        mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
-        if ndim_mom == 1:
+        if mom_ndim == 1:
             func = convert.to_central_moments
-        elif ndim_mom == 2:
+        elif mom_ndim == 2:
             func = convert.to_central_comoments
         data = func(raw)
 
         return cls.from_data(
-            data, ndim_mom=ndim_mom, mom=mom, shape_val=shape_val, dtype=dtype, copy=False, **kws
+            data, mom_ndim=mom_ndim, mom=mom, val_shape=val_shape, dtype=dtype, copy=False, **kws
         )
 
     @classmethod
     def from_raws(
-        cls, raws, ndim_mom=None, mom=None, axis=0, shape_val=None, dtype=None, **kws
+        cls, raws, mom_ndim=None, mom=None, axis=0, val_shape=None, dtype=None, **kws
     ):
-        ndim_mom = cls._choose_ndim_mom(mom, ndim_mom)
+        mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
-        if ndim_mom == 1:
+        if mom_ndim == 1:
             func = convert.to_central_moments
-        elif ndim_mom == 2:
+        elif mom_ndim == 2:
             func = convert.to_central_comoments
         datas = func(raws)
         return cls.from_datas(
             datas=datas,
             axis=axis,
-            ndim_mom=ndim_mom,
+            mom_ndim=mom_ndim,
             mom=mom,
-            shape_val=shape_val,
+            val_shape=val_shape,
             dtype=dtype,
-            copy=False,
             **kws,
         )
 
@@ -1168,7 +1174,7 @@ class StatsAccum(object):
     ###########################################################################
     @property
     def _is_vector(self):
-        return self.ndim_val > 0
+        return self.val_ndim > 0
 
     def _raise_if_scalar(self, message=None):
         if not self._is_vector:
@@ -1207,10 +1213,10 @@ class StatsAccum(object):
             resample_kws = {}
 
         freq = randsamp_freq(
-            nrep=nrep, indices=indices, freq=freq, size=self.shape_val[axis], check=True
+            nrep=nrep, indices=indices, freq=freq, size=self.val_shape[axis], check=True
         )
         data = resample_data(self.data, freq, mom=self.mom, axis=axis, **resample_kws)
-        return type(self).from_data(data, ndim_mom=self.ndim_mom, copy=False, **kws)
+        return type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
 
     def resample(self, indices, axis=0, first=True, **kws):
         """
@@ -1239,7 +1245,7 @@ class StatsAccum(object):
             axis = 0
 
         out = np.take(data, indices, axis=axis)
-        return type(self)(data=out, ndim_mom=self.ndim_mom, **kws)
+        return type(self)(data=out, mom_ndim=self.mom_ndim, **kws)
 
     def reduce(self, axis=0, **kws):
         """
@@ -1248,7 +1254,7 @@ class StatsAccum(object):
         self._raise_if_scalar()
         axis = self._wrap_axis(axis)
         return type(self).from_datas(
-            self.values, ndim_mom=self.ndim_mom, axis=axis, **kws
+            self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
         )
 
     def block(self, block_size=None, axis=None, **kws):
@@ -1288,7 +1294,7 @@ class StatsAccum(object):
             (nblock, block_size) + data.shape[1:]
         )
 
-        return type(self).from_datas(datas=datas, ndim_mom=self.ndim_mom, axis=1, **kws)
+        return type(self).from_datas(datas=datas, mom_ndim=self.mom_ndim, axis=1, **kws)
 
     def reshape(self, shape, copy=True, copy_kws=None, **kws):
         """
@@ -1300,7 +1306,7 @@ class StatsAccum(object):
             shape of values part of data
         """
         self._raise_if_scalar()
-        new_shape = shape + self.shape_mom
+        new_shape = shape + self.mom_shape
         data = self._data.reshape(new_shape)
         return self.new_like(
             data=data, verify=False, check=False, copy=copy, copy_kws=copy_kws, **kws
@@ -1328,25 +1334,25 @@ class StatsAccum(object):
         return type(self).from_data(
             data,
             mom=self.mom,
-            ndim_mom=self.ndim_mom,
-            shape_val=data.shape[: -self.ndim_mom],
+            mom_ndim=self.mom_ndim,
+            val_shape=data.shape[: -self.mom_ndim],
             copy=copy,
             copy_kws=copy_kws,
             **kws,
         )
 
     # --------------------------------------------------
-    # ndim_mom == 1 specific
+    # mom_ndim == 1 specific
     # --------------------------------------------------
 
     @staticmethod
-    def _raise_if_not_1d(ndim_mom):
-        if ndim_mom != 1:
-            raise NotImplementedError("only available for ndim_mom == 1")
+    def _raise_if_not_1d(mom_ndim):
+        if mom_ndim != 1:
+            raise NotImplementedError("only available for mom_ndim == 1")
 
     # special, 1d only methods
     def push_stat(self, a, v=0.0, w=None, broadcast=True):
-        self._raise_if_not_1d(self.ndim_mom)
+        self._raise_if_not_1d(self.mom_ndim)
 
         ar, target = self.check_val(a, target="val")
         vr = self.check_var(v, broadcast=broadcast)
@@ -1355,7 +1361,7 @@ class StatsAccum(object):
         return self
 
     def push_stats(self, a, v=0.0, w=None, axis=0, broadcast=True):
-        self._raise_if_not_1d(self.ndim_mom)
+        self._raise_if_not_1d(self.mom_ndim)
 
         ar, target = self.check_vals(a, target="vals", axis=axis)
         vr = self.check_vars(v, target=target, axis=axis, broadcast=broadcast)
@@ -1364,39 +1370,39 @@ class StatsAccum(object):
         return self
 
     @classmethod
-    def from_stat(cls, a, v=0.0, w=None, mom=2, shape_val=None, dtype=None, **kws):
+    def from_stat(cls, a, v=0.0, w=None, mom=2, val_shape=None, dtype=None, **kws):
         """
         object from single weight, average, variance/covariance
         """
-        ndim_mom = cls._ndim_mom_from_mom(mom)
-        cls._raise_if_not_1d(ndim_mom)
+        mom_ndim = cls._mom_ndim_from_mom(mom)
+        cls._raise_if_not_1d(mom_ndim)
 
-        if shape_val is None:
-            shape_val = a.shape
+        if val_shape is None:
+            val_shape = a.shape
         if dtype is None:
             dtype = a.dtype
 
         return (
-            cls.zeros(shape_val=shape_val, mom=mom, dtype=dtype, **kws)
+            cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws)
             .push_stat(w=w, a=a, v=v)
         )
 
     @classmethod
     def from_stats(
-        cls, a, v=0.0, w=None, axis=0, mom=2, shape_val=None, dtype=None, **kws,
+        cls, a, v=0.0, w=None, axis=0, mom=2, val_shape=None, dtype=None, **kws,
     ):
         """
         object from several weights, averages, variances/covarainces along axis
         """
 
-        ndim_mom = cls._ndim_mom_from_mom(mom)
-        cls._raise_if_not_1d(ndim_mom)
+        mom_ndim = cls._mom_ndim_from_mom(mom)
+        cls._raise_if_not_1d(mom_ndim)
 
-        # get shape_val
-        if shape_val is None:
-            shape_val = _shape_reduce(a.shape, axis)
+        # get val_shape
+        if val_shape is None:
+            val_shape = _shape_reduce(a.shape, axis)
         return (
-            cls.zeros(shape_val=shape_val, dtype=dtype, mom=mom, **kws)
+            cls.zeros(val_shape=val_shape, dtype=dtype, mom=mom, **kws)
             .push_stats(a=a, v=v, w=w, axis=axis)
         )
 
