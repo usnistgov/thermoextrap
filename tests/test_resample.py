@@ -6,7 +6,6 @@ import cmomy.accumulator as accumulator
 import pytest
 
 
-
 def test_resample_vals(other):
     # test basic resampling
     if other.style == 'total':
@@ -16,7 +15,7 @@ def test_resample_vals(other):
             freq=other.freq,
             axis=other.axis,
             w=other.w,
-            mom_len=other.s._mom_len,
+            ndim_mom=other.s._ndim_mom,
             broadcast=other.broadcast,
         )
 
@@ -55,7 +54,7 @@ def test_resample_data(other):
     nrep = 10
 
     if len(other.shape_val) > 0:
-        for axis in range(other.s.ndim):
+        for axis in range(other.s.ndim_val):
 
             data = other.data_test
 
@@ -67,7 +66,7 @@ def test_resample_data(other):
             if axis != 0:
                 data = np.rollaxis(data, axis, 0)
             data = np.take(data, idx, axis=0)
-            data_ref = other.cls.from_datas(data, mom_len=other.mom_len, axis=1)
+            data_ref = other.cls.from_datas(data, ndim_mom=other.ndim_mom, axis=1)
 
 
             t = other.s.resample_and_reduce(freq=freq, axis=axis)
@@ -82,8 +81,8 @@ def test_resample_against_vals(other):
     if len(other.shape_val) > 0:
         s = other.s
 
-        for axis in range(s.ndim):
-            ndat = s.shape[axis]
+        for axis in range(s.ndim_val):
+            ndat = s.shape_val[axis]
             idx = np.random.choice(ndat, (nrep, ndat), replace=True)
 
             t0 = s.resample_and_reduce(indices=idx, axis=axis)

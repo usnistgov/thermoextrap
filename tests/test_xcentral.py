@@ -39,7 +39,7 @@ def scramble_xr(x):
 
 
 def test_create(other):
-    t = xcentral.xStatsAccum.zeros(mom=other.mom, shape=other.shape_val)
+    t = xcentral.xStatsAccum.zeros(mom=other.mom, shape_val=other.shape_val)
 
     # from array
     t.push_vals(other.x, w=other.w, axis=other.axis, broadcast=other.broadcast)
@@ -73,7 +73,7 @@ def test_from_vals(other):
 
 def test_push_val(other):
     if other.axis == 0 and other.style == "total":
-        if other.s._mom_len == 1:
+        if other.s._ndim_mom == 1:
             print("do_push_val")
             t = other.s_xr.zeros_like()
             for ww, xx in zip(other.w, other.x):
@@ -128,7 +128,7 @@ def test_push_datas(other):
 
 
 # def test_push_stat(other):
-#     if other.s._mom_len == 1:
+#     if other.s._ndim_mom == 1:
 
 #         t = other.s_xr.zeros_like()
 #         for s in other.S_xr:
@@ -137,7 +137,7 @@ def test_push_datas(other):
 
 
 # def test_from_stat(other):
-#     if other.s._mom_len == 1:
+#     if other.s._ndim_mom == 1:
 #         t = other.cls.from_stat(
 #             a=other.s.mean(),
 #             v=other.s.values[..., 2:],
@@ -148,7 +148,7 @@ def test_push_datas(other):
 
 
 # def test_from_stats(other):
-#     if other.s._mom_len == 1:
+#     if other.s._ndim_mom == 1:
 #         t = other.s.zeros_like()
 #         t.push_stats(
 #             a=np.array([s.mean() for s in other.S]),

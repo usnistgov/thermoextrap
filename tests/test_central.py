@@ -24,7 +24,7 @@ def test_push(other):
 
 
 def test_create(other):
-    t = other.cls.zeros(mom=other.mom, shape=other.shape_val)
+    t = other.cls.zeros(mom=other.mom, shape_val=other.shape_val)
     t.push_vals(other.x, w=other.w, axis=other.axis, broadcast=other.broadcast)
     other.test_values(t.values)
 
@@ -39,7 +39,7 @@ def test_from_vals(other):
 def test_push_val(other):
     if other.axis == 0 and other.style == "total":
         t = other.s.zeros_like()
-        if other.s.mom_len == 1:
+        if other.s.ndim_mom == 1:
             for ww, xx in zip(other.w, other.x):
                 t.push_val(x=xx, w=ww, broadcast=other.broadcast)
             other.test_values(t.values)
@@ -73,7 +73,7 @@ def test_push_datas(other):
 
 
 def test_push_stat(other):
-    if other.s.mom_len == 1:
+    if other.s.ndim_mom == 1:
         t = other.s.zeros_like()
         for s in other.S:
             t.push_stat(s.mean(), v=s.values[..., 2:], w=s.weight())
@@ -81,7 +81,7 @@ def test_push_stat(other):
 
 
 def test_from_stat(other):
-    if other.s.mom_len == 1:
+    if other.s.ndim_mom == 1:
         t = other.cls.from_stat(
             a=other.s.mean(),
             v=other.s.values[..., 2:],
@@ -92,7 +92,7 @@ def test_from_stat(other):
 
 
 def test_from_stats(other):
-    if other.s.mom_len == 1:
+    if other.s.ndim_mom == 1:
         t = other.s.zeros_like()
         t.push_stats(
             a=np.array([s.mean() for s in other.S]),
@@ -154,7 +154,7 @@ def test_reduce(other):
         for axis in range(ndim):
             t = other.s.reduce(axis)
 
-            f = other.cls.from_datas(other.data_test, axis=axis, mom_len=other.mom_len)
+            f = other.cls.from_datas(other.data_test, axis=axis, ndim_mom=other.ndim_mom)
             np.testing.assert_allclose(t.data, f.data)
 
 
@@ -165,7 +165,7 @@ def test_reshape(other):
 
         for axis in range(ndim):
 
-            new_shape = list(other.s.shape)
+            new_shape = list(other.s.shape_val)
             new_shape = tuple(new_shape[:axis] + [1, -1] + new_shape[axis+1:])
 
             t = other.s.reshape(new_shape)

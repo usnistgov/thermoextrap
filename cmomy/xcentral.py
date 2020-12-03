@@ -261,7 +261,7 @@ class xStatsAccum(central.StatsAccum):
     def __init__(
         self,
         data,
-        mom_len,
+        ndim_mom,
         dims=None,
         coords=None,
         attrs=None,
@@ -273,11 +273,11 @@ class xStatsAccum(central.StatsAccum):
 
         if isinstance(data, xr.DataArray):
             if dims_mom is None:
-                dims_mom = data.dims[-mom_len :]
+                dims_mom = data.dims[-ndim_mom :]
             else:
                 if isinstance(dims_mom, str):
                     dims_mom = [dims_mom]
-                assert len(dims_mom) == mom_len
+                assert len(dims_mom) == ndim_mom
                 order = (...,) + tuple(dims_mom)
 
                 if data.dims != order:
@@ -285,11 +285,11 @@ class xStatsAccum(central.StatsAccum):
             self._xdata = data
 
         else:
-            data = self._wrap_data_with_xr(data=data, mom_len=mom_len, dims=dims, coords=coords, attrs=attrs, name=name, indexes=indexes, dims_mom=dims_mom)
+            data = self._wrap_data_with_xr(data=data, ndim_mom=ndim_mom, dims=dims, coords=coords, attrs=attrs, name=name, indexes=indexes, dims_mom=dims_mom)
 
         self._xdata = data
         # TODO: data.data or data.values?
-        super(xStatsAccum, self).__init__(data=data.data, mom_len=mom_len)
+        super(xStatsAccum, self).__init__(data=data.data, ndim_mom=ndim_mom)
 
 
 
@@ -339,16 +339,16 @@ class xStatsAccum(central.StatsAccum):
     @gcached()
     def _dims_val(self):
         """dim names of values"""
-        return self.dims[: -self.mom_len]
+        return self.dims[: -self.ndim_mom]
 
     @gcached()
     def _dims_mom(self):
         """dim names of mom"""
-        return self.dims[-self.mom_len :]
+        return self.dims[-self.ndim_mom :]
 
     @property
     def dims_mom(self):
-        return self.dims[-self.mom_len:]
+        return self.dims[-self.ndim_mom:]
 
     @property
     def _one_like_val(self):
@@ -395,13 +395,13 @@ class xStatsAccum(central.StatsAccum):
                 if copy_kws is None:
                     copy_kws = {}
                 data = data.copy(**copy_kws)
-        return type(self)(data=data, mom_len=self.mom_len, **kws)
+        return type(self)(data=data, ndim_mom=self.ndim_mom, **kws)
 
     @classmethod
     def _wrap_data_with_xr(
         cls,
         data,
-        mom_len,
+        ndim_mom,
         dims=None,
         coords=None,
         attrs=None,
@@ -419,19 +419,19 @@ class xStatsAccum(central.StatsAccum):
             if isinstance(dims, str):
                 dims = [dims]
         else:
-            dims = [f"dim_{i}" for i in range(ndim - mom_len)]
+            dims = [f"dim_{i}" for i in range(ndim - ndim_mom)]
         dims = tuple(dims)
 
         if len(dims) == ndim:
             dims_total = dims
-        elif len(dims) == ndim - mom_len:
+        elif len(dims) == ndim - ndim_mom:
             if dims_mom is None:
                 # default mom dims
-                dims_mom = [f"mom_{i}" for i in range(mom_len)]
+                dims_mom = [f"mom_{i}" for i in range(ndim_mom)]
             elif isinstance(dims_mom, str):
                 dims_mom = [dims_mom]
 
-            assert len(dims_mom) == mom_len
+            assert len(dims_mom) == ndim_mom
             dims_total = dims + tuple(dims_mom)
         else:
             raise ValueError("bad dims {}, moment_dims {}".format(dims, dims_mom))
@@ -453,8 +453,8 @@ class xStatsAccum(central.StatsAccum):
     def zeros(
         cls,
         mom=None,
-        shape=None,
-        mom_len=None,
+        shape_val=None,
+        ndim_mom=None,
         shape_tot=None,
         dtype=None,
         zeros_kws=None,
@@ -475,9 +475,9 @@ class xStatsAccum(central.StatsAccum):
             if passed, create object with this total shape
         mom : int or tuple
             moments.  if integer, then moments will be (mom,)
-        shape : tuple, optional
+        shape_val : tuple, optional
             shape of values, excluding moments.  For example, if considering the average of
-            observations `x`, then shape = x.shape.  
+            observations `x`, then shape_val = x.shape.  
             if not passed, then assume shape = ()
         dtype : nunpy dtype, default=float
         kwargs : dict
@@ -493,7 +493,7 @@ class xStatsAccum(central.StatsAccum):
         """
 
         return super(xStatsAccum, cls).zeros(
-            mom=mom, shape=shape, mom_len=mom_len, shape_tot=shape_tot, dtype=dtype, zeros_kws=zeros_kws,
+            mom=mom, shape_val=shape_val, ndim_mom=ndim_mom, shape_tot=shape_tot, dtype=dtype, zeros_kws=zeros_kws,
             dims=dims, coords=coords, attrs=attrs, name=name, indexes=indexes, dims_mom=dims_mom, **kws)
 
 
@@ -533,7 +533,7 @@ class xStatsAccum(central.StatsAccum):
         _data_kws.setdefault("copy", _data_copy)
         _data_kws.setdefault("copy", _data_copy)
 
-        return type(self).from_data(data=xdata, mom_len=self.mom_len, **_data_kws)
+        return type(self).from_data(data=xdata, ndim_mom=self.ndim_mom, **_data_kws)
 
     def stack(
         self,
@@ -711,17 +711,17 @@ class xStatsAccum(central.StatsAccum):
     def _single_index_selector(
         self, val, dim_combined="variable", coords_combined=None, select=True
     ):
-        idxs = self._single_index(val)[-self.mom_len :]
+        idxs = self._single_index(val)[-self.ndim_mom :]
         if coords_combined is None:
             coords_combined = self._dims_mom
 
         selector = {
-            dim: (idx if self._mom_len == 1 else xr.DataArray(idx, dims=dim_combined))
+            dim: (idx if self._ndim_mom == 1 else xr.DataArray(idx, dims=dim_combined))
             for dim, idx in zip(self._dims_mom, idxs)
         }
         if select:
             out = self.values.isel(**selector)
-            if self._mom_len > 1:
+            if self._ndim_mom > 1:
                 out = out.assign_coords(**{dim_combined: list(coords_combined)})
             return out
         else:
@@ -852,8 +852,8 @@ class xStatsAccum(central.StatsAccum):
         cls,
         data,
         mom=None,
-        mom_len=None,
-        shape=None,
+        ndim_mom=None,
+        shape_val=None,
         dtype=None,
         copy=True,
         dims=None,
@@ -887,8 +887,8 @@ class xStatsAccum(central.StatsAccum):
         return super(xStatsAccum, cls).from_data(
             data=data,
             mom=mom,
-            mom_len=mom_len,
-            shape=shape,
+            ndim_mom=ndim_mom,
+            shape_val=shape_val,
             dtype=dtype,
             copy=copy,
             verify=verify,
@@ -900,9 +900,9 @@ class xStatsAccum(central.StatsAccum):
         cls,
         datas,
         mom=None,
-        mom_len=None,
+        ndim_mom=None,
         axis=0,
-        shape=None,
+        shape_val=None,
         dtype=None,
         dims=None,
         attrs=None,
@@ -931,7 +931,7 @@ class xStatsAccum(central.StatsAccum):
         )
 
         return super(xStatsAccum, cls).from_datas(
-            datas=values, mom=mom, mom_len=mom_len, axis=axis, shape=shape, dtype=dtype, **kws
+            datas=values, mom=mom, ndim_mom=ndim_mom, axis=axis, shape_val=shape_val, dtype=dtype, **kws
         )
 
     def to_raw(self):
@@ -942,8 +942,8 @@ class xStatsAccum(central.StatsAccum):
         cls,
         raw,
         mom=None,
-        mom_len=None,
-        shape=None,
+        ndim_mom=None,
+        shape_val=None,
         dtype=None,
         dims=None,
         attrs=None,
@@ -970,7 +970,7 @@ class xStatsAccum(central.StatsAccum):
         )
 
         return super(xStatsAccum, cls).from_raw(
-            raw=values, mom_len=mom_len, mom=mom, shape=shape, dtype=dtype, **kws
+            raw=values, ndim_mom=ndim_mom, mom=mom, shape_val=shape_val, dtype=dtype, **kws
         )
 
     @classmethod
@@ -978,9 +978,9 @@ class xStatsAccum(central.StatsAccum):
         cls,
         raws,
         mom=None,
-        mom_len=None,
+        ndim_mom=None,
         axis=0,
-        shape=None,
+        shape_val=None,
         dtype=None,
         dims=None,
         attrs=None,
@@ -1002,7 +1002,7 @@ class xStatsAccum(central.StatsAccum):
         )
 
         super(xStatsAccum, cls).from_raws(
-            values, mom=mom, mom_len=mom_len, axis=axis, shape=shape, dtype=dtype, **kws
+            values, mom=mom, ndim_mom=ndim_mom, axis=axis, shape_val=shape_val, dtype=dtype, **kws
         )
 
 
@@ -1013,7 +1013,7 @@ class xStatsAccum(central.StatsAccum):
         w=None,
         axis=0,
         mom=2,
-        shape=None,
+        shape_val=None,
         dtype=None,
         broadcast=False,
         dims=None,
@@ -1024,8 +1024,8 @@ class xStatsAccum(central.StatsAccum):
         dims_mom=None,
     ):
 
-        mom_len = cls._mom_len_from_mom(mom)
-        x0 = x if mom_len == 1 else x[0]
+        ndim_mom = cls._ndim_mom_from_mom(mom)
+        x0 = x if ndim_mom == 1 else x[0]
         kws, axis, values = _check_xr_input(
             x0,
             axis=axis,
@@ -1038,7 +1038,7 @@ class xStatsAccum(central.StatsAccum):
         )
 
         return super(xStatsAccum, cls).from_vals(
-            x, w=w, axis=axis, mom=mom, shape=shape, dtype=dtype,
+            x, w=w, axis=axis, mom=mom, shape_val=shape_val, dtype=dtype,
             broadcast=broadcast,
             **kws
         )
@@ -1065,8 +1065,8 @@ class xStatsAccum(central.StatsAccum):
         dims_mom=None,
     ):
 
-        mom_len = cls._mom_len_from_mom(mom)
-        if mom_len == 1:
+        ndim_mom = cls._ndim_mom_from_mom(mom)
+        if ndim_mom == 1:
             ys = ()
         else:
             x, *ys = x
@@ -1115,7 +1115,7 @@ class xStatsAccum(central.StatsAccum):
         v=0.0,
         w=None,
         mom=2,
-        shape=None,
+        shape_val=None,
         dtype=None,
         dims=None,
         attrs=None,
@@ -1137,7 +1137,7 @@ class xStatsAccum(central.StatsAccum):
         )
 
         return super(xStatsAccum, cls).from_stat(
-            a=a, v=v, w=w, mom=mom, shape=shape, dtype=dtype, **kws
+            a=a, v=v, w=w, mom=mom, shape_val=shape_val, dtype=dtype, **kws
         )
 
     @classmethod
@@ -1148,7 +1148,7 @@ class xStatsAccum(central.StatsAccum):
         w=None,
         axis=0,
         mom=2,
-        shape=None,
+        shape_val=None,
         dtype=None,
         dims=None,
         attrs=None,
@@ -1170,7 +1170,7 @@ class xStatsAccum(central.StatsAccum):
         )
 
         return super(xStatsAccum, cls).from_stat(
-            a=a, v=v, w=w, axis=axis, mom=mom, shape=shape, dtype=dtype, **kws
+            a=a, v=v, w=w, axis=axis, mom=mom, shape_val=shape_val, dtype=dtype, **kws
         )
 
     def transpose(self, *dims, transpose_coords=None, copy=False, **kws):
@@ -1186,16 +1186,16 @@ class xStatsAccum(central.StatsAccum):
             # make sure mom are last
             # .transpose(...,*self._dims_mom)
         )
-        return type(self).from_data(values, mom_len=self.mom_len, copy=copy, **kws)
+        return type(self).from_data(values, ndim_mom=self.ndim_mom, copy=copy, **kws)
 
 
 # class xStatsAccumCov(xStatsAccum, StatsAccumCov):
-#     _mom_len = 2
+#     _ndim_mom = 2
 
     # def _single_index_selector(
     #     self, val, dim_combined="variable", coords_combined=None, select=True
     # ):
-    #     idxs = self._single_index(1)[-self._mom_len :]
+    #     idxs = self._single_index(1)[-self._ndim_mom :]
     #     if coords_combined is None:
     #         coords_combined = self._dims_mom
 

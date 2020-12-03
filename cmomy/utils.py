@@ -46,6 +46,13 @@ def _shape_insert_axis(shape, axis, new_size):
     return tuple(shape)
 
 
+def _shape_reduce(shape, axis):
+    """given input shape, give shape after reducing along axis"""
+    shape = list(shape)
+    shape.pop(axis)
+    return tuple(shape)
+
+
 def _axis_expand_broadcast(x, shape, axis,
                            verify=True,
                            expand=True,

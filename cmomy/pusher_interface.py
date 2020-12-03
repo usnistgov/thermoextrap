@@ -101,12 +101,12 @@ def verify_value(x,
 
 #     if isinstance(mom, int):
 #         mom = (mom,)
-#     mom_len = len(mom)
-#     assert mom_len in (1, 2)
+#     ndim_mom = len(mom)
+#     assert ndim_mom in (1, 2)
 #     shape_mom = tuple(x+1 for x in mom)
 
 
-#     if mom_len == 1:
+#     if ndim_mom == 1:
 #         x = (x,)
 
 #     if verify:

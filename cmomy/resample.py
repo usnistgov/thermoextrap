@@ -263,7 +263,7 @@ def _factory_resample_vals_cov(push_vals_scale, fastmath=True, parallel=False):
 
 def resample_vals(x, freq, mom,
                   axis=0, w=None,
-                  mom_len=None,
+                  ndim_mom=None,
                   broadcast=False,
                   dtype=None, order=None,
                   fastmath=True, parallel=False,
@@ -277,17 +277,17 @@ def resample_vals(x, freq, mom,
         mom = (mom,) * 1
     assert isinstance(mom, tuple)
 
-    if mom_len is None:
-        mom_len = len(mom)
-    assert len(mom) == mom_len
+    if ndim_mom is None:
+        ndim_mom = len(mom)
+    assert len(mom) == ndim_mom
     mom_shape = tuple(x + 1 for x in mom)
 
-    if mom_len == 1:
+    if ndim_mom == 1:
         y = None
-    elif mom_len == 2:
+    elif ndim_mom == 2:
         x, y = x
     else:
-        raise ValueError('only mom_len <= 2 supported')
+        raise ValueError('only ndim_mom <= 2 supported')
 
     cov = y is not None
 

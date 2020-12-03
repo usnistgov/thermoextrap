@@ -116,7 +116,7 @@ class Data(object):
             return True
 
     @property
-    def mom_len(self):
+    def ndim_mom(self):
         if self.cov:
             return 2
         else:
@@ -224,7 +224,7 @@ class Data(object):
 
     @gcached()
     def s(self):
-        s = self.cls.zeros(shape=self.shape_val, mom=self.mom)
+        s = self.cls.zeros(shape_val=self.shape_val, mom=self.mom)
         s.push_vals(x=self.x, w=self.w, axis=self.axis, broadcast=self.broadcast)
         return s
 
