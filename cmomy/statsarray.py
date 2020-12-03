@@ -1,12 +1,12 @@
 """
-Container for multiple (similar) StatsAccum objects
+Container for multiple (similar) CentralMoments objects
 """
 from __future__ import absolute_import
 
 import numpy as np
 
 from .cached_decorators import cached_clear, gcached
-from .central import StatsAccum, StatsAccumCov
+from .central import CentralMoments, CentralMomentsCov
 from .resample import randsamp_freq, resample_data, resample_vals
 from .utils import (_axis_expand_broadcast, _cached_ones, _my_broadcast,
                     _shape_insert_axis)
@@ -73,8 +73,8 @@ class StatsArray(object):
         dtype : numpy dtype
         child : Accumulator object, optional
             if not specified, choose child class based on moments.
-            If moments is a scalar or length 1 tuple, child is StatsAccum object.
-            If moments is a length 2 tuple, child is a StatsAccumCov object
+            If moments is a scalar or length 1 tuple, child is CentralMoments object.
+            If moments is a length 2 tuple, child is a CentralMomentsCov object
         """
 
         if isinstance(moments, int):
@@ -84,9 +84,9 @@ class StatsArray(object):
 
         if child is None:
             if len(moments) == 1:
-                child = StatsAccum
+                child = CentralMoments
             else:
-                child = StatsAccumCov
+                child = CentralMomentsCov
 
         self._child = child
         self._accum = child(shape=shape, moments=moments, dtype=dtype)
@@ -172,7 +172,7 @@ class StatsArray(object):
 
     @cached_clear()
     def append(self, data):
-        assert data.shape == self._accum._data_shape
+        assert data.shape == self._accum.shape_data
         self._values.append(data)
 
     @cached_clear()
@@ -191,7 +191,7 @@ class StatsArray(object):
 
     @cached_clear()
     def push_data(self, data, copy=False):
-        assert data.shape == self._accum._data_shape
+        assert data.shape == self._accum.shape_data
         if copy:
             data = data.copy()
         self._values.append(data)
@@ -200,7 +200,7 @@ class StatsArray(object):
     def push_datas(self, datas, axis=0):
         if axis != 0:
             datas = np.moveaxis(datas, axis, 0)
-        assert datas.shape[1:] == self._accum._data_shape
+        assert datas.shape[1:] == self._accum.shape_data
         for data in datas:
             self._values.append(data)
 
@@ -258,7 +258,7 @@ class StatsArray(object):
     @classmethod
     def from_accum(cls, accum, axis=None):
         """
-        create StatsArray from StatsAccum object
+        create StatsArray from CentralMoments object
 
         if accum object is a scalar object, or a vector object with no specified axis,
         then create a StatsArray object with accum as the sole elements
@@ -293,7 +293,7 @@ class StatsArray(object):
 
     @gcached()
     def cumdata(self):
-        cumdata = np.zeros((len(self),) + self.accum._data_shape)
+        cumdata = np.zeros((len(self),) + self.accum.shape_data)
         self._accum.zero()
         for i, data in enumerate(self.values):
             self._accum.push_data(data)

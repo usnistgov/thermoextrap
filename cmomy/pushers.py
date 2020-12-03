@@ -270,6 +270,12 @@ def _push_val_cov(data, w, x0, x1):
     incr0 = delta0 * alpha
     incr1 = delta1 * alpha
 
+    # NOTE: decided to force order > 1
+    # otherwise, this is just normal variance
+    # if order0 > 0:
+    #     data[1, 0] += incr0
+    # if order1 > 0:
+    #     data[0, 1] += incr1
     data[1, 0] += incr0
     data[0, 1] += incr1
 
@@ -356,6 +362,11 @@ def _push_data_scale_cov(data, data_in, scale):
     incr0 = delta0 * alpha
     incr1 = delta1 * alpha
 
+    # NOTE : decided to force all orders >0
+    # if order0 > 0:
+    #     data[1, 0] += incr0
+    # if order1 > 0:
+    #     data[0, 1] += incr1
     data[1, 0] += incr0
     data[0, 1] += incr1
 
@@ -577,50 +588,5 @@ def factory_pusher_vals_scale(cov=False, vec=False):
 
 
 
-# _pushers_dict = {
-#     'push_val':   _push_val,
-#     'push_vals':  _push_vals,
-#     'push_stat':  _push_stat,
-#     'push_stats': _push_stats,
-#     'push_data':  _push_data,
-#     'push_datas': _push_datas,
-# }
-
-# _pushers_dict_vec = {
-#     'push_val':   _push_val_vec,
-#     'push_vals':  _push_vals_vec,
-#     'push_stat':  _push_stat_vec,
-#     'push_stats': _push_stats_vec,
-#     'push_data':  _push_data_vec,
-#     'push_datas': _push_datas_vec,
-# }
-
-
-# _pushers_dict_cov = {
-#     'push_val':   _push_val_cov,
-#     'push_vals':  _push_vals_cov,
-#     'push_data':  _push_data_cov,
-#     'push_datas': _push_datas_cov,
-# }
-
-# _pushers_dict_cov_vec = {
-#     'push_val':   _push_val_cov_vec,
-#     'push_vals':  _push_vals_cov_vec,
-#     'push_data':  _push_data_cov_vec,
-#     'push_datas': _push_datas_cov_vec,
-# }
-
-
-# def factory_pushers_dict(cov=False, vec=False):
-#     if cov:
-#         if vec:
-#             return _pushers_dict_cov_vec
-#         else:
-#             return _pushers_dict_cov
-#     else:
-#         if vec:
-#             return _pushers_dict_vec
-#         else:
-#             return _pushers_dict
 
 

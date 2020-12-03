@@ -32,12 +32,24 @@ def _shape_insert_axis(shape, axis, new_size):
     """
     given shape, get new shape with size put in position axis
     """
-    if axis < 0:
-        axis += len(shape) + 1
-        print(len(shape), axis)
+    n = len(shape)
 
+    axis = np.core.numeric.normalize_axis_index(axis, n+1)
+    # assert -(n+1) <= axis <= n
+    # if axis < 0: 
+    #     axis = axis + n + 1
+
+    # if axis < 0:
+    #     axis += len(shape) + 1
     shape = list(shape)
     shape.insert(axis, new_size)
+    return tuple(shape)
+
+
+def _shape_reduce(shape, axis):
+    """given input shape, give shape after reducing along axis"""
+    shape = list(shape)
+    shape.pop(axis)
     return tuple(shape)
 
 
@@ -73,6 +85,11 @@ def _axis_expand_broadcast(x, shape, axis,
 
 
 
-@lru_cache(maxsize=20)
+@lru_cache(maxsize=5)
 def _cached_ones(shape, dtype=None):
     return np.ones(shape, dtype=dtype)
+
+
+
+
+

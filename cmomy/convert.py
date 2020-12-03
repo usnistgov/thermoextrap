@@ -213,25 +213,6 @@ def to_raw_moments(x, axis=-1, dtype=None, order=None, out=None):
     )
 
 
-def to_central_moments(x, axis=-1, dtype=None, order=None, out=None):
-    """
-    convert central moments to raw moments
-    """
-
-    if axis is None:
-        axis = -1
-
-    return _convert_moments(
-        data=x,
-        axis=axis,
-        target_axis=-1,
-        func=_raw_to_central_moments,
-        dtype=dtype,
-        order=order,
-        out=out,
-    )
-
-
 def to_raw_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
     """
     convert central moments to raw moments
@@ -245,6 +226,25 @@ def to_raw_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
         axis=axis,
         target_axis=(-2, -1),
         func=_central_to_raw_comoments,
+        dtype=dtype,
+        order=order,
+        out=out,
+    )
+
+
+def to_central_moments(x, axis=-1, dtype=None, order=None, out=None):
+    """
+    convert central moments to raw moments
+    """
+
+    if axis is None:
+        axis = -1
+
+    return _convert_moments(
+        data=x,
+        axis=axis,
+        target_axis=-1,
+        func=_raw_to_central_moments,
         dtype=dtype,
         order=order,
         out=out,

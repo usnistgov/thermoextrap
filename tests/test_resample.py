@@ -6,279 +6,94 @@ import cmomy.accumulator as accumulator
 import pytest
 
 
-@pytest.mark.parametrize('shape,axis,nrep', [
-    ((100,), 0, 20),
-    ((100, 5), 0, 20),
-    ((5, 100), 1, 20)])
-@pytest.mark.parametrize('moments', [2, 5])
-@pytest.mark.parametrize('weighted',[False, True])
-def test_resample_vals(shape, axis, nrep, moments, weighted):
-    """
-    test resampling
-    """
-
-    x = np.random.rand(*shape)
-    if weighted:
-        weights = np.random.rand(*shape)
-    else:
-        weights = None
-
-    ndat = shape[axis]
-    shape = (nrep, ndat)
-    idx = np.random.choice(ndat, shape, replace=True)
-
-    # direct sampling
-    xx = np.take(x, idx, axis=axis)
-    if weighted:
-        ww = np.take(weights, idx, axis=axis)
-    else:
-        ww = None
-    data = central.central_moments(xx, moments, weights=ww, axis=axis+1)
-    # could have rep in weird place so move it
-    data = np.rollaxis(data, axis, 0)
-
-    # frequnecy samplign
-    freq = central.randsamp_freq(nrep, ndat, indices=idx)
-    out = central.resample_vals(x, freq, moments, axis=axis, weights=weights)
-    np.testing.assert_allclose(data, out)
-
-    # factory
-    s = central.StatsAccum.from_resample_vals(x=x, freq=freq, moments=moments, axis=axis, w=weights)
-    np.testing.assert_allclose(s.data, out)
+def test_resample_vals(other):
+    # test basic resampling
+    if other.style == 'total':
+        datar = central.resample_vals(
+            x=other.x,
+            mom=other.mom,
+            freq=other.freq,
+            axis=other.axis,
+            w=other.w,
+            mom_ndim=other.s._mom_ndim,
+            broadcast=other.broadcast,
+        )
 
+        np.testing.assert_allclose(datar, other.data_test_resamp)
 
-
-@pytest.mark.parametrize('shape,axis,nrep', [
-    ((100, 10), 0, 20),
-    ((100, 10, 5), 0, 20),
-    ((100, 5, 10), 1, 20)])
-@pytest.mark.parametrize('moments', [2, 5])
-@pytest.mark.parametrize('weighted',[False, True])
-def test_resample_data(shape, axis, nrep, moments, weighted):
-    """
-    test resampling
-    """
-    x = np.random.rand(*shape)
-    if weighted:
-        weights = np.random.rand(*shape)
-    else:
-        weights = None
-
-    data = central.central_moments(x, moments, weights=weights, axis=0)
-
-    ndat = data.shape[axis]
-    shape = (nrep, ndat)
-
-    idx = np.random.choice(ndat, shape, replace=True)
-    freq = central.randsamp_freq(nrep, ndat, idx)
-
-    if axis != 0:
-        d = np.rollaxis(data, axis, 0)
-    else:
-        d = data
-    ref = accumulator.resample_data(d[..., :3], freq.T, parallel=False)
-
-
-    out = central.resample_data(data, freq, moments,
-                                parallel=False, axis=axis)
-    # only test against ref up to 3rd order
-    np.testing.assert_allclose(ref, out[..., :3])
-
-
-    # resample_and_reduce
-    s = central.StatsAccum.from_vals(x, moments=moments, w=weights, axis=0)
-    sr = s.resample_and_reduce(freq, axis=axis)
-    np.testing.assert_allclose(out, sr.data)
-
-    # resample/reduce
-    sr = s.resample(idx, axis=axis).reduce(1)
-    np.testing.assert_allclose(out, sr.data)
 
 
-
-
-
-@pytest.mark.parametrize('shape,axis,nrep', [
-    ((10,), 0, 20),
-    ((10, 5), 0, 20),
-    ((5, 10), 1, 20)])
-@pytest.mark.parametrize('moments', [2, 5])
-@pytest.mark.parametrize('weighted',[False, True])
-def test_resample_data_against_vals(shape, axis, nrep, moments, weighted):
-    """
-    test resampling
-    """
-    x = np.random.rand(*shape)
+def test_stats_resample_vals(other):
 
-    xx = x[None, ...]
-    if weighted:
-        weights = np.random.rand(*shape)
-        ww = weights[None, ...]
-    else:
-        weights = None
-        ww = None
+    if other.style == 'total':
+        t = other.cls.from_resample_vals(
+            x=other.x,
+            w=other.w,
+            mom=other.mom,
+            freq=other.freq,
+            axis=other.axis,
+            broadcast=other.broadcast,
+        )
+        np.testing.assert_allclose(t.data, other.data_test_resamp)
 
-    # first do a resampling of values
-    ndat = x.shape[axis]
+        # test based on indices
+        t = other.cls.from_resample_vals(
+            x=other.x,
+            w=other.w,
+            mom=other.mom,
+            indices=other.indices,
+            axis=other.axis,
+            broadcast=other.broadcast,
+        )
+        np.testing.assert_allclose(t.data, other.data_test_resamp)
 
-    idx = np.random.choice(ndat, (nrep, ndat), True)
 
-    freq = central.randsamp_freq(nrep, ndat, idx)
-    ref = central.resample_vals(x, freq, moments, weights=weights, axis=axis)
 
-    # create singleton dataset
-    s = central.StatsAccum.from_vals(x=xx, w=ww, axis=0, moments=moments)
+def test_resample_data(other):
 
-    # resample
-    out = central.resample_data(s.data, freq, moments, axis=axis)
-    np.testing.assert_allclose(out, ref)
+    nrep = 10
 
-    sr = s.resample_and_reduce(freq, axis=axis)
-    np.testing.assert_allclose(ref, sr.data)
+    if len(other.val_shape) > 0:
+        for axis in range(other.s.val_ndim):
 
+            data = other.data_test
 
-    sr = s.resample(idx, axis=axis).reduce(1)
-    np.testing.assert_allclose(ref, sr.data)
+            ndat = data.shape[axis]
 
+            idx = np.random.choice(ndat, (nrep, ndat), replace=True)
+            freq = central.randsamp_freq(indices=idx)
 
+            if axis != 0:
+                data = np.rollaxis(data, axis, 0)
+            data = np.take(data, idx, axis=0)
+            data_ref = other.cls.from_datas(data, mom_ndim=other.mom_ndim, axis=1)
 
 
-@pytest.mark.parametrize('shape,axis,nrep', [
-    ((100,), 0, 20),
-    ((100, 5), 0, 20),
-    ((5, 100), 1, 20)])
-@pytest.mark.parametrize('moments', [(2,2), (5,5)])
-@pytest.mark.parametrize('weighted',[False, True])
-def test_resample_vals_cov(shape, axis, nrep, moments, weighted):
-    """
-    test resampling
-    """
+            t = other.s.resample_and_reduce(freq=freq, axis=axis)
+            np.testing.assert_allclose(data_ref, t.data)
 
-    x = np.random.rand(*shape)
-    x1 = np.random.rand(*shape)
 
-    if weighted:
-        weights = np.random.rand(*shape)
-    else:
-        weights = None
 
-    ndat = shape[axis]
-    shape = (nrep, ndat)
-    idx = np.random.choice(ndat, shape, replace=True)
+def test_resample_against_vals(other):
 
-    # direct sampling
-    xx = np.rollaxis(x, axis, 0)
-    xx1 = np.rollaxis(x1, axis, 0)
+    nrep = 10
 
-    xx = np.take(xx, idx, axis=0)
-    xx1 = np.take(xx1, idx, axis=0)
+    if len(other.val_shape) > 0:
+        s = other.s
 
-    if weighted:
-        ww = np.rollaxis(weights, axis, 0)
-        ww = np.take(ww, idx, axis=0)
-    else:
-        ww = None
+        for axis in range(s.val_ndim):
+            ndat = s.val_shape[axis]
+            idx = np.random.choice(ndat, (nrep, ndat), replace=True)
 
-    data = central.central_comoments(xx, xx1, moments, weights=ww, axis=1)
+            t0 = s.resample_and_reduce(indices=idx, axis=axis)
 
-    # frequnecy sampling
-    freq = central.randsamp_freq(nrep, ndat, indices=idx)
-    out = central.resample_vals(x=x, x1=x1, freq=freq, moments=moments, axis=axis, weights=weights, parallel=False)
-    np.testing.assert_allclose(data, out)
+            t1 = s.resample(idx, axis=axis).reduce(1)
 
-    # factory
-    s = central.StatsAccumCov.from_resample_vals(x0=x, x1=x1, freq=freq, w=weights, moments=moments, axis=axis, resample_kws=dict(parallel=False))
-    np.testing.assert_allclose(s.data, out)
+            np.testing.assert_allclose(t0.values, t1.values)
 
 
 
-@pytest.mark.parametrize('shape,axis,nrep', [
-    ((100, 10), 0, 20),
-    ((100, 10, 5), 0, 20),
-    ((100, 5, 10), 1, 20)])
-@pytest.mark.parametrize('moments', [(2,2), (5,5)])
-@pytest.mark.parametrize('weighted',[False, True])
-def test_resample_data_cov(shape, axis, nrep, moments, weighted):
-    """
-    test resampling
-    """
-    x = np.random.rand(*shape)
-    x1 = np.random.rand(*shape)
-    if weighted:
-        weights = np.random.rand(*shape)
-    else:
-        weights = None
 
-    data = central.central_comoments(x, x1, moments, weights=weights, axis=0)
 
-    ndat = data.shape[axis]
-    shape = (nrep, ndat)
-
-    idx = np.random.choice(ndat, shape, replace=True)
-    freq = central.randsamp_freq(nrep, ndat, idx)
-
-    if axis != 0:
-        d = np.rollaxis(data, axis, 0)
-    else:
-        d = data
-
-    ref0 = accumulator.resample_data(d[..., :3, 0], freq.T, parallel=False)
-    ref1 = accumulator.resample_data(d[..., 0, :3], freq.T, parallel=False)
-
-    out = central.resample_data(data, freq, moments, parallel=False, axis=axis)
-
-    # can only test up to third order
-    np.testing.assert_allclose(ref0, out[..., :3, 0])
-    np.testing.assert_allclose(ref1, out[..., 0, :3])
-
-    s = central.StatsAccumCov.from_vals(x, x1, moments=moments, w=weights, axis=0)
-    sr = s.resample_and_reduce(freq, axis=axis)
-    np.testing.assert_allclose(out, sr.data)
-
-
-    sr = s.resample(idx, axis=axis).reduce(1)
-    np.testing.assert_allclose(out, sr.data)
-
-
-
-
-
-@pytest.mark.parametrize('shape,axis,nrep', [
-    ((10,), 0, 20),
-    ((10, 5), 0, 20),
-    ((5, 10), 1, 20)])
-@pytest.mark.parametrize('moments', [(2,1), (5,5)])
-@pytest.mark.parametrize('weighted',[False, True])
-def test_resample_data_against_vals_cov(shape, axis, nrep, moments, weighted):
-    """
-    test resampling
-    """
-    x = np.random.rand(*shape)
-    x1 = np.random.rand(*shape)
-
-    xx = x[None, ...]
-    xx1 = x1[None, ...]
-
-    if weighted:
-        weights = np.random.rand(*shape)
-        ww = weights[None, ...]
-    else:
-        weights = None
-        ww = None
-
-    # first do a resampling of values
-    ndat = x.shape[axis]
-    freq = central.randsamp_freq(nrep, ndat)
-    ref = central.resample_vals(x, freq, moments, x1=x1, weights=weights, axis=axis)
-
-    # create singleton dataset
-    s = central.StatsAccumCov.from_vals(x0=xx, x1=xx1, w=ww, axis=0, moments=moments)
-
-    # resample
-    out = central.resample_data(s.data, freq, moments, axis=axis)
-    np.testing.assert_allclose(out, ref)
-
-    sr = s.resample_and_reduce(freq, axis=axis)
-    np.testing.assert_allclose(ref, sr.data)
 
 
