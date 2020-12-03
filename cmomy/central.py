@@ -14,7 +14,7 @@ from .utils import (
     _cached_ones,
     _my_broadcast,
     _shape_insert_axis,
-    _shape_reduce
+    _shape_reduce,
 )
 
 from .pushers import factory_pushers
@@ -42,7 +42,6 @@ def _central_moments(
         w = _axis_expand_broadcast(
             w, x.shape, axis, roll=False, dtype=dtype, order=order
         )
-
 
     # if axis < 0:
     #     axis += x.ndim
@@ -103,7 +102,6 @@ def _central_comoments(
     x = np.asarray(x, dtype=dtype, order=order)
     if dtype is None:
         dtype = x.dtype
-
 
     y = _axis_expand_broadcast(
         y,
@@ -346,7 +344,7 @@ class CentralMoments(object):
         else:
             return (np.prod(self.val_shape),)
 
-    @property
+   @property
     def shape_flat(self):
         return self.val_shape_flat + self.mom_shape
 
@@ -364,7 +362,6 @@ class CentralMoments(object):
     @property
     def shape_flat_var(self):
         return self.val_shape_flat + self.mom_shape_var
-
 
     # I think this is for pickling
     # probably don't need it anymore
@@ -625,7 +622,7 @@ class CentralMoments(object):
                 target = self.shape
             elif target == "datas":
                 # make sure axis in limits
-                axis = normalize_axis_index(axis, self.val_ndim+1)
+                axis = normalize_axis_index(axis, self.val_ndim + 1)
                 # if axis < 0:
                 #     axis += self.ndim - self.mom_ndim
                 target = _shape_insert_axis(self.shape, axis, x.shape[axis])
@@ -741,8 +738,7 @@ class CentralMoments(object):
         )[0]
 
     def check_data(self, data):
-        return self._verify_value(
-            data, target="data", shape_flat=self.shape_flat)[0]
+        return self._verify_value(data, target="data", shape_flat=self.shape_flat)[0]
 
     def check_datas(self, datas, axis=0):
         return self._verify_value(
@@ -876,7 +872,6 @@ class CentralMoments(object):
         # return self
         return self.push_data(b.data)
 
-
     def __add__(self, b):
         self._check_other(b)
         # new = self.copy()
@@ -930,7 +925,9 @@ class CentralMoments(object):
         if moments is None:
             if shape is not None:
                 if mom_ndim is None:
-                    raise ValueError("must speficy either moments or shape and mom_ndim")
+                    raise ValueError(
+                        "must speficy either moments or shape and mom_ndim"
+                    )
                 moments = tuple(x - 1 for x in shape[-mom_ndim:])
             else:
                 raise ValueError("must specify moments")
@@ -1039,7 +1036,7 @@ class CentralMoments(object):
         cls,
         datas,
         mom_ndim=None,
-        axis=0, 
+        axis=0,
         mom=None,
         val_shape=None,
         dtype=None,
@@ -1069,14 +1066,21 @@ class CentralMoments(object):
         if dtype is None:
             dtype = datas.dtype
 
-        return (
-            cls.zeros(shape=datas.shape[1:], mom_ndim=mom_ndim, dtype=dtype, **kws)
-            .push_datas(datas=datas, axis=0)
-        )
+        return cls.zeros(
+            shape=datas.shape[1:], mom_ndim=mom_ndim, dtype=dtype, **kws
+        ).push_datas(datas=datas, axis=0)
 
     @classmethod
     def from_vals(
-        cls, x, w=None, axis=0, mom=2, val_shape=None, dtype=None, broadcast=False, **kws
+        cls,
+        x,
+        w=None,
+        axis=0,
+        mom=2,
+        val_shape=None,
+        dtype=None,
+        broadcast=False,
+        **kws,
     ):
 
         mom_ndim = cls._mom_ndim_from_mom(mom)
@@ -1086,9 +1090,8 @@ class CentralMoments(object):
         if dtype is None:
             dtype = x0.dtype
 
-        return (
-            cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws)
-            .push_vals(x=x, axis=axis, w=w, broadcast=broadcast)
+        return cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws).push_vals(
+            x=x, axis=axis, w=w, broadcast=broadcast
         )
 
     @classmethod
@@ -1145,7 +1148,13 @@ class CentralMoments(object):
         data = func(raw)
 
         return cls.from_data(
-            data, mom_ndim=mom_ndim, mom=mom, val_shape=val_shape, dtype=dtype, copy=False, **kws
+            data,
+            mom_ndim=mom_ndim,
+            mom=mom,
+            val_shape=val_shape,
+            dtype=dtype,
+            copy=False,
+            **kws,
         )
 
     @classmethod
@@ -1382,9 +1391,8 @@ class CentralMoments(object):
         if dtype is None:
             dtype = a.dtype
 
-        return (
-            cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws)
-            .push_stat(w=w, a=a, v=v)
+        return cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws).push_stat(
+            w=w, a=a, v=v
         )
 
     @classmethod
@@ -1401,8 +1409,6 @@ class CentralMoments(object):
         # get val_shape
         if val_shape is None:
             val_shape = _shape_reduce(a.shape, axis)
-        return (
-            cls.zeros(val_shape=val_shape, dtype=dtype, mom=mom, **kws)
-            .push_stats(a=a, v=v, w=w, axis=axis)
+        return cls.zeros(val_shape=val_shape, dtype=dtype, mom=mom, **kws).push_stats(
+            a=a, v=v, w=w, axis=axis
         )
-

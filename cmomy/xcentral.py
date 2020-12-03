@@ -121,10 +121,8 @@ def _xcentral_comoments(
     return out
 
 
-
 def xcentral_moments(
-        x, mom, w=None, axis=0, last=True, mom_dims=None,
-        broadcast=False,
+    x, mom, w=None, axis=0, last=True, mom_dims=None, broadcast=False,
 ):
     """
     calculate central mom along axis
@@ -163,9 +161,7 @@ def xcentral_moments(
     if isinstance(mom, int):
         mom = (mom,)
 
-    kws = dict(
-        x=x, mom=mom, w=w, axis=axis, last=last, mom_dims=mom_dims
-    )
+    kws = dict(x=x, mom=mom, w=w, axis=axis, last=last, mom_dims=mom_dims)
     if len(mom) == 1:
         func = _xcentral_moments
     else:
@@ -173,7 +169,6 @@ def xcentral_moments(
         kws["broadcast"] = broadcast
 
     return func(**kws)
-
 
 
 def _attributes_from_xr(da, dim=None, mom_dims=None, **kws):
@@ -209,6 +204,7 @@ def _check_xr_input(x, axis=None, mom_dims=None, **kws):
 
     kws = _attributes_from_xr(x, dim=dim, mom_dims=mom_dims, **kws)
     return kws, axis, values
+
 
 def _wrap_like(da, x):
     """
@@ -282,12 +278,12 @@ class xCentralMoments(central.CentralMoments):
         name=None,
         indexes=None,
         mom_dims=None,
-        **kws
+        **kws,
     ):
 
         if isinstance(data, xr.DataArray):
             if mom_dims is None:
-                mom_dims = data.dims[-mom_ndim :]
+                mom_dims = data.dims[-mom_ndim:]
             else:
                 if isinstance(mom_dims, str):
                     mom_dims = [mom_dims]
@@ -299,13 +295,20 @@ class xCentralMoments(central.CentralMoments):
             self._xdata = data
 
         else:
-            data = self._wrap_data_with_xr(data=data, mom_ndim=mom_ndim, dims=dims, coords=coords, attrs=attrs, name=name, indexes=indexes, mom_dims=mom_dims)
+            data = self._wrap_data_with_xr(
+                data=data,
+                mom_ndim=mom_ndim,
+                dims=dims,
+                coords=coords,
+                attrs=attrs,
+                name=name,
+                indexes=indexes,
+                mom_dims=mom_dims,
+            )
 
         self._xdata = data
         # TODO: data.data or data.values?
         super(xCentralMoments, self).__init__(data=data.data, mom_ndim=mom_ndim)
-
-
 
     @property
     def values(self):
@@ -357,7 +360,7 @@ class xCentralMoments(central.CentralMoments):
 
     @property
     def mom_dims(self):
-        return self.dims[-self.mom_ndim:]
+        return self.dims[-self.mom_ndim :]
 
     @property
     def _one_like_val(self):
@@ -368,7 +371,7 @@ class xCentralMoments(central.CentralMoments):
         return xr.zeros_like(self._template_val)
 
     def new_like(
-            self, data=None, verify=False, check=False, copy=False, copy_kws=None, **kws
+        self, data=None, verify=False, check=False, copy=False, copy_kws=None, **kws
     ):
         """
         create new object like self, with new data
@@ -498,13 +501,24 @@ class xCentralMoments(central.CentralMoments):
 
         Notes
         -----
-        the resulting total shape of data is shape + (mom + 1)
+        the resulting total shape of data is shape + mom_shape
         """
 
         return super(xCentralMoments, cls).zeros(
-            mom=mom, val_shape=val_shape, mom_ndim=mom_ndim, shape=shape, dtype=dtype, zeros_kws=zeros_kws,
-            dims=dims, coords=coords, attrs=attrs, name=name, indexes=indexes, mom_dims=mom_dims, **kws)
-
+            mom=mom,
+            val_shape=val_shape,
+            mom_ndim=mom_ndim,
+            shape=shape,
+            dtype=dtype,
+            zeros_kws=zeros_kws,
+            dims=dims,
+            coords=coords,
+            attrs=attrs,
+            name=name,
+            indexes=indexes,
+            mom_dims=mom_dims,
+            **kws,
+        )
 
     ###########################################################################
     # xarray specific methods
@@ -756,8 +770,6 @@ class xCentralMoments(central.CentralMoments):
     def rmom(self):
         return self._wrap_like(super(xCentralMoments, self).rmom())
 
-
-
     def resample_and_reduce(
         self,
         freq=None,
@@ -840,8 +852,6 @@ class xCentralMoments(central.CentralMoments):
 
     #     if not isinstance(indices, xr.DataArray):
 
-
-
     def _wrap_axis(self, axis, default=0, ndim=None):
         # if isinstance(axis, str):
         #     axis = self._xdata.get_axis_num(axis)
@@ -854,7 +864,6 @@ class xCentralMoments(central.CentralMoments):
             return super(xCentralMoments, self)._wrap_axis(
                 axis=axis, default=default, ndim=ndim
             )
-
 
     @classmethod
     def from_data(
@@ -940,7 +949,13 @@ class xCentralMoments(central.CentralMoments):
         )
 
         return super(xCentralMoments, cls).from_datas(
-            datas=values, mom=mom, mom_ndim=mom_ndim, axis=axis, val_shape=val_shape, dtype=dtype, **kws
+            datas=values,
+            mom=mom,
+            mom_ndim=mom_ndim,
+            axis=axis,
+            val_shape=val_shape,
+            dtype=dtype,
+            **kws,
         )
 
     def to_raw(self):
@@ -979,7 +994,12 @@ class xCentralMoments(central.CentralMoments):
         )
 
         return super(xCentralMoments, cls).from_raw(
-            raw=values, mom_ndim=mom_ndim, mom=mom, val_shape=val_shape, dtype=dtype, **kws
+            raw=values,
+            mom_ndim=mom_ndim,
+            mom=mom,
+            val_shape=val_shape,
+            dtype=dtype,
+            **kws,
         )
 
     @classmethod
@@ -1011,9 +1031,14 @@ class xCentralMoments(central.CentralMoments):
         )
 
         super(xCentralMoments, cls).from_raws(
-            values, mom=mom, mom_ndim=mom_ndim, axis=axis, val_shape=val_shape, dtype=dtype, **kws
+            values,
+            mom=mom,
+            mom_ndim=mom_ndim,
+            axis=axis,
+            val_shape=val_shape,
+            dtype=dtype,
+            **kws,
         )
-
 
     @classmethod
     def from_vals(
@@ -1047,9 +1072,14 @@ class xCentralMoments(central.CentralMoments):
         )
 
         return super(xCentralMoments, cls).from_vals(
-            x, w=w, axis=axis, mom=mom, val_shape=val_shape, dtype=dtype,
+            x,
+            w=w,
+            axis=axis,
+            mom=mom,
+            val_shape=val_shape,
+            dtype=dtype,
             broadcast=broadcast,
-            **kws
+            **kws,
         )
 
     @classmethod
@@ -1113,7 +1143,6 @@ class xCentralMoments(central.CentralMoments):
             resample_kws=resample_kws,
             **kws,
         )
-
 
     @classmethod
     def from_stat(
@@ -1194,141 +1223,3 @@ class xCentralMoments(central.CentralMoments):
             # .transpose(...,*self.mom_dims)
         )
         return type(self).from_data(values, mom_ndim=self.mom_ndim, copy=copy, **kws)
-
-
-# class xCentralMomentsCov(xCentralMoments, CentralMomentsCov):
-#     _mom_ndim = 2
-
-    # def _single_index_selector(
-    #     self, val, dim_combined="variable", coords_combined=None, select=True
-    # ):
-    #     idxs = self._single_index(1)[-self._mom_ndim :]
-    #     if coords_combined is None:
-    #         coords_combined = self.mom_dims
-
-    #     selector = {
-    #         dim: xr.DataArray(idx, dims=dim_combined)
-    #         for dim, idx in zip(self.mom_dims, idxs)
-    #     }
-    #     if select:
-    #         return self.values.isel(**selector).assign_coords(
-    #             **{dim_combined: list(coords_combined)}
-    #         )
-    #     else:
-    #         return selector
-
-    #     return selector
-
-    # # have to do some special stuff for mean/var
-    # # due to xarray special indexing
-    # def mean(self, dim_combined="variable", coords_combined=None):
-    #     return self._single_index_selector(
-    #         val=1, dim_combined=dim_combined, coords_combined=coords_combined
-    #     )
-
-    # def var(self, dim_combined="variable", coords_combined=None):
-    #     return self._single_index_selector(
-    #         val=2, dim_combined=dim_combined, coords_combined=coords_combined
-    #     )
-
-    # def cmom(self):
-    #     return self._wrap_like(super(xCentralMomentsCov, self).cmom())
-
-    # def rmom(self):
-    #     return self._wrap_like(super(xCentralMomentsCov, self).rmom())
-
-    # @classmethod
-    # def from_vals(
-    #     cls,
-    #     x,
-    #     y,
-    #     w=None,
-    #     axis=0,
-    #     mom=2,
-    #     broadcast=False,
-    #     shape=None,
-    #     dtype=None,
-    #     dims=None,
-    #     attrs=None,
-    #     coords=None,
-    #     indexes=None,
-    #     name=None,
-    #     mom_dims=None,
-    # ):
-
-    #     kws, axis, values = _check_xr_input(
-    #         x,
-    #         axis=axis,
-    #         mom_dims=mom_dims,
-    #         dims=dims,
-    #         attrs=attrs,
-    #         coords=coords,
-    #         indexes=indexes,
-    #         name=name,
-    #     )
-
-    #     return super(xCentralMomentsCov, cls).from_vals(
-    #         x=x,
-    #         y=y,
-    #         w=w,
-    #         axis=axis,
-    #         mom=mom,
-    #         broadcast=broadcast,
-    #         shape=shape,
-    #         dtype=dtype,
-    #         **kws,
-    #     )
-
-    # @classmethod
-    # def from_resample_vals(
-    #     cls,
-    #     x,
-    #     y,
-    #     freq=None,
-    #     indices=None,
-    #     nrep=None,
-    #     w=None,
-    #     axis=0,
-    #     mom=2,
-    #     rep_dim="rep",
-    #     broadcast=False,
-    #     dtype=None,
-    #     resample_kws=None,
-    #     dims=None,
-    #     attrs=None,
-    #     coords=None,
-    #     indexes=None,
-    #     name=None,
-    #     mom_dims=None,
-    # ):
-
-    #     kws, axis, values = _check_xr_input(
-    #         x,
-    #         axis=axis,
-    #         mom_dims=mom_dims,
-    #         dims=dims,
-    #         attrs=attrs,
-    #         coords=coords,
-    #         indexes=indexes,
-    #         name=name,
-    #     )
-
-    #     if kws["dims"] is not None:
-    #         kws["dims"] = (rep_dim,) + tuple(kws["dims"])
-
-    #     y, w = _order_like(x, y, w)
-
-    #     return super(xCentralMomentsCov, cls).from_resample_vals(
-    #         x=x,
-    #         y=y,
-    #         freq=freq,
-    #         indices=indices,
-    #         nrep=nrep,
-    #         w=w,
-    #         axis=axis,
-    #         mom=mom,
-    #         broadcast=broadcast,
-    #         dtype=dtype,
-    #         resample_kws=resample_kws,
-    #         **kws,
-    #     )
