@@ -777,6 +777,7 @@ class xCentralMoments(central.CentralMoments):
         nrep=None,
         axis=None,
         rep_dim="rep",
+        parallel=True,
         resample_kws=None,
         **kwargs,
     ):
@@ -808,6 +809,7 @@ class xCentralMoments(central.CentralMoments):
             indices=indices,
             nrep=nrep,
             axis=axis,
+            parallel=parallel,
             resample_kws=resample_kws,
             **kwargs,
         )
@@ -1095,6 +1097,7 @@ class xCentralMoments(central.CentralMoments):
         rep_dim="rep",
         dtype=None,
         broadcast=False,
+        parallel=True,
         resample_kws=None,
         dims=None,
         attrs=None,
@@ -1140,6 +1143,7 @@ class xCentralMoments(central.CentralMoments):
             mom=mom,
             dtype=dtype,
             broadcast=broadcast,
+            parallel=parallel,
             resample_kws=resample_kws,
             **kws,
         )

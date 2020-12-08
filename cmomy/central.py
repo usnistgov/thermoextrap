@@ -1106,6 +1106,7 @@ class CentralMoments(object):
         mom=2,
         dtype=None,
         broadcast=False,
+        parallel=True,
         resample_kws=None,
         **kws,
     ):
@@ -1127,6 +1128,7 @@ class CentralMoments(object):
             axis=axis,
             w=w,
             mom_ndim=mom_ndim,
+            parallel=parallel,
             **resample_kws,
             broadcast=broadcast,
         )
@@ -1193,7 +1195,9 @@ class CentralMoments(object):
 
     # Universal reducers
     def resample_and_reduce(
-        self, freq=None, indices=None, nrep=None, axis=None, resample_kws=None, **kws,
+        self, freq=None, indices=None, nrep=None, axis=None,
+            parallel=True,
+            resample_kws=None, **kws,
     ):
         """
         bootstrap resample and reduce
@@ -1209,8 +1213,10 @@ class CentralMoments(object):
             if specified, create idx array with this number of replicates 
         axis : int, Default=0
             axis to resample and reduce along
+        parallel : bool, default=True
+            flags to `numba.njit`
         resample_kws : dict
-            extra arguments to resample.resample_and_reduce
+            extra arguments to `cmomy.resample.resample_and_reduce`
         args : tuple
             extra positional arguments to from_data method
         kwargs : dict
@@ -1224,7 +1230,9 @@ class CentralMoments(object):
         freq = randsamp_freq(
             nrep=nrep, indices=indices, freq=freq, size=self.val_shape[axis], check=True
         )
-        data = resample_data(self.data, freq, mom=self.mom, axis=axis, **resample_kws)
+        data = resample_data(self.data, freq, mom=self.mom, axis=axis,
+                             parallel=parallel,
+                             **resample_kws)
         return type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
 
     def resample(self, indices, axis=0, first=True, **kws):
