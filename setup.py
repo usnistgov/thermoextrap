@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='cmomy',
       version='0.0.1',
@@ -15,7 +15,7 @@ setup(name='cmomy',
       author='William Krekelberg',
       author_email='wpk@nist.gov',
       license='NIST license https://www.nist.gov/director/licensing',
-      packages=['cmomy'],
+      packages=find_packages(), #['cmomy'],
       install_requires=[
 #          'numpy>=1.13.3',
 #          'pandas>=0.21.0',
@@ -25,5 +25,6 @@ setup(name='cmomy',
       # testing
       setup_requires=['pytest-runner'],
       tests_require=['pytest'],
+      test_suite='pytest',
       include_package_data=True,
       zip_safe=False)
