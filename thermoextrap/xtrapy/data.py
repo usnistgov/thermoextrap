@@ -236,6 +236,7 @@ class DataValuesBase(AbstractData):
         skipna=False,
         chunk=None,
         compute=None,
+        build_aves_kws=None,
         **kws,
     ):
         """
@@ -283,6 +284,11 @@ class DataValuesBase(AbstractData):
             else:
                 compute = True
 
+        if build_aves_kws is None:
+            build_aves_kws = {}
+
+        self.build_aves_kws = build_aves_kws
+
         self.uv = uv
         self.xv = xv
         self._order = order
@@ -311,6 +317,7 @@ class DataValuesBase(AbstractData):
         skipna=False,
         chunk=None,
         compute=None,
+        build_aves_kws=None,
         **kws,
     ):
         """
@@ -364,6 +371,7 @@ class DataValuesBase(AbstractData):
             skipna=skipna,
             chunk=chunk,
             compute=compute,
+            build_aves_kws=build_aves_kws,
             **kws,
         )
 
@@ -431,6 +439,7 @@ class DataValuesBase(AbstractData):
             skipna=self.skipna,
             chunk=chunk,
             compute=compute,
+            build_aves_kws=self.build_aves_kws,
             **self.kws,
         )
 
@@ -635,7 +644,7 @@ class DataValues(DataValuesBase):
             rec=self.rec,
             moment=self.mom_u,
             deriv=self.deriv,
-            **self.kws,
+            **self.build_aves_kws,
         )
 
     @gcached()
@@ -693,7 +702,7 @@ class DataValuesCentral(DataValuesBase):
             rec=self.rec,
             moment=self.mom_u,
             deriv=self.deriv,
-            **self.kws,
+            **self.build_aves_kws,
         )
 
     @gcached()
@@ -950,9 +959,6 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         if axis is None:
             axis = self.rec
-        if resample_kws is None:
-            resample_kws = {}
-        resample_kws["parallel"] = parallel
 
         dxdu_new = self.dxduave.resample_and_reduce(
             freq=freq,
@@ -961,6 +967,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             axis=axis,
             rep_dim=rep,
             resample_kws=resample_kws,
+            parallel=parallel,
             **kwargs,
         )
         return self.new_like(dxduave=dxdu_new, rec=rep)
@@ -1112,10 +1119,6 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         """
 
-        if resample_kws is None:
-            resample_kws = {}
-        resample_kws["parallel"] = parallel
-
         dxduave = xcentral.xCentralMoments.from_resample_vals(
             x=(xv, uv),
             w=w,
@@ -1124,6 +1127,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             nrep=nrep,
             axis=axis,
             mom=(1, order),
+            parallel=parallel,
             resample_kws=resample_kws,
             broadcast=broadcast,
             dtype=dtype,
@@ -1547,9 +1551,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         Resample data
         """
 
-        if resample_kws is None:
-            resample_kws = {}
-        resample_kws["parallel"] = parallel
 
         if axis is None:
             axis = self.rec
@@ -1562,6 +1563,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             nrep=nrep,
             axis=axis,
             mom=(1, self.order),
+            parallel=parallel,
             resample_kws=resample_kws,
             broadcast=True,
             rep_dim=rep,
