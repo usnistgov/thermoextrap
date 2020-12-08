@@ -1,0 +1,21 @@
+* Package for analyzing central moments
+
+  For example usage, look at[[file:examples/example_usage.ipynb][ example_usage.ipynb]]
+
+* Installation
+** From source
+   #+begin_src
+$ cd directory/path
+$ git clone https://github.com/wpk-nist-gov/cmomy.git
+
+# for editable use -e 
+pip install .
+   #+end_src
+** pip install
+   #+begin_src
+pip install -U git+https://github.com/wpk-nist-gov/cmomy.git@develop
+   #+end_src
+   
+   
+
+  
