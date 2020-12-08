@@ -344,7 +344,7 @@ class CentralMoments(object):
         else:
             return (np.prod(self.val_shape),)
 
-   @property
+    @property
     def shape_flat(self):
         return self.val_shape_flat + self.mom_shape
 

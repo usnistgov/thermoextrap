@@ -1106,9 +1106,9 @@ class xCentralMoments(central.CentralMoments):
 
         mom_ndim = cls._mom_ndim_from_mom(mom)
         if mom_ndim == 1:
-            ys = ()
+            y = None
         else:
-            x, *ys = x
+            x, y = x
 
         kws, axis, values = _check_xr_input(
             x,
@@ -1120,15 +1120,15 @@ class xCentralMoments(central.CentralMoments):
             indexes=indexes,
             name=name,
         )
-
+        
         if kws["dims"] is not None:
             kws["dims"] = (rep_dim,) + tuple(kws["dims"])
 
         # reorder
         w = _order_like(x, w)
-        if ys:
-            ys = _order_like(x, *ys)
-        x = (x,) + ys
+        if y is not None:
+            y = _order_like(x, y)
+            x = (x, y)
 
         return super(xCentralMoments, cls).from_resample_vals(
             x=x,

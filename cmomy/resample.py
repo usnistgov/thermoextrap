@@ -142,7 +142,7 @@ def resample_data(
     dtype=None,
     order=None,
     fastmath=True,
-    parallel=False,
+    parallel=True,
     pusher=None,
     out=None,
 ):
@@ -274,7 +274,7 @@ def resample_vals(
     dtype=None,
     order=None,
     fastmath=True,
-    parallel=False,
+    parallel=True,
     pusher=None,
     out=None,
 ):
