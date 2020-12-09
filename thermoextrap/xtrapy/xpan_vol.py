@@ -159,12 +159,12 @@ class DataValuesVolume(DataValues):
 
 
 def factory_extrapmodel(
+    volume,
     uv,
     xv,
-    order,
     dxdqv,
-    volume,
-    ndim=1,
+    ndim=3,
+    order=1,
     alpha_name="volume",
     rec="rec",
     val="val",
@@ -176,8 +176,6 @@ def factory_extrapmodel(
 
     Parameters
     ----------
-    order : int
-        maximum order
     volume : float
         reference value of volume
     uv, xv : array-like
@@ -186,10 +184,10 @@ def factory_extrapmodel(
     dxdqv : array-like
         values of `sum dx/dq_i q_i` where `q_i` is the ith coordinate
         This array is wrapped with `cmomy.data.xrwrap_xv`
-    beta : float
-        value of inverse temperature
-    ndim : int
+    ndim : int, default=3
         number of dimensions
+    order : int, default=1
+        maximum order.  Only `order=1` is currently supported
     alpha_name, str, default='volume'
         name of expansion parameter
     kws : dict
@@ -199,6 +197,9 @@ def factory_extrapmodel(
     -------
     extrapmodel : ExtrapModel object
     """
+
+    if order != 1:
+        raise ValueError('only order=1 is supported')
 
     dxdqv = xrwrap_xv(dxdqv, rec="rec", rep="rep", deriv=None, val=val)
     data = DataValuesVolume.from_vals(

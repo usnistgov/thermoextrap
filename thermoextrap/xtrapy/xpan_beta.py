@@ -335,7 +335,7 @@ def factory_coefs(xalpha=False, central=False):
 
 
 def factory_extrapmodel(
-    alpha0,
+    beta,
     data,
     xalpha=None,
     central=None,
@@ -348,8 +348,8 @@ def factory_extrapmodel(
 
     Parameters
     ----------
-    alpha0 : float
-        reference value of alpha (beta)
+    beta : float
+        reference value of inverse temperature
     data : Data object
         data object to consider.
         See data.AbstractData
@@ -387,7 +387,7 @@ def factory_extrapmodel(
 
     coefs = factory_coefs(xalpha=xalpha, central=central)
     return ExtrapModel(
-        alpha0=alpha0,
+        alpha0=beta,
         data=data,
         coefs=coefs,
         order=order,
@@ -396,14 +396,14 @@ def factory_extrapmodel(
     )
 
 
-def factory_perturbmodel(alpha0, uv, xv, alpha_name="beta", **kws):
+def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     """
     factory function to create PerturbModel for beta expansion
 
     Parameters
     ----------
-    alpha0 : float
-        reference value of beta
+    beta : float
+        reference value of inverse temperature
     uv, xv : array-like
         values of u and x
     alpha_name : str, default='beta'
@@ -416,4 +416,4 @@ def factory_perturbmodel(alpha0, uv, xv, alpha_name="beta", **kws):
     perturbmodel : PerturbModel object
     """
     data = factory_data(uv=uv, xv=xv, order=0, central=False, **kws)
-    return PerturbModel(alpha0=alpha0, data=data, alpha_name=alpha_name)
+    return PerturbModel(alpha0=beta, data=data, alpha_name=alpha_name)
