@@ -1,6 +1,5 @@
-
 """
-Routines for volume expansion(s)
+Routines for volume expansion(s) of ideal gas
 """
 
 from __future__ import absolute_import
@@ -12,14 +11,14 @@ import sympy as sp
 
 from .cached_decorators import gcached
 from .core import _get_default_symbol, _get_default_indexed
-from .core import DataTemplateValues, DatasetSelector
+# from .core import DataTemplateValues, DatasetSelector
 from .core import SymSubs, Coefs
 from .core import ExtrapModel, PerturbModel
 
-from .xpan_beta import Data
+from .xpan_beta import factory_data
+#from .data import DataCentralMoments, DataCentralMomentsVals
 
 #Lazily imported everything above - will trim down later
-
 #Need funcs to pass to Coefs class
 #Just needs to be indexable based on order, so...
 # d^n X / d V^n = funcs[n](*args)
@@ -35,11 +34,11 @@ class VolumeDerivFuncsIG(object):
        Only go to first order for volume extrapolation.
        Here W represents the virial instead of the potential energy.
     """
-
-    # args = volume, beta, ndim
-
-    def __init__(self):
-        pass
+    def __init__(self, refV=1.0):
+        #If do not set refV, assumes virial data is already divided by the reference volume
+        #If this is not the case, need to set refV
+        #Or if need refV to also compute custom term, need to specify
+        self.refV = refV
 
     def __getitem__(self, order):
         #Check to make sure not going past first order
@@ -54,22 +53,25 @@ class VolumeDerivFuncsIG(object):
         #Works only because of local scope
         #Even if order is defined somewhere outside of this class, won't affect returned func
 
-        def func(W, xW, volume, beta, ndim=1):
-            #Zeroth order derivative
+        def func(W, xW):
+
             if order == 0:
+                #Zeroth order derivative
                 deriv_val =  xW[0]
-            #First order derivative
+
             else:
-                deriv_val = beta / (volume * ndim) * (xW[1] - xW[0]*W[1]) 
+                #First order derivative
+                deriv_val = (xW[1] - xW[0]*W[1]) / (self.refV) #No 3 b/c our IG is 1D
                 #Term unique to Ideal Gas... <x>/L
-                #Replace with whatever is ap propriate to observable of interest
-                deriv_val += xW[0] * beta / (volume * ndim)
+                #Replace with whatever is appropriate to observable of interest
+                deriv_val += (xW[0] / self.refV)
             return deriv_val
 
         return func
 
+
 @lru_cache(5)
-def factory_coefs_volume():
+def factory_coefs(refV=1.0):
     """
     factory function to provide coefficients of expansion
 
@@ -81,39 +83,12 @@ def factory_coefs_volume():
     -------
     coefs : Coefs object used to calculate moments
     """
-    deriv_funcs = VolumeDerivFuncsIG()
+    deriv_funcs = VolumeDerivFuncsIG(refV=refV)
     return Coefs(deriv_funcs)
 
 
-# make a special data class
-class DataSpecial(Data):
-
-    def __init__(self, uv, xv, order,
-                 volume, beta, ndim=1,
-                 skipna=False, xalpha=False, rec='rec', moment='moment', val='val', rep='rep', deriv='deriv', chunk=None, compute=None, **kws):
-
-        super(DataSpecial, self).__init__(
-            uv=uv,
-            xv=xv,
-            order=order, skipna=skipna,
-            xalpha=xalpha, rec=rec, moment=moment, val=val, rep=rep, deriv=deriv, chunk=chunk, compute=compute, **kws)
-
-        self.volume = volume
-        self.beta = beta
-        self.ndim = ndim
-
-    @property
-    def xcoefs_args(self):
-        return (self.u_selector, self.xu_selector, self.volume, self.beta, self.ndim)
-
-
-
-
-
-def factory_extrapmodel_volume(
-        order, uv, xv,
-        volume, beta, ndim=1,
-        alpha_name='volume', **kws
+def factory_extrapmodel(
+        order, alpha0, uv, xv, alpha_name='volume', **kws
 ):
     """
     factory function to create Extrapolation model for volume expansion
@@ -122,14 +97,10 @@ def factory_extrapmodel_volume(
     ----------
     order : int
         maximum order
-    volume : float
+    alpha0 : float
         reference value of volume
     uv, xv : array-like
         values for u and x
-    beta : float
-        value of inverse temperature
-    ndim : int
-        number of dimensions
     alpha_name, str, default='volume'
         name of expansion parameter
     kws : dict
@@ -139,15 +110,44 @@ def factory_extrapmodel_volume(
     -------
     extrapmodel : ExtrapModel object
     """
-    data = DataSpecial(uv=uv, xv=xv, order=order, volume=volume, beta=beta, ndim=ndim,
-                       xalpha=False, **kws
-
+    data = factory_data(
+        uv=uv, xv=xv, order=order, central=False, xalpha=False, **kws
     )
-
-    coefs = factory_coefs_volume()
+    coefs = factory_coefs(refV=alpha0)
     return ExtrapModel(
-        alpha0=volume, data=data, coefs=coefs, order=order, minus_log=False,
+        alpha0=alpha0, data=data, coefs=coefs, order=order, minus_log=False,
         alpha_name=alpha_name
     )
 
 
+
+def factory_extrapmodel_data(
+        alpha0, data, order=None, alpha_name='volume'
+):
+    """
+    factory function to create Extrapolation model for volume expansion
+
+    Parameters
+    ----------
+    alpha0 : float
+        reference value of volume
+    data : data object
+        Note that this data object should have central=False, deriv=None
+    alpha_name, str, default='volume'
+        name of expansion parameter
+    Returns
+    -------
+    extrapmodel : ExtrapModel object
+    """
+
+    if order is None:
+        order = data.order
+
+    assert not data.central
+    assert data.deriv is None
+
+    coefs = factory_coefs_volume(refV=alpha0)
+    return ExtrapModel(
+        alpha0=alpha0, data=data, coefs=coefs, order=order, minus_log=False,
+        alpha_name=alpha_name
+    )

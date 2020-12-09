@@ -262,7 +262,8 @@ class DataValuesBase(AbstractData):
         compute : bool, optional
             whether to perform compute step on xarray outputs
         **kws : dict
-            extra keyword arguments
+            extra keyword arguments.
+            To be used in subclasses with care
         """
 
         assert isinstance(uv, xr.DataArray)
@@ -301,6 +302,7 @@ class DataValuesBase(AbstractData):
         self.rec = rec
         self.mom_u = mom_u
         self.deriv = deriv
+
         self.kws = kws
 
     @classmethod
@@ -386,6 +388,18 @@ class DataValuesBase(AbstractData):
     def __len__(self):
         return len(self.uv[self.rec])
 
+
+    def resample_other_params(self, indices):
+        """
+        incase any other values are to be considered,
+        then this is where they should be resampled
+
+        Returns
+        -------
+        other_params : transformed version of self.other_params
+        """
+        return self.kws
+
     def resample(self, indices=None, nrep=None, rep="rep", chunk=None, compute="None"):
         """
         resample object
@@ -428,6 +442,7 @@ class DataValuesBase(AbstractData):
 
         uv = self.uv.compute()[indices]
         xv = self.xv.compute().isel(**{self.rec: indices})
+        kws = self.resample_other_params(indices)
 
         return self.__class__(
             uv=uv,
@@ -440,7 +455,7 @@ class DataValuesBase(AbstractData):
             chunk=chunk,
             compute=compute,
             build_aves_kws=self.build_aves_kws,
-            **self.kws,
+            **kws,
         )
 
 
