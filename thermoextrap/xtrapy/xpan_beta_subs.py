@@ -353,7 +353,7 @@ class _SubsBeta_xalpha(_SubsBeta):
 
 
 @lru_cache(5)
-def factory_coefs_beta(xalpha=False, central=False):
+def factory_coefs(xalpha=False, central=False):
     derivs = _SymDerivBeta()
 
     if xalpha:
