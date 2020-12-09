@@ -88,7 +88,7 @@ def factory_coefs(refV=1.0):
 
 
 def factory_extrapmodel(
-        order, alpha0, uv, xv, alpha_name='volume', **kws
+        volume, uv, xv, order=1, alpha_name='volume', **kws
 ):
     """
     factory function to create Extrapolation model for volume expansion
@@ -97,7 +97,7 @@ def factory_extrapmodel(
     ----------
     order : int
         maximum order
-    alpha0 : float
+    volume : float
         reference value of volume
     uv, xv : array-like
         values for u and x
@@ -110,26 +110,30 @@ def factory_extrapmodel(
     -------
     extrapmodel : ExtrapModel object
     """
+
+    if order != 1:
+        raise ValueError('only first order supported')
+
     data = factory_data(
         uv=uv, xv=xv, order=order, central=False, xalpha=False, **kws
     )
-    coefs = factory_coefs(refV=alpha0)
+    coefs = factory_coefs(refV=volume)
     return ExtrapModel(
-        alpha0=alpha0, data=data, coefs=coefs, order=order, minus_log=False,
+        alpha0=volume, data=data, coefs=coefs, order=order, minus_log=False,
         alpha_name=alpha_name
     )
 
 
 
 def factory_extrapmodel_data(
-        alpha0, data, order=None, alpha_name='volume'
+        volume, data, order=1, alpha_name='volume'
 ):
     """
     factory function to create Extrapolation model for volume expansion
 
     Parameters
     ----------
-    alpha0 : float
+    volume : float
         reference value of volume
     data : data object
         Note that this data object should have central=False, deriv=None
@@ -143,11 +147,15 @@ def factory_extrapmodel_data(
     if order is None:
         order = data.order
 
+    if order != 1:
+        raise ValueError('only first order supported')
+
+
     assert not data.central
     assert data.deriv is None
 
-    coefs = factory_coefs_volume(refV=alpha0)
+    coefs = factory_coefs(refV=volume)
     return ExtrapModel(
-        alpha0=alpha0, data=data, coefs=coefs, order=order, minus_log=False,
+        alpha0=volume, data=data, coefs=coefs, order=order, minus_log=False,
         alpha_name=alpha_name
     )

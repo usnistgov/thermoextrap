@@ -304,8 +304,17 @@ class ExtrapModel(object):
 
 
 class StateCollection(object):
-    def __init__(self, states):
+    def __init__(self, states): #, **kws):
+        """
+        Parameters
+        ----------
+        states : list
+            list of states to consider
+            Note that some subclasses require this list to be sorted
+        """
+
         self.states = states
+        #self.kws = kws
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -340,11 +349,10 @@ class StateCollection(object):
             assert len(freq) == len(self)
 
 
-            return self.__class__(
+            return type(self)(
                 states=tuple(
                     state.resample(indices=idx, nrep=nrep, freq=fq, **kws)
-                    for state, idx, fq in zip(self.states, indices, freq)
-                )
+                    for state, idx, fq in zip(self.states, indices, freq))
             )
 
         else:
@@ -359,6 +367,11 @@ class StateCollection(object):
     def order(self):
         return min([m.order for m in self])
 
+    @gcached()
+    def alpha0(self):
+        return [m.alpha0 for m in self]
+
+
 
 def xr_weights_minkowski(deltas, m=20, dim="state"):
     deltas_m = deltas ** m
@@ -366,6 +379,33 @@ def xr_weights_minkowski(deltas, m=20, dim="state"):
 
 
 class ExtrapWeightedModel(StateCollection):
+
+    def _states_between_alpha(self, alpha):
+        idx = np.digitize(alpha, self.alpha0, right=False) - 1
+        if idx < 0:
+            idx = 0
+        elif idx == len(self) - 1:
+            idx = len(self) - 2
+
+        return self.states[idx:idx+2]
+
+
+    def _states_nearest_alpha(self, alpha):
+        dalpha = np.abs(np.array(self.alpha0) - alpha)
+        # two lowest
+        idx = np.argsort(dalpha)[:2]
+        return [self[i] for i in idx]
+
+
+    def _states_alpha(self, alpha, method):
+        if method is None or method=='between':
+            return self._states_between_alpha(alpha)
+        elif method == 'nearest':
+            return self._states_nearest_alpha(alpha)
+        else:
+            raise ValueError('unknown method {}'.format(method))
+
+
     def predict(
         self,
         alpha,
@@ -374,12 +414,52 @@ class ExtrapWeightedModel(StateCollection):
         cumsum=False,
         minus_log=None,
         alpha_name=None,
+        method=None,
     ):
+        """
+        Parameters
+        ----------
+        method : {None, 'between', 'nearest'}
+            method to select which models are chosen to predict value for given
+            value of alpha.
+            * None or between: use states such that `state[i].alpha0 <= alpha < states[i+1]`
+              if alpha < state[0].alpha0 use first two states
+              if alpha > states[-1].alpha0 use last two states
+            * nearest: use two states with minimum `abs(state[k].alpha0 - alpha)`
+
+        Notes
+        -----
+        This requires that self.states are ordered in ascending alpha0 order
+        """
+
+        if alpha_name is None:
+            alpha_name = self.alpha_name
 
         if order is None:
             order = self.order
         if alpha_name is None:
             alpha_name = self.alpha_name
+
+        if len(self) == 2:
+            states = self.states
+
+        else:
+            # multiple states
+            if np.array(alpha).ndim > 0:
+                # have multiple alphas
+                # recursively call
+                return xr.concat(
+                    (self.predict(alpha=a, order=order,
+                                  order_name=order_name, cumsum=cumsum,
+                                  minus_log=minus_log, alpha_name=alpha_name,
+                                  method=method)
+                     for a in alpha),
+                    dim=alpha_name)
+
+            states = self._states_alpha(alpha, method)
+
+
+
 
         out = xr.concat(
             [
@@ -391,7 +471,7 @@ class ExtrapWeightedModel(StateCollection):
                     minus_log=minus_log,
                     alpha_name=alpha_name,
                 )
-                for m in self.states
+                for m in states
             ],
             dim="state",
         )
@@ -536,7 +616,7 @@ class MBARModel(StateCollection):
         uv = xr.concat([m.data.uv for m in self], dim=state_name)
         alpha0 = xrwrap_alpha([m.alpha0 for m in self], name=alpha_name)
 
-        # make sure uv, xv in correct order
+        # make sure uv, xv in correct orde
         rec = self[0].data.rec
         xv = xv.transpose(state_name, rec, ...)
         uv = uv.transpose(state_name, rec, ...)
@@ -576,3 +656,6 @@ class MBARModel(StateCollection):
         ).assign_coords(alpha=alpha)
 
         return out
+
+    def resample(self, *args, **kwargs):
+        raise NotImplementedError('resample not implemented for this class')
