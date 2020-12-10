@@ -1234,6 +1234,7 @@ class CentralMoments(object):
                              **resample_kws)
         return type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
 
+
     def resample(self, indices, axis=0, first=True, **kws):
         """
         create a new object sampled from index
@@ -1273,6 +1274,7 @@ class CentralMoments(object):
             self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
         )
 
+
     def block(self, block_size=None, axis=None, **kws):
         """
         block average reduction
@@ -1309,7 +1311,6 @@ class CentralMoments(object):
         datas = data[: (nblock * block_size), ...].reshape(
             (nblock, block_size) + data.shape[1:]
         )
-
         return type(self).from_datas(datas=datas, mom_ndim=self.mom_ndim, axis=1, **kws)
 
     def reshape(self, shape, copy=True, copy_kws=None, **kws):

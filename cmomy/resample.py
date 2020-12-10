@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from functools import lru_cache
 
 import numpy as np
+import xarray as xr
 
 
 from .utils import _axis_expand_broadcast, myjit
@@ -98,12 +99,9 @@ def randsamp_freq(
     else:
         raise ValueError("must specify freq, indices, or nrep and size")
 
-
     if transpose:
         freq = freq.T
     return freq
-
-
 
 
 def resample_data(
@@ -187,14 +185,14 @@ def resample_data(
     datar = data.reshape(data_reshape)
     outr = out.reshape(out_reshape)
 
-    resample = factory_resample_data(cov=len(mom) > 1, vec=len(shape) > 0, parallel=parallel)
+    resample = factory_resample_data(
+        cov=len(mom) > 1, vec=len(shape) > 0, parallel=parallel
+    )
 
     outr.fill(0.0)
     resample(datar, freq, outr)
 
     return out
-
-
 
 
 def resample_vals(
@@ -281,7 +279,6 @@ def resample_vals(
     if cov:
         yr = y.reshape(data_reshape)
 
-
     resample = factory_resample_vals(cov=cov, vec=len(shape) > 0, parallel=parallel)
     outr.fill(0.0)
     if cov:
@@ -289,4 +286,147 @@ def resample_vals(
     else:
         resample(wr, xr, freq, outr)
 
+    return out
+
+
+def bootstrap_confidence_interval(
+    distribution, stats_val='mean', axis=0, alpha=0.05, style=None, **kws
+):
+    """
+    Calculate the error bounds
+
+    Parameters
+    ----------
+    distribution : array-like
+        distribution of values to consider
+    stats_val : array-like, {None, 'mean','median'}
+        * None: percentiles, with value as median
+        * array: perform pivotal error bounds (correct) with this as `value`.
+        * mean: pivotal error bounds with mean as value
+        * median: pivotal error bounds with median as value
+    axis : int, default=0
+        axis to analyze along
+    alpha : float
+        alpha value for confidence interval.
+        Percent confidence = `100 * (1 - alpha)`
+    kws : dict
+        extra arguments to `numpy.percentile`
+    style : {None, 'delta', 'pm'}
+        controls style of output
+
+    Returns
+    -------
+    out : array
+    fist dimension will be statistics.  Other dimensions
+    have shape of input less axis reduced over.
+    Depending on `style` first dimension will be (note val is either stats_val or median):
+
+    * None: [val, low, high]
+    * delta:  [val, val-low, high - val]
+    * pm : [val, (high - low) / 2]
+    """
+
+    if stats_val is None:
+        p_low = 100 * (alpha / 2.0)
+        p_mid = 50
+        p_high = 100 - p_low
+        val, low, high = np.percentile(
+            a=distribution, q=[p_mid, p_low, p_high], axis=axis, **kws
+        )
+
+    else:
+        if isinstance(stats_val, str):
+            if stats_val == 'mean':
+                stats_val = np.mean(distribution, axis=axis)
+            elif stats_val == 'median':
+                stats_val = np.median(distribution, axis=axis)
+            else:
+                raise ValueError('stats val should be None, mean, median, or an array')
+
+        q_high = 100 * (alpha / 2.0)
+        q_low = 100 - q_high
+        val = stats_val
+        low = 2 * stats_val - np.percentile(a=distribution, q=q_low, axis=axis, **kws)
+        high = 2 * stats_val - np.percentile(a=distribution, q=q_high, axis=axis, **kws)
+
+    if style is None:
+        out = np.array([val, low, high])
+    elif style == "delta":
+        out = np.array([val, val - low, high - val])
+    elif style == "pm":
+        out = np.array([val, (high - low) / 2.0])
+    return out
+
+
+def xbootstrap_confidence_interval(
+    x,
+    stats_val='mean',
+    axis=0,
+    dim=None,
+    alpha=0.05,
+    style=None,
+    bootstrap_dim='bootstrap',
+    bootstrap_coords=None,
+    **kws
+):
+    """
+    xarray version of bootstrap_confidence_interval
+
+    Parameters
+    ----------
+    dim : str
+        if passed, use reduce along this dimension
+    bootstrap_dim : str, default='bootstrap'
+        name of new dimension.  If `bootstrap_dim` conflicts, then
+        `new_name = dim + new_name`
+    bootstrap_coords : array-like or str
+        coords of new dimension.
+        If `None`, use default names
+        If string, use this for the 'values' name
+    """
+
+    if dim is not None:
+        axis = x.get_axis_num(dim)
+    else:
+        dim = x.dims[axis]
+
+    template = x.isel(**{dim: 0})
+
+    if bootstrap_dim is None:
+        bootstrap_dim = 'bootstrap'
+
+    if bootstrap_dim in template.dims:
+        bootstrap_dim = '{}_{}'.format(dim, bootstrap_dim)
+    dims = (bootstrap_dim,) + template.dims
+
+    if bootstrap_coords is None:
+        if isinstance(stats_val, str):
+            bootstrap_coords = stats_val
+        else:
+            bootstrap_coords = 'stats_val'
+
+    if isinstance(bootstrap_coords, str):
+        if style is None:
+            bootstrap_coords = [bootstrap_coords, "low", "high"]
+        elif style == "delta":
+            bootstrap_coords = [bootstrap_coords, "err_low", "err_high"]
+        elif style == "pm":
+            bootstrap_coords = [bootstrap_coords, "err"]
+
+
+    if stats_val is not None and not isinstance(stats_val, str):
+        stats_val = np.array(stats_val)
+
+    out = bootstrap_confidence_interval(
+        x, stats_val=stats_val, axis=axis, alpha=alpha, style=style, **kws
+    )
+
+    out = xr.DataArray(out, dims=dims,
+                       coords=template.coords,
+                       attrs=template.attrs,
+                       name=template.name,
+                       indexes=template.indexes,
+    )
+    if bootstrap_coords is not None:
+        out.coords[bootstrap_dim] = bootstrap_coords
     return out

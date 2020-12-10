@@ -9,6 +9,7 @@ import xarray as xr
 
 from . import central
 from .cached_decorators import gcached, cached_clear
+from .utils import _xr_wrap_like, _xr_order_like
 
 
 ###############################################################################
@@ -167,7 +168,6 @@ def xcentral_moments(
     else:
         func = _xcentral_comoments
         kws["broadcast"] = broadcast
-
     return func(**kws)
 
 
@@ -206,48 +206,6 @@ def _check_xr_input(x, axis=None, mom_dims=None, **kws):
     return kws, axis, values
 
 
-def _wrap_like(da, x):
-    """
-    wrap x with xarray like da
-    """
-    x = np.asarray(x)
-    assert x.shape == da.shape
-
-    return xr.DataArray(
-        x, dims=da.dims, coords=da.coords, name=da.name, indexes=da.name
-    )
-
-
-def _order_like(template, *others):
-    """
-    given dimensions, order in same manner
-    """
-
-    if not isinstance(template, xr.DataArray):
-        out = others
-
-    else:
-        dims = template.dims
-
-        key_map = {dim: i for i, dim in enumerate(dims)}
-        key = lambda x: key_map[x]
-
-        out = []
-        for other in others:
-            if isinstance(other, xr.DataArray):
-                # reorder
-                order = sorted(other.dims, key=key)
-
-                x = other.transpose(*order)
-            else:
-                x = other
-
-            out.append(x)
-
-    if len(out) == 1:
-        out = out[0]
-
-    return out
 
 
 class xCentralMoments(central.CentralMoments):
@@ -351,7 +309,7 @@ class xCentralMoments(central.CentralMoments):
     #     return _wrap_like(self._template_val, x)
 
     def _wrap_like(self, x):
-        return _wrap_like(self._xdata, x)
+        return _xr_wrap_like(self._xdata, x)
 
     @property
     def val_dims(self):
@@ -1128,9 +1086,9 @@ class xCentralMoments(central.CentralMoments):
             kws["dims"] = (rep_dim,) + tuple(kws["dims"])
 
         # reorder
-        w = _order_like(x, w)
+        w = _xr_order_like(x, w)
         if y is not None:
-            y = _order_like(x, y)
+            y = _xr_order_like(x, y)
             x = (x, y)
 
         return super(xCentralMoments, cls).from_resample_vals(

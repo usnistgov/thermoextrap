@@ -1,12 +1,16 @@
 from __future__ import absolute_import
+
 from functools import lru_cache
 
 import numpy as np
-from numba import njit, prange
+import xarray as xr
+
+from numba import njit
 from scipy.special import binom
 
 from .cached_decorators import cached_clear, gcached
 from .options import OPTIONS
+
 
 def myjit(func):
     """
@@ -90,6 +94,45 @@ def _cached_ones(shape, dtype=None):
     return np.ones(shape, dtype=dtype)
 
 
+def _xr_wrap_like(da, x):
+    """
+    wrap x with xarray like da
+    """
+    x = np.asarray(x)
+    assert x.shape == da.shape
+
+    return xr.DataArray(
+        x, dims=da.dims, coords=da.coords, name=da.name, indexes=da.indexes
+    )
 
 
+def _xr_order_like(template, *others):
+    """
+    given dimensions, order in same manner
+    """
 
+    if not isinstance(template, xr.DataArray):
+        out = others
+
+    else:
+        dims = template.dims
+
+        key_map = {dim: i for i, dim in enumerate(dims)}
+        key = lambda x: key_map[x]
+
+        out = []
+        for other in others:
+            if isinstance(other, xr.DataArray):
+                # reorder
+                order = sorted(other.dims, key=key)
+
+                x = other.transpose(*order)
+            else:
+                x = other
+
+            out.append(x)
+
+    if len(out) == 1:
+        out = out[0]
+
+    return out
