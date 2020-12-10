@@ -18,10 +18,44 @@ from .pushers import (
 def jitter(parallel):
     return njit(fastmath=OPTIONS["fastmath"], cache=OPTIONS["cache"], parallel=parallel)
 
+
+# NOTE: this is all due to closures not being cache-able with numba
+# used to use the following
+# 
+# @lru_cache(10)
+# def _factory_resample(push_datas_scale, fastmath=True, parallel=False):
+#     @njit(fastmath=fastmath, parallel=parallel)
+#     def resample(data, freq, out):
+#         nrep = freq.shape[0]
+#         for irep in prange(nrep):
+#             push_datas_scale(out[irep, ...], data, freq[irep, ...])
+
+#     return resample
+
+# @lru_cache(10)
+# def _factory_resample_vals(push_vals_scale, fastmath=True, parallel=False):
+#     @njit(fastmath=fastmath, parallel=parallel)
+#     def resample(W, X, freq, out):
+#         nrep = freq.shape[0]
+#         for irep in prange(nrep):
+#             push_vals_scale(out[irep, ...], W, X, freq[irep, ...])
+
+#     return resample
+
+
+# @lru_cache(10)
+# def _factory_resample_vals_cov(push_vals_scale, fastmath=True, parallel=False):
+#     @njit(fastmath=fastmath, parallel=parallel)
+#     def resample(W, X, Y, freq, out):
+#         nrep = freq.shape[0]
+#         for irep in prange(nrep):
+#             push_vals_scale(out[irep, ...], W, X, Y, freq[irep, ...])
+
+#     return resample
+
 ######################################################################
 # resample data
 # mom/scalar
-
 @jitter(parallel=False)
 def _resample_data(data, freq, out):
     nrep = freq.shape[0]

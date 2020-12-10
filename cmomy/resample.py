@@ -5,11 +5,9 @@ from __future__ import absolute_import
 from functools import lru_cache
 
 import numpy as np
-# from numba import njit, prange
 
 
 from .utils import _axis_expand_broadcast, myjit
-#from .pushers import factory_pusher_datas_scale, factory_pusher_vals_scale
 from ._resample import factory_resample_data, factory_resample_vals
 
 ###############################################################################
