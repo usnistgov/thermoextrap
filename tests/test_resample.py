@@ -1,7 +1,7 @@
 import numpy as np
 
 import cmomy.central as central
-import cmomy.accumulator as accumulator
+
 
 import pytest
 

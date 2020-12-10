@@ -1011,7 +1011,6 @@ class CentralMoments(object):
 
         must pass either mom_ndim or mom
         """
-
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
         if verify:

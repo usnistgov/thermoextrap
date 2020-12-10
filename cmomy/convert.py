@@ -4,15 +4,13 @@ routines to convert central (co)moments to raw (co)moments
 from __future__ import absolute_import
 
 import numpy as np
-from numba import njit
 
-from .utils import factory_binomial
+from .utils import factory_binomial, myjit
 from .options import OPTIONS
 
 _bfac = factory_binomial(OPTIONS["nmax"])
 
-
-@njit
+@myjit
 def _central_to_raw_moments(central, raw):
     nv = central.shape[0]
     order = central.shape[1] - 1
@@ -40,7 +38,7 @@ def _central_to_raw_moments(central, raw):
             r[n] = tmp
 
 
-@njit
+@myjit
 def _raw_to_central_moments(raw, central):
     nv = central.shape[0]
     order = central.shape[1] - 1
@@ -72,7 +70,7 @@ def _raw_to_central_moments(raw, central):
 
 
 # comoments
-@njit
+@myjit
 def _central_to_raw_comoments(central, raw):
     nv = central.shape[0]
     order0 = central.shape[1] - 1
@@ -116,7 +114,7 @@ def _central_to_raw_comoments(central, raw):
                     r[n, m] = tmp
 
 
-@njit
+@myjit
 def _raw_to_central_comoments(raw, central):
     nv = central.shape[0]
     order0 = central.shape[1] - 1

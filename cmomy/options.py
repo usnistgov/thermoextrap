@@ -3,22 +3,28 @@ This sets up optional values
 """
 
 
-NMAX = 'nmax'
+NMAX = "nmax"
+FASTMATH = "fastmath"
+PARALLEL = "parallel"
+CACHE = "cache"
 
-OPTIONS = {
-    NMAX : 10,
-}
+
+OPTIONS = {NMAX: 20, PARALLEL: True, CACHE: True, FASTMATH: True}
 
 
 _isbool = lambda x: isinstance(x, bool)
-_isint  = lambda x: isinstance(x, int)
-_isstr  = lambda x: isinstance(x, str)
+_isint = lambda x: isinstance(x, int)
+_isstr = lambda x: isinstance(x, str)
 
 _VALIDATORS = {
-    NMAX : _isint,
+    NMAX: _isint,
+    PARALLEL: _isbool,
+    CACHE: _isbool,
+    FASTMATH: _isbool,
 }
 
 _SETTERS = {}
+
 
 class set_options(object):
     """Set options for xarray in a controlled context.
@@ -55,4 +61,3 @@ class set_options(object):
 
     def __exit__(self, type, value, traceback):
         self._apply_update(self.old)
-

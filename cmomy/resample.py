@@ -5,17 +5,17 @@ from __future__ import absolute_import
 from functools import lru_cache
 
 import numpy as np
-from numba import njit, prange
+# from numba import njit, prange
 
 
-from .utils import _axis_expand_broadcast
-from .pushers import factory_pusher_datas_scale, factory_pusher_vals_scale
-
+from .utils import _axis_expand_broadcast, myjit
+#from .pushers import factory_pusher_datas_scale, factory_pusher_vals_scale
+from ._resample import factory_resample_data, factory_resample_vals
 
 ###############################################################################
 # resampling
 ###############################################################################
-@njit
+@myjit
 def _randsamp_freq_out(freq):
     nrep = freq.shape[0]
     ndat = freq.shape[1]
@@ -25,7 +25,7 @@ def _randsamp_freq_out(freq):
             freq[i, index] += 1
 
 
-@njit
+@myjit
 def _randsamp_freq_indices(indices, freq):
     assert freq.shape == indices.shape
     nrep, ndat = freq.shape
@@ -100,38 +100,12 @@ def randsamp_freq(
     else:
         raise ValueError("must specify freq, indices, or nrep and size")
 
-    # if indices is not None:
-    #     indices = np.asarray(indices, dtype=np.int64)
-    #     if nrep is None:
-    #         nrep = indices.shape[0]
-    #     if size is None:
-    #         size = indices.shape[1]
-    #     if indices.shape != (nrep, size):
-    #         raise ValueError('passed indices shape {indices.shape} doesn not match {(nrep, size)}')
-
-    # elif nrep is None or size is None:
-    #     raise ValueError('must specify nrep and size or indices')
-
-    # freq = np.zeros((nrep, size), dtype=np.int64)
-    # if indices is None:
-    #     _randsamp_freq_out(freq)
-    # else:
-    #     _randsamp_freq_indices(indices, freq)
 
     if transpose:
         freq = freq.T
     return freq
 
 
-@lru_cache(10)
-def _factory_resample(push_datas_scale, fastmath=True, parallel=False):
-    @njit(fastmath=fastmath, parallel=parallel)
-    def resample(data, freq, out):
-        nrep = freq.shape[0]
-        for irep in prange(nrep):
-            push_datas_scale(out[irep, ...], data, freq[irep, ...])
-
-    return resample
 
 
 def resample_data(
@@ -216,51 +190,14 @@ def resample_data(
     datar = data.reshape(data_reshape)
     outr = out.reshape(out_reshape)
 
-    # get resampler
-    if pusher is None:
-        pusher = factory_pusher_datas_scale(cov=len(mom) > 1, vec=len(shape) > 0)
+    resample = factory_resample_data(cov=len(mom) > 1, vec=len(shape) > 0, parallel=parallel)
 
-        # if len(mom) == 1:
-        #     if shape == ():
-        #         pusher = _push_datas_scale
-        #     else:
-        #         pusher = _push_datas_scale_vec
-
-        # else:
-        #     if shape == ():
-        #         pusher = _push_datas_scale_cov
-        #     else:
-        #         pusher = _push_datas_scale_cov_vec
-
-    resample = _factory_resample(pusher, fastmath=fastmath, parallel=parallel)
-
-    # resample
     outr.fill(0.0)
     resample(datar, freq, outr)
 
     return out
 
 
-@lru_cache(10)
-def _factory_resample_vals(push_vals_scale, fastmath=True, parallel=False):
-    @njit(fastmath=fastmath, parallel=parallel)
-    def resample(W, X, freq, out):
-        nrep = freq.shape[0]
-        for irep in prange(nrep):
-            push_vals_scale(out[irep, ...], W, X, freq[irep, ...])
-
-    return resample
-
-
-@lru_cache(10)
-def _factory_resample_vals_cov(push_vals_scale, fastmath=True, parallel=False):
-    @njit(fastmath=fastmath, parallel=parallel)
-    def resample(W, X, Y, freq, out):
-        nrep = freq.shape[0]
-        for irep in prange(nrep):
-            push_vals_scale(out[irep, ...], W, X, Y, freq[irep, ...])
-
-    return resample
 
 
 def resample_vals(
@@ -348,19 +285,12 @@ def resample_vals(
     if cov:
         yr = y.reshape(data_reshape)
 
-    # select push function
-    if pusher is None:
-        pusher = factory_pusher_vals_scale(cov=cov, vec=len(shape) > 0)
-    # sample
-    outr[...] = 0.0
-    if cov:
-        resample = _factory_resample_vals_cov(
-            pusher, fastmath=fastmath, parallel=parallel
-        )
-        resample(wr, xr, yr, freq, outr)
 
+    resample = factory_resample_vals(cov=cov, vec=len(shape) > 0, parallel=parallel)
+    outr.fill(0.0)
+    if cov:
+        resample(wr, xr, yr, freq, outr)
     else:
-        resample = _factory_resample_vals(pusher, fastmath=fastmath, parallel=parallel)
         resample(wr, xr, freq, outr)
 
     return out

@@ -6,14 +6,14 @@ from numba import njit, prange
 from scipy.special import binom
 
 from .cached_decorators import cached_clear, gcached
-
+from .options import OPTIONS
 
 def myjit(func):
     """
     "my" jit function
     uses option inline='always', fastmath=True
     """
-    return njit(inline="always", fastmath=True)(func)
+    return njit(inline="always", fastmath=OPTIONS['fastmath'], cache=OPTIONS['cache'])(func)
 
 def factory_binomial(order):
     irange = np.arange(order + 1)
