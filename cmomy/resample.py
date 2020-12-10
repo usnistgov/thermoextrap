@@ -113,7 +113,6 @@ def resample_data(
     axis=0,
     dtype=None,
     order=None,
-    fastmath=True,
     parallel=True,
     pusher=None,
     out=None,
@@ -134,7 +133,7 @@ def resample_data(
         axis to reduce along
     pusher : callable, optiona
         jitted function to perform scaled reduction
-    fastmath, parallel : bool
+    parallel : bool
         options for jitting pusher
     dtype, order : options to np.asarray
     out : optional output
@@ -208,7 +207,6 @@ def resample_vals(
     broadcast=False,
     dtype=None,
     order=None,
-    fastmath=True,
     parallel=True,
     pusher=None,
     out=None,
