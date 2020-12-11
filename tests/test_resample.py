@@ -95,7 +95,6 @@ def test_resample_against_vals(other):
 
 from cmomy.resample import bootstrap_confidence_interval, xbootstrap_confidence_interval
 
-
 def test_bootstrap_stats(other):
 
     x = other.xdata

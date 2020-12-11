@@ -95,11 +95,16 @@ def _get_comom(w, x, y, moments, axis=0, broadcast=True):
 
 class Data(object):
     """wrapper around stuff for generic testing
-
     """
+    #_count = 0
 
     def __init__(self, shape, axis, style, mom, nsplit=3):
-        print("creating data", shape, axis, style, mom, nsplit)
+        print(
+            f'shape:{shape}, axis:{axis}, style:{style}, mom:{mom}, nsplit:{nsplit}',
+            end=' ')
+        #self.__class__._count += 1
+
+
         if isinstance(shape, int):
             shape = (shape,)
         self.shape = shape
@@ -444,21 +449,24 @@ class Data(object):
 
 
 
-
-
 # Fixutre
+# def get_params():
+#     for shape, axis in [(20, 0), ((20, 2, 3), 0), ((2, 20, 3), 1), ((2, 3, 20), 2)]:
+#         for style in [None, "total", "broadcast"]:
+#             for mom in [4, (3, 3)]:
+#                 yield Data(shape, axis, style, mom)
+
+
+# @pytest.fixture(params=get_params(), scope="module")
+# def other(request):
+#     return request.param
 def get_params():
-    i = -1
     for shape, axis in [(20, 0), ((20, 2, 3), 0), ((2, 20, 3), 1), ((2, 3, 20), 2)]:
         for style in [None, "total", "broadcast"]:
             for mom in [4, (3, 3)]:
-                # i += 1
-                # if i != 12:
-                #     continue
-                yield Data(shape, axis, style, mom)
-#                params.append(Data(shape, axis, style, mom))
+                yield shape, axis, style, mom
 
 
 @pytest.fixture(params=get_params(), scope="module")
 def other(request):
-    return request.param
+    return Data(*request.param)
