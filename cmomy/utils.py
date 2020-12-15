@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 
 from numba import njit
-from scipy.special import binom
+
 
 from .cached_decorators import cached_clear, gcached
 from .options import OPTIONS
@@ -19,10 +19,30 @@ def myjit(func):
     """
     return njit(inline="always", fastmath=OPTIONS['fastmath'], cache=OPTIONS['cache'])(func)
 
-def factory_binomial(order):
-    irange = np.arange(order + 1)
-    bfac = np.array([binom(i, irange) for i in irange])
-    return bfac
+# from scipy.special import binom
+# def factory_binomial(order):
+#     irange = np.arange(order + 1)
+#     bfac = np.array([binom(i, irange) for i in irange])
+#     return bfac
+
+def _binom(n, k):
+    if n > k:
+        return np.math.factorial(n) / (np.math.factorial(k) * np.math.factorial(n - k))
+    elif n == k:
+        return 1.
+    else:
+        # n < k
+        return 0.0
+
+def factory_binomial(order, dtype=np.float):
+    out = np.zeros((order+1, order+1), dtype=dtype)
+    for n in range(order + 1):
+        for k in range(order + 1):
+            out[n, k]= _binom(n, k)
+
+    return out
+
+
 
 
 def _my_broadcast(x, shape, dtype=None, order=None):

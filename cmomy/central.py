@@ -460,7 +460,7 @@ class CentralMoments(object):
         shape : tuple, optional
             if passed, create object with this total shape
         mom_ndim : int {1, 2}, optional
-            number of variables.  
+            number of variables.
             if pass `shape`, then must pass mom_ndim
         dtype : nunpy dtype, default=float
         zeros_kws : dict
@@ -548,7 +548,7 @@ class CentralMoments(object):
 
     def cmom(self):
         """central moments
-        `cmom[i0, i1, ...] = < (x0 - <x0>)**i0 * (x1 - <x1>)**i1 ...>`
+        `cmom[..., i0, i1] = < (x0 - <x0>)**i0 * (x1 - <x1>)**i1>`
         """
         out = self.data.copy()
         # zeroth central moment
@@ -561,8 +561,8 @@ class CentralMoments(object):
     def to_raw(self):
         """convert central moments to raw moments
 
-        out[...,0,0] = weight
-        out[...,i0,i1] =  <x0**i0 * x1**i1 * ...>
+        raw[...,i, j] = weight,           i = j = 0
+                      = <x0**i * x1**j>,  otherwise
         """
         if self.mom_ndim == 1:
             func = convert.to_raw_moments
@@ -571,7 +571,9 @@ class CentralMoments(object):
         return func(self.data)
 
     def rmom(self):
-        """raw moments"""
+        """raw moments
+        rmom[..., i, j] = <x0 ** i * x1 ** j>
+        """
         out = self.to_raw()
         out[self._weight_index] = 1
         return out
@@ -1114,7 +1116,11 @@ class CentralMoments(object):
 
         x0 = x if mom_ndim == 1 else x[0]
         freq = randsamp_freq(
-            nrep=nrep, freq=freq, indices=indices, size=x0.shape[axis], check=True,
+            nrep=nrep,
+            freq=freq,
+            indices=indices,
+            size=x0.shape[axis],
+            check=True,
         )
 
         if resample_kws is None:
@@ -1194,9 +1200,14 @@ class CentralMoments(object):
 
     # Universal reducers
     def resample_and_reduce(
-        self, freq=None, indices=None, nrep=None, axis=None,
-            parallel=True,
-            resample_kws=None, **kws,
+        self,
+        freq=None,
+        indices=None,
+        nrep=None,
+        axis=None,
+        parallel=True,
+        resample_kws=None,
+        **kws,
     ):
         """
         bootstrap resample and reduce
@@ -1209,7 +1220,7 @@ class CentralMoments(object):
             resampling array.  idx[i, j] is the record index of the original array to place in new sample[i, j].
             if specified, create freq array from idx
         nrep : int, optional
-            if specified, create idx array with this number of replicates 
+            if specified, create idx array with this number of replicates
         axis : int, Default=0
             axis to resample and reduce along
         parallel : bool, default=True
@@ -1229,11 +1240,10 @@ class CentralMoments(object):
         freq = randsamp_freq(
             nrep=nrep, indices=indices, freq=freq, size=self.val_shape[axis], check=True
         )
-        data = resample_data(self.data, freq, mom=self.mom, axis=axis,
-                             parallel=parallel,
-                             **resample_kws)
+        data = resample_data(
+            self.data, freq, mom=self.mom, axis=axis, parallel=parallel, **resample_kws
+        )
         return type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
-
 
     def resample(self, indices, axis=0, first=True, **kws):
         """
@@ -1273,7 +1283,6 @@ class CentralMoments(object):
         return type(self).from_datas(
             self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
         )
-
 
     def block(self, block_size=None, axis=None, **kws):
         """
@@ -1405,7 +1414,15 @@ class CentralMoments(object):
 
     @classmethod
     def from_stats(
-        cls, a, v=0.0, w=None, axis=0, mom=2, val_shape=None, dtype=None, **kws,
+        cls,
+        a,
+        v=0.0,
+        w=None,
+        axis=0,
+        mom=2,
+        val_shape=None,
+        dtype=None,
+        **kws,
     ):
         """
         object from several weights, averages, variances/covarainces along axis

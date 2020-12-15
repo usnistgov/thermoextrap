@@ -64,40 +64,49 @@ class StatsArray(object):
     Collection of Accumulator objects
     """
 
-    def __init__(self, moments, shape=None, dtype=np.float, child=None):
+    def __init__(self, obj):
         """
-        moments : int or tuple
-            moments to consider
-        shape : tuple, optional
-            shape of data
-        dtype : numpy dtype
-        child : Accumulator object, optional
-            if not specified, choose child class based on moments.
-            If moments is a scalar or length 1 tuple, child is CentralMoments object.
-            If moments is a length 2 tuple, child is a CentralMomentsCov object
+        Parameters
+        ----------
+        obj : CentralMoments
         """
-
-        if isinstance(moments, int):
-            moments = (moments,)
-
-        assert isinstance(moments, tuple)
-
-        if child is None:
-            if len(moments) == 1:
-                child = CentralMoments
-            else:
-                child = CentralMomentsCov
-
-        self._child = child
-        self._accum = child(shape=shape, moments=moments, dtype=dtype)
+        self._accum = obj
         self.zero()
+
+
+        # if isinstance(moments, int):
+        #     moments = (moments,)
+
+        # assert isinstance(moments, tuple)
+
+        # if child is None:
+        #     if len(moments) == 1:
+        #         child = CentralMoments
+        #     else:
+        #         child = CentralMomentsCov
+
+        # self._child = child
+        # self._accum = child(shape=shape, moments=moments, dtype=dtype)
+        #self.zero()
+
+
+    @classmethod
+    def zeros(cls, *args, **kwargs):
+        """create empty array object with baseclass CentralMoments"""
+        pass
+
+    @classmethod
+    def xzeros(cls, *args, **kwargs):
+        """create empty array object with baseclass xCentralMoments"""
+        pass
+
 
     @property
     def accum(self):
         return self._accum
 
     @property
-    def moments(self):
+    def mom(self):
         return self._accum.moments
 
     @property
