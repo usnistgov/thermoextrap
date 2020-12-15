@@ -5,8 +5,8 @@ import cmomy.central as central
 
 import pytest
 
-
-def test_resample_vals(other):
+@pytest.mark.parametrize('parallel', [True, False])
+def test_resample_vals(other, parallel):
     # test basic resampling
     if other.style == 'total':
         datar = central.resample_vals(
@@ -17,13 +17,14 @@ def test_resample_vals(other):
             w=other.w,
             mom_ndim=other.s._mom_ndim,
             broadcast=other.broadcast,
+            parallel=parallel
         )
 
         np.testing.assert_allclose(datar, other.data_test_resamp)
 
 
-
-def test_stats_resample_vals(other):
+@pytest.mark.parametrize('parallel', [True, False])
+def test_stats_resample_vals(other, parallel):
 
     if other.style == 'total':
         t = other.cls.from_resample_vals(
@@ -33,6 +34,7 @@ def test_stats_resample_vals(other):
             freq=other.freq,
             axis=other.axis,
             broadcast=other.broadcast,
+            parallel=parallel
         )
         np.testing.assert_allclose(t.data, other.data_test_resamp)
 
@@ -44,12 +46,13 @@ def test_stats_resample_vals(other):
             indices=other.indices,
             axis=other.axis,
             broadcast=other.broadcast,
+            parallel=parallel,
         )
         np.testing.assert_allclose(t.data, other.data_test_resamp)
 
 
-
-def test_resample_data(other):
+@pytest.mark.parametrize('parallel', [True, False])
+def test_resample_data(other, parallel):
 
     nrep = 10
 
@@ -69,12 +72,12 @@ def test_resample_data(other):
             data_ref = other.cls.from_datas(data, mom_ndim=other.mom_ndim, axis=1)
 
 
-            t = other.s.resample_and_reduce(freq=freq, axis=axis)
+            t = other.s.resample_and_reduce(freq=freq, axis=axis, parallel=parallel)
             np.testing.assert_allclose(data_ref, t.data)
 
 
-
-def test_resample_against_vals(other):
+@pytest.mark.parametrize('parallel', [True, False])
+def test_resample_against_vals(other, parallel):
 
     nrep = 10
 
@@ -85,7 +88,7 @@ def test_resample_against_vals(other):
             ndat = s.val_shape[axis]
             idx = np.random.choice(ndat, (nrep, ndat), replace=True)
 
-            t0 = s.resample_and_reduce(indices=idx, axis=axis)
+            t0 = s.resample_and_reduce(indices=idx, axis=axis, parallel=parallel)
 
             t1 = s.resample(idx, axis=axis).reduce(1)
 

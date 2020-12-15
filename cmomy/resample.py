@@ -112,7 +112,6 @@ def resample_data(
     dtype=None,
     order=None,
     parallel=True,
-    pusher=None,
     out=None,
 ):
     """
@@ -129,8 +128,6 @@ def resample_data(
         if length is 2, then data contains central comom
     axis : int, default=0
         axis to reduce along
-    pusher : callable, optiona
-        jitted function to perform scaled reduction
     parallel : bool
         options for jitting pusher
     dtype, order : options to np.asarray
@@ -206,7 +203,6 @@ def resample_vals(
     dtype=None,
     order=None,
     parallel=True,
-    pusher=None,
     out=None,
 ):
     """

@@ -266,8 +266,9 @@ class CentralMoments(object):
         self._data = data
 
         # check moments make sense
-        if not all([x > 0 for x in self.mom]):
-            raise ValueError("All moments must positive")
+        # skip this as it comes from array shape
+        # if not all([x > 0 for x in self.mom]):
+        #     raise ValueError("All moments must positive")
 
         self._data_flat = self._data.reshape(self.shape_flat)
 

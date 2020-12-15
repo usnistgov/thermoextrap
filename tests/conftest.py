@@ -9,6 +9,10 @@ import cmomy.xcentral as xcentral
 
 
 def _get_cmom(w, x, moments, axis=0, last=True):
+
+    if w is None:
+        w = np.array(1.0)
+
     if w.ndim == 1 and w.ndim != x.ndim and len(w) == x.shape[axis]:
         shape = [1] * x.ndim
         shape[axis] = -1
@@ -42,6 +46,10 @@ def _get_cmom(w, x, moments, axis=0, last=True):
 
 
 def _get_comom(w, x, y, moments, axis=0, broadcast=True):
+
+    if w is None:
+        w = np.array(1.0)
+
     if w.ndim == 1 and w.ndim != x.ndim and len(w) == x.shape[axis]:
         shape = [1] * x.ndim
         shape[axis] = -1
@@ -160,7 +168,8 @@ class Data(object):
     @gcached()
     def w(self):
         if self.style is None:
-            return np.array(1.0)
+            return None
+#            return np.array(1.0)
         else:
             return self._get_data(style=self.style)
         return self._get_weight()

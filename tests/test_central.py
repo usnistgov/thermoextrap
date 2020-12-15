@@ -12,6 +12,40 @@ def test_fix_test(other):
     np.testing.assert_allclose(other.data_fix, other.data_test)
 
 
+# test central_moments with out parameter
+def test_central_moments_out(other):
+
+    out = np.zeros_like(other.data_test)
+
+    _ = central.central_moments(
+        x=other.x, mom=other.mom, w=other.w, axis=other.axis, last=True, broadcast=other.broadcast, out=out
+    )
+
+    np.testing.assert_allclose(out, other.data_test)
+
+# exceptions
+def test_mom_ndim():
+
+    with pytest.raises(ValueError):
+        central.CentralMoments(np.zeros((4,4)), mom_ndim=0)
+
+    with pytest.raises(ValueError):
+        central.CentralMoments(np.zeros((4,4)), mom_ndim=3)
+
+
+def test_data_ndim():
+    with pytest.raises(ValueError):
+        central.CentralMoments(np.zeros(4), mom_ndim=2)
+
+def test_ndim():
+    data = np.empty((1,2,3))
+
+    s = central.CentralMoments(data, 1)
+
+    assert data.ndim == s.ndim
+
+
+
 
 def test_s(other):
     other.test_values(other.s.values)
