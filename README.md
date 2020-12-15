@@ -1,9 +1,8 @@
 # Package for analyzing central moments
 
-For example usage, look at[
-example~usage~.ipynb](examples/example_usage.ipynb)
+For example usage, look at [example usage](examples/example_usage.ipynb)
 
-# Installation
+# INSTALLATION
 
 ## Install needed packages
 
