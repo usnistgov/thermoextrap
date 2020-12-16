@@ -5,15 +5,15 @@ with open("README.md", "r") as f:
 
 setup(
     name="cmomy",
-    version="0.0.1",
+    version="0.0.2",
     description="Central (co)moment calculation",
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
         "Development Status :: 3 - Alpha",
-        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8"
     ],
     keywords="data analysis",
     url="https://github.com/wpk-nist-gov/cmomy",
@@ -28,6 +28,5 @@ setup(
     tests_require=["pytest"],
     test_suite="pytest",
     include_package_data=True,
-    # zip_safe=False,
     zip_safe=True,
 )
