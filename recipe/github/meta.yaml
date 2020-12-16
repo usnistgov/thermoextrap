@@ -18,7 +18,6 @@ build:
 requirements:
   host:
     - pip
-    - pytest-runner
     - python
   run:
     - numba
@@ -37,7 +36,7 @@ test:
 about:
   home: https://github.com/wpk-nist-gov/cmomy
   summary: Central (co)moment calculation
-  license: NIST
+  license: NIST https://www.nist.gov/director/licensing
 
 extra:
   recipe-maintainers:
