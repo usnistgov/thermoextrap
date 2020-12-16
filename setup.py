@@ -20,11 +20,9 @@ setup(
     author="William Krekelberg",
     author_email="wpk@nist.gov",
     license="NIST license https://www.nist.gov/director/licensing",
-    # packages=['cmomy'],
     packages=find_packages(), 
     install_requires=["numpy", "numba", "xarray"],
     # testing
-    setup_requires=["pytest-runner"],
     tests_require=["pytest"],
     test_suite="pytest",
     include_package_data=True,
