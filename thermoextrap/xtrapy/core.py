@@ -13,7 +13,6 @@ from .data import xrwrap_alpha
 
 try:
     from pymbar import mbar
-
     _HAS_PYMBAR = True
 except ImportError:
     _HAS_PYMBAR = False
@@ -25,7 +24,6 @@ except ImportError:
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
-
 
 @lru_cache(100)
 def _get_default_symbol(*args):
@@ -389,13 +387,11 @@ class ExtrapWeightedModel(StateCollection):
 
         return self.states[idx:idx+2]
 
-
     def _states_nearest_alpha(self, alpha):
         dalpha = np.abs(np.array(self.alpha0) - alpha)
         # two lowest
         idx = np.argsort(dalpha)[:2]
         return [self[i] for i in idx]
-
 
     def _states_alpha(self, alpha, method):
         if method is None or method=='between':
