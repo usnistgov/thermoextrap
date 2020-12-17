@@ -2,20 +2,21 @@
 Routines to perform resampling
 """
 from __future__ import absolute_import
-from functools import lru_cache
 
 import numpy as np
 import xarray as xr
 
-
-from .utils import _axis_expand_broadcast, myjit
 from ._resample import factory_resample_data, factory_resample_vals
+from .utils import _axis_expand_broadcast, myjit
 
 ###############################################################################
 # resampling
 ###############################################################################
+
+
 @myjit
 def _randsamp_freq_out(freq):
+
     nrep = freq.shape[0]
     ndat = freq.shape[1]
     for i in range(nrep):
@@ -286,7 +287,7 @@ def resample_vals(
 
 
 def bootstrap_confidence_interval(
-    distribution, stats_val='mean', axis=0, alpha=0.05, style=None, **kws
+    distribution, stats_val="mean", axis=0, alpha=0.05, style=None, **kws
 ):
     """
     Calculate the error bounds
@@ -313,9 +314,10 @@ def bootstrap_confidence_interval(
     Returns
     -------
     out : array
-    fist dimension will be statistics.  Other dimensions
-    have shape of input less axis reduced over.
-    Depending on `style` first dimension will be (note val is either stats_val or median):
+        fist dimension will be statistics.  Other dimensions
+        have shape of input less axis reduced over.
+        Depending on `style` first dimension will be
+        (note val is either stats_val or median):
 
     * None: [val, low, high]
     * delta:  [val, val-low, high - val]
@@ -332,12 +334,12 @@ def bootstrap_confidence_interval(
 
     else:
         if isinstance(stats_val, str):
-            if stats_val == 'mean':
+            if stats_val == "mean":
                 stats_val = np.mean(distribution, axis=axis)
-            elif stats_val == 'median':
+            elif stats_val == "median":
                 stats_val = np.median(distribution, axis=axis)
             else:
-                raise ValueError('stats val should be None, mean, median, or an array')
+                raise ValueError("stats val should be None, mean, median, or an array")
 
         q_high = 100 * (alpha / 2.0)
         q_low = 100 - q_high
@@ -356,12 +358,12 @@ def bootstrap_confidence_interval(
 
 def xbootstrap_confidence_interval(
     x,
-    stats_val='mean',
+    stats_val="mean",
     axis=0,
     dim=None,
     alpha=0.05,
     style=None,
-    bootstrap_dim='bootstrap',
+    bootstrap_dim="bootstrap",
     bootstrap_coords=None,
     **kws
 ):
@@ -389,17 +391,17 @@ def xbootstrap_confidence_interval(
     template = x.isel(**{dim: 0})
 
     if bootstrap_dim is None:
-        bootstrap_dim = 'bootstrap'
+        bootstrap_dim = "bootstrap"
 
     if bootstrap_dim in template.dims:
-        bootstrap_dim = '{}_{}'.format(dim, bootstrap_dim)
+        bootstrap_dim = "{}_{}".format(dim, bootstrap_dim)
     dims = (bootstrap_dim,) + template.dims
 
     if bootstrap_coords is None:
         if isinstance(stats_val, str):
             bootstrap_coords = stats_val
         else:
-            bootstrap_coords = 'stats_val'
+            bootstrap_coords = "stats_val"
 
     if isinstance(bootstrap_coords, str):
         if style is None:
@@ -409,7 +411,6 @@ def xbootstrap_confidence_interval(
         elif style == "pm":
             bootstrap_coords = [bootstrap_coords, "err"]
 
-
     if stats_val is not None and not isinstance(stats_val, str):
         stats_val = np.array(stats_val)
 
@@ -417,11 +418,13 @@ def xbootstrap_confidence_interval(
         x, stats_val=stats_val, axis=axis, alpha=alpha, style=style, **kws
     )
 
-    out = xr.DataArray(out, dims=dims,
-                       coords=template.coords,
-                       attrs=template.attrs,
-                       name=template.name,
-                       indexes=template.indexes,
+    out = xr.DataArray(
+        out,
+        dims=dims,
+        coords=template.coords,
+        attrs=template.attrs,
+        name=template.name,
+        indexes=template.indexes,
     )
     if bootstrap_coords is not None:
         out.coords[bootstrap_dim] = bootstrap_coords

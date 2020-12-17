@@ -9,7 +9,7 @@ For example usage, look at [example usage](examples/example_usage.ipynb)
 If using conda, then
 
 ``` {.bash org-language="sh"}
-conda install numpy xarray numba 
+conda install numpy xarray numba
 ```
 
 ## From source

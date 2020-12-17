@@ -1,17 +1,23 @@
 import numpy as np
-from .pushers import factory_pushers
 
-def verify_value(x,
-                 val_shape,
-                 mom_shape=None,
-                 axis=None,
-                 nrec=None,
-                 expand=False,
-                 broadcast=False,
-                 flatten=True,
-                 verify=False,
-                 dtype=None, order=None,
-                 shape=None, shape_flat=None
+# from .pushers import factory_pushers
+
+
+def verify_value(
+    x,
+    val_shape,
+    mom_shape=None,
+    axis=None,
+    nrec=None,
+    expand=False,
+    broadcast=False,
+    flatten=True,
+    verify=False,
+    dtype=None,
+    order=None,
+    shape=None,
+    shape_flat=None,
+    first=True,
 ):
     """
     given an array `x` verify that it conforms to a target shape
@@ -31,7 +37,8 @@ def verify_value(x,
 
 
     axis: int, optional
-        if specified, then this is the axis that will be reduced over.  This axis will be moved to the first axis of the output
+        if specified, then this is the axis that will be reduced over.
+        This axis will be moved to the first axis of the output
     nrec: int, optional
         number of records.  That is, x.shape[axis]
         Pass this to perform a check on sizes.
@@ -44,7 +51,7 @@ def verify_value(x,
         x = np.asarray(x, dtype=dtype, order=order)
 
     ndim = len(val_shape)
-    axis = np.core.numeric.normalize_axis_index(axis, ndim+1)
+    axis = np.core.numeric.normalize_axis_index(axis, ndim + 1)
 
     if shape is None or shape_flat is None:
         if ndim == 0:
@@ -52,16 +59,13 @@ def verify_value(x,
         else:
             shape_flat = (np.prod(shape),)
 
-
         if axis is not None:
             shape = shape[:axis] + (nrec,) + shape[axis:]
             shape_flat = (nrec,) + shape_flat
 
-
         if mom_shape is not None:
             shape = shape + mom_shape
             shape_flat = shape_flat + mom_shape
-
 
     if expand:
         if x.ndim == 1 and x.ndim != len(shape) and len(x) == shape[axis]:
@@ -85,7 +89,6 @@ def verify_value(x,
         x = x[()]
 
     return x, shape, shape_flat
-
 
 
 # def push_val(x,
@@ -125,9 +128,3 @@ def verify_value(x,
 
 #     # verify x[0]
 #     x = verify_value(x, val_shape=val_shape, mom_shape=)
-
-
-
-
-
-

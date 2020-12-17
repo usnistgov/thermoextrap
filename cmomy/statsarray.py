@@ -6,10 +6,15 @@ from __future__ import absolute_import
 import numpy as np
 
 from .cached_decorators import cached_clear, gcached
-from .central import CentralMoments, CentralMomentsCov
-from .resample import randsamp_freq, resample_data, resample_vals
-from .utils import (_axis_expand_broadcast, _cached_ones, _my_broadcast,
-                    _shape_insert_axis)
+
+# from .central import CentralMoments, CentralMomentsCov
+# from .resample import randsamp_freq, resample_data, resample_vals
+# from .utils import (
+#     _axis_expand_broadcast,
+#     _cached_ones,
+#     _my_broadcast,
+#     _shape_insert_axis,
+# )
 
 
 def weighted_var(x, w, axis=None, axis_sum=None, unbiased=True, **kwargs):
@@ -24,7 +29,7 @@ def weighted_var(x, w, axis=None, axis_sum=None, unbiased=True, **kwargs):
         values to consider
 
     w : array
-        weights 
+        weights
 
     axis : axis to average over
 
@@ -42,7 +47,7 @@ def weighted_var(x, w, axis=None, axis_sum=None, unbiased=True, **kwargs):
     Ave : weighted average
         shape x with `axis` removed
 
-    Var : weighted variance 
+    Var : weighted variance
         shape x with `axis` removed
     """
 
@@ -73,7 +78,6 @@ class StatsArray(object):
         self._accum = obj
         self.zero()
 
-
         # if isinstance(moments, int):
         #     moments = (moments,)
 
@@ -87,8 +91,7 @@ class StatsArray(object):
 
         # self._child = child
         # self._accum = child(shape=shape, moments=moments, dtype=dtype)
-        #self.zero()
-
+        # self.zero()
 
     @classmethod
     def zeros(cls, *args, **kwargs):
@@ -99,7 +102,6 @@ class StatsArray(object):
     def xzeros(cls, *args, **kwargs):
         """create empty array object with baseclass xCentralMoments"""
         pass
-
 
     @property
     def accum(self):
@@ -143,7 +145,7 @@ class StatsArray(object):
         new = self.new_like()
         try:
             y = self._values[idx]
-        except:
+        except Exception:
             y = list(self.data[idx])
         if not isinstance(y, list):
             y = [y]
@@ -170,7 +172,7 @@ class StatsArray(object):
         for bootstrapping
         """
         data = self.data
-        data_new = resample_data(data, freq, moments=self.moments, **kwargs)
+        data_new = data.resample_data(data, freq, moments=self.moments, **kwargs)
         return self.__class__.from_datas(
             data_new, shape=self._accum.shape, child=self._child, moments=self.moments
         )
@@ -272,7 +274,8 @@ class StatsArray(object):
         if accum object is a scalar object, or a vector object with no specified axis,
         then create a StatsArray object with accum as the sole elements
 
-        if accum object is a vector object with a specified axis, create a StatsArray object
+        if accum object is a vector object with a specified axis, create a
+        StatsArray object
         with elements along this axis
         """
 
@@ -412,7 +415,7 @@ class StatsArray(object):
 
         Returns
         -------
-        sem : standard error in mean 
+        sem : standard error in mean
         """
         if weighted:
             v = weighted_var(x, w=self.weight(), axis=0, unbiased=unbiased)[-1]

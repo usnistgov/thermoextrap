@@ -2,18 +2,24 @@
 Routines to perform resampling
 """
 from __future__ import absolute_import
-from functools import lru_cache
 
-import numpy as np
 from numba import njit, prange
 
 from .options import OPTIONS
 from .pushers import (
     _push_datas_scale,
-    _push_datas_scale_vec,
     _push_datas_scale_cov,
     _push_datas_scale_cov_vec,
+    _push_datas_scale_vec,
+    _push_vals_scale,
+    _push_vals_scale_cov,
+    _push_vals_scale_cov_vec,
+    _push_vals_scale_vec,
 )
+
+# from functools import lru_cache
+# import numpy as np
+
 
 def jitter(parallel):
     return njit(fastmath=OPTIONS["fastmath"], cache=OPTIONS["cache"], parallel=parallel)
@@ -21,7 +27,7 @@ def jitter(parallel):
 
 # NOTE: this is all due to closures not being cache-able with numba
 # used to use the following
-# 
+#
 # @lru_cache(10)
 # def _factory_resample(push_datas_scale, fastmath=True, parallel=False):
 #     @njit(fastmath=fastmath, parallel=parallel)
@@ -135,12 +141,6 @@ def factory_resample_data(cov, vec, parallel):
 ######################################################################
 # resample values
 
-from .pushers import (
-    _push_vals_scale,
-    _push_vals_scale_vec,
-    _push_vals_scale_cov,
-    _push_vals_scale_cov_vec,
-)
 
 # mom/scalar
 @jitter(parallel=False)
@@ -155,6 +155,7 @@ def _resample_vals_parallel(W, X, freq, out):
     nrep = freq.shape[0]
     for irep in prange(nrep):
         _push_vals_scale(out[irep, ...], W, X, freq[irep, ...])
+
 
 # mom/vec
 @jitter(parallel=False)
@@ -178,6 +179,7 @@ def _resample_vals_cov(W, X, Y, freq, out):
     for irep in prange(nrep):
         _push_vals_scale_cov(out[irep, ...], W, X, Y, freq[irep, ...])
 
+
 @jitter(parallel=True)
 def _resample_vals_cov_parallel(W, X, Y, freq, out):
     nrep = freq.shape[0]
@@ -192,12 +194,12 @@ def _resample_vals_cov_vec(W, X, Y, freq, out):
     for irep in prange(nrep):
         _push_vals_scale_cov_vec(out[irep, ...], W, X, Y, freq[irep, ...])
 
+
 @jitter(parallel=True)
 def _resample_vals_cov_vec_parallel(W, X, Y, freq, out):
     nrep = freq.shape[0]
     for irep in prange(nrep):
         _push_vals_scale_cov_vec(out[irep, ...], W, X, Y, freq[irep, ...])
-
 
 
 _RESAMPLE_VALS_DICT = {

@@ -6,17 +6,21 @@ from __future__ import absolute_import
 import numpy as np
 import xarray as xr
 
-
 from . import central
-from .cached_decorators import gcached, cached_clear
-from .utils import _xr_wrap_like, _xr_order_like
+from .cached_decorators import gcached
+from .utils import _xr_order_like, _xr_wrap_like
 
 
 ###############################################################################
 # central mom/comom routine
 ###############################################################################
 def _xcentral_moments(
-    x, mom, w=None, axis=0, last=True, mom_dims=None,
+    x,
+    mom,
+    w=None,
+    axis=0,
+    last=True,
+    mom_dims=None,
 ):
 
     assert isinstance(x, xr.DataArray)
@@ -58,7 +62,13 @@ def _xcentral_moments(
 
 
 def _xcentral_comoments(
-    x, mom, w=None, axis=0, last=True, broadcast=False, mom_dims=None,
+    x,
+    mom,
+    w=None,
+    axis=0,
+    last=True,
+    broadcast=False,
+    mom_dims=None,
 ):
     """
     calculate central co-mom (covariance, etc) along axis
@@ -123,7 +133,13 @@ def _xcentral_comoments(
 
 
 def xcentral_moments(
-    x, mom, w=None, axis=0, last=True, mom_dims=None, broadcast=False,
+    x,
+    mom,
+    w=None,
+    axis=0,
+    last=True,
+    mom_dims=None,
+    broadcast=False,
 ):
     """
     calculate central mom along axis
@@ -204,8 +220,6 @@ def _check_xr_input(x, axis=None, mom_dims=None, **kws):
 
     kws = _attributes_from_xr(x, dim=dim, mom_dims=mom_dims, **kws)
     return kws, axis, values
-
-
 
 
 class xCentralMoments(central.CentralMoments):
@@ -446,8 +460,8 @@ class xCentralMoments(central.CentralMoments):
         mom : int or tuple
             moments.  if integer, then moments will be (mom,)
         val_shape : tuple, optional
-            shape of values, excluding moments.  For example, if considering the average of
-            observations `x`, then val_shape = x.shape.  
+            shape of values, excluding moments.  For example, if considering the average
+            of observations `x`, then val_shape = x.shape.
             if not passed, then assume shape = ()
         dtype : nunpy dtype, default=float
         kwargs : dict
@@ -667,7 +681,13 @@ class xCentralMoments(central.CentralMoments):
             return values, target_output
 
     def _verify_value(
-        self, x, target=None, axis=None, broadcast=False, expand=False, shape_flat=None,
+        self,
+        x,
+        target=None,
+        axis=None,
+        broadcast=False,
+        expand=False,
+        shape_flat=None,
     ):
         if isinstance(x, xr.DataArray) or isinstance(target, xr.DataArray):
             return self._xverify_value(
@@ -1081,7 +1101,7 @@ class xCentralMoments(central.CentralMoments):
             indexes=indexes,
             name=name,
         )
-        
+
         if kws["dims"] is not None:
             kws["dims"] = (rep_dim,) + tuple(kws["dims"])
 
@@ -1124,7 +1144,7 @@ class xCentralMoments(central.CentralMoments):
     ):
 
         kws, _, values = _check_xr_input(
-            x,
+            a,
             axis=None,
             mom_dims=mom_dims,
             dims=dims,

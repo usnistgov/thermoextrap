@@ -1,11 +1,10 @@
-
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
 
-from cmomy.cached_decorators import gcached
 import cmomy.central as central
 import cmomy.xcentral as xcentral
+from cmomy.cached_decorators import gcached
 
 
 def _get_cmom(w, x, moments, axis=0, last=True):
@@ -102,16 +101,16 @@ def _get_comom(w, x, y, moments, axis=0, broadcast=True):
 
 
 class Data(object):
-    """wrapper around stuff for generic testing
-    """
-    #_count = 0
+    """wrapper around stuff for generic testing"""
+
+    # _count = 0
 
     def __init__(self, shape, axis, style, mom, nsplit=3):
         print(
-            f'shape:{shape}, axis:{axis}, style:{style}, mom:{mom}, nsplit:{nsplit}',
-            end=' ')
-        #self.__class__._count += 1
-
+            f"shape:{shape}, axis:{axis}, style:{style}, mom:{mom}, nsplit:{nsplit}",
+            end=" ",
+        )
+        # self.__class__._count += 1
 
         if isinstance(shape, int):
             shape = (shape,)
@@ -169,7 +168,7 @@ class Data(object):
     def w(self):
         if self.style is None:
             return None
-#            return np.array(1.0)
+        #            return np.array(1.0)
         else:
             return self._get_data(style=self.style)
         return self._get_weight()
@@ -213,7 +212,6 @@ class Data(object):
     def X(self):
         return self.split_data[1]
 
-
     @gcached()
     def data_fix(self):
         if self.cov:
@@ -233,15 +231,19 @@ class Data(object):
     @gcached()
     def data_test(self):
         return central.central_moments(
-            x=self.x, mom=self.mom, w=self.w, axis=self.axis, last=True, broadcast=self.broadcast)
-
+            x=self.x,
+            mom=self.mom,
+            w=self.w,
+            axis=self.axis,
+            last=True,
+            broadcast=self.broadcast,
+        )
 
     @gcached()
     def s(self):
         s = self.cls.zeros(val_shape=self.val_shape, mom=self.mom)
         s.push_vals(x=self.x, w=self.w, axis=self.axis, broadcast=self.broadcast)
         return s
-
 
     @gcached()
     def S(self):
@@ -265,12 +267,16 @@ class Data(object):
     def test_values(self, x):
         np.testing.assert_allclose(self.values, x)
 
-
     @property
     def raw(self):
-        if self.style == 'total':
+        if self.style == "total":
             if not self.cov:
-                raw = np.array([np.average(self.x**i, weights=self.w, axis=self.axis) for i in range(self.mom + 1)])
+                raw = np.array(
+                    [
+                        np.average(self.x ** i, weights=self.w, axis=self.axis)
+                        for i in range(self.mom + 1)
+                    ]
+                )
                 raw[0, ...] = self.w.sum(self.axis)
 
                 raw = np.moveaxis(raw, 0, -1)
@@ -280,7 +286,11 @@ class Data(object):
                 raw = np.zeros_like(self.data_test)
                 for i in range(self.mom[0] + 1):
                     for j in range(self.mom[1] + 1):
-                        raw[..., i, j] = np.average(self.x[0]**i * self.x[1]**j, weights=self.w, axis=self.axis)
+                        raw[..., i, j] = np.average(
+                            self.x[0] ** i * self.x[1] ** j,
+                            weights=self.w,
+                            axis=self.axis,
+                        )
 
                 raw[..., 0, 0] = self.w.sum(self.axis)
 
@@ -288,18 +298,15 @@ class Data(object):
             raw = None
         return raw
 
-
     @gcached()
     def indices(self):
         ndat = self.xdata.shape[self.axis]
         nrep = 10
         return np.random.choice(ndat, (nrep, ndat), replace=True)
 
-
     @gcached()
     def freq(self):
         return central.randsamp_freq(indices=self.indices)
-
 
     @gcached()
     def xdata_resamp(self):
@@ -308,26 +315,18 @@ class Data(object):
         if self.axis != 0:
             xdata = np.moveaxis(xdata, self.axis, 0)
 
-        return np.take(
-            xdata,
-            self.indices,
-            axis=0
-        )
+        return np.take(xdata, self.indices, axis=0)
 
     @gcached()
     def ydata_resamp(self):
         ydata = self.ydata
 
-        if self.style == 'broadcast':
+        if self.style == "broadcast":
             return np.take(ydata, self.indices, axis=0)
         else:
             if self.axis != 0:
                 ydata = np.moveaxis(ydata, self.axis, 0)
-            return np.take(
-                ydata,
-                self.indices,
-                axis=0
-            )
+            return np.take(ydata, self.indices, axis=0)
 
     @property
     def x_resamp(self):
@@ -336,38 +335,33 @@ class Data(object):
         else:
             return self.xdata_resamp
 
-
     @gcached()
     def w_resamp(self):
         w = self.w
 
         if self.style is None:
             return w
-        elif self.style == 'broadcast':
+        elif self.style == "broadcast":
             return np.take(w, self.indices, axis=0)
         else:
             if self.axis != 0:
                 w = np.moveaxis(w, self.axis, 0)
-            return np.take(
-                w,
-                self.indices,
-                axis=0
-            )
-
+            return np.take(w, self.indices, axis=0)
 
     @gcached()
     def data_test_resamp(self):
         return central.central_moments(
-            x=self.x_resamp, mom=self.mom, w=self.w_resamp, axis=1, broadcast=self.broadcast
+            x=self.x_resamp,
+            mom=self.mom,
+            w=self.w_resamp,
+            axis=1,
+            broadcast=self.broadcast,
         )
-
-
 
     # xcentral specific stuff
     @property
     def cls_xr(self):
         return xcentral.xCentralMoments
-
 
     @gcached()
     def s_xr(self):
@@ -375,20 +369,18 @@ class Data(object):
             x=self.x, w=self.w, axis=self.axis, mom=self.mom, broadcast=self.broadcast
         )
 
-
     @gcached()
     def xdata_xr(self):
-        dims = [f'dim_{i}' for i in range(len(self.shape)-1)]
-        dims.insert(self.axis, 'rec')
+        dims = [f"dim_{i}" for i in range(len(self.shape) - 1)]
+        dims.insert(self.axis, "rec")
         return xr.DataArray(self.xdata, dims=dims)
-
 
     @gcached()
     def ydata_xr(self):
-        if self.style is None or self.style == 'total':
+        if self.style is None or self.style == "total":
             dims = self.xdata_xr.dims
         else:
-            dims = 'rec'
+            dims = "rec"
 
         return xr.DataArray(self.ydata, dims=dims)
 
@@ -396,13 +388,12 @@ class Data(object):
     def w_xr(self):
         if self.style is None:
             return None
-        elif self.style == 'broadcast':
-            dims = 'rec'
+        elif self.style == "broadcast":
+            dims = "rec"
         else:
             dims = self.xdata_xr.dims
 
         return xr.DataArray(self.w, dims=dims)
-
 
     @property
     def x_xr(self):
@@ -411,18 +402,11 @@ class Data(object):
         else:
             return self.xdata_xr
 
-
     @gcached()
     def data_test_xr(self):
-        return xcentral.xcentral_moments(x=self.x_xr, mom=self.mom, axis='rec', w=self.w_xr, broadcast=self.broadcast)
-
-
-    @gcached()
-    def s_xr(self):
-        # return self.cls_xr.from_vals(x=self.x_xr, w=self.w_xr, axis='rec', mom=self.mom, broadcast=self.broadcast)
-        return self.cls_xr.from_vals(x=self.x, w=self.w, axis=self.axis, mom=self.mom, broadcast=self.broadcast)
-
-
+        return xcentral.xcentral_moments(
+            x=self.x_xr, mom=self.mom, axis="rec", w=self.w_xr, broadcast=self.broadcast
+        )
 
     @gcached()
     def W_xr(self):
@@ -439,23 +423,21 @@ class Data(object):
         if self.cov:
             ydims = self.ydata_xr.dims
 
-            return [(xr.DataArray(x, dims=xdims),
-                     xr.DataArray(y, dims=ydims))
-                    for x, y in self.X]
+            return [
+                (xr.DataArray(x, dims=xdims), xr.DataArray(y, dims=ydims))
+                for x, y in self.X
+            ]
         else:
-            return [xr.DataArray(x, dims=xdims)
-                    for x in self.X]
-
+            return [xr.DataArray(x, dims=xdims) for x in self.X]
 
     @gcached()
     def S_xr(self):
         return [
-            self.cls_xr.from_vals(x=x, w=w, axis=self.axis, mom=self.mom, broadcast=self.broadcast)
+            self.cls_xr.from_vals(
+                x=x, w=w, axis=self.axis, mom=self.mom, broadcast=self.broadcast
+            )
             for w, x, in zip(self.W, self.X)
         ]
-
-
-
 
 
 # Fixutre

@@ -3,18 +3,22 @@ low level routines to do pushing
 """
 from __future__ import absolute_import
 
-from functools import lru_cache
+from collections import namedtuple
 
 from .options import OPTIONS
 from .utils import factory_binomial, myjit
 
+# from functools import lru_cache
+
+
 # Maximum binomial factor
-_bfac = factory_binomial(OPTIONS['nmax'])
+_bfac = factory_binomial(OPTIONS["nmax"])
 
 
 ###############################################################################
 # Moments
 ###############################################################################
+
 
 @myjit
 def _push_val(data, w, x):
@@ -64,6 +68,7 @@ def _push_vals(data, W, X):
     ns = X.shape[0]
     for s in range(ns):
         _push_val(data, W[s], X[s])
+
 
 @myjit
 def _push_vals_scale(data, W, X, scale):
@@ -213,6 +218,7 @@ def _push_datas_vec(data, Data_in):
         for k in range(nv):
             _push_data(data[k, :], Data_in[s, k, :])
 
+
 @myjit
 def _push_vals_scale_vec(data, W, X, scale):
     ns = X.shape[0]
@@ -222,7 +228,7 @@ def _push_vals_scale_vec(data, W, X, scale):
         if f == 0:
             continue
         for k in range(nv):
-            _push_val(data[k,:], W[s, k] * f, X[s, k])
+            _push_val(data[k, :], W[s, k] * f, X[s, k])
 
 
 @myjit
@@ -230,7 +236,7 @@ def _push_data_scale_vec(data, data_in, scale):
     nv = data.shape[0]
     if scale != 0:
         for k in range(nv):
-            _push_data_scale(data[i, :], data_in[i, :], scale)
+            _push_data_scale(data[k, :], data_in[k, :], scale)
 
 
 @myjit
@@ -245,11 +251,10 @@ def _push_datas_scale_vec(data, Data_in, scale):
             _push_data_scale(data[k, :], Data_in[s, k, :], f)
 
 
-
-
 ######################################################################
 # Covariance "stuff"
 ######################################################################
+
 
 @myjit
 def _push_val_cov(data, w, x0, x1):
@@ -331,6 +336,7 @@ def _push_vals_cov(data, W, X1, X2):
     ns = X1.shape[0]
     for s in range(ns):
         _push_val_cov(data, W[s], X1[s], X2[s])
+
 
 @myjit
 def _push_vals_scale_cov(data, W, X1, X2, scale):
@@ -432,6 +438,7 @@ def _push_datas_cov(data, datas):
     for s in range(ns):
         _push_data_scale_cov(data, datas[s], 1.0)
 
+
 @myjit
 def _push_datas_scale_cov(data, datas, scale):
     ns = datas.shape[0]
@@ -457,6 +464,7 @@ def _push_vals_cov_vec(data, W, X0, X1):
     for s in range(ns):
         for k in range(nv):
             _push_val_cov(data[k, ...], W[s, k], X0[s, k], X1[s, k])
+
 
 @myjit
 def _push_vals_scale_cov_vec(data, W, X0, X1, scale):
@@ -506,11 +514,10 @@ def _push_datas_scale_cov_vec(data, Datas, scale):
             _push_data_scale_cov(data[k, ...], Datas[s, k, ...], f)
 
 
-
 # named tuple for pushers
-from collections import namedtuple
 
-Pusher = namedtuple('Pusher',['val','vals','stat','stats', 'data','datas'])
+
+Pusher = namedtuple("Pusher", ["val", "vals", "stat", "stats", "data", "datas"])
 
 pusher_scalar = Pusher(
     val=_push_val,
@@ -527,7 +534,8 @@ pusher_vector = Pusher(
     stat=_push_stat_vec,
     stats=_push_stats_vec,
     data=_push_data_vec,
-    datas=_push_datas_vec)
+    datas=_push_datas_vec,
+)
 
 
 pusher_cov_scalar = Pusher(
@@ -536,15 +544,18 @@ pusher_cov_scalar = Pusher(
     stat=None,
     stats=None,
     data=_push_data_cov,
-    datas=_push_datas_cov)
+    datas=_push_datas_cov,
+)
 
-pusher_cov_vector  = Pusher(
+pusher_cov_vector = Pusher(
     val=_push_val_cov_vec,
     vals=_push_vals_cov_vec,
     stat=None,
     stats=None,
     data=_push_data_cov_vec,
-    datas=_push_datas_cov_vec)
+    datas=_push_datas_cov_vec,
+)
+
 
 def factory_pushers(cov=False, vec=False):
     if cov:
@@ -585,8 +596,3 @@ def factory_pusher_vals_scale(cov=False, vec=False):
             return _push_vals_scale_vec
         else:
             return _push_vals_scale
-
-
-
-
-

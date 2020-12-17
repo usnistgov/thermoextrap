@@ -5,10 +5,11 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from .utils import factory_binomial, myjit
 from .options import OPTIONS
+from .utils import factory_binomial, myjit
 
 _bfac = factory_binomial(OPTIONS["nmax"])
+
 
 @myjit
 def _central_to_raw_moments(central, raw):

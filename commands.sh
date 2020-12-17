@@ -27,4 +27,3 @@ conda create -n cmomy_conda python=3.8 pytest
 conda activate cmomy_conda
 conda install -c wpk-nist cmomy
 pytest -x -v ...
-

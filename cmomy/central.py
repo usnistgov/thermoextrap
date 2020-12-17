@@ -4,22 +4,15 @@ Central moments/comoments routines
 from __future__ import absolute_import
 
 import numpy as np
-from .cached_decorators import gcached
+from numpy.core.numeric import normalize_axis_index  # , normalize_axis_tuple
 
-from numpy.core.numeric import normalize_axis_index, normalize_axis_tuple
-
-
-from .utils import (
-    _axis_expand_broadcast,
-    _cached_ones,
-    _my_broadcast,
-    _shape_insert_axis,
-    _shape_reduce,
-)
-
-from .pushers import factory_pushers
-from .resample import resample_data, resample_vals, randsamp_freq
 from . import convert
+from .cached_decorators import gcached
+from .pushers import factory_pushers
+from .resample import randsamp_freq, resample_data, resample_vals
+from .utils import _axis_expand_broadcast  # _cached_ones,; _my_broadcast,
+from .utils import _shape_insert_axis, _shape_reduce
+
 
 ###############################################################################
 # central mom/comoments routines
@@ -200,8 +193,8 @@ def central_moments(
     output : array
         array of shape=shape + mom_shape or mom_shape + shape depending on
         value of `last`, where `shape` is the shape of `x` with axis removed,
-        i.e., shape=x.shape[:axis] + x.shape[axis+1:], and `mom_shape` is the shape of the
-        moment part, either (mom+1,) or (mom0+1, mom1+1).  Assuming `last is True`,
+        i.e., shape=x.shape[:axis] + x.shape[axis+1:], and `mom_shape` is the shape of
+        the moment part, either (mom+1,) or (mom0+1, mom1+1).  Assuming `last is True`,
         output[...,0] is the total weight (or count), output[...,1] is the mean
         value of x, output[...,n] with n>1 is the nth central moment.
     """
@@ -288,8 +281,8 @@ class CentralMoments(object):
 
         By convention data has the following meaning for the moments indexes
 
-        * `data[i_0=0,... i_n=0]`, if all moment indices are zero, this is the sum of weights
-        * `data[i_0=0,... i_k=1, ... i_n=0]`, if only one moment indice is one and all
+        * `data[...,i=0,j=0]`, weights
+        * `data[...,i=1,j=0]]`, if only one moment indice is one and all
         others zero, then this is the average value of the variable with unit index.
 
         * all other cases, the central moments `<(x0-<x0>)**i0 * (x1 - <x1>)**i1 * ...>`
@@ -455,8 +448,8 @@ class CentralMoments(object):
             if integer, or length one tuple, then moments of single variable.
             if tuple of length 2, then comoments of two variables.
         val_shape : tuple, optional
-            shape of values, excluding moments.  For example, if considering the average of
-            observations `x`, then `val_shape = x.shape`
+            shape of values, excluding moments.  For example, if considering the average
+            of observations `x`, then `val_shape = x.shape`
             if not passed, then assume val_shape = ()
         shape : tuple, optional
             if passed, create object with this total shape
@@ -1024,7 +1017,7 @@ class CentralMoments(object):
         mom = cls._check_mom(mom, mom_ndim, data.shape)
 
         if data.shape != val_shape + tuple(x + 1 for x in mom):
-            raise ValueError(f"{data.shape} does not conform to {shape} and {moments}")
+            raise ValueError(f"{data.shape} does not conform to {val_shape} and {mom}")
 
         if copy:
             if copy_kws is None:
@@ -1216,10 +1209,10 @@ class CentralMoments(object):
         Parameter
         ----------
         freq : array-like, shape=(nrep, nrec), optional
-            frequence table.  freq[i, j] is the weight of the jth record to the ith replicate
-        indices : array-like, shape=(nrep, nrec), optional
-            resampling array.  idx[i, j] is the record index of the original array to place in new sample[i, j].
-            if specified, create freq array from idx
+            frequence table.  freq[i, j] is the weight of the jth record to the ith
+            replicate indices : array-like, shape=(nrep, nrec), optional
+            resampling array.  idx[i, j] is the record index of the original array to
+            place in new sample[i, j]. if specified, create freq array from idx
         nrep : int, optional
             if specified, create idx array with this number of replicates
         axis : int, Default=0
@@ -1317,7 +1310,6 @@ class CentralMoments(object):
         else:
             nblock = n // block_size
 
-        new_shape = (nblock, block_size) + data.shape[1:]
         datas = data[: (nblock * block_size), ...].reshape(
             (nblock, block_size) + data.shape[1:]
         )

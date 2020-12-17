@@ -1,10 +1,7 @@
-
 import numpy as np
 import pytest
 
-from cmomy.cached_decorators import gcached
 import cmomy.central as central
-
 
 
 # Tests
@@ -18,40 +15,53 @@ def test_central_moments_out(other):
     out = np.zeros_like(other.data_test)
 
     _ = central.central_moments(
-        x=other.x, mom=other.mom, w=other.w, axis=other.axis, last=True, broadcast=other.broadcast, out=out
+        x=other.x,
+        mom=other.mom,
+        w=other.w,
+        axis=other.axis,
+        last=True,
+        broadcast=other.broadcast,
+        out=out,
     )
 
     np.testing.assert_allclose(out, other.data_test)
+
 
 # exceptions
 def test_mom_ndim():
 
     with pytest.raises(ValueError):
-        central.CentralMoments(np.zeros((4,4)), mom_ndim=0)
+        central.CentralMoments(np.zeros((4, 4)), mom_ndim=0)
 
     with pytest.raises(ValueError):
-        central.CentralMoments(np.zeros((4,4)), mom_ndim=3)
+        central.CentralMoments(np.zeros((4, 4)), mom_ndim=3)
 
 
 def test_data_ndim():
     with pytest.raises(ValueError):
         central.CentralMoments(np.zeros(4), mom_ndim=2)
 
+
 def test_ndim():
-    data = np.empty((1,2,3))
+    data = np.empty((1, 2, 3))
 
     s = central.CentralMoments(data, 1)
 
     assert data.ndim == s.ndim
 
 
-
-
 def test_s(other):
     other.test_values(other.s.values)
 
+
 def test_push(other):
-    s, x, w, axis, broadcast = other.unpack("s", "x", "w", "axis", "broadcast",)
+    s, x, w, axis, broadcast = other.unpack(
+        "s",
+        "x",
+        "w",
+        "axis",
+        "broadcast",
+    )
     t = s.zeros_like()
     t.push_vals(x, w=w, axis=axis, broadcast=broadcast)
     other.test_values(t.values)
@@ -171,15 +181,11 @@ def test_isub(other):
 def test_mult(other):
     s = other.s
 
-    np.testing.assert_allclose(
-        (s * 2).values,
-        (s + s).values
-    )
+    np.testing.assert_allclose((s * 2).values, (s + s).values)
 
     t = s.copy()
     t *= 2
-    np.testing.assert_allclose(t.values, (s+s).values)
-
+    np.testing.assert_allclose(t.values, (s + s).values)
 
 
 def test_reduce(other):
@@ -188,7 +194,9 @@ def test_reduce(other):
         for axis in range(ndim):
             t = other.s.reduce(axis)
 
-            f = other.cls.from_datas(other.data_test, axis=axis, mom_ndim=other.mom_ndim)
+            f = other.cls.from_datas(
+                other.data_test, axis=axis, mom_ndim=other.mom_ndim
+            )
             np.testing.assert_allclose(t.data, f.data)
 
 
@@ -200,7 +208,7 @@ def test_reshape(other):
         for axis in range(ndim):
 
             new_shape = list(other.s.val_shape)
-            new_shape = tuple(new_shape[:axis] + [1, -1] + new_shape[axis+1:])
+            new_shape = tuple(new_shape[:axis] + [1, -1] + new_shape[axis + 1 :])
 
             t = other.s.reshape(new_shape)
 
@@ -208,7 +216,6 @@ def test_reshape(other):
 
             f = other.data_test.reshape(new_shape2)
             np.testing.assert_allclose(t.data, f)
-
 
 
 def test_moveaxis(other):
@@ -223,9 +230,3 @@ def test_moveaxis(other):
             f = np.moveaxis(other.data_test, axis, 0)
 
             np.testing.assert_allclose(t.data, f)
-
-
-
-
-
-
