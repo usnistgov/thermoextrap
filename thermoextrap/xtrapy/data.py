@@ -987,6 +987,11 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
         return self.new_like(dxduave=dxdu_new, rec=rep)
 
+    # TODO : update from_raw from_data to
+    # include a mom_dims arguments
+    # that defaults to (mom_x, mom_u)
+    # so if things are in wrong order, stuff still works out
+
     @classmethod
     def from_raw(
         cls,
@@ -1011,7 +1016,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         ----------
         raw : array-like
             raw moments.  The form of this array is such that
-            raw[..., i, j] = <x**i * u**j>
+            raw[..., i, j] = weight,        i = j = 0
+                           = <x**i * u**j>, otherwise
            The shape should be (..., 2, order+1)
         """
 
@@ -1093,6 +1099,46 @@ class DataCentralMoments(DataCentralMomentsBase):
             central=central,
             **kws,
         )
+
+
+    @classmethod
+    def from_data(
+            cls, data,
+            rec='rec', mom_x='mom_x', mom_u='mom_u',
+            deriv=None, central=False, mom=None, val_shape=None,
+            dtype=None, dims=None, attrs=None, coords=None, indexes=None,
+            name=None, **kws
+    ):
+        """
+        Create DataCentralMoments object from data
+
+        data[..., i, j] = weight                          i = j = 0
+                        = < x >                           i = 1 and j = 0
+                        = < u >                           i = 0 and j = 1
+                        = <(x - <x>)**i * (u - <u>)**j >  otherwise
+        """
+        dxduave = xcentral.xCentralMoments.from_data(
+            data=data,
+            mom_ndim=2,
+            mom=mom,
+            val_shape=val_shape,
+            dims=dims,
+            attrs=attrs,
+            coords=coords,
+            indexes=indexes,
+            name=name,
+            mom_dims=(mom_x, mom_u)
+        )
+
+        return cls(
+            dxduave=dxduave,
+            mom_x=mom_x,
+            mom_u=mom_u,
+            rec=rec, deriv=deriv,
+            central=central,
+            **kws
+        )
+
 
     @classmethod
     def from_resample_vals(
