@@ -119,14 +119,14 @@ Currently, everything is only intended to work with 1D observables.
 
         #Want full list of all combinations of derivative pairs
         #Definitely only works for 1D data because of way reshaping
-        expand_d1 = np.reshape(np.tile(d1, (1, d2.shape[0])), (d1.shape[0]*d2.shape[0], -1))
-        expand_d2 = np.tile(d2, (d1.shape[0], 1))
-        deriv_pairs = np.hstack([expand_d1, expand_d2])
+        expand_d1 = tf.reshape(tf.tile(d1, (1, d2.shape[0])), (d1.shape[0]*d2.shape[0], -1))
+        expand_d2 = tf.tile(d2, (d1.shape[0], 1))
+        deriv_pairs = tf.stack([expand_d1, expand_d2], axis=1)
 
         #For convenience, do same with x, but no need to stack
         #Sort of same idea as creating a mesh grid
-        expand_x1 = np.reshape(np.tile(x1, (1, x2.shape[0])), (x1.shape[0]*x2.shape[0], -1))
-        expand_x2 = np.tile(x2, (x1.shape[0], 1))
+        expand_x1 = tf.reshape(tf.tile(x1, (1, x2.shape[0])), (x1.shape[0]*x2.shape[0], -1))
+        expand_x2 = tf.tile(x2, (x1.shape[0], 1))
 
         #Now need UNIQUE derivative pairs because will be faster to loop over
         unique_pairs = np.unique(deriv_pairs, axis=0)
@@ -136,7 +136,8 @@ Currently, everything is only intended to work with 1D observables.
         inds_list = []
         for pair in unique_pairs:
             #Get the right indices
-            this_inds = np.where(np.all(deriv_pairs == pair, axis=1))[0]
+            this_inds = tf.cast(tf.where(tf.reduce_all(deriv_pairs == pair, axis=1))[:, :1],
+                                tf.int32)
             #Use sympy to obtain right derivative
             this_expr = sp.diff(self.kernel_expr,
                                 self.x_syms[0], int(pair[0]),
@@ -146,7 +147,8 @@ Currently, everything is only intended to work with 1D observables.
                                      this_expr,
                                      modules="tensorflow")
             #Plug in our values for the derivative kernel
-            k_list.append(this_func(expand_x1[this_inds], expand_x2[this_inds],
+            k_list.append(this_func(tf.gather_nd(expand_x1, this_inds),
+                                    tf.gather_nd(expand_x2, this_inds),
                                     *[getattr(self, s.name) for s in self.param_syms]))
             #Also keep track of indices so can dynamically stitch back together
             inds_list.append(this_inds)
@@ -165,14 +167,15 @@ Currently, everything is only intended to work with 1D observables.
         k_list = []
         inds_list = []
         for d in unique_d1:
-            this_inds = np.where(d1 == unique_d1)[0]
+            this_inds = tf.cast(tf.where(d1 == d)[:, :1], tf.int32)
             this_expr = sp.diff(self.kernel_expr,
                                 self.x_syms[0], int(d),
                                 self.x_syms[1], int(d))
             this_func = sp.lambdify((self.x_syms[0], self.x_syms[1], *self.param_syms),
                                      this_expr,
                                      modules="tensorflow")
-            k_list.append(this_func(x1[this_inds], x1[this_inds],
+            k_list.append(this_func(tf.gather_nd(x1, this_inds),
+                                    tf.gather_nd(x1, this_inds),
                                     *[getattr(self, s.name) for s in self.param_syms]))
             inds_list.append(this_inds)
 
