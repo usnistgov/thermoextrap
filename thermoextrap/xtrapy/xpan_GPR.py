@@ -247,7 +247,7 @@ class GPRModel(StateCollection):
           #Obtain variances by bootstrap resampling of original data and compute for each
           this_boot = m.resample(n_resample).xcoefs(order=order, order_name=order_name,
                                                     norm=False)
-          y_data_err_xr.append(this_boot.std('rep'))
+          y_data_err_xr.append(this_boot.var('rep'))
         y_data_xr = xr.concat(y_data_xr, dim='state')
         y_data_err_xr = xr.concat(y_data_err_xr, dim='state')
         #Need to flatten order and state dimensions together
@@ -280,7 +280,7 @@ class GPRModel(StateCollection):
 
         #Run optimization
         natgrad = gpflow.optimizers.NaturalGradient(gamma=1.0)
-        adam = tf.optimizers.Adam()
+        adam = tf.optimizers.Adam(learning_rate=0.5) #Can be VERY aggressive with learning
         for _ in range(ci_niter(opt_steps)):
             natgrad.minimize(self.gp.training_loss, [(self.gp.q_mu, self.gp.q_sqrt)])
             adam.minimize(self.gp.training_loss, self.gp.trainable_variables)
