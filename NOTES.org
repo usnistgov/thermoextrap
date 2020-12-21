@@ -1,0 +1,11 @@
+* creating enviroments for development
+
+  create the base runtime enviroment with
+  #+begin_src sh
+    conda env create -n 'env name' -f environment.yml
+  #+end_src
+
+  To add development stuff do
+  #+begin_src sh
+    conda env update -n 'env name' -f environment.dev.yml -f 'any-other-recipes'
+  #+end_src
