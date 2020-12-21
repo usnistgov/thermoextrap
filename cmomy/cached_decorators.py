@@ -4,8 +4,9 @@ routines to define a cached class without needing to subclass Cached class
 from __future__ import absolute_import
 
 from functools import wraps
+from inspect import signature
 
-# __all__ = ['cached', 'cached_func', 'cached_clear', 'gcached']
+__all__ = ["cached", "cached_func", "cached_clear", "gcached"]
 
 
 def gcached(key=None, prop=True):
@@ -125,10 +126,16 @@ def cached_func(key=None):
         else:
             _key = key
 
+        # use signature
+        bind = signature(func).bind
+
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            key_func = (_key, args, frozenset(kwargs.items()))
-
+            # key_func = (_key, args, frozenset(kwargs.items()))
+            # params = sig.bind
+            params = bind(self, *args, **kwargs)
+            params.apply_defaults()
+            key_func = (_key, params.args[1:], frozenset(params.kwargs.items()))
             try:
                 return self._cache[key_func]
             except TypeError:
