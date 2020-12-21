@@ -2,7 +2,7 @@
 
 For example usage, look at [example usage](examples/example_usage.ipynb)
 
-# INSTALLATION
+# Installation
 
 ## Install needed packages
 
@@ -48,3 +48,17 @@ time a funciton called, it has to compile the underlying code. However,
 caching has been implemented. Therefore, the very first time you run a
 function, it may be slow. But all subsequent uses (including other
 sessions) will be already compiled.
+
+# Testing
+
+Tests are packaged with the distribution intentionally. To test code
+run:
+
+``` {.bash org-language="sh"}
+pytest -x -v --pyargs cmomy
+```
+
+By running the tests once, you create a cache of the numba code for most
+cases. The first time you run the tests, it will take a while (about 1.5
+min on my machine). However, subsequent runs will be much faster (about
+3 seconds on my machine).
