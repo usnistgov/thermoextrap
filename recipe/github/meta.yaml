@@ -1,0 +1,42 @@
+{% set name = "cmomy" %}
+{% set version = "0.0.2" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/wpk-nist-gov/cmomy.git
+  git_tag: develop
+
+build:
+  number: 0
+  noarch: python
+  script: "{{ PYTHON }} -m pip install . -vv --no-deps --ignore-installed "
+
+requirements:
+  host:
+    - pip
+    - python
+  run:
+    - numba
+    - numpy
+    - python
+    - xarray
+
+test:
+  imports:
+    - cmomy
+  commands:
+    - pip check
+  requires:
+    - pip
+
+about:
+  home: https://github.com/wpk-nist-gov/cmomy
+  summary: Central (co)moment calculation
+  license: NIST https://www.nist.gov/director/licensing
+
+extra:
+  recipe-maintainers:
+    - wpK
