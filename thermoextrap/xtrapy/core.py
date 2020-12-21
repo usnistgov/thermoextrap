@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-
 from functools import lru_cache
 
 import numpy as np
@@ -10,245 +9,21 @@ from scipy.special import factorial as sp_factorial
 
 from .cached_decorators import gcached
 
+from .data import xrwrap_alpha
+
 try:
     from pymbar import mbar
-
     _HAS_PYMBAR = True
 except ImportError:
     _HAS_PYMBAR = False
 
-# NOTE: General scheme:
-# uv, xv -> samples (values) for u, x
-# u, xu -> averages of u and x*u
-# u[i] = <u**i>
-# xu[i] = <x * u**i>
-# xu[i, j] = <d^i x/d beta^i * u**j>
 
 
-###############################################################################
-# Structure(s) to handle data
-###############################################################################
-def _check_xr(x, dims, strict=True, name=None):
-    if isinstance(x, xr.Dataset):
-        # don't do anything to datasets
-        pass
-
-    elif not isinstance(x, xr.DataArray):
-        x = np.array(x)
-        if isinstance(dims, dict):
-            dims = dims[x.ndim]
-        x = xr.DataArray(x, dims=dims, name=name)
-    elif strict:
-        if isinstance(dims, dict):
-            dims = dims[x.ndim]
-        for d in dims:
-            if d not in x.dims:
-                raise ValueError("{} not in dims".format(d))
-    return x
-
-
-def xrwrap_uv(uv, dims=None, rec="rec", rep="rep", name="u", stict=True):
-    """
-    wrap uv (energy values) array
-
-    assumes uv[rec], or uv[rep, rec] where rec is recored (or time) and rep is replicate
-    """
-    if dims is None:
-        dims = {1: [rec], 2: [rep, rec]}
-    return _check_xr(uv, dims, strict=stict, name=name)
-
-
-def xrwrap_xv(
-    xv,
-    dims=None,
-    rec="rec",
-    rep="rep",
-    deriv="deriv",
-    val="val",
-    xalpha=False,
-    name="x",
-    strict=None,
-):
-    """
-    wraps xv (x values) array
-
-    if xalpha is False, assumes xv[rec], xv[rec, val], xv[rep, rec, val]
-    if xalpha is True, assumes xv[rec, deriv], xv[rec,deriv, val], xv[rep,rec,deriv,val]
-    """
-    if not xalpha:
-        if strict is None:
-            strict = False
-        if dims is None:
-            dims = {1: [rec], 2: [rec, val], 3: [rep, rec, val]}
-
-    else:
-        if strict is None:
-            strict = False
-        if dims is None:
-            dims = {2: [rec, deriv], 3: [rec, deriv, val], 4: [rep, rec, deriv, val]}
-    return _check_xr(xv, dims=dims, strict=strict, name=name)
-
-
-def xrwrap_alpha(alpha, dims=None, stict=False, name="alpha"):
-    """
-    wrap alpha values
-    """
-    if isinstance(alpha, xr.DataArray):
-        pass
-    else:
-        alpha = np.array(alpha)
-        if dims is None:
-            dims = name
-
-        if alpha.ndim == 0:
-            alpha = xr.DataArray(alpha, coords={dims: alpha}, name=name)
-        elif alpha.ndim == 1:
-            alpha = xr.DataArray(alpha, dims=dims, coords={dims: alpha}, name=name)
-        else:
-            alpha = xr.DataArray(alpha, dims=dims, name=name)
-    return alpha
-
-
-def resample_indicies(size, nrep, rec="rec", rep="rep"):
-    """
-    get indexing DataArray
-    """
-    return (
-        xr.DataArray(
-            [np.random.choice(size, size=size, replace=True) for _ in range(nrep)],
-            dims=[rep, rec],
-        )
-        # things are faster with
-        .transpose("rec", ...)
-    )
-
-
-class DatasetSelector(object):
-    """
-    wrap dataset so can index like ds[i, j]
-
-    Needed for calling sympy.lambdify functions
-    """
-
-    def __init__(self, data, dims=None, moment="moment", deriv="deriv"):
-
-        # Default dims
-        if dims is None:
-            if deriv in data.dims:
-                dims = [moment, deriv]
-            else:
-                dims = [moment]
-
-        if isinstance(dims, str):
-            dims = [dims]
-
-        self.data = data
-        self.dims = dims
-
-    def __getitem__(self, idx):
-        if not isinstance(idx, tuple):
-            idx = (idx,)
-        assert len(idx) == len(self.dims)
-        selector = dict(zip(self.dims, idx))
-        return self.data.isel(**selector)
-
-
-class DataBase(object):
-    def __init__(
-        self,
-        uv,
-        xv,
-        order,
-        skipna=False,
-        xalpha=False,
-        rec="rec",
-        moment="moment",
-        val="val",
-        rep="rep",
-        deriv="deriv",
-        chunk=None,
-        compute=None,
-        **kws
-    ):
-
-        uv = xrwrap_uv(uv, rec=rec, rep=rep)
-        xv = xrwrap_xv(xv, rec=rec, rep=rep, deriv=deriv, val=val, xalpha=xalpha)
-
-        if chunk is not None:
-            if isinstance(chunk, int):
-                chunk = {rec: chunk}
-
-            uv = uv.chunk(chunk)
-            xv = xv.chunk(chunk)
-
-        if compute is None:
-            # default compute
-            # if not chunk, default compute is False
-            # if chunk, default compute is True
-            if chunk is None:
-                compute = False
-            else:
-                compute = True
-
-        self.uv = uv
-        self.xv = xv
-        self.chunk = chunk
-        self.compute = compute
-
-        self.order = order
-        self.skipna = skipna
-        self.xalpha = xalpha
-
-        self._rec = rec
-        self._rep = rep
-        self._val = val
-        self._moment = moment
-        self._deriv = deriv
-        self._kws = kws
-
-    def __len__(self):
-        return len(self.uv["rec"])
-
-    def resample(self, nrep, idx=None, chunk=None, compute="None"):
-
-        if chunk is None:
-            chunk = self.chunk
-
-        if compute is "None":
-            compute = None
-        elif compute is None:
-            compute = self.compute
-
-        shape = len(self.uv[self._rec])
-
-        if idx is None:
-            idx = resample_indicies(shape, nrep, rec=self._rec, rep=self._rep)
-
-        uv = self.uv.compute()[idx]
-        # allow for Dataset
-        xv = self.xv.compute().isel(**{self._rec: idx})
-
-        return self.__class__(
-            uv=uv,
-            xv=xv,
-            order=self.order,
-            rec=self._rec,
-            rep=self._rep,
-            val=self._val,
-            moment=self._moment,
-            deriv=self._deriv,
-            xalpha=self.xalpha,
-            skipna=self.skipna,
-            chunk=chunk,
-            compute=compute,
-            **self._kws
-        )
 
 
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
-
 
 @lru_cache(100)
 def _get_default_symbol(*args):
@@ -325,6 +100,7 @@ class Lambdify(object):
     """
     create python function from list of sympy expression
     """
+
     def __init__(self, exprs, args=None, **opts):
         """
         Parameters
@@ -366,6 +142,7 @@ class Lambdify(object):
 # -log<X>
 class SymMinusLog(object):
     """class to take -log(X)"""
+
     X, dX = _get_default_indexed("X", "dX")
 
     @gcached(prop=False)
@@ -392,6 +169,7 @@ def factory_minus_log():
 
 class Coefs(object):
     """class to handle coefficients in taylor expansion"""
+
     def __init__(self, funcs, exprs=None):
         """
         Parameters
@@ -423,7 +201,7 @@ class Coefs(object):
         if order is None:
             order = data.order
         out = self.coefs(
-            *data._xcoefs_args, order=order, norm=norm, minus_log=minus_log
+            *data.xcoefs_args, order=order, norm=norm, minus_log=minus_log
         )
         return xr.concat(out, dim=order_name)
 
@@ -437,21 +215,25 @@ class ExtrapModel(object):
     """
     apply taylor series extrapolation
     """
-    def __init__(self, alpha0, data, coefs, order=None, minus_log=False, alpha_name='alpha'):
+
+    def __init__(
+        self, alpha0, data, coefs, order=None, minus_log=False, alpha_name="alpha"
+    ):
         self.alpha0 = alpha0
         self.data = data
         self.coefs = coefs
 
         if order is None:
-            order = self.order
-        if minus_log is None:
-            minus_log = False
-
-        self.minus_log = minus_log
+            order = data.order
         self.order = order
 
+        if minus_log is None:
+            minus_log = False
+        self.minus_log = minus_log
+
+
         if alpha_name is None:
-            alpha_name = 'alpha'
+            alpha_name = "alpha"
         self.alpha_name = alpha_name
 
     @gcached(prop=False)
@@ -472,8 +254,13 @@ class ExtrapModel(object):
         return self.predict(*args, **kwargs)
 
     def predict(
-            self, alpha, order=None, order_name="order", cumsum=False, minus_log=None,
-            alpha_name=None,
+        self,
+        alpha,
+        order=None,
+        order_name="order",
+        cumsum=False,
+        minus_log=None,
+        alpha_name=None,
     ):
         if order is None:
             order = self.order
@@ -490,11 +277,10 @@ class ExtrapModel(object):
         p = xr.DataArray(np.arange(order + 1), dims=order_name)
         prefac = dalpha ** p
 
-        coords = {'dalpha': dalpha, alpha_name + '0': self.alpha0}
+        coords = {"dalpha": dalpha, alpha_name + "0": self.alpha0}
 
-        out = (
-            (prefac * xcoefs.sel(**{order_name: prefac[order_name]}))
-            .assign_coords(**coords)
+        out = (prefac * xcoefs.sel(**{order_name: prefac[order_name]})).assign_coords(
+            **coords
         )
 
         if cumsum:
@@ -504,38 +290,29 @@ class ExtrapModel(object):
 
         return out
 
-    def resample(self, nrep, idx=None, **kws):
+    def resample(self, indices=None, nrep=None, **kws):
         return self.__class__(
             order=self.order,
             alpha0=self.alpha0,
             coefs=self.coefs,
-            data=self.data.resample(nrep=nrep, idx=idx, **kws),
+            data=self.data.resample(nrep=nrep, indices=indices, **kws),
             minus_log=self.minus_log,
             alpha_name=self.alpha_name,
         )
 
-    # @classmethod
-    # def from_values_beta(
-    #     cls, order, alpha0, uv, xv, xalpha=False, central=False, minus_log=False, **kws
-    # ):
-    #     """
-    #     build a model from beta extraploation from data
-    #     """
-
-    #     data = factory_data(
-    #         uv=uv, xv=xv, order=order, xalpha=xalpha, central=central, **kws
-    #     )
-
-    #     coefs = factory_coefs_beta(xalpha=xalpha, central=central)
-
-    #     return cls(
-    #         order=order, alpha0=alpha0, coefs=coefs, data=data, minus_log=minus_log
-    #     )
-
 
 class StateCollection(object):
-    def __init__(self, states):
+    def __init__(self, states): #, **kws):
+        """
+        Parameters
+        ----------
+        states : list
+            list of states to consider
+            Note that some subclasses require this list to be sorted
+        """
+
         self.states = states
+        #self.kws = kws
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -546,30 +323,52 @@ class StateCollection(object):
     def __getitem__(self, idx):
         return self.states[idx]
 
-
     @property
     def alpha_name(self):
         try:
             alpha_name = self[0].alpha_name
         except:
-            alpha_name = 'alpha'
+            alpha_name = "alpha"
         return alpha_name
 
-    def resample(self, nrep, idxs=None, **kws):
-        if idxs is None:
-            idxs = [None] * len(self)
-        assert len(idxs) == len(self)
+    def resample(self, indices=None, nrep=None, **kws):
+        """
+        resample things
+        """
+        if indices is None:
+            indices = [None] * len(self)
 
-        return self.__class__(
-            states=tuple(
-                state.resample(nrep=nrep, idx=idx, **kws)
-                for state, idx in zip(self.states, idxs)
+        assert len(indices) == len(self)
+
+        if 'freq' in kws:
+            freq = kws.pop('freq')
+            if freq is None:
+                freq = [None] * len(self)
+            assert len(freq) == len(self)
+
+
+            return type(self)(
+                states=tuple(
+                    state.resample(indices=idx, nrep=nrep, freq=fq, **kws)
+                    for state, idx, fq in zip(self.states, indices, freq))
             )
-        )
+
+        else:
+            return self.__class__(
+                states=tuple(
+                    state.resample(indices=idx, nrep=nrep, **kws)
+                    for state, idx in zip(self.states, indices)
+                )
+            )
 
     @gcached()
     def order(self):
         return min([m.order for m in self])
+
+    @gcached()
+    def alpha0(self):
+        return [m.alpha0 for m in self]
+
 
 
 def xr_weights_minkowski(deltas, m=20, dim="state"):
@@ -578,15 +377,85 @@ def xr_weights_minkowski(deltas, m=20, dim="state"):
 
 
 class ExtrapWeightedModel(StateCollection):
+
+    def _states_between_alpha(self, alpha):
+        idx = np.digitize(alpha, self.alpha0, right=False) - 1
+        if idx < 0:
+            idx = 0
+        elif idx == len(self) - 1:
+            idx = len(self) - 2
+
+        return self.states[idx:idx+2]
+
+    def _states_nearest_alpha(self, alpha):
+        dalpha = np.abs(np.array(self.alpha0) - alpha)
+        # two lowest
+        idx = np.argsort(dalpha)[:2]
+        return [self[i] for i in idx]
+
+    def _states_alpha(self, alpha, method):
+        if method is None or method=='between':
+            return self._states_between_alpha(alpha)
+        elif method == 'nearest':
+            return self._states_nearest_alpha(alpha)
+        else:
+            raise ValueError('unknown method {}'.format(method))
+
+
     def predict(
-            self, alpha, order=None, order_name="order", cumsum=False, minus_log=None,
-            alpha_name=None,
+        self,
+        alpha,
+        order=None,
+        order_name="order",
+        cumsum=False,
+        minus_log=None,
+        alpha_name=None,
+        method=None,
     ):
+        """
+        Parameters
+        ----------
+        method : {None, 'between', 'nearest'}
+            method to select which models are chosen to predict value for given
+            value of alpha.
+            * None or between: use states such that `state[i].alpha0 <= alpha < states[i+1]`
+              if alpha < state[0].alpha0 use first two states
+              if alpha > states[-1].alpha0 use last two states
+            * nearest: use two states with minimum `abs(state[k].alpha0 - alpha)`
+
+        Notes
+        -----
+        This requires that self.states are ordered in ascending alpha0 order
+        """
+
+        if alpha_name is None:
+            alpha_name = self.alpha_name
 
         if order is None:
             order = self.order
         if alpha_name is None:
             alpha_name = self.alpha_name
+
+        if len(self) == 2:
+            states = self.states
+
+        else:
+            # multiple states
+            if np.array(alpha).ndim > 0:
+                # have multiple alphas
+                # recursively call
+                return xr.concat(
+                    (self.predict(alpha=a, order=order,
+                                  order_name=order_name, cumsum=cumsum,
+                                  minus_log=minus_log, alpha_name=alpha_name,
+                                  method=method)
+                     for a in alpha),
+                    dim=alpha_name)
+
+            states = self._states_alpha(alpha, method)
+
+
+
 
         out = xr.concat(
             [
@@ -598,7 +467,7 @@ class ExtrapWeightedModel(StateCollection):
                     minus_log=minus_log,
                     alpha_name=alpha_name,
                 )
-                for m in self.states
+                for m in states
             ],
             dim="state",
         )
@@ -663,7 +532,9 @@ class InterpModel(StateCollection):
 
         return coefs
 
-    def predict(self, alpha, order=None, order_name="porder", minus_log=None, alpha_name=None):
+    def predict(
+        self, alpha, order=None, order_name="porder", minus_log=None, alpha_name=None
+    ):
 
         if order is None:
             order = self.order
@@ -683,13 +554,13 @@ class InterpModel(StateCollection):
 
 
 class PerturbModel(object):
-    def __init__(self, alpha0, data, alpha_name='alpha'):
+    def __init__(self, alpha0, data, alpha_name="alpha"):
 
         self.alpha0 = alpha0
         self.data = data
 
         if alpha_name is None:
-            alpha_name = 'alpha'
+            alpha_name = "alpha"
         self.alpha_name = alpha_name
 
     def predict(self, alpha, alpha_name=None):
@@ -703,7 +574,7 @@ class PerturbModel(object):
 
         alpha0 = self.alpha0
 
-        rec = self.data._rec
+        rec = self.data.rec
         dalpha = alpha - alpha0
 
         dalpha_uv = (-1.0) * dalpha * uv
@@ -721,7 +592,6 @@ class PerturbModel(object):
             data=self.data.resample(nrep=nrep, idx=idx, **kws),
             alpha_name=self.alpha_name,
         )
-
 
 
 class MBARModel(StateCollection):
@@ -742,8 +612,8 @@ class MBARModel(StateCollection):
         uv = xr.concat([m.data.uv for m in self], dim=state_name)
         alpha0 = xrwrap_alpha([m.alpha0 for m in self], name=alpha_name)
 
-        # make sure uv, xv in correct order
-        rec = self[0].data._rec
+        # make sure uv, xv in correct orde
+        rec = self[0].data.rec
         xv = xv.transpose(state_name, rec, ...)
         uv = uv.transpose(state_name, rec, ...)
 
@@ -757,7 +627,6 @@ class MBARModel(StateCollection):
     def predict(self, alpha, alpha_name=None):
         if alpha_name is None:
             alpha_name = self.alpha_name
-
 
         alpha = xrwrap_alpha(alpha, name=alpha_name)
         if alpha.ndim == 0:
@@ -783,3 +652,6 @@ class MBARModel(StateCollection):
         ).assign_coords(alpha=alpha)
 
         return out
+
+    def resample(self, *args, **kwargs):
+        raise NotImplementedError('resample not implemented for this class')
