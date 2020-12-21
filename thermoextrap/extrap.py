@@ -108,7 +108,7 @@ class ExtrapModel:
     predictVals = np.zeros((B.shape[0], self.x.shape[-1]))
     for o in range(order+1):
       predictVals += np.tensordot((dBeta**o), params[o], axes=0)/np.math.factorial(o)
-
+      
     return predictVals
 
   def resampleData(self):

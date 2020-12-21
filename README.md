@@ -19,8 +19,29 @@ If specific features would be helpful just let us know and we will be happy to w
 - numpy
 - scipy
 - sympy
+- cmomy
 - matplotlib (optional --- for visual consistency checks)
 - pymbar (optional --- for comparisons)
+
+cmomy may e installed with either (recommended)
+```
+conda install -c wpk-nist cmomy
+```
+or
+```
+pip install cmomy
+```
+
+# Running tests
+```
+conda install pytest
+# run all tests
+pytest -x -v --runslow tests
+# run all but some legacy tests
+pytest -x -v tests
+```
+
+
 
 # Installation
 Move into the repository directory and run
