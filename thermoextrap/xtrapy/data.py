@@ -198,7 +198,7 @@ class DatasetSelector(object):
         if len(idx) != len(self.dims):
             raise ValueError("bad idx {}, vs dims {}".format(idx, self.dims))
         selector = dict(zip(self.dims, idx))
-        return self.data.isel(**selector)
+        return self.data.isel(**selector, drop=True)
 
 
 class AbstractData(ABC):
@@ -832,29 +832,29 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def u(self):
-        out = self.rmom().sel(**{self.mom_x: 0})
+        out = self.rmom().sel(**{self.mom_x: 0}, drop=True)
         if self.xalpha:
-            out = out.sel(**{self.deriv: 0})
+            out = out.sel(**{self.deriv: 0}, drop=True)
         return out
 
     @gcached()
     def xu(self):
-        return self.rmom().sel(**{self.mom_x: 1})
+        return self.rmom().sel(**{self.mom_x: 1}, drop=True)
 
     @gcached()
     def xave(self):
-        return self.dxduave.values.sel(**{self.mom_u: 0, self.mom_x: 1})
+        return self.dxduave.values.sel(**{self.mom_u: 0, self.mom_x: 1}, drop=True)
 
     @gcached()
     def du(self):
-        out = self.cmom().sel(**{self.mom_x: 0})
+        out = self.cmom().sel(**{self.mom_x: 0}, drop=True)
         if self.xalpha:
-            out = out.sel(**{self.deriv: 0})
+            out = out.sel(**{self.deriv: 0}, drop=True)
         return out
 
     @gcached()
     def dxdu(self):
-        return self.cmom().sel(**{self.mom_x: 1})
+        return self.cmom().sel(**{self.mom_x: 1}, drop=True)
 
     @gcached()
     def u_selector(self):
