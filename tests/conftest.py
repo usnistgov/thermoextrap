@@ -1,16 +1,12 @@
 import numpy as np
+import pytest
 import xarray as xr
 
 import thermoextrap
-
 import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
-
 from thermoextrap.xtrapy.cached_decorators import gcached
-
-import pytest
-
 
 
 class FixtureData:
@@ -32,7 +28,53 @@ class FixtureData:
         self.ub = self.rs.rand(n) + uoff
         self.xb = self.rs.rand(n, nv) + xoff
 
+    # bunch of things to test
+    @gcached()
+    def rdata(self):
+        return xpan_beta.factory_data(
+            uv=self.u, xv=self.x, order=self.order, central=False
+        )
 
+    @gcached()
+    def cdata(self):
+        return xpan_beta.factory_data(
+            uv=self.u, xv=self.x, order=self.order, central=True
+        )
+
+    @gcached()
+    def xdata(self):
+        return xtrapy_data.DataCentralMoments.from_vals(
+            xv=self.x,
+            uv=self.u,
+            order=self.order,
+            central=True,
+            dims=["val"],
+        )
+
+    @gcached()
+    def xdata_val(self):
+        return xtrapy_data.DataCentralMomentsVals.from_vals(
+            xv=self.x, uv=self.u, order=self.order, central=True
+        )
+
+    @gcached()
+    def xrdata(self):
+        return xtrapy_data.DataCentralMoments.from_vals(
+            xv=self.x,
+            uv=self.u,
+            order=self.order,
+            central=False,
+            dims=["val"],
+        )
+
+    @gcached()
+    def xrdata_val(self):
+        return xtrapy_data.DataCentralMomentsVals.from_vals(
+            xv=self.x,
+            uv=self.u,
+            order=self.order,
+            central=False,
+        )
 
     # bunch of things to test
     @gcached()
@@ -50,7 +92,11 @@ class FixtureData:
     @gcached()
     def xdata(self):
         return xtrapy_data.DataCentralMoments.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=True, dims=["val"],
+            xv=self.x,
+            uv=self.u,
+            order=self.order,
+            central=True,
+            dims=["val"],
         )
 
     @gcached()
@@ -62,53 +108,21 @@ class FixtureData:
     @gcached()
     def xrdata(self):
         return xtrapy_data.DataCentralMoments.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=False, dims=["val"],
+            xv=self.x,
+            uv=self.u,
+            order=self.order,
+            central=False,
+            dims=["val"],
         )
 
     @gcached()
     def xrdata_val(self):
         return xtrapy_data.DataCentralMomentsVals.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=False,
+            xv=self.x,
+            uv=self.u,
+            order=self.order,
+            central=False,
         )
-
-
-    # bunch of things to test
-    @gcached()
-    def rdata(self):
-        return xpan_beta.factory_data(
-            uv=self.u, xv=self.x, order=self.order, central=False
-        )
-
-    @gcached()
-    def cdata(self):
-        return xpan_beta.factory_data(
-            uv=self.u, xv=self.x, order=self.order, central=True
-        )
-
-    @gcached()
-    def xdata(self):
-        return xtrapy_data.DataCentralMoments.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=True, dims=["val"],
-        )
-
-    @gcached()
-    def xdata_val(self):
-        return xtrapy_data.DataCentralMomentsVals.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=True
-        )
-
-    @gcached()
-    def xrdata(self):
-        return xtrapy_data.DataCentralMoments.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=False, dims=["val"],
-        )
-
-    @gcached()
-    def xrdata_val(self):
-        return xtrapy_data.DataCentralMomentsVals.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=False,
-        )
-
 
     @property
     def beta0(self):
@@ -127,19 +141,16 @@ class FixtureData:
 
         return em
 
-
-
     @gcached()
     def u_xu_funcs(self):
         ufunc, xufunc = thermoextrap.buildAvgFuncs(self.x, self.u, self.order)
         return ufunc, xufunc
 
-
     @gcached()
     def coefs_list(self):
-        fs = [thermoextrap.symDerivAvgX(i) for i in range(self.order+1)]
+        fs = [thermoextrap.symDerivAvgX(i) for i in range(self.order + 1)]
         ufunc, xufunc = self.u_xu_funcs
-        return [fs[i](ufunc, xufunc) for i in range(self.order+1)]
+        return [fs[i](ufunc, xufunc) for i in range(self.order + 1)]
 
     def xr_test_raw(self, b, a=None):
         if a is None:
@@ -175,7 +186,6 @@ def fixture(request):
     return FixtureData(*request.param)
 
 
-
 def pytest_addoption(parser):
     parser.addoption(
         "--runslow", action="store_true", default=False, help="run slow tests"
@@ -196,8 +206,6 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(skip_slow)
 
 
-
-
 # an attempt for using fixtures better
 # whatever, went with above
 
@@ -215,7 +223,6 @@ def pytest_collection_modifyitems(config, items):
 #     return u, x
 
 
-
 # class Fixture_Old:
 #     def __init__(self, x, u, order):
 #         self.x = x
@@ -230,7 +237,6 @@ def pytest_collection_modifyitems(config, items):
 #     @gcached(prop=False)
 #     def em(self, alpha0=0.5):
 #         return thermoextrap.ExtrapModel(self.order, alpha0, self.x, self.u)
-
 
 
 # class Fixture_New:
@@ -265,7 +271,6 @@ def pytest_collection_modifyitems(config, items):
 #     @staticmethod
 #     def xr_test(a, b):
 #         xr.testing.assert_allclose(a, b.transpose(*a.dims))
-
 
 
 # @pytest.fixture

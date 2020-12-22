@@ -9,20 +9,11 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
-import xarray as xr
-import sympy as sp
-
 from .cached_decorators import gcached
-from .core import _get_default_symbol, _get_default_indexed
-
-from .core import SymSubs, Coefs
-from .core import ExtrapModel, PerturbModel
-
-from .data import DataValues
-from .data import xrwrap_xv
+from .core import Coefs, ExtrapModel
+from .data import DataValues, xrwrap_xv
 
 # Lazily imported everything above - will trim down later
-
 # Need funcs to pass to Coefs class
 # Just needs to be indexable based on order, so...
 # d^n X / d V^n = funcs[n](*args)
@@ -33,16 +24,16 @@ from .data import xrwrap_xv
 # This is because the last, custom term may need more information than W and x*W moments
 # Though ALL of the observables in the paper end up with a unique term that is just
 # some constant multiplied by an average of x (same with ideal gas, too).
+
+
 class VolumeDerivFuncs(object):
     """Calculates specific derivative values at refV with data x and W.
-       Only go to first order for volume extrapolation.
-       Here W represents the virial instead of the potential energy.
+    Only go to first order for volume extrapolation.
+    Here W represents the virial instead of the potential energy.
     """
 
-    # args = volume, beta, ndim
-
-    def __init__(self):
-        pass
+    # def __init__(self):
+    #     pass
 
     def __getitem__(self, order):
         # Check to make sure not going past first order
@@ -55,13 +46,15 @@ class VolumeDerivFuncs(object):
         else:
             return self.create_deriv_func(order)
 
-    def create_deriv_func(self, order):
+    # TODO: move this to just a functions
+    @staticmethod
+    def create_deriv_func(order):
         # Works only because of local scope
         # Even if order is defined somewhere outside of this class, won't affect returned func
 
         def func(W, xW, dxdq, volume, ndim=1):
             """
-            dxdq is <\sum_{i=1}^N dy/dx_i x_i>
+            dxdq is <sum_{i=1}^N dy/dx_i x_i>
 
             for ideal gas
             """
@@ -94,8 +87,6 @@ def factory_coefs():
     """
     deriv_funcs = VolumeDerivFuncs()
     return Coefs(deriv_funcs)
-
-
 
 
 # make a special data class
@@ -134,7 +125,6 @@ class DataValuesVolume(DataValues):
             dxdqv=dxdqv,
         )
 
-
     @property
     def xcoefs_args(self):
         return (
@@ -154,8 +144,6 @@ class DataValuesVolume(DataValues):
         out = self.kws.copy()
         out["dxdqv"] = out["dxdqv"][indices]
         return out
-
-
 
 
 def factory_extrapmodel(
@@ -199,7 +187,7 @@ def factory_extrapmodel(
     """
 
     if order != 1:
-        raise ValueError('only order=1 is supported')
+        raise ValueError("only order=1 is supported")
 
     dxdqv = xrwrap_xv(dxdqv, rec="rec", rep="rep", deriv=None, val=val)
     data = DataValuesVolume.from_vals(
