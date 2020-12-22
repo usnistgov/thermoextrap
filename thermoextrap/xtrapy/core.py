@@ -272,6 +272,7 @@ class ExtrapModel(object):
         p = xr.DataArray(np.arange(order + 1), dims=order_name)
         prefac = dalpha ** p
 
+        # TODO : this should be an option, same for xcoefs
         coords = {"dalpha": dalpha, alpha_name + "0": self.alpha0}
 
         out = (prefac * xcoefs.sel(**{order_name: prefac[order_name]})).assign_coords(
