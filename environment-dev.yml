@@ -1,0 +1,12 @@
+# packages for development
+dependencies:
+  - ipykernel
+  - black
+  - blackdoc
+  - flake8
+  - isort
+  - pytest
+  - pytest-cov
+  - tox-conda
+  - pre-commit
+  - versioneer
