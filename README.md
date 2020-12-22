@@ -73,5 +73,3 @@ If pymbar is not installed, the output will differ by a single test to check MBA
 
 # Contact
 Questions may be addressed to Jacob Monroe at jacob.monroe@nist.gov.
-
-

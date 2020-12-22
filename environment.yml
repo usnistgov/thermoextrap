@@ -1,17 +1,18 @@
-name: gpflow_test
+name: xtrapy-dev
 channels:
   - conda-forge
   - wpk-nist
 dependencies:
-  - sympy
   - python=3.8
+  - sympy
   - matplotlib
   - numpy
   - scipy
-  - ipykernel
   - xarray
   - openmm
   - cmomy
+  - pymbar
+  - pip
   - pip:
       - tensorflow
       - tensorflow-probability

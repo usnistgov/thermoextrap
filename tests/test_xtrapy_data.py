@@ -1,21 +1,23 @@
 import numpy as np
+import pytest
 import xarray as xr
 
 import thermoextrap
-
 import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
-
 from thermoextrap.xtrapy.cached_decorators import gcached
 
-import pytest
 
 def test_rdata(fixture):
     """testing new interface against old interface"""
     ufunc, xufunc = fixture.u_xu_funcs
-    np.testing.assert_allclose(fixture.rdata.u, [ufunc(i) for i in range(fixture.order+1)])
-    np.testing.assert_allclose(fixture.rdata.xu, [xufunc(i) for i in range(fixture.order+1)])
+    np.testing.assert_allclose(
+        fixture.rdata.u, [ufunc(i) for i in range(fixture.order + 1)]
+    )
+    np.testing.assert_allclose(
+        fixture.rdata.xu, [xufunc(i) for i in range(fixture.order + 1)]
+    )
 
 
 def test_xdata(fixture):
@@ -40,7 +42,11 @@ def test_xdata_from_ave_raw(fixture):
     fixture.xr_test_raw(b)
 
     # base on xarray
-    b = xtrapy_data.DataCentralMoments.from_ave_raw(u=a.u, xu=a.xu, w=len(a.uv),)
+    b = xtrapy_data.DataCentralMoments.from_ave_raw(
+        u=a.u,
+        xu=a.xu,
+        w=len(a.uv),
+    )
     fixture.xr_test_raw(b)
 
 

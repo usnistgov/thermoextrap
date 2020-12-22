@@ -12,12 +12,11 @@ import xarray as xr
 
 from .cached_decorators import gcached
 
-
 try:
     import cmomy.xcentral as xcentral
 
     _HAS_CMOMY = True
-except:
+except ImportError:
     _HAS_CMOMY = False
 
 
@@ -63,7 +62,14 @@ def xrwrap_uv(uv, dims=None, rec="rec", rep="rep", name="u", stict=True):
 
 
 def xrwrap_xv(
-    xv, dims=None, rec="rec", rep="rep", deriv=None, val="val", name="x", strict=None,
+    xv,
+    dims=None,
+    rec="rec",
+    rep="rep",
+    deriv=None,
+    val="val",
+    name="x",
+    strict=None,
 ):
     """
     wraps xv (x values) array
@@ -145,7 +151,6 @@ def resample_indicies(size, nrep, rec="rec", rep="rep", replace=True, transpose=
         if transpose, shape=(size, nrep)
         else, shape=(nrep, size)
     """
-
     indices = xr.DataArray(
         data=np.random.choice(size, size=(nrep, size), replace=replace),
         dims=[rep, "rec"],
@@ -172,20 +177,18 @@ class DatasetSelector(object):
             else:
                 dims = [moment]
 
-
         # if dims is None:
         #     if deriv in data.dims:
         #         dims = [moment, deriv]
         #     else:
         #         dims = [moment]
 
-
         if isinstance(dims, str):
             dims = [dims]
 
         for d in dims:
             if d not in data.dims:
-                raise ValueError('{} not in dims {}'.format(d, data.dims))
+                raise ValueError("{} not in dims {}".format(d, data.dims))
         self.data = data
         self.dims = dims
 
@@ -193,7 +196,7 @@ class DatasetSelector(object):
         if not isinstance(idx, tuple):
             idx = (idx,)
         if len(idx) != len(self.dims):
-            raise ValueError('bad idx {}, vs dims {}'.format(idx, self.dims))
+            raise ValueError("bad idx {}, vs dims {}".format(idx, self.dims))
         selector = dict(zip(self.dims, idx))
         return self.data.isel(**selector)
 
@@ -387,7 +390,6 @@ class DataValuesBase(AbstractData):
 
     def __len__(self):
         return len(self.uv[self.rec])
-
 
     def resample_other_params(self, indices):
         """
@@ -1100,14 +1102,24 @@ class DataCentralMoments(DataCentralMomentsBase):
             **kws,
         )
 
-
     @classmethod
     def from_data(
-            cls, data,
-            rec='rec', mom_x='mom_x', mom_u='mom_u',
-            deriv=None, central=False, mom=None, val_shape=None,
-            dtype=None, dims=None, attrs=None, coords=None, indexes=None,
-            name=None, **kws
+        cls,
+        data,
+        rec="rec",
+        mom_x="mom_x",
+        mom_u="mom_u",
+        deriv=None,
+        central=False,
+        mom=None,
+        val_shape=None,
+        dtype=None,
+        dims=None,
+        attrs=None,
+        coords=None,
+        indexes=None,
+        name=None,
+        **kws,
     ):
         """
         Create DataCentralMoments object from data
@@ -1127,18 +1139,18 @@ class DataCentralMoments(DataCentralMomentsBase):
             coords=coords,
             indexes=indexes,
             name=name,
-            mom_dims=(mom_x, mom_u)
+            mom_dims=(mom_x, mom_u),
         )
 
         return cls(
             dxduave=dxduave,
             mom_x=mom_x,
             mom_u=mom_u,
-            rec=rec, deriv=deriv,
+            rec=rec,
+            deriv=deriv,
             central=central,
-            **kws
+            **kws,
         )
-
 
     @classmethod
     def from_resample_vals(
@@ -1423,6 +1435,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             **kws,
         )
 
+
 class DataCentralMomentsVals(DataCentralMomentsBase):
     def __init__(
         self,
@@ -1611,7 +1624,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         """
         Resample data
         """
-
 
         if axis is None:
             axis = self.rec

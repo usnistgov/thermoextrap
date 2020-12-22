@@ -1,8 +1,7 @@
+import numpy as np
+
 from thermoextrap.ig import IGmodel
 from thermoextrap.xtrapy import idealgas
-
-
-import numpy as np
 
 
 def test_idealgas():
@@ -13,7 +12,7 @@ def test_idealgas():
     np.testing.assert_allclose(idealgas.x_ave(b), mIG.avgX(b))
     np.testing.assert_allclose(idealgas.x_var(b), mIG.varX(b))
     np.testing.assert_allclose(idealgas.x_prob(x, b), mIG.PofX(x, b))
-    np.testing.assert_allclose(idealgas.u_prob(x*300, 1000, b), mIG.PofU(x*300, b))
+    np.testing.assert_allclose(idealgas.u_prob(x * 300, 1000, b), mIG.PofU(x * 300, b))
 
     np.testing.assert_allclose(idealgas.x_cdf(x, b), mIG.cdfX(x, b))
 
@@ -43,4 +42,3 @@ def test_idealgas():
     totb, coefb = mIG.extrapAnalyticVolume(1.0, 0.3, 5, beta)
     np.testing.assert_allclose(tota, totb)
     np.testing.assert_allclose(coefa, coefb)
-
