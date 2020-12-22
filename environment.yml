@@ -1,4 +1,4 @@
-name: thermoextrap-dev
+name: xtrapy-dev
 channels:
   - conda-forge
   - wpk-nist
