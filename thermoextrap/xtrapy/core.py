@@ -1,29 +1,27 @@
 from __future__ import absolute_import
+
 from functools import lru_cache
 
 import numpy as np
 import sympy as sp
 import xarray as xr
-
 from scipy.special import factorial as sp_factorial
 
 from .cached_decorators import gcached
-
 from .data import xrwrap_alpha
 
 try:
     from pymbar import mbar
+
     _HAS_PYMBAR = True
 except ImportError:
     _HAS_PYMBAR = False
 
 
-
-
-
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
+
 
 @lru_cache(100)
 def _get_default_symbol(*args):
@@ -38,12 +36,12 @@ def _get_default_indexed(*args):
     return out
 
 
-@lru_cache(100)
-def _get_default_function(*args):
-    out = [sp.Function(key) for key in args]
-    if len(out) == 1:
-        out = out[0]
-    return out
+# @lru_cache(100)
+# def _get_default_function(*args):
+#     out = [sp.Function(key) for key in args]
+#     if len(out) == 1:
+#         out = out[0]
+#     return out
 
 
 class SymSubs(object):
@@ -125,7 +123,7 @@ class Lambdify(object):
     def from_u_xu(cls, exprs, **opts):
         """factory for u/xu args"""
         u, xu = _get_default_indexed("u", "xu")
-        args = (u, xu)
+        # args = (u, xu)
         return cls(exprs=exprs, args=(u, xu), **opts)
 
     @classmethod
@@ -200,9 +198,7 @@ class Coefs(object):
     def xcoefs(self, data, order=None, norm=True, minus_log=False, order_name="order"):
         if order is None:
             order = data.order
-        out = self.coefs(
-            *data.xcoefs_args, order=order, norm=norm, minus_log=minus_log
-        )
+        out = self.coefs(*data.xcoefs_args, order=order, norm=norm, minus_log=minus_log)
         return xr.concat(out, dim=order_name)
 
     @classmethod
@@ -230,7 +226,6 @@ class ExtrapModel(object):
         if minus_log is None:
             minus_log = False
         self.minus_log = minus_log
-
 
         if alpha_name is None:
             alpha_name = "alpha"
@@ -302,7 +297,7 @@ class ExtrapModel(object):
 
 
 class StateCollection(object):
-    def __init__(self, states): #, **kws):
+    def __init__(self, states):  # , **kws):
         """
         Parameters
         ----------
@@ -312,7 +307,7 @@ class StateCollection(object):
         """
 
         self.states = states
-        #self.kws = kws
+        # self.kws = kws
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -327,7 +322,7 @@ class StateCollection(object):
     def alpha_name(self):
         try:
             alpha_name = self[0].alpha_name
-        except:
+        except Exception:
             alpha_name = "alpha"
         return alpha_name
 
@@ -340,17 +335,17 @@ class StateCollection(object):
 
         assert len(indices) == len(self)
 
-        if 'freq' in kws:
-            freq = kws.pop('freq')
+        if "freq" in kws:
+            freq = kws.pop("freq")
             if freq is None:
                 freq = [None] * len(self)
             assert len(freq) == len(self)
 
-
             return type(self)(
                 states=tuple(
                     state.resample(indices=idx, nrep=nrep, freq=fq, **kws)
-                    for state, idx, fq in zip(self.states, indices, freq))
+                    for state, idx, fq in zip(self.states, indices, freq)
+                )
             )
 
         else:
@@ -370,14 +365,12 @@ class StateCollection(object):
         return [m.alpha0 for m in self]
 
 
-
 def xr_weights_minkowski(deltas, m=20, dim="state"):
     deltas_m = deltas ** m
     return 1.0 - deltas_m / deltas_m.sum(dim)
 
 
 class ExtrapWeightedModel(StateCollection):
-
     def _states_between_alpha(self, alpha):
         idx = np.digitize(alpha, self.alpha0, right=False) - 1
         if idx < 0:
@@ -385,7 +378,7 @@ class ExtrapWeightedModel(StateCollection):
         elif idx == len(self) - 1:
             idx = len(self) - 2
 
-        return self.states[idx:idx+2]
+        return self.states[idx : idx + 2]
 
     def _states_nearest_alpha(self, alpha):
         dalpha = np.abs(np.array(self.alpha0) - alpha)
@@ -394,13 +387,12 @@ class ExtrapWeightedModel(StateCollection):
         return [self[i] for i in idx]
 
     def _states_alpha(self, alpha, method):
-        if method is None or method=='between':
+        if method is None or method == "between":
             return self._states_between_alpha(alpha)
-        elif method == 'nearest':
+        elif method == "nearest":
             return self._states_nearest_alpha(alpha)
         else:
-            raise ValueError('unknown method {}'.format(method))
-
+            raise ValueError("unknown method {}".format(method))
 
     def predict(
         self,
@@ -445,17 +437,22 @@ class ExtrapWeightedModel(StateCollection):
                 # have multiple alphas
                 # recursively call
                 return xr.concat(
-                    (self.predict(alpha=a, order=order,
-                                  order_name=order_name, cumsum=cumsum,
-                                  minus_log=minus_log, alpha_name=alpha_name,
-                                  method=method)
-                     for a in alpha),
-                    dim=alpha_name)
+                    (
+                        self.predict(
+                            alpha=a,
+                            order=order,
+                            order_name=order_name,
+                            cumsum=cumsum,
+                            minus_log=minus_log,
+                            alpha_name=alpha_name,
+                            method=method,
+                        )
+                        for a in alpha
+                    ),
+                    dim=alpha_name,
+                )
 
             states = self._states_alpha(alpha, method)
-
-
-
 
         out = xr.concat(
             [
@@ -654,4 +651,4 @@ class MBARModel(StateCollection):
         return out
 
     def resample(self, *args, **kwargs):
-        raise NotImplementedError('resample not implemented for this class')
+        raise NotImplementedError("resample not implemented for this class")

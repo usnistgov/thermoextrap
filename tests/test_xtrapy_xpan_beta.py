@@ -1,15 +1,12 @@
 import numpy as np
+import pytest
 import xarray as xr
 
 import thermoextrap
-
 import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
-
 from thermoextrap.xtrapy.cached_decorators import gcached
-
-import pytest
 
 
 @pytest.mark.slow
@@ -156,7 +153,10 @@ def test_extrapmodel_weighted(fixture):
     xem1 = xpan_beta.factory_extrapmodel(
         beta=beta0[1],
         data=xpan_beta.factory_data(
-            uv=fixture.ub, xv=fixture.xb, order=fixture.order, central=True,
+            uv=fixture.ub,
+            xv=fixture.xb,
+            order=fixture.order,
+            central=True,
         ),
     )
 
@@ -182,9 +182,7 @@ def test_extrapmodel_weighted(fixture):
     fixture.xr_test(a, b)
 
 
-
 def test_extrapmodel_weighted_multi(fixture):
-
 
     beta0 = [0.05, 0.2, 1.0]
     betas = [0.3, 0.4, 0.6, 0.7]
@@ -196,7 +194,7 @@ def test_extrapmodel_weighted_multi(fixture):
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
-                order=fixture.order
+                order=fixture.order,
             ),
         )
         for beta in beta0
@@ -206,8 +204,8 @@ def test_extrapmodel_weighted_multi(fixture):
         xpan_beta.factory_extrapmodel(
             beta=xem.alpha0,
             data=xpan_beta.factory_data(
-                order=fixture.order,
-                uv=xem.data.uv, xv=xem.data.xv, central=True),
+                order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
+            ),
         )
         for xem in xems_r
     ]
@@ -216,8 +214,7 @@ def test_extrapmodel_weighted_multi(fixture):
         xpan_beta.factory_extrapmodel(
             beta=xem.alpha0,
             data=xpan_beta.DataCentralMomentsVals.from_vals(
-                order=fixture.order,
-                uv=xem.data.uv, xv=xem.data.xv, central=True
+                order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
         for xem in xems_r
@@ -229,14 +226,11 @@ def test_extrapmodel_weighted_multi(fixture):
     xemw_b = xtrapy_core.ExtrapWeightedModel([xems_r[1], xems_r[2]])
     xemw_r = xtrapy_core.ExtrapWeightedModel(xems_r)
 
-
     vals = [0.2, 0.4]
-    fixture.xr_test(xemw_a.predict(vals), xemw_r.predict(vals, method='nearest'))
+    fixture.xr_test(xemw_a.predict(vals), xemw_r.predict(vals, method="nearest"))
 
     vals = [0.4, 0.8]
-    fixture.xr_test(xemw_b.predict(vals), xemw_r.predict(vals, method='between'))
-
-
+    fixture.xr_test(xemw_b.predict(vals), xemw_r.predict(vals, method="between"))
 
     # other data models
     xemw_c = xtrapy_core.ExtrapWeightedModel(xems_c)
@@ -294,7 +288,7 @@ def test_interpmodel(fixture):
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
-                order=fixture.order
+                order=fixture.order,
             ),
         )
         for beta in beta0
@@ -304,8 +298,8 @@ def test_interpmodel(fixture):
         xpan_beta.factory_extrapmodel(
             beta=xem.alpha0,
             data=xpan_beta.factory_data(
-                order=fixture.order,
-                uv=xem.data.uv, xv=xem.data.xv, central=True),
+                order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
+            ),
         )
         for xem in xems_r
     ]
@@ -314,8 +308,7 @@ def test_interpmodel(fixture):
         xpan_beta.factory_extrapmodel(
             beta=xem.alpha0,
             data=xpan_beta.DataCentralMomentsVals.from_vals(
-                order=fixture.order,
-                uv=xem.data.uv, xv=xem.data.xv, central=True
+                order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
         for xem in xems_r
@@ -324,7 +317,6 @@ def test_interpmodel(fixture):
     xemi_r = xtrapy_core.InterpModel(xems_r)
     xemi_c = xtrapy_core.InterpModel(xems_c)
     xemi_x = xtrapy_core.InterpModel(xems_x)
-
 
     fixture.xr_test(xemi_r.predict(betas, order=3), xemi_c.predict(betas, order=3))
     fixture.xr_test(xemi_r.predict(betas, order=3), xemi_x.predict(betas, order=3))
@@ -339,8 +331,6 @@ def test_interpmodel(fixture):
     a = xemi_c.resample(indices=indices)
     b = xemi_x.resample(indices=indices)
     fixture.xr_test(a.predict(betas), b.predict(betas))
-
-
 
 
 def test_mbar(fixture):
@@ -370,9 +360,10 @@ def test_mbar(fixture):
     np.testing.assert_allclose(emi.predict(betas), xemi.predict(betas))
 
 
+from sympy import bell
+
 # Test log
 from thermoextrap.utilities import buildAvgFuncs
-from sympy import bell
 
 
 class LogAvgExtrapModel(thermoextrap.ExtrapModel):
@@ -413,7 +404,12 @@ def test_extrapmodel_minuslog_slow(fixture):
     betas = [0.2, 0.3]
     u, x, order = fixture.u, fixture.x, fixture.order
 
-    em = LogAvgExtrapModel(maxOrder=order, refB=beta0, xData=x, uData=u,)
+    em = LogAvgExtrapModel(
+        maxOrder=order,
+        refB=beta0,
+        xData=x,
+        uData=u,
+    )
 
     xem = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, minus_log=True)
 
@@ -447,12 +443,11 @@ def test_extrapmodel_minuslog_slow(fixture):
 
 # depend on alpha/betas
 # Need to import from utilities
-from thermoextrap.utilities import symDerivAvgXdependent, buildAvgFuncsDependent
+from thermoextrap.utilities import buildAvgFuncsDependent, symDerivAvgXdependent
 
 
 class ExtrapModelDependent(thermoextrap.ExtrapModel):
-    """Class to hold information about an extrapolation that is dependent on the extrapolation variable.
-    """
+    """Class to hold information about an extrapolation that is dependent on the extrapolation variable."""
 
     # Calculates symbolic derivatives up to maximum order given data
     # Returns list of functions that can be used to evaluate derivatives for specific data
