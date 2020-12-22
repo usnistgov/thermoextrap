@@ -6,65 +6,65 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
-import xarray as xr
-import sympy as sp
-
-from .cached_decorators import gcached
-from .core import _get_default_symbol, _get_default_indexed
 # from .core import DataTemplateValues, DatasetSelector
-from .core import SymSubs, Coefs
-from .core import ExtrapModel, PerturbModel
-
+from .core import Coefs, ExtrapModel
 from .xpan_beta import factory_data
-#from .data import DataCentralMoments, DataCentralMomentsVals
 
-#Lazily imported everything above - will trim down later
-#Need funcs to pass to Coefs class
-#Just needs to be indexable based on order, so...
+# from .data import DataCentralMoments, DataCentralMomentsVals
+
+
+# Lazily imported everything above - will trim down later
+# Need funcs to pass to Coefs class
+# Just needs to be indexable based on order, so...
 # d^n X / d V^n = funcs[n](*args)
-#Could create list of simple functions for each derivative order
-#But here I'm trying something similar to what's in xtrapy already
-#For any general observable, might need to modify Data class to also pass full x values
-#(or other data, perhaps)
-#This is because the last, custom term may need more information than W and x*W moments
-#Though ALL of the observables in the paper end up with a unique term that is just
-#some constant multiplied by an average of x (same with ideal gas, too).
+# Could create list of simple functions for each derivative order
+# But here I'm trying something similar to what's in xtrapy already
+# For any general observable, might need to modify Data class to also pass full x values
+# (or other data, perhaps)
+# This is because the last, custom term may need more information than W and x*W moments
+# Though ALL of the observables in the paper end up with a unique term that is just
+# some constant multiplied by an average of x (same with ideal gas, too).
 class VolumeDerivFuncsIG(object):
     """Calculates specific derivative values at refV with data x and W.
-       Only go to first order for volume extrapolation.
-       Here W represents the virial instead of the potential energy.
+    Only go to first order for volume extrapolation.
+    Here W represents the virial instead of the potential energy.
     """
+
     def __init__(self, refV=1.0):
-        #If do not set refV, assumes virial data is already divided by the reference volume
-        #If this is not the case, need to set refV
-        #Or if need refV to also compute custom term, need to specify
+        # If do not set refV, assumes virial data is already divided by the reference volume
+        # If this is not the case, need to set refV
+        # Or if need refV to also compute custom term, need to specify
         self.refV = refV
 
     def __getitem__(self, order):
-        #Check to make sure not going past first order
+        # Check to make sure not going past first order
         if order > 1:
-            raise ValueError("Volume derivatives cannot go past 1st order"
-                             +" and received %i"%order
-                             +"\n(because would need derivatives of forces)")
+            raise ValueError(
+                "Volume derivatives cannot go past 1st order"
+                + " and received %i" % order
+                + "\n(because would need derivatives of forces)"
+            )
         else:
             return self.create_deriv_func(order)
 
     def create_deriv_func(self, order):
-        #Works only because of local scope
-        #Even if order is defined somewhere outside of this class, won't affect returned func
+        # Works only because of local scope
+        # Even if order is defined somewhere outside of this class, won't affect returned func
 
         def func(W, xW):
 
             if order == 0:
-                #Zeroth order derivative
-                deriv_val =  xW[0]
+                # Zeroth order derivative
+                deriv_val = xW[0]
 
             else:
-                #First order derivative
-                deriv_val = (xW[1] - xW[0]*W[1]) / (self.refV) #No 3 b/c our IG is 1D
-                #Term unique to Ideal Gas... <x>/L
-                #Replace with whatever is appropriate to observable of interest
-                deriv_val += (xW[0] / self.refV)
+                # First order derivative
+                deriv_val = (xW[1] - xW[0] * W[1]) / (
+                    self.refV
+                )  # No 3 b/c our IG is 1D
+                # Term unique to Ideal Gas... <x>/L
+                # Replace with whatever is appropriate to observable of interest
+                deriv_val += xW[0] / self.refV
             return deriv_val
 
         return func
@@ -87,9 +87,7 @@ def factory_coefs(refV=1.0):
     return Coefs(deriv_funcs)
 
 
-def factory_extrapmodel(
-        volume, uv, xv, order=1, alpha_name='volume', **kws
-):
+def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
     """
     factory function to create Extrapolation model for volume expansion
 
@@ -112,22 +110,21 @@ def factory_extrapmodel(
     """
 
     if order != 1:
-        raise ValueError('only first order supported')
+        raise ValueError("only first order supported")
 
-    data = factory_data(
-        uv=uv, xv=xv, order=order, central=False, xalpha=False, **kws
-    )
+    data = factory_data(uv=uv, xv=xv, order=order, central=False, xalpha=False, **kws)
     coefs = factory_coefs(refV=volume)
     return ExtrapModel(
-        alpha0=volume, data=data, coefs=coefs, order=order, minus_log=False,
-        alpha_name=alpha_name
+        alpha0=volume,
+        data=data,
+        coefs=coefs,
+        order=order,
+        minus_log=False,
+        alpha_name=alpha_name,
     )
 
 
-
-def factory_extrapmodel_data(
-        volume, data, order=1, alpha_name='volume'
-):
+def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
     """
     factory function to create Extrapolation model for volume expansion
 
@@ -148,14 +145,17 @@ def factory_extrapmodel_data(
         order = data.order
 
     if order != 1:
-        raise ValueError('only first order supported')
-
+        raise ValueError("only first order supported")
 
     assert not data.central
     assert data.deriv is None
 
     coefs = factory_coefs(refV=volume)
     return ExtrapModel(
-        alpha0=volume, data=data, coefs=coefs, order=order, minus_log=False,
-        alpha_name=alpha_name
+        alpha0=volume,
+        data=data,
+        coefs=coefs,
+        order=order,
+        minus_log=False,
+        alpha_name=alpha_name,
     )

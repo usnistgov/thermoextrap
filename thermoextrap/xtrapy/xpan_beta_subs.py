@@ -2,17 +2,25 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
-import numpy as np
+# import numpy as np
 import sympy as sp
-from scipy.special import factorial as sp_factorial
 
 from .cached_decorators import gcached
+from .core import (
+    Coefs,
+    SymSubs,
+    _get_default_function,
+    _get_default_indexed,
+    _get_default_symbol,
+)
 
-from .core import SymSubs, Coefs, _get_default_indexed, _get_default_symbol, _get_default_function
+# from scipy.special import factorial as sp_factorial
+
 
 ###############################################################################
 # Central moment classes:
 ###############################################################################
+
 
 class _Central_u_dxdu(object):
     """
@@ -41,7 +49,7 @@ class _Central_u_dxdu(object):
         if use_u1:
             key = "u1"
             if key in kwargs:
-                    val = kwargs[key]
+                val = kwargs[key]
             else:
                 val = _get_default_symbol(key)
             setattr(self, key, val)
@@ -349,7 +357,6 @@ class _SubsBeta_xalpha(_SubsBeta):
         rhs = (-1) ** order * self.u[order] * self.z
         new.append((lhs, rhs))
         self._data.append(new)
-
 
 
 @lru_cache(5)
