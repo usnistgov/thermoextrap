@@ -1,0 +1,9 @@
+name: cmomy-test-pip
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pytest
+  - pip
+  - pip:
+      - cmomy

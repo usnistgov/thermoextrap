@@ -1,0 +1,6 @@
+name: cmomy
+dependencies:
+  - python=3.8
+  - numpy
+  - numba
+  - xarray

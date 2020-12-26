@@ -1,0 +1,8 @@
+name: cmomy-test-conda
+channels:
+  - conda-forge
+  - wpk-nist
+dependencies:
+  - python=3.8
+  - cmomy
+  - pytest
