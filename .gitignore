@@ -6,3 +6,6 @@ __pycache__
 dist
 build
 recipe/pypi/cmomy
+
+pyrightconfig.json
+.venv
