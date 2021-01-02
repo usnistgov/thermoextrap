@@ -220,6 +220,19 @@ def central_moments(
 class CentralMoments(object):
     """
     Base class for moments accumulation
+
+    Parameters
+    ----------
+    data : numpy data array
+        data should have the shape `val_shape + mom_shape`
+        where `val_shape` is the shape of a single observation,
+        and mom_shape is the shape of the moments
+    mom_ndim : int, {1, 2}
+        number of dimensions of moments.
+        * 1 : central moments of single variable
+        * 2 : central comoments of two variables
+    kws : dict
+        optional arguments to be used in subclasses
     """
 
     __slots__ = (
@@ -231,20 +244,6 @@ class CentralMoments(object):
     )
 
     def __init__(self, data, mom_ndim=1):
-        """
-        Parameters
-        ----------
-        data : numpy data array
-            data should have the shape `val_shape + mom_shape`
-            where `val_shape` is the shape of a single observation,
-            and mom_shape is the shape of the moments
-        mom_ndim : int, {1, 2}
-            number of dimensions of moments.
-            * 1 : central moments of single variable
-            * 2 : central comoments of two variables
-        **kws : dict
-            optional arguments to be used in subclasses
-        """
 
         if mom_ndim not in (1, 2):
             raise ValueError(
@@ -670,7 +669,7 @@ class CentralMoments(object):
         else:
             return x, target_output
 
-    def check_weight(self, w, target):
+    def _check_weight(self, w, target):
         if w is None:
             w = 1.0
         return self._verify_value(
@@ -682,7 +681,7 @@ class CentralMoments(object):
             shape_flat=self.val_shape_flat,
         )
 
-    def check_weights(self, w, target, axis=0):
+    def _check_weights(self, w, target, axis=0):
         if w is None:
             w = 1.0
         return self._verify_value(
@@ -694,7 +693,7 @@ class CentralMoments(object):
             shape_flat=self.val_shape_flat,
         )
 
-    def check_val(self, x, target, broadcast=False):
+    def _check_val(self, x, target, broadcast=False):
         return self._verify_value(
             x,
             target=target,
@@ -703,7 +702,7 @@ class CentralMoments(object):
             shape_flat=self.val_shape_flat,
         )
 
-    def check_vals(self, x, target, axis=0, broadcast=False):
+    def _check_vals(self, x, target, axis=0, broadcast=False):
         return self._verify_value(
             x,
             target=target,
@@ -713,7 +712,7 @@ class CentralMoments(object):
             shape_flat=self.val_shape_flat,
         )
 
-    def check_var(self, v, broadcast=False):
+    def _check_var(self, v, broadcast=False):
         return self._verify_value(
             v,
             target="var",  # self.shape_var,
@@ -722,7 +721,7 @@ class CentralMoments(object):
             shape_flat=self.shape_flat_var,
         )[0]
 
-    def check_vars(self, v, target, axis=0, broadcast=False):
+    def _check_vars(self, v, target, axis=0, broadcast=False):
         return self._verify_value(
             v,
             target="vars",
@@ -733,10 +732,10 @@ class CentralMoments(object):
             other=target,
         )[0]
 
-    def check_data(self, data):
+    def _check_data(self, data):
         return self._verify_value(data, target="data", shape_flat=self.shape_flat)[0]
 
-    def check_datas(self, datas, axis=0):
+    def _check_datas(self, datas, axis=0):
         return self._verify_value(
             datas, target="datas", axis=axis, shape_flat=self.shape_flat
         )[0]
@@ -751,11 +750,11 @@ class CentralMoments(object):
         return self.fill(value=0)
 
     def push_data(self, data):
-        """push `data` to moments
+        """push data object to moments
 
         Parameters
         ----------
-        data : array-like, shape=self.shape
+        data : array-like, `shape=self.shape`
             array storing moment information
         Returns
         -------
@@ -763,9 +762,9 @@ class CentralMoments(object):
 
         See Also
         --------
-        `self.data`
+        cmomy.CentralMoments.data
         """
-        data = self.check_data(data)
+        data = self._check_data(data)
         self._push.data(self._data_flat, data)
         return self
 
@@ -784,7 +783,7 @@ class CentralMoments(object):
         -------
         self
         """
-        datas = self.check_datas(datas, axis)
+        datas = self._check_datas(datas, axis)
         self._push.datas(self._data_flat, datas)
         return self
 
@@ -794,8 +793,8 @@ class CentralMoments(object):
         Parameters
         ----------
         x : array-like or tuple of arrays
-            if `self.mom_ndim` == 1, then this is the value to consider
-            if `self.mom_ndim` == 2, then x = (x0, x1)
+            if `self.mom_ndim == 1`, then this is the value to consider
+            if `self.mom_ndim == 2`, then `x = (x0, x1)`
             `x.shape == self.val_shape`
 
         w : int, float, array-like, optional
@@ -814,9 +813,9 @@ class CentralMoments(object):
             assert len(x) == self.mom_ndim
             x, *ys = x
 
-        xr, target = self.check_val(x, "val")
-        yr = tuple(self.check_val(y, target=target, broadcast=broadcast) for y in ys)
-        wr = self.check_weight(w, target)
+        xr, target = self._check_val(x, "val")
+        yr = tuple(self._check_val(y, target=target, broadcast=broadcast) for y in ys)
+        wr = self._check_weight(w, target)
         self._push.val(self._data_flat, *((wr, xr) + yr))
         return self
 
@@ -844,12 +843,12 @@ class CentralMoments(object):
             assert len(x) == self.mom_ndim
             x, *ys = x
 
-        xr, target = self.check_vals(x, axis=axis, target="vals")
+        xr, target = self._check_vals(x, axis=axis, target="vals")
         yr = tuple(
-            self.check_vals(y, target=target, axis=axis, broadcast=broadcast)
+            self._check_vals(y, target=target, axis=axis, broadcast=broadcast)
             for y in ys
         )
-        wr = self.check_weights(w, target=target, axis=axis)
+        wr = self._check_weights(w, target=target, axis=axis)
         self._push.vals(self._data_flat, *((wr, xr) + yr))
         return self
 
@@ -869,6 +868,7 @@ class CentralMoments(object):
         return self.push_data(b.data)
 
     def __add__(self, b):
+        """add objects to new object"""
         self._check_other(b)
         # new = self.copy()
         # new.push_data(b.data)
@@ -1337,15 +1337,15 @@ class CentralMoments(object):
         """
         self._raise_if_scalar()
 
-        def _check_val(v):
+        def __check_val(v):
             if isinstance(v, int):
                 v = (v,)
             else:
                 v = tuple(v)
             return tuple(self._wrap_axis(x) for x in v)
 
-        source = _check_val(source)
-        destination = _check_val(destination)
+        source = __check_val(source)
+        destination = __check_val(destination)
         data = np.moveaxis(self.data, source, destination)
 
         # use from data for extra checks
@@ -1373,18 +1373,18 @@ class CentralMoments(object):
     def push_stat(self, a, v=0.0, w=None, broadcast=True):
         self._raise_if_not_1d(self.mom_ndim)
 
-        ar, target = self.check_val(a, target="val")
-        vr = self.check_var(v, broadcast=broadcast)
-        wr = self.check_weight(w, target=target)
+        ar, target = self._check_val(a, target="val")
+        vr = self._check_var(v, broadcast=broadcast)
+        wr = self._check_weight(w, target=target)
         self._push.stat(self._data_flat, wr, ar, vr)
         return self
 
     def push_stats(self, a, v=0.0, w=None, axis=0, broadcast=True):
         self._raise_if_not_1d(self.mom_ndim)
 
-        ar, target = self.check_vals(a, target="vals", axis=axis)
-        vr = self.check_vars(v, target=target, axis=axis, broadcast=broadcast)
-        wr = self.check_weights(w, target=target, axis=axis)
+        ar, target = self._check_vals(a, target="vals", axis=axis)
+        vr = self._check_vars(v, target=target, axis=axis, broadcast=broadcast)
+        wr = self._check_weights(w, target=target, axis=axis)
         self._push.stats(self._data_flat, wr, ar, vr)
         return self
 
