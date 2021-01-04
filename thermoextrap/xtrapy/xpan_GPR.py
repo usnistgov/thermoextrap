@@ -283,7 +283,7 @@ class GPRModel(StateCollection):
             # Set norm to False so does not divide by factorial of each derivative order
             y_data_xr.append(m.xcoefs(order=order, order_name=order_name, norm=False))
             # Obtain variances by bootstrap resampling of original data and compute for each
-            this_boot = m.resample(n_resample).xcoefs(
+            this_boot = m.resample(nrep=n_resample).xcoefs(
                 order=order, order_name=order_name, norm=False
             )
             y_data_err_xr.append(this_boot.var("rep"))
