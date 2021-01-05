@@ -254,6 +254,16 @@ class HeteroscedasticGaussian(gpflow.likelihoods.Likelihood):
         raise NotImplementedError
 
 
+class combined_loss(object):
+    """Convenience function for training all output dimension in parallel with sum of losses."""
+
+    def __init__(self, loss_list):
+        self.loss_list = loss_list
+
+    def __call__(self):
+        return tf.reduce_sum([loss() for loss in self.loss_list])
+
+
 # Now can construct a model class inheriting from StateCollection
 class GPRModel(StateCollection):
     def _collect_data(self, order=None, order_name="order", n_resample=100):
@@ -283,14 +293,20 @@ class GPRModel(StateCollection):
         # ORDER MATTERS - we want state first to be consistent with x_data
         y_data_xr = y_data_xr.stack(flat_state=("state", "order"))
         y_data_err_xr = y_data_err_xr.stack(flat_state=("state", "order"))
-        # And create numpy array
-        y_data = np.concatenate(
-            [
-                y_data_xr.transpose("flat_state", "val").values,
-                y_data_err_xr.transpose("flat_state", "val").values,
-            ],
-            axis=1,
-        )
+        # If the y data has a multidimensional observable ('val' dimension)
+        # then we want to split it and the error estimates along this dimension
+        # In that case (including if just has one dimension), will return list
+        y_data_vals = y_data_xr.transpose("flat_state", "val").values
+        y_data_err_vals = y_data_err_xr.transpose("flat_state", "val").values
+        # Before wrapping up, realize that any error values of 0 will mess up GPR
+        # Anywhere this is the case, add uncertainty near smallest possible floating point
+        err_zero = np.where(y_data_err_vals == 0)
+        y_data_err_vals[err_zero] = 1.0e-44
+        # Stack it all together
+        y_data = [
+            np.vstack([y_data_vals[:, i], y_data_err_vals[:, i]]).T
+            for i in range(y_data_vals.shape[1])
+        ]
         return x_data, y_data
 
     # Define function to train the Gaussian process
@@ -303,16 +319,27 @@ class GPRModel(StateCollection):
         # Might use to add extra training or if add more data
         # If set fresh_train to True, will get new model - need if change order
         if self.gp is None or fresh_train:
-            self.gp = gpflow.models.VGP(
-                (x_input, y_input),
-                kernel=self.kern,
-                likelihood=self.het_gauss,
-                num_latent_gps=1,
-            )
+            self.gp = [
+                gpflow.models.VGP(
+                    (x_input, y_input[i]),
+                    kernel=self.kern[i],
+                    likelihood=self.het_gauss[i],
+                    num_latent_gps=1,
+                )
+                for i in range(self.out_dim)
+            ]
+
+        # To train all models over all dimension in parallel, create sum over losses
+        tot_loss = combined_loss([g.training_loss for g in self.gp])
 
         # Make some parameters fixed
-        gpflow.set_trainable(self.gp.q_mu, False)
-        gpflow.set_trainable(self.gp.q_sqrt, False)
+        variational_params = []
+        trainable_params = []
+        for i in range(self.out_dim):
+            gpflow.set_trainable(self.gp[i].q_mu, False)
+            gpflow.set_trainable(self.gp[i].q_sqrt, False)
+            variational_params.append((self.gp[i].q_mu, self.gp[i].q_sqrt))
+            trainable_params.append(self.gp[i].trainable_variables)
 
         # Run optimization
         natgrad = gpflow.optimizers.NaturalGradient(gamma=1.0)
@@ -320,23 +347,39 @@ class GPRModel(StateCollection):
             learning_rate=0.5
         )  # Can be VERY aggressive with learning
         for _ in range(ci_niter(opt_steps)):
-            natgrad.minimize(self.gp.training_loss, [(self.gp.q_mu, self.gp.q_sqrt)])
-            adam.minimize(self.gp.training_loss, self.gp.trainable_variables)
+            # Training is extremely slow for vector observables with large dimension
+            # Seems to mainly be because natgrad requires matrix inversion
+            natgrad.minimize(tot_loss, variational_params)
+            # Even running loop, as below, does not see to speed things up, though...
+            # So not exactly sure why so much slower
+            # for i in range(self.out_dim):
+            #    natgrad.minimize(self.gp[i].training_loss, [variational_params[i]])
+            adam.minimize(tot_loss, trainable_params)
+        # And even though trains, convergence is slow, so requires more steps
+        # Again not sure why
 
     def __init__(self, states, kernel_expr, kernel_params={}, **kwargs):
 
         super().__init__(states, **kwargs)
 
-        self.kern = DerivativeKernel(
-            kernel_expr,
-            self.states[0].data.xv.shape[1],  # Better way, Bill?
-            kernel_params=kernel_params,
-        )
-        self.het_gauss = HeteroscedasticGaussian()
+        # Collect data for training and defining output dimensionality
+        x_in, y_in = self._collect_data()
+
+        # y_in should be a list
+        # Create separate GP model for each output dimension
+        self.out_dim = len(y_in)
+        self.kern = [
+            DerivativeKernel(
+                kernel_expr,
+                1,  # For now, obs_dims is always 1 while figure out math
+                kernel_params=kernel_params,
+            )
+            for _ in range(self.out_dim)
+        ]
+        self.het_gauss = [HeteroscedasticGaussian() for _ in range(self.out_dim)]
 
         # Initially train GPR model
         self.gp = None
-        x_in, y_in = self._collect_data()
         self._train_GP(x_in, y_in)
 
     def predict(self, alpha, order=None, order_name="order", alpha_name=None):
@@ -350,17 +393,19 @@ class GPRModel(StateCollection):
             self._train_GP(x_in, y_in, fresh_train=True)
 
         x_pred = np.hstack([np.reshape(alpha, (-1, 1)), np.zeros((alpha.shape[0], 1))])
-        out = self.gp.predict_f(x_pred)
+        out = np.array([np.hstack(g.predict_f(x_pred)) for g in self.gp])
 
         # Make it an xarray for consistency
         # Output from predict_f is mean and variance, so split up
         if alpha_name is None:
             alpha_name = self.alpha_name
         mean_out = xr.DataArray(
-            out[0], dims=(alpha_name, "val"), coords={alpha_name: alpha}
+            out[:, :, 0].T, dims=(alpha_name, "val"), coords={alpha_name: alpha}
         )
         std_out = xr.DataArray(
-            np.sqrt(out[1]), dims=(alpha_name, "val"), coords={alpha_name: alpha}
+            np.sqrt(out[:, :, 1].T),
+            dims=(alpha_name, "val"),
+            coords={alpha_name: alpha},
         )
         return mean_out, std_out
 
