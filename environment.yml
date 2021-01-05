@@ -1,9 +1,10 @@
-name: xtrapy-dev
+name: thermoextrap-env
 channels:
   - conda-forge
   - wpk-nist
 dependencies:
   - python=3.8
+  - setuptools
   - sympy
   - matplotlib
   - numpy

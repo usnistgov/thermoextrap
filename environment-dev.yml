@@ -1,12 +1,34 @@
 # packages for development
 dependencies:
-  - ipykernel
+  # linting
   - black
   - blackdoc
   - flake8
   - isort
+  # testing
   - pytest
   - pytest-cov
   - tox-conda
+  # hooks
   - pre-commit
-  - versioneer
+ # repl
+  - ipython
+  - ipykernel
+  # build
+  - setuptools
+  - setuptools-scm
+  - twine
+  # conda specific
+  - conda-build
+  - anaconda-client
+  - greyskull
+  # doc stuff
+  - sphinx
+  - sphinx_rtd_theme
+  - recommonmark # if want markdown
+  - nbsphinx # if want notebooks
+  # lsp stuff
+  - autoflake
+  - pyls-mypy
+  - pyls-black
+  - pyls-isort
