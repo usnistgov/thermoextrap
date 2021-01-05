@@ -220,6 +220,11 @@ class RecursiveInterp:
         for Bval in Btrain:
             if Bval not in self.edgeB:
                 self.edgeB = np.hstack((self.edgeB, [Bval]))
+                self.xData.append(None)
+                self.uData.append(None)
+        sortInds = np.argsort(self.edgeB)
+        self.xData = [self.xData[i] for i in sortInds]
+        self.uData = [self.uData[i] for i in sortInds]
         self.edgeB = np.sort(self.edgeB)
 
         # Set self.modelParams and self.modelParamErrs to empty lists
@@ -229,8 +234,8 @@ class RecursiveInterp:
 
         # Loop over pairs of edge points
         for i in range(len(self.edgeB) - 1):
-            B1 = Btrain[i]
-            B2 = Btrain[i + 1]
+            B1 = self.edgeB[i]
+            B2 = self.edgeB[i + 1]
 
             if verbose:
                 print("\nInterpolating from points %f and %f" % (B1, B2))
