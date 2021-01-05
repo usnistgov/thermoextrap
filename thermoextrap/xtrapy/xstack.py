@@ -1,6 +1,8 @@
 """
 A set of routines to stack data for gpflow analysis
+
 """
+
 
 import numpy as np
 import pandas as pd
@@ -141,3 +143,77 @@ def states_xcoefs_concat(states, dim=None, **kws):
         dim = pd.Index(states.alpha0, name=states.alpha_name)
 
     return xr.concat((s.xcoefs(norm=False) for s in states), dim=dim, **kws)
+
+
+# from .core import StateCollection
+from .cached_decorators import gcached
+
+
+class GPFlowData:
+    """
+    Wrapper around StateCollection for GPFlow analysis
+
+    Parameters
+    ----------
+    collection : StateCollection object
+
+    xdims : sequence of str
+        dimensions for X.   The last element should correspond to the dimension
+        which specifies the order of the derivative (likely 'order').
+    ydims : str or sequence of str
+        dimensions for Y
+    rep_dim : str
+        name of dimensions to calculate mean/variance along
+
+    xname, yname : str
+        name of new stacked dimensions
+    """
+
+    def __init__(
+        self,
+        collection,
+        xdims,
+        ydims=None,
+        xname="xstack",
+        yname="ystack",
+        rep_dim="rep",  # dimension to reduce along
+    ):
+
+        self.collection = collection
+
+        self.xdims = xdims
+        self.ydims = ydims
+        self.xname = xname
+        self.yname = yname
+        self.rep_dim = rep_dim
+
+    @gcached()
+    def stacked(self):
+        return (
+            states_xcoefs_concat(self.collection)
+            .pipe(to_mean_var, dim=self.rep_dim)
+            .pipe(
+                stack_dataarray,
+                xdims=self.xdims,
+                ydims=self.ydims,
+                xname=self.xname,
+                yname=self.yname,
+                vdim="variable",
+                policy="infer",
+            )
+        )
+
+    @gcached()
+    def xarray(self):
+        return multiindex_to_array(self.stacked.indexes[self.xname])
+
+    def xindexer(self, *args, **kwargs):
+        """
+        create indexer for indexing into gpflow trained object
+        """
+        return (
+            pd.DataFrame(*args, **kwargs)
+            .assign(**{self.xdims[-1]: 0})
+            .set_index(self.xdims)
+            .index
+        )
