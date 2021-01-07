@@ -33,8 +33,8 @@ def test_mean_var(states):
 
     out = xstack.to_mean_var(x, dim="rep")
 
-    xr.testing.assert_allclose(out.sel(variable="mean", drop=True), x.mean("rep"))
-    xr.testing.assert_allclose(out.sel(variable="var", drop=True), x.var("rep"))
+    xr.testing.assert_allclose(out.sel(stats="mean", drop=True), x.mean("rep"))
+    xr.testing.assert_allclose(out.sel(stats="var", drop=True), x.var("rep"))
 
     # test concat_dim
     out = xstack.to_mean_var(x, dim="rep", concat_dim="var")
@@ -56,7 +56,7 @@ def test_xcoefs_concat(states):
 def test_stack(states):
 
     Y_unstack = xstack.states_xcoefs_concat(states).pipe(xstack.to_mean_var, "rep")
-    Y = xstack.stack_dataarray(Y_unstack, xdims=["beta", "order"], vdim="variable")
+    Y = xstack.stack_dataarray(Y_unstack, x_dims=["beta", "order"], stats_dim="stats")
 
     X = xstack.multiindex_to_array(Y.indexes["xstack"])
 
@@ -66,6 +66,6 @@ def test_stack(states):
             np.testing.assert_allclose((beta, order), X[ij, :])
             ij += 1
 
-    Ytest = Y_unstack.transpose("beta", "order", ..., "variable")
-    newshape = (Ytest.sizes["beta"] * Ytest.sizes["order"], -1, Ytest.sizes["variable"])
+    Ytest = Y_unstack.transpose("beta", "order", ..., "stats")
+    newshape = (Ytest.sizes["beta"] * Ytest.sizes["order"], -1, Ytest.sizes["stats"])
     np.testing.assert_allclose(Ytest.values.reshape(newshape), Y.values)

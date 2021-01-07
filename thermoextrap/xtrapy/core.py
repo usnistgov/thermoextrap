@@ -300,17 +300,19 @@ class ExtrapModel(object):
 
 
 class StateCollection(object):
-    def __init__(self, states):  # , **kws):
+    def __init__(self, states, **kws):
         """
         Parameters
         ----------
         states : list
             list of states to consider
             Note that some subclasses require this list to be sorted
+        kws : dict
+            additional key word arguments to keep internally in self.kws
         """
 
         self.states = states
-        # self.kws = kws
+        self.kws = kws
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -348,7 +350,8 @@ class StateCollection(object):
                 states=tuple(
                     state.resample(indices=idx, nrep=nrep, freq=fq, **kws)
                     for state, idx, fq in zip(self.states, indices, freq)
-                )
+                ),
+                **self.kws
             )
 
         else:
@@ -356,8 +359,15 @@ class StateCollection(object):
                 states=tuple(
                     state.resample(indices=idx, nrep=nrep, **kws)
                     for state, idx in zip(self.states, indices)
-                )
+                ),
+                **self.kws
             )
+
+    def map(self, func, *args, **kwargs):
+        """
+        apply a function to elements self.
+        """
+        return [func(s, *args, **kwargs) for s in self]
 
     @gcached()
     def order(self):
