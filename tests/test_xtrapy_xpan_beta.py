@@ -5,6 +5,7 @@ import xarray as xr
 import thermoextrap
 import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
+import thermoextrap.xtrapy.idealgas as idealgas
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
 from thermoextrap.xtrapy.cached_decorators import gcached
 
@@ -67,6 +68,60 @@ def test_extrapmodel(fixture):
     ]:
         xem1 = xpan_beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
         fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
+
+
+def test_extrapmodel_ig():
+    ref_beta = 5.0
+    max_order = 3
+    test_betas = np.array([4.9, 5.1])
+    ref_vol = 1.0
+
+    # Get ideal gas data to compare to analytical results
+    # Should consider moving ideal-gas generated data to conftest.py and use as type of fixture
+    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata = xr.DataArray(xdata, dims=["rec"])
+    udata = xr.DataArray(udata, dims=["rec"])
+    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+        order=max_order, xv=xdata, uv=udata, central=True
+    )
+
+    # Create extrapolation model to test against analytical
+    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=False, minus_log=False)
+    # Will need estimate of uncertainty for test data so can check if within that bound
+    # So resample
+    ex_res = ex.resample(nrep=100)
+
+    # Loop over orders and compare based on uncertainty
+    for o in range(max_order + 1):
+        # Get the exact values we're shooting for
+        true_extrap, true_derivs = idealgas.x_beta_extrap(
+            o, ref_beta, test_betas, ref_vol
+        )
+        # Get the derivatives up to this order
+        test_derivs = ex.xcoefs(order=o, norm=False).values
+        # And extrapolations
+        test_extrap = ex.predict(test_betas, order=o).values
+        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
+        # Redefine as confidence interval, and just for the highest derivative order
+        test_derivs_err = 2.0 * test_derivs_err[-1]
+        test_extrap_err = 2.0 * np.max(
+            test_extrap_err
+        )  # Taking max because can't be array
+        # Just checking to make sure within 1 std
+        # Not the best check... tried p-values...
+        # But bootstrapped std decreases faster with N than absolute error from analytical
+        # Must be good way to do this, but not sure what it is
+        # As long as well-control random number seed and number of samples, should work
+        print("Order %i" % o)
+        print(true_derivs[-1], test_derivs[-1])
+        print(true_extrap, test_extrap)
+        np.testing.assert_allclose(
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+        )
+        np.testing.assert_allclose(
+            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err
+        )
 
 
 def test_extrapmodel_resample(fixture):
@@ -441,6 +496,55 @@ def test_extrapmodel_minuslog_slow(fixture):
         fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
+def test_extrapmodel_minuslog_ig():
+    ref_beta = 5.0
+    max_order = 3
+    test_betas = np.array([4.9, 5.1])
+    ref_vol = 1.0
+
+    # Get ideal gas data to compare to analytical results
+    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata = xr.DataArray(xdata, dims=["rec"])
+    udata = xr.DataArray(udata, dims=["rec"])
+    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+        order=max_order, xv=xdata, uv=udata, central=True
+    )
+
+    # Create extrapolation model to test against analytical
+    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=False, minus_log=True)
+    # Will need estimate of uncertainty for test data so can check if within that bound
+    # So resample
+    ex_res = ex.resample(nrep=100)
+
+    true_derivs = np.zeros(max_order + 1)
+    # Loop over orders and compare based on uncertainty
+    for o in range(max_order + 1):
+        # Get the exact values we're shooting for
+        true_extrap, true_derivs = idealgas.x_beta_extrap_minuslog(
+            o, ref_beta, test_betas, ref_vol
+        )
+        # Get the derivatives up to this order
+        test_derivs = ex.xcoefs(order=o, norm=False).values
+        # And extrapolations
+        test_extrap = ex.predict(test_betas, order=o).values
+        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
+        # Redefine as confidence interval, and just for the highest derivative order
+        test_derivs_err = 2.0 * test_derivs_err[-1]
+        test_extrap_err = 2.0 * np.max(test_extrap_err)
+        # Just checking to make sure within 1 std
+        # Not the best check... tried p-values...
+        # But bootstrapped std decreases faster with N than absolute error from analytical
+        # Must be good way to do this, but not sure what it is
+        # As long as well-control random number seed and number of samples, should work
+        np.testing.assert_allclose(
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+        )
+        np.testing.assert_allclose(
+            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err
+        )
+
+
 # depend on alpha/betas
 # Need to import from utilities
 from thermoextrap.utilities import buildAvgFuncsDependent, symDerivAvgXdependent
@@ -544,6 +648,60 @@ def test_extrapmodel_alphadep(fixture):
     )
 
     fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
+
+
+def test_extrapmodel_alphadep_ig():
+    ref_beta = 5.0
+    max_order = 3
+    test_betas = np.array([4.9, 5.1])
+    ref_vol = 1.0
+
+    # Get ideal gas data to compare to analytical results
+    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata = xr.DataArray(xdata, dims=["rec"])
+    xdata = (
+        xr.concat([xdata * ref_beta, xdata], dim="deriv")
+        .assign_coords(deriv=lambda x: np.arange(x.sizes["deriv"]))
+        .reindex(deriv=np.arange(max_order + 1))
+        .fillna(0.0)
+    )
+    udata = xr.DataArray(udata, dims=["rec"])
+    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+        order=max_order, xv=xdata, uv=udata, deriv="deriv", central=True
+    )
+
+    # Create extrapolation model to test against analytical
+    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=True, minus_log=False)
+    # Will need estimate of uncertainty for test data so can check if within that bound
+    # So resample
+    ex_res = ex.resample(nrep=100)
+
+    # Loop over orders and compare based on uncertainty
+    for o in range(max_order + 1):
+        # Get the exact values we're shooting for
+        true_extrap, true_derivs = idealgas.x_beta_extrap_depend(
+            o, ref_beta, test_betas, ref_vol
+        )
+        # Get the derivatives up to this order
+        test_derivs = ex.xcoefs(order=o, norm=False).values
+        # And extrapolations
+        test_extrap = ex.predict(test_betas, order=o).values
+        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
+        # Redefine as confidence interval, and just for the highest derivative order
+        test_derivs_err = 2.0 * test_derivs_err[-1]
+        test_extrap_err = 2.0 * np.max(test_extrap_err)
+        # Just checking to make sure within 1 std
+        # Not the best check... tried p-values...
+        # But bootstrapped std decreases faster with N than absolute error from analytical
+        # Must be good way to do this, but not sure what it is
+        # As long as well-control random number seed and number of samples, should work
+        np.testing.assert_allclose(
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+        )
+        np.testing.assert_allclose(
+            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err
+        )
 
 
 # minus_log, alphadep
@@ -671,3 +829,57 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     )
 
     fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
+
+
+def test_extrapmodel_alphadep_ig():
+    ref_beta = 5.0
+    max_order = 3
+    test_betas = np.array([4.9, 5.1])
+    ref_vol = 1.0
+
+    # Get ideal gas data to compare to analytical results
+    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata = xr.DataArray(xdata, dims=["rec"])
+    xdata = (
+        xr.concat([xdata * ref_beta, xdata], dim="deriv")
+        .assign_coords(deriv=lambda x: np.arange(x.sizes["deriv"]))
+        .reindex(deriv=np.arange(max_order + 1))
+        .fillna(0.0)
+    )
+    udata = xr.DataArray(udata, dims=["rec"])
+    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+        order=max_order, xv=xdata, uv=udata, deriv="deriv", central=True
+    )
+
+    # Create extrapolation model to test against analytical
+    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=True, minus_log=True)
+    # Will need estimate of uncertainty for test data so can check if within that bound
+    # So resample
+    ex_res = ex.resample(nrep=100)
+
+    # Loop over orders and compare based on uncertainty
+    for o in range(max_order + 1):
+        # Get the exact values we're shooting for
+        true_extrap, true_derivs = idealgas.x_beta_extrap_depend_minuslog(
+            o, ref_beta, test_betas, ref_vol
+        )
+        # Get the derivatives up to this order
+        test_derivs = ex.xcoefs(order=o, norm=False).values
+        # And extrapolations
+        test_extrap = ex.predict(test_betas, order=o).values
+        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
+        # Redefine as confidence interval, and just for the highest derivative order
+        test_derivs_err = 2.0 * test_derivs_err[-1]
+        test_extrap_err = 2.0 * np.max(test_extrap_err)
+        # Just checking to make sure within 1 std
+        # Not the best check... tried p-values...
+        # But bootstrapped std decreases faster with N than absolute error from analytical
+        # Must be good way to do this, but not sure what it is
+        # As long as well-control random number seed and number of samples, should work
+        np.testing.assert_allclose(
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+        )
+        np.testing.assert_allclose(
+            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err
+        )
