@@ -71,6 +71,24 @@ def dbeta_xave(k):
 
 
 @lru_cache(maxsize=100)
+def dbeta_xave_minuslog(k):
+    deriv = sp.diff(-sp.log(xave_sym), beta_sym, k)
+    return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
+
+
+@lru_cache(maxsize=100)
+def dbeta_xave_depend(k):
+    deriv = sp.diff(beta_sym * xave_sym, beta_sym, k)
+    return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
+
+
+@lru_cache(maxsize=100)
+def dbeta_xave_depend_minuslog(k):
+    deriv = sp.diff(-sp.log(beta_sym * xave_sym), beta_sym, k)
+    return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
+
+
+@lru_cache(maxsize=100)
 def dvol_xave(k):
     deriv = sp.diff(xave_sym, vol_sym, k)
     return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
@@ -87,6 +105,65 @@ def x_beta_extrap(order, beta0, beta, vol=1.0):
         out.append(val)
         tot += val / np.math.factorial(k) * (dbeta ** k)
     return tot, np.array(out)
+
+
+def x_beta_extrap_minuslog(order, beta0, beta, vol=1.0):
+    """Same as x_beta_extrap but with -ln<x>"""
+    dbeta = beta - beta0
+
+    out = np.zeros(order + 1)
+    tot = 0.0
+    for o in range(order + 1):
+        out[o] = dbeta_xave_minuslog(o)(beta0, vol)
+        # Above does derivative with sympy... slower, but more straight-forward than below
+        # if o == 0:
+        #     out[o] = -np.log(x_ave(beta0, vol))
+        # else:
+        #     for k in range(1,o+1):
+        #         this_diffs = np.array([dbeta_xave(kk)(beta0, vol) for kk in range(1, o-k+2)])
+        #         out[o] += (np.math.factorial(k-1) * (-1/x_ave(beta0, vol))**k) *  sp.bell(o, k, this_diffs)
+        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+
+    return tot, out
+
+
+def x_beta_extrap_depend(order, beta0, beta, vol=1.0):
+    """Same as x_beta_extrap but for <beta*x> to provide non-sensical beta dependence"""
+    dbeta = beta - beta0
+
+    out = np.zeros(order + 1)
+    tot = 0.0
+    for o in range(order + 1):
+        out[o] = dbeta_xave_depend(o)(beta0, vol)
+        # Above does derivative with sympy... slower, but more straight-forward than below
+        # if o == 0:
+        #     out[o] = beta0*(x_ave(beta0, vol))
+        # else:
+        #     out[o] = (o * dbeta_xave(o-1)(beta0, vol) + beta0 * dbeta_xave(o)(beta0, vol))
+        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+
+    return tot, out
+
+
+def x_beta_extrap_depend_minuslog(order, beta0, beta, vol=1.0):
+    """Same as x_beta_extrap but with -ln<beta*x>"""
+    dbeta = beta - beta0
+
+    out = np.zeros(order + 1)
+    tot = 0.0
+    for o in range(order + 1):
+        out[o] = dbeta_xave_depend_minuslog(o)(beta0, vol)
+        # Above does derivative with sympy... slower, but more straight-forward than below
+        # if o == 0:
+        #     out[o] = -np.log(beta0 * x_ave(beta0, vol))
+        # else:
+        #     out[o] += np.math.factorial(o-1)*((-1.0/beta0)**o)
+        #     for k in range(1,o+1):
+        #         this_diffs = np.array([dbeta_xave(kk)(beta0, vol) for kk in range(1, o-k+2)])
+        #         out[o] += (np.math.factorial(k-1) * (-1/x_ave(beta0, vol))**k) *  sp.bell(o, k, this_diffs)
+        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+
+    return tot, out
 
 
 def x_vol_extrap(order, vol0, beta, vol):
