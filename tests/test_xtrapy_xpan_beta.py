@@ -388,6 +388,30 @@ def test_interpmodel(fixture):
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
+def test_interpmodel_polynomial():
+    # Test 1st, 2nd, and 3rd order polynomials at [-1.0, 1.0] points
+    xdat2 = xr.DataArray([0.5, 1.5], dims=["rec"])
+
+    for i in range(3):
+        xdat1 = ((-1.0) ** (i + 1)) * xdat2
+        udat1 = (i + 1) * xr.DataArray([-2.0, 2.0], dims=["rec"])
+        udat2 = (i + 1) * xr.DataArray([2.0, -2.0], dims=["rec"])
+        print(udat1, udat2)
+        dat1 = xpan_beta.DataCentralMomentsVals.from_vals(
+            order=1, xv=xdat1, uv=udat1, central=True
+        )
+        dat2 = xpan_beta.DataCentralMomentsVals.from_vals(
+            order=1, xv=xdat2, uv=udat2, central=True
+        )
+
+        ex1 = xpan_beta.factory_extrapmodel(-1.0, dat1, xalpha=False, minus_log=False)
+        ex2 = xpan_beta.factory_extrapmodel(1.0, dat2, xalpha=False, minus_log=False)
+        interp = xtrapy_core.InterpModel([ex1, ex2])
+        check_array = np.zeros(4)
+        check_array[i + 1] = 1.0
+        np.testing.assert_array_equal(interp.xcoefs().values, check_array)
+
+
 def test_mbar(fixture):
 
     beta0 = [0.05, 0.5]
@@ -831,7 +855,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
-def test_extrapmodel_alphadep_ig():
+def test_extrapmodel_alphadep_minuslog_ig():
     ref_beta = 5.0
     max_order = 3
     test_betas = np.array([4.9, 5.1])
