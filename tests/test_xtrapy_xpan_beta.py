@@ -606,7 +606,9 @@ def test_extrapmodel_alphadep_slow(fixture):
     # by passign a derivative name, we are
     xem = xpan_beta.factory_extrapmodel(
         beta0,
-        xpan_beta.factory_data(uv=u, xv=x, order=order, central=False, deriv="deriv"),
+        xpan_beta.factory_data(
+            uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
+        ),
     )
 
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
@@ -627,13 +629,15 @@ def test_extrapmodel_alphadep(fixture):
     # by passign a derivative name, we are
     xem0 = xpan_beta.factory_extrapmodel(
         beta0,
-        xpan_beta.factory_data(uv=u, xv=x, order=order, central=False, deriv="deriv"),
+        xpan_beta.factory_data(
+            uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
+        ),
     )
 
     xem1 = xpan_beta.factory_extrapmodel(
         beta0,
         data=xpan_beta.DataCentralMomentsVals.from_vals(
-            uv=u, xv=x, order=order, central=False, deriv="deriv"
+            uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
@@ -643,7 +647,7 @@ def test_extrapmodel_alphadep(fixture):
     xem1 = xpan_beta.factory_extrapmodel(
         beta0,
         data=xpan_beta.DataCentralMomentsVals.from_vals(
-            uv=u, xv=x, order=order, central=True, deriv="deriv"
+            uv=u, xv=x, order=order, central=True, deriv_dim="deriv"
         ),
     )
 
@@ -667,7 +671,7 @@ def test_extrapmodel_alphadep_ig():
     )
     udata = xr.DataArray(udata, dims=["rec"])
     dat = xpan_beta.DataCentralMomentsVals.from_vals(
-        order=max_order, xv=xdata, uv=udata, deriv="deriv", central=True
+        order=max_order, xv=xdata, uv=udata, deriv_dim="deriv", central=True
     )
 
     # Create extrapolation model to test against analytical
@@ -697,7 +701,7 @@ def test_extrapmodel_alphadep_ig():
         # Must be good way to do this, but not sure what it is
         # As long as well-control random number seed and number of samples, should work
         np.testing.assert_allclose(
-            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err * 2
         )
         np.testing.assert_allclose(
             true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err
@@ -775,7 +779,7 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
         beta0,
         minus_log=True,
         data=xpan_beta.factory_data(
-            uv=u, xv=x, order=order, central=False, deriv="deriv"
+            uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
@@ -805,7 +809,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
         beta0,
         minus_log=True,
         data=xpan_beta.factory_data(
-            uv=u, xv=x, order=order, central=False, deriv="deriv"
+            uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
@@ -813,7 +817,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
         beta0,
         minus_log=True,
         data=xpan_beta.DataCentralMomentsVals.from_vals(
-            uv=u, xv=x, order=order, central=False, deriv="deriv"
+            uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
@@ -824,7 +828,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
         beta0,
         minus_log=True,
         data=xpan_beta.DataCentralMomentsVals.from_vals(
-            uv=u, xv=x, order=order, central=True, deriv="deriv"
+            uv=u, xv=x, order=order, central=True, deriv_dim="deriv"
         ),
     )
 
@@ -848,7 +852,7 @@ def test_extrapmodel_alphadep_ig():
     )
     udata = xr.DataArray(udata, dims=["rec"])
     dat = xpan_beta.DataCentralMomentsVals.from_vals(
-        order=max_order, xv=xdata, uv=udata, deriv="deriv", central=True
+        order=max_order, xv=xdata, uv=udata, deriv_dim="deriv", central=True
     )
 
     # Create extrapolation model to test against analytical
