@@ -252,7 +252,7 @@ class GPRData(StateCollection):
 
         """
 
-        kws = dict(self.deriv_kws, order_name=self.order_dim)
+        kws = dict(self.deriv_kws, order_dim=self.order_dim)
         return (
             states_xcoefs_concat(self, order=order, **kws)
             .pipe(

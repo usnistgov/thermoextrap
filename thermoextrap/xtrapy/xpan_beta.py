@@ -252,11 +252,11 @@ def factory_data(
     central=False,
     skipna=False,
     xalpha=False,
-    rec="rec",
-    mom_u="mom_u",
-    val="val",
-    rep="rep",
-    deriv=None,
+    rec_dim="rec",
+    umom_dim="umom",
+    val_dims="val",
+    rep_dim="rep",
+    deriv_dim=None,
     chunk=None,
     compute=None,
     **kws
@@ -271,12 +271,12 @@ def factory_data(
     xv : array-like
         observable values
     order : int
-        highest mom_u to calculate
+        highest umom_dim to calculate
     skipna : bool, default=False
         if True, skip `np.nan` values in creating averages.
         Can make some "big" calculations slow
-    rec, mom_u, val, rep, deriv : str
-        names of record (i.e. time), mom_u, value, replicate,
+    rec_dim, umom_dim, val_dim, rep_dim, deriv_dim : str
+        names of record (i.e. time), umom_dim, value, replicate,
         and derivative (with respect to alpha)
     chunk : int or dict, optional
         If specified, perform chunking on resulting uv, xv arrays.
@@ -295,7 +295,7 @@ def factory_data(
     else:
         cls = DataValues
 
-    if xalpha and deriv is None:
+    if xalpha and deriv_dim is None:
         raise ValueError("if xalpha, must pass string name of derivative")
 
     return cls.from_vals(
@@ -303,11 +303,11 @@ def factory_data(
         xv=xv,
         order=order,
         skipna=skipna,
-        rec=rec,
-        mom_u=mom_u,
-        val=val,
-        rep=rep,
-        deriv=deriv,
+        rec_dim=rec_dim,
+        umom_dim=umom_dim,
+        val_dims=val_dims,
+        rep_dim=rep_dim,
+        deriv_dim=deriv_dim,
         chunk=chunk,
         compute=compute,
         **kws
