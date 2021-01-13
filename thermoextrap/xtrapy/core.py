@@ -197,11 +197,11 @@ class Coefs(object):
             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
         return out
 
-    def xcoefs(self, data, order=None, norm=True, minus_log=False, order_name="order"):
+    def xcoefs(self, data, order=None, norm=True, minus_log=False, order_dim="order"):
         if order is None:
             order = data.order
         out = self.coefs(*data.xcoefs_args, order=order, norm=norm, minus_log=minus_log)
-        return xr.concat(out, dim=order_name)
+        return xr.concat(out, dim=order_dim)
 
     @classmethod
     def from_sympy(cls, exprs, args):
@@ -234,7 +234,7 @@ class ExtrapModel(object):
         self.alpha_name = alpha_name
 
     @gcached(prop=False)
-    def xcoefs(self, order=None, order_name="order", norm=True, minus_log=None):
+    def xcoefs(self, order=None, order_dim="order", norm=True, minus_log=None):
         if minus_log is None:
             minus_log = self.minus_log
         if order is None:
@@ -242,7 +242,7 @@ class ExtrapModel(object):
         return self.coefs.xcoefs(
             self.data,
             order=order,
-            order_name=order_name,
+            order_dim=order_dim,
             norm=norm,
             minus_log=minus_log,
         )
@@ -254,7 +254,7 @@ class ExtrapModel(object):
         self,
         alpha,
         order=None,
-        order_name="order",
+        order_dim="order",
         cumsum=False,
         minus_log=None,
         alpha_name=None,
@@ -266,25 +266,25 @@ class ExtrapModel(object):
             alpha_name = self.alpha_name
 
         xcoefs = self.xcoefs(
-            order=order, order_name=order_name, norm=True, minus_log=minus_log
+            order=order, order_dim=order_dim, norm=True, minus_log=minus_log
         )
 
         alpha = xrwrap_alpha(alpha, name=alpha_name)
         dalpha = alpha - self.alpha0
-        p = xr.DataArray(np.arange(order + 1), dims=order_name)
+        p = xr.DataArray(np.arange(order + 1), dims=order_dim)
         prefac = dalpha ** p
 
         # TODO : this should be an option, same for xcoefs
         coords = {"dalpha": dalpha, alpha_name + "0": self.alpha0}
 
-        out = (prefac * xcoefs.sel(**{order_name: prefac[order_name]})).assign_coords(
+        out = (prefac * xcoefs.sel(**{order_dim: prefac[order_dim]})).assign_coords(
             **coords
         )
 
         if cumsum:
-            out = out.cumsum(order_name)
+            out = out.cumsum(order_dim)
         else:
-            out = out.sum(order_name)
+            out = out.sum(order_dim)
 
         return out
 
@@ -411,7 +411,7 @@ class ExtrapWeightedModel(StateCollection):
         self,
         alpha,
         order=None,
-        order_name="order",
+        order_dim="order",
         cumsum=False,
         minus_log=None,
         alpha_name=None,
@@ -454,7 +454,7 @@ class ExtrapWeightedModel(StateCollection):
                         self.predict(
                             alpha=a,
                             order=order,
-                            order_name=order_name,
+                            order_dim=order_dim,
                             cumsum=cumsum,
                             minus_log=minus_log,
                             alpha_name=alpha_name,
@@ -472,7 +472,7 @@ class ExtrapWeightedModel(StateCollection):
                 m.predict(
                     alpha,
                     order=order,
-                    order_name=order_name,
+                    order_dim=order_dim,
                     cumsum=cumsum,
                     minus_log=minus_log,
                     alpha_name=alpha_name,
@@ -489,7 +489,7 @@ class ExtrapWeightedModel(StateCollection):
 
 class InterpModel(StateCollection):
     @gcached(prop=False)
-    def xcoefs(self, order=None, order_name="porder", minus_log=None):
+    def xcoefs(self, order=None, order_dim="porder", minus_log=None):
 
         if order is None:
             order = self.order
@@ -524,7 +524,7 @@ class InterpModel(StateCollection):
 
         mat_inv = np.linalg.inv(mat)
         mat_inv = (
-            xr.DataArray(mat_inv, dims=[order_name, "state_order"])
+            xr.DataArray(mat_inv, dims=[order_dim, "state_order"])
             .assign_coords(state=("state_order", states))
             .assign_coords(order=("state_order", orders))
             .set_index(state_order=["state", "order"])
@@ -543,7 +543,7 @@ class InterpModel(StateCollection):
         return coefs
 
     def predict(
-        self, alpha, order=None, order_name="porder", minus_log=None, alpha_name=None
+        self, alpha, order=None, order_dim="porder", minus_log=None, alpha_name=None
     ):
 
         if order is None:
@@ -551,15 +551,15 @@ class InterpModel(StateCollection):
         if alpha_name is None:
             alpha_name = self.alpha_name
 
-        xcoefs = self.xcoefs(order=order, order_name=order_name, minus_log=minus_log)
+        xcoefs = self.xcoefs(order=order, order_dim=order_dim, minus_log=minus_log)
         alpha = xrwrap_alpha(alpha, name=alpha_name)
 
-        porder = len(xcoefs[order_name]) - 1
+        porder = len(xcoefs[order_dim]) - 1
 
-        p = xr.DataArray(np.arange(porder + 1), dims=order_name)
+        p = xr.DataArray(np.arange(porder + 1), dims=order_dim)
         prefac = alpha ** p
 
-        out = (prefac * xcoefs).sum(order_name)
+        out = (prefac * xcoefs).sum(order_dim)
         return out
 
 
@@ -584,15 +584,15 @@ class PerturbModel(object):
 
         alpha0 = self.alpha0
 
-        rec = self.data.rec
+        rec_dim = self.data.rec_dim
         dalpha = alpha - alpha0
 
         dalpha_uv = (-1.0) * dalpha * uv
-        dalpha_uv_diff = dalpha_uv - dalpha_uv.max(rec)
+        dalpha_uv_diff = dalpha_uv - dalpha_uv.max(rec_dim)
         expvals = np.exp(dalpha_uv_diff)
 
-        num = xr.dot(expvals, xv, dims="rec") / len(xv[rec])
-        den = expvals.mean("rec")
+        num = xr.dot(expvals, xv, dims=rec_dim) / len(xv[rec_dim])
+        den = expvals.mean(rec_dim)
 
         return num / den
 
@@ -615,21 +615,21 @@ class MBARModel(StateCollection):
         super(MBARModel, self).__init__(states)
 
     @gcached(prop=False)
-    def _default_params(self, state_name="state", alpha_name="alpha"):
+    def _default_params(self, state_dim="state", alpha_name="alpha"):
 
         # all xvalues:
-        xv = xr.concat([m.data.xv for m in self], dim=state_name)
-        uv = xr.concat([m.data.uv for m in self], dim=state_name)
+        xv = xr.concat([m.data.xv for m in self], dim=state_dim)
+        uv = xr.concat([m.data.uv for m in self], dim=state_dim)
         alpha0 = xrwrap_alpha([m.alpha0 for m in self], name=alpha_name)
 
         # make sure uv, xv in correct orde
-        rec = self[0].data.rec
-        xv = xv.transpose(state_name, rec, ...)
-        uv = uv.transpose(state_name, rec, ...)
+        rec_dim = self[0].data.rec_dim
+        xv = xv.transpose(state_dim, rec_dim, ...)
+        uv = uv.transpose(state_dim, rec_dim, ...)
 
-        # alpha[alpha] * uv[state, rec] = out[alpha, state, rec]
+        # alpha[alpha] * uv[state, rec_dim] = out[alpha, state, rec_dim]
         Ukn = (alpha0 * uv).values.reshape(len(self), -1)
-        N = np.ones(len(self)) * len(xv["rec"])
+        N = np.ones(len(self)) * len(xv[rec_dim])
         mbar_obj = mbar.MBAR(Ukn, N)
 
         return uv, xv, alpha0, mbar_obj

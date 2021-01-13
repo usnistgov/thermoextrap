@@ -96,34 +96,46 @@ class DataValuesVolume(DataValues):
         uv,
         xv,
         order,
-        dxdqv,
-        volume,
-        ndim=3,
-        rec="rec",
-        mom_u="mom_u",
-        deriv=None,
+        meta,
+        rec_dim="rec",
+        umom_dim="umom",
+        deriv_dim=None,
         skipna=False,
         chunk=None,
         compute=None,
         build_aves_kws=None,
     ):
 
+        for k in ["volume", "dxdqv"]:
+            assert k in meta
+
+        if "ndim" not in meta:
+            meta["ndim"] = 3
+
         super(DataValuesVolume, self).__init__(
             uv=uv,
             xv=xv,
             order=order,
             skipna=skipna,
-            rec=rec,
-            mom_u=mom_u,
-            deriv=deriv,
+            rec_dim=rec_dim,
+            umom_dim=umom_dim,
+            deriv_dim=deriv_dim,
             chunk=chunk,
             compute=compute,
             build_aves_kws=build_aves_kws,
-            # kws
-            volume=volume,
-            ndim=ndim,
-            dxdqv=dxdqv,
+            # meta data:
+            meta=meta,
         )
+
+    @gcached()
+    def dxdq(self):
+        return self.meta["dxdqv"].mean(self.rec_dim, skipna=self.skipna)
+
+    def resample_meta(self, indices):
+        # resample "other" arrays
+        out = self.meta.copy()
+        out["dxdqv"] = out["dxdqv"][indices]
+        return out
 
     @property
     def xcoefs_args(self):
@@ -131,19 +143,9 @@ class DataValuesVolume(DataValues):
             self.u_selector,
             self.xu_selector,
             self.dxdq,
-            self.kws["volume"],
-            self.kws["ndim"],
+            self.meta["volume"],
+            self.meta["ndim"],
         )
-
-    @gcached()
-    def dxdq(self):
-        return self.kws["dxdqv"].mean("rec", skipna=self.skipna)
-
-    def resample_other_params(self, indices):
-        # resample "other" arrays
-        out = self.kws.copy()
-        out["dxdqv"] = out["dxdqv"][indices]
-        return out
 
 
 def factory_extrapmodel(
@@ -154,9 +156,9 @@ def factory_extrapmodel(
     ndim=3,
     order=1,
     alpha_name="volume",
-    rec="rec",
-    val="val",
-    rep="rep",
+    rec_dim="rec",
+    val_dims="val",
+    rep_dim="rep",
     **kws
 ):
     """
@@ -189,18 +191,22 @@ def factory_extrapmodel(
     if order != 1:
         raise ValueError("only order=1 is supported")
 
-    dxdqv = xrwrap_xv(dxdqv, rec="rec", rep="rep", deriv=None, val=val)
+    dxdqv = xrwrap_xv(
+        dxdqv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=None, val_dims=val_dims
+    )
     data = DataValuesVolume.from_vals(
         uv=uv,
         xv=xv,
         order=order,
-        dxdqv=dxdqv,
-        volume=volume,
-        ndim=ndim,
-        rec=rec,
-        rep=rep,
-        val=val,
-        deriv=None,
+        meta=dict(
+            dxdqv=dxdqv,
+            volume=volume,
+            ndim=ndim,
+        ),
+        rec_dim=rec_dim,
+        rep_dim=rep_dim,
+        val_dims=val_dims,
+        deriv_dim=None,
         **kws
     )
 

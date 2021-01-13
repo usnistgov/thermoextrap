@@ -266,7 +266,7 @@ class combined_loss(object):
 
 # Now can construct a model class inheriting from StateCollection
 class GPRModel(StateCollection):
-    def _collect_data(self, order=None, order_name="order", n_resample=100):
+    def _collect_data(self, order=None, order_dim="order", n_resample=100):
         if order is None:
             order = self.order
         x_data = np.reshape([m.alpha0 for m in self.states], (-1, 1))
@@ -281,10 +281,10 @@ class GPRModel(StateCollection):
         y_data_err_xr = []
         for m in self.states:
             # Set norm to False so does not divide by factorial of each derivative order
-            y_data_xr.append(m.xcoefs(order=order, order_name=order_name, norm=False))
+            y_data_xr.append(m.xcoefs(order=order, order_dim=order_dim, norm=False))
             # Obtain variances by bootstrap resampling of original data and compute for each
             this_boot = m.resample(nrep=n_resample).xcoefs(
-                order=order, order_name=order_name, norm=False
+                order=order, order_dim=order_dim, norm=False
             )
             y_data_err_xr.append(this_boot.var("rep"))
         y_data_xr = xr.concat(y_data_xr, dim="state")
@@ -382,14 +382,14 @@ class GPRModel(StateCollection):
         self.gp = None
         self._train_GP(x_in, y_in)
 
-    def predict(self, alpha, order=None, order_name="order", alpha_name=None):
+    def predict(self, alpha, order=None, order_dim="order", alpha_name=None):
 
         if order is None:
             order = self.order
         elif order != self.order:
             # In this case, must retrain GP at different order
             # So try not to do this if possible
-            x_in, y_in = self._collect_data(order=order, order_name=order_name)
+            x_in, y_in = self._collect_data(order=order, order_dim=order_dim)
             self._train_GP(x_in, y_in, fresh_train=True)
 
         x_pred = np.hstack([np.reshape(alpha, (-1, 1)), np.zeros((alpha.shape[0], 1))])
