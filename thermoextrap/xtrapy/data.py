@@ -50,58 +50,62 @@ def _check_xr(x, dims, strict=True, name=None):
     return x
 
 
-def xrwrap_uv(uv, dims=None, rec="rec", rep="rep", name="u", stict=True):
+def xrwrap_uv(uv, dims=None, rec_dim="rec", rep_dim="rep", name="u", stict=True):
     """
     wrap uv (energy values) array
 
-    assumes uv[rec], or uv[rep, rec] where rec is recored (or time) and rep is replicate
+    assumes uv[rec_dim], or uv[rep_dim, rec_dim] where rec_dim is recored (or time) and rep_dim is replicate
     """
     if dims is None:
-        dims = {1: [rec], 2: [rep, rec]}
+        dims = {1: [rec_dim], 2: [rep_dim, rec_dim]}
     return _check_xr(uv, dims, strict=stict, name=name)
 
 
 def xrwrap_xv(
     xv,
     dims=None,
-    rec="rec",
-    rep="rep",
-    deriv=None,
-    val="val",
+    rec_dim="rec",
+    rep_dim="rep",
+    deriv_dim=None,
+    val_dims="val",
     name="x",
     strict=None,
 ):
     """
     wraps xv (x values) array
 
-    if deriv is None, assumes xv[rec], xv[rec, vals], xv[rep, rec, val]
-    if deriv is not None, assumes xv[rec, deriv], xv[rec,deriv, val], xv[rep,rec,deriv,val]
+    if deriv_dim is None, assumes xv[rec_dim], xv[rec_dim, vals], xv[rep_dim, rec_dim, val_dims]
+    if deriv_dim is not None, assumes xv[rec_dim, deriv_dim], xv[rec_dim,deriv_dim, val_dims], xv[rep_dim,rec_dim,deriv_dim,val_dims]
     """
 
-    if isinstance(val, str):
-        val = [val]
-    elif not isinstance(val, list):
-        val = list(val)
+    if isinstance(val_dims, str):
+        val_dims = [val_dims]
+    elif not isinstance(val_dims, list):
+        val_dims = list(val_dims)
 
-    if deriv is None:
+    if deriv_dim is None:
         if strict is None:
             strict = False
         if dims is None:
-            rec_val = [rec] + val
-            rep_val = [rep, rec] + val
+            rec_val = [rec_dim] + val_dims
+            rep_val = [rep_dim, rec_dim] + val_dims
 
-            dims = {1: [rec], len(rec_val): [rec] + val, len(rep_val): [rep, rec] + val}
+            dims = {
+                1: [rec_dim],
+                len(rec_val): [rec_dim] + val_dims,
+                len(rep_val): [rep_dim, rec_dim] + val_dims,
+            }
 
     else:
         if strict is None:
             strict = False
         if dims is None:
-            rec_val = [rec, deriv] + val
-            rep_val = [rep, rec, deriv] + val
+            rec_val = [rec_dim, deriv_dim] + val_dims
+            rep_val = [rep_dim, rec_dim, deriv_dim] + val_dims
             dims = {
-                2: [rec, deriv],
-                len(rec_val): [rec, deriv] + val,
-                len(rep_val): [rep, rec, deriv] + [val],
+                2: [rec_dim, deriv_dim],
+                len(rec_val): [rec_dim, deriv_dim] + val_dims,
+                len(rep_val): [rep_dim, rec_dim, deriv_dim] + [val_dims],
             }
     return _check_xr(xv, dims=dims, strict=strict, name=name)
 
@@ -126,7 +130,7 @@ def xrwrap_alpha(alpha, dims=None, stict=False, name="alpha"):
     return alpha
 
 
-def resample_indicies(size, nrep, rec="rec", rep="rep", replace=True, transpose=False):
+def resample_indicies(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
     """
     get indexing DataArray
 
@@ -136,10 +140,12 @@ def resample_indicies(size, nrep, rec="rec", rep="rep", replace=True, transpose=
         size of axis to bootstrap along
     nrep : int
         number of replicates
-    rec : str, default='rec'
-        name of record dimension
-    rep : str, default='rep'
-        name of replicate dimension
+    rec_dim : str, default='rec'
+        name of record dimension.
+        That is, the dimension to sample along
+    rep_dim : str, default='rep'
+        name of replicate dimension.
+        That is, the new resampledd dimension.
     replace : bool, default=True
         if True, sample with replacement.
     transpose : bool, default=False
@@ -153,11 +159,11 @@ def resample_indicies(size, nrep, rec="rec", rep="rep", replace=True, transpose=
     """
     indices = xr.DataArray(
         data=np.random.choice(size, size=(nrep, size), replace=replace),
-        dims=[rep, "rec"],
+        dims=[rep_dim, rec_dim],
     )
 
-    if transpose:
-        indices = indices.transpose(rec, rep)
+    # if transpose:
+    #     indices = indices.transpose(rec_dim, rep_dim)
     return indices
 
 
@@ -168,20 +174,20 @@ class DatasetSelector(object):
     Needed for calling sympy.lambdify functions
     """
 
-    def __init__(self, data, dims=None, moment="moment", deriv=None):
+    def __init__(self, data, dims=None, mom_dim="moment", deriv_dim=None):
 
         # Default dims
         if dims is None:
-            if deriv is not None:
-                dims = [moment, deriv]
+            if deriv_dim is not None:
+                dims = [mom_dim, deriv_dim]
             else:
-                dims = [moment]
+                dims = [mom_dim]
 
         # if dims is None:
-        #     if deriv in data.dims:
-        #         dims = [moment, deriv]
+        #     if deriv_dim in data.dims:
+        #         dims = [mom_dim, deriv_dim]
         #     else:
-        #         dims = [moment]
+        #         dims = [mom_dim]
 
         if isinstance(dims, str):
             dims = [dims]
@@ -224,7 +230,7 @@ class AbstractData(ABC):
 
     @property
     def xalpha(self):
-        return self.deriv is not None
+        return self.deriv_dim is not None
 
 
 class DataValuesBase(AbstractData):
@@ -233,14 +239,14 @@ class DataValuesBase(AbstractData):
         uv,
         xv,
         order,
-        rec="rec",
-        mom_u="mom_u",
-        deriv=None,
+        rec_dim="rec",
+        umom_dim="umom",
+        deriv_dim=None,
         skipna=False,
         chunk=None,
         compute=None,
         build_aves_kws=None,
-        **kws,
+        meta=None,
     ):
         """
         Parameters
@@ -251,12 +257,12 @@ class DataValuesBase(AbstractData):
             raw values of x (observable)
         order : int
             maximum order of moments to calculate
-        rec : str, default='rec'
+        rec_dim : str, default='rec'
             Name of dimension to average along.
-        mom_u : str, default='mom_u',
-            Name of moment dimension <u**mom_u>
-        deriv : str, default=None
-            if deriv is a string, then this is the name of the derivative dimension
+        umom_dim : str, default='umom',
+            Name of moment dimension < u ** umom >
+        deriv_dim : str, default=None
+            if deriv_dim is a string, then this is the name of the derivative dimension
             and xarray objects will have a derivative
         skipna : bool, default=False
             if True, skip nan values
@@ -264,9 +270,9 @@ class DataValuesBase(AbstractData):
             chunking of xarray objects
         compute : bool, optional
             whether to perform compute step on xarray outputs
-        **kws : dict
-            extra keyword arguments.
-            To be used in subclasses with care
+        meta : dict, optional
+            extra meta data/parameters to be caried along with object and child objects.
+        Values passed through method `resample_meta`
         """
 
         assert isinstance(uv, xr.DataArray)
@@ -274,7 +280,7 @@ class DataValuesBase(AbstractData):
 
         if chunk is not None:
             if isinstance(chunk, int):
-                chunk = {rec: chunk}
+                chunk = {rec_dim: chunk}
 
             uv = uv.chunk(chunk)
             xv = xv.chunk(chunk)
@@ -302,11 +308,11 @@ class DataValuesBase(AbstractData):
         self.skipna = skipna
 
         # dimension names
-        self.rec = rec
-        self.mom_u = mom_u
-        self.deriv = deriv
+        self.rec_dim = rec_dim
+        self.umom_dim = umom_dim
+        self.deriv_dim = deriv_dim
 
-        self.kws = kws
+        self.meta = meta
 
     @classmethod
     def from_vals(
@@ -314,16 +320,16 @@ class DataValuesBase(AbstractData):
         xv,
         uv,
         order,
-        rec="rec",
-        mom_u="mom_u",
-        rep="rep",
-        deriv=None,
-        val="val",
+        rec_dim="rec",
+        umom_dim="umom",
+        rep_dim="rep",
+        deriv_dim=None,
+        val_dims="val",
         skipna=False,
         chunk=None,
         compute=None,
         build_aves_kws=None,
-        **kws,
+        meta=None,
     ):
         """
         Constructor from arrays
@@ -338,14 +344,14 @@ class DataValuesBase(AbstractData):
             if not DataArray, wrap with `xrwrap_xv`
         order : int
             maximum order of moments to calculate
-        rec : str, default='rec'
+        rec_dim : str, default='rec'
             Name of dimension to average along.
-        mom_u : str, default='mom_u',
-            Name of moment dimension <u**mom_u>
-        val : str or list-like
+        umom_dim : str, default='umom',
+            Name of moment dimension <u**umom_dim>
+        val_dims : str or list-like
             names of extra dimensions
-        deriv : str, default=None
-            if deriv is a string, then this is the name of the derivative dimension
+        deriv_dim : str, default=None
+            if deriv_dim is a string, then this is the name of the derivative dimension
             and xarray objects will have a derivative
         skipna : bool, default=False
             if True, skip nan values
@@ -353,31 +359,33 @@ class DataValuesBase(AbstractData):
             chunking of xarray objects
         compute : bool, optional
             whether to perform compute step on xarray outputs
-        **kws : dict
+        meta : dict, optional
             extra keyword arguments
         """
 
         # make sure "val" is a list
-        if isinstance(val, str):
-            val = [val]
-        elif not isinstance(val, list):
-            val = list(val)
+        if isinstance(val_dims, str):
+            val_dims = [val_dims]
+        elif not isinstance(val_dims, list):
+            val_dims = list(val_dims)
 
-        uv = xrwrap_uv(uv, rec=rec, rep=rep)
-        xv = xrwrap_xv(xv, rec=rec, rep=rep, deriv=deriv, val=val)
+        uv = xrwrap_uv(uv, rec_dim=rec_dim, rep_dim=rep_dim)
+        xv = xrwrap_xv(
+            xv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=deriv_dim, val_dims=val_dims
+        )
 
         return cls(
             uv=uv,
             xv=xv,
             order=order,
-            rec=rec,
-            mom_u=mom_u,
-            deriv=deriv,
+            rec_dim=rec_dim,
+            umom_dim=umom_dim,
+            deriv_dim=deriv_dim,
             skipna=skipna,
             chunk=chunk,
             compute=compute,
             build_aves_kws=build_aves_kws,
-            **kws,
+            meta=meta,
         )
 
     @property
@@ -389,9 +397,9 @@ class DataValuesBase(AbstractData):
         return self._CENTRAL
 
     def __len__(self):
-        return len(self.uv[self.rec])
+        return len(self.uv[self.rec_dim])
 
-    def resample_other_params(self, indices):
+    def resample_meta(self, indices):
         """
         incase any other values are to be considered,
         then this is where they should be resampled
@@ -400,9 +408,11 @@ class DataValuesBase(AbstractData):
         -------
         other_params : transformed version of self.other_params
         """
-        return self.kws
+        return self.meta
 
-    def resample(self, indices=None, nrep=None, rep="rep", chunk=None, compute="None"):
+    def resample(
+        self, indices=None, nrep=None, rep_dim="rep", chunk=None, compute="None"
+    ):
         """
         resample object
 
@@ -412,7 +422,7 @@ class DataValuesBase(AbstractData):
             if present, use this to resample
         nrep : int, optional
             construct resampling with `nrep` samples
-        rep : str, default='rep'
+        rep_dim : str, default='rep'
             dimension name for repetition dimension
         chunk : optional
             chunk size
@@ -431,33 +441,35 @@ class DataValuesBase(AbstractData):
         elif compute is None:
             compute = self.compute
 
-        if rep is None:
-            rep = self.rep
+        if rep_dim is None:
+            rep_dim = self.rep_dim
 
         if indices is None:
             assert nrep is not None
-            indices = resample_indicies(len(self), nrep, rec=self.rec, rep=rep)
+            indices = resample_indicies(
+                len(self), nrep, rec_dim=self.rec_dim, rep_dim=rep_dim
+            )
         elif not isinstance(indices, xr.DataArray):
-            indices = xr.DataArray(indices, dims=(rep, self.rec))
+            indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))
 
-        assert indices.sizes[self.rec] == len(self)
+        assert indices.sizes[self.rec_dim] == len(self)
 
         uv = self.uv.compute()[indices]
-        xv = self.xv.compute().isel(**{self.rec: indices})
-        kws = self.resample_other_params(indices)
+        xv = self.xv.compute().isel(**{self.rec_dim: indices})
+        meta = self.resample_meta(indices)
 
         return self.__class__(
             uv=uv,
             xv=xv,
             order=self.order,
-            rec=self.rec,
-            mom_u=self.mom_u,
-            deriv=self.deriv,
+            rec_dim=self.rec_dim,
+            umom_dim=self.umom_dim,
+            deriv_dim=self.deriv_dim,
             skipna=self.skipna,
             chunk=chunk,
             compute=compute,
             build_aves_kws=self.build_aves_kws,
-            **kws,
+            meta=meta,
         )
 
 
@@ -468,9 +480,9 @@ def build_aves_xu(
     uv,
     xv,
     order,
-    rec="rec",
-    moment="mom_u",
-    deriv=None,
+    rec_dim="rec",
+    umom_dim="umom",
+    deriv_dim=None,
     skipna=False,
     u_name=None,
     xu_name=None,
@@ -482,8 +494,8 @@ def build_aves_xu(
 
     Parameters
     ----------
-    moment : dimension with moment order
-    deriv : dimension with derivative order
+    umom_dim : dimension with moment order
+    deriv_dim : dimension with derivative order
 
     skipna : bool, default=False
         if True, then handle nan values correctly.  Note that skipna=True
@@ -501,8 +513,8 @@ def build_aves_xu(
     u = []
     xu = []
 
-    uave = uv.mean(rec, skipna=skipna)
-    xave = xv.mean(rec, skipna=skipna)
+    uave = uv.mean(rec_dim, skipna=skipna)
+    xave = xv.mean(rec_dim, skipna=skipna)
     for i in range(order + 1):
         if i == 0:
             # <u**0>
@@ -515,26 +527,26 @@ def build_aves_xu(
             xu_n = xv * uv
 
             u.append(uave)
-            xu.append(xu_n.mean(rec, skipna=skipna))
+            xu.append(xu_n.mean(rec_dim, skipna=skipna))
         else:
             u_n *= uv
             xu_n *= uv
-            u.append(u_n.mean(rec, skipna=skipna))
-            xu.append(xu_n.mean(rec, skipna=skipna))
+            u.append(u_n.mean(rec_dim, skipna=skipna))
+            xu.append(xu_n.mean(rec_dim, skipna=skipna))
 
-    u = xr.concat(u, dim=moment)
-    xu = xr.concat(xu, dim=moment)
+    u = xr.concat(u, dim=umom_dim)
+    xu = xr.concat(xu, dim=umom_dim)
 
     # simple, but sometimes slow....
-    # nvals = xr.DataArray(np.arange(order + 1), dims=[moment])
+    # nvals = xr.DataArray(np.arange(order + 1), dims=[umom_dim])
     # un = uv**nvals
-    # u = (un).mean(rec, skipna=skipna)
-    # xu = (un * xv).mean(rec, skipna=skipna)
+    # u = (un).mean(rec_dim, skipna=skipna)
+    # xu = (un * xv).mean(rec_dim, skipna=skipna)
 
     if transpose:
-        u_order = (moment, ...)
-        if deriv is not None:
-            x_order = (moment, deriv, ...)
+        u_order = (umom_dim, ...)
+        if deriv_dim is not None:
+            x_order = (umom_dim, deriv_dim, ...)
         else:
             x_order = u_order
         u = u.trapsose(*u_order)
@@ -556,9 +568,9 @@ def build_aves_dxdu(
     uv,
     xv,
     order,
-    rec="rec",
-    moment="mom_u",
-    deriv=None,
+    rec_dim="rec",
+    umom_dim="umom",
+    deriv_dim=None,
     skipna=False,
     du_name=None,
     dxdu_name=None,
@@ -571,8 +583,8 @@ def build_aves_dxdu(
 
     Parameters
     ----------
-    moment : dimension with moment order
-    deriv : dimension with derivative order
+    umom_dim : dimension with moment order
+    deriv_dim : dimension with derivative order
 
     skipna : bool, default=False
         if True, then handle nan values correctly.  Note that skipna=True
@@ -583,8 +595,8 @@ def build_aves_dxdu(
     assert isinstance(uv, xr.DataArray)
     assert isinstance(xv, (xr.DataArray, xr.Dataset))
 
-    xave = xv.mean(rec, skipna=skipna)
-    uave = uv.mean(rec, skipna=skipna)
+    xave = xv.mean(rec_dim, skipna=skipna)
+    uave = uv.mean(rec_dim, skipna=skipna)
 
     # i=0
     # <du**0> = 1
@@ -607,21 +619,21 @@ def build_aves_dxdu(
             du_n = du.copy()
             dxdu_n = (xv - xave) * du
             duave.append(xr.zeros_like(uave))
-            dxduave.append(dxdu_n.mean(rec, skipna=skipna))
+            dxduave.append(dxdu_n.mean(rec_dim, skipna=skipna))
 
         else:
             du_n *= du
             dxdu_n *= du
-            duave.append(du_n.mean(rec, skipna=skipna))
-            dxduave.append(dxdu_n.mean(rec, skipna=skipna))
+            duave.append(du_n.mean(rec_dim, skipna=skipna))
+            dxduave.append(dxdu_n.mean(rec_dim, skipna=skipna))
 
-    duave = xr.concat(duave, dim=moment)
-    dxduave = xr.concat(dxduave, dim=moment)
+    duave = xr.concat(duave, dim=umom_dim)
+    dxduave = xr.concat(dxduave, dim=umom_dim)
 
     if transpose:
-        u_order = (moment, ...)
-        if deriv is not None:
-            x_order = (deriv,) + u_order
+        u_order = (umom_dim, ...)
+        if deriv_dim is not None:
+            x_order = (deriv_dim,) + u_order
         else:
             x_order = u_order
 
@@ -658,9 +670,9 @@ class DataValues(DataValuesBase):
             xv=self.xv,
             order=self.order,
             skipna=skipna,
-            rec=self.rec,
-            moment=self.mom_u,
-            deriv=self.deriv,
+            rec_dim=self.rec_dim,
+            umom_dim=self.umom_dim,
+            deriv_dim=self.deriv_dim,
             **self.build_aves_kws,
         )
 
@@ -680,11 +692,11 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def u_selector(self):
-        return DatasetSelector(self.u, deriv=None, moment=self.mom_u)
+        return DatasetSelector(self.u, deriv_dim=None, mom_dim=self.umom_dim)
 
     @gcached()
     def xu_selector(self):
-        return DatasetSelector(self.xu, deriv=self.deriv, moment=self.mom_u)
+        return DatasetSelector(self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim)
 
     @property
     def xcoefs_args(self):
@@ -716,9 +728,9 @@ class DataValuesCentral(DataValuesBase):
             xv=self.xv,
             order=self.order,
             skipna=skipna,
-            rec=self.rec,
-            moment=self.mom_u,
-            deriv=self.deriv,
+            rec_dim=self.rec_dim,
+            umom_dim=self.umom_dim,
+            deriv_dim=self.deriv_dim,
             **self.build_aves_kws,
         )
 
@@ -745,18 +757,20 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def du_selector(self):
-        return DatasetSelector(self.du, deriv=None, moment=self.mom_u)
+        return DatasetSelector(self.du, deriv_dim=None, mom_dim=self.umom_dim)
 
     @gcached()
     def dxdu_selector(self):
-        return DatasetSelector(self.dxdu, deriv=self.deriv, moment=self.mom_u)
+        return DatasetSelector(
+            self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
+        )
 
     @gcached()
     def xave_selector(self):
-        if self.deriv is None:
+        if self.deriv_dim is None:
             return self.xave
         else:
-            return DatasetSelector(self.xave, dims=[self.deriv])
+            return DatasetSelector(self.xave, dims=[self.deriv_dim])
 
     @property
     def xcoefs_args(self):
@@ -770,12 +784,12 @@ class DataCentralMomentsBase(AbstractData):
     def __init__(
         self,
         dxduave,
-        mom_u="mom_u",
-        mom_x="mom_x",
-        rec="rec",
-        deriv=None,
+        umom_dim="umom",
+        xmom_dim="xmom",
+        rec_dim="rec",
+        deriv_dim=None,
         central=False,
-        **kws,
+        meta=None,
     ):
         """
         Data object based on central co-moments array
@@ -784,25 +798,29 @@ class DataCentralMomentsBase(AbstractData):
         ----------
         dxduave : cmomy.xcentral.xStatsAccum object
             central object to work with
-        rec : str, default='rec'
+        rec_dim : str, default='rec'
             Name of dimension to average along.
-        mom_u : str, default='mom_u',
-            Name of moment dimension <u**mom_u>
-        deriv : str, default=None
-            if deriv is a string, then this is the name of the derivative dimension
+        umom_dim : str, default='umom',
+            Name of moment dimension on `u`, < u ** umom>
+        xmom_dim : str, default='xmom'
+            Name of moment dimension on `x` variable
+        deriv_dim : str, default=None
+            if deriv_dim is a string, then this is the name of the derivative dimension
             and xarray objects will have a derivative
         central : bool, default=False
             if True, use central moments.
             if False, use raw moments
+        meta : dict, optional
+            extra meta data/parameters to be passed to child objects.  To be used with care.
         """
 
         self.dxduave = dxduave
-        self.mom_u = mom_u
-        self.mom_x = mom_x
-        self.rec = rec
-        self.deriv = deriv
+        self.umom_dim = umom_dim
+        self.xmom_dim = xmom_dim
+        self.rec_dim = rec_dim
+        self.deriv_dim = deriv_dim
         self._central = central
-        self.kws = kws
+        self.meta = meta
 
     @property
     def central(self):
@@ -810,7 +828,7 @@ class DataCentralMomentsBase(AbstractData):
 
     @property
     def order(self):
-        return self.dxduave.sizes[self.mom_u] - 1
+        return self.dxduave.sizes[self.umom_dim] - 1
 
     @property
     def values(self):
@@ -832,52 +850,56 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def u(self):
-        out = self.rmom().sel(**{self.mom_x: 0}, drop=True)
+        out = self.rmom().sel(**{self.xmom_dim: 0}, drop=True)
         if self.xalpha:
-            out = out.sel(**{self.deriv: 0}, drop=True)
+            out = out.sel(**{self.deriv_dim: 0}, drop=True)
         return out
 
     @gcached()
     def xu(self):
-        return self.rmom().sel(**{self.mom_x: 1}, drop=True)
+        return self.rmom().sel(**{self.xmom_dim: 1}, drop=True)
 
     @gcached()
     def xave(self):
-        return self.dxduave.values.sel(**{self.mom_u: 0, self.mom_x: 1}, drop=True)
+        return self.dxduave.values.sel(
+            **{self.umom_dim: 0, self.xmom_dim: 1}, drop=True
+        )
 
     @gcached()
     def du(self):
-        out = self.cmom().sel(**{self.mom_x: 0}, drop=True)
+        out = self.cmom().sel(**{self.xmom_dim: 0}, drop=True)
         if self.xalpha:
-            out = out.sel(**{self.deriv: 0}, drop=True)
+            out = out.sel(**{self.deriv_dim: 0}, drop=True)
         return out
 
     @gcached()
     def dxdu(self):
-        return self.cmom().sel(**{self.mom_x: 1}, drop=True)
+        return self.cmom().sel(**{self.xmom_dim: 1}, drop=True)
 
     @gcached()
     def u_selector(self):
-        return DatasetSelector(self.u, deriv=None, moment=self.mom_u)
+        return DatasetSelector(self.u, deriv_dim=None, mom_dim=self.umom_dim)
 
     @gcached()
     def xu_selector(self):
-        return DatasetSelector(self.xu, deriv=self.deriv, moment=self.mom_u)
+        return DatasetSelector(self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim)
 
     @gcached()
     def xave_selector(self):
-        if self.deriv is None:
+        if self.deriv_dim is None:
             return self.xave
         else:
-            return DatasetSelector(self.xave, dims=[self.deriv])
+            return DatasetSelector(self.xave, dims=[self.deriv_dim])
 
     @gcached()
     def du_selector(self):
-        return DatasetSelector(self.du, deriv=None, moment=self.mom_u)
+        return DatasetSelector(self.du, deriv_dim=None, mom_dim=self.umom_dim)
 
     @gcached()
     def dxdu_selector(self):
-        return DatasetSelector(self.dxdu, deriv=self.deriv, moment=self.mom_u)
+        return DatasetSelector(
+            self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
+        )
 
     @property
     def xcoefs_args(self):
@@ -890,19 +912,19 @@ class DataCentralMomentsBase(AbstractData):
 
 class DataCentralMoments(DataCentralMomentsBase):
     def __len__(self):
-        return self.values.sizes[self.rec]
+        return self.values.sizes[self.rec_dim]
 
     def new_like(self, **kws):
         kws = dict(
             # default dict
             dict(
                 dxduave=self.dxduave,
-                mom_x=self.mom_x,
-                mom_u=self.mom_u,
-                rec=self.rec,
-                deriv=self.deriv,
+                xmom_dim=self.xmom_dim,
+                umom_dim=self.umom_dim,
+                rec_dim=self.rec_dim,
+                deriv_dim=self.deriv_dim,
                 central=self.central,
-                **self.kws,
+                meta=self.meta,
             ),
             **kws,
         )
@@ -916,14 +938,14 @@ class DataCentralMoments(DataCentralMomentsBase):
         ---------
         block_size : int
             number of sample to block average together
-        axis : int or str, default=self.rec
+        axis : int or str, default=self.rec_dim
             axis or dimension to block average along
         **kwargs : dict
             extra arguments to cmomy.xCentralMoments.block
         """
 
         if axis is None:
-            axis = self.rec
+            axis = self.rec_dim
         return self.new_like(
             dxduave=self.dxduave.block(block_size=block_size, axis=axis, **kwargs)
         )
@@ -934,11 +956,11 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         Parameters
         ----------
-        axis : int or str, default=self.rec
+        axis : int or str, default=self.rec_dim
             axis to reduce (combine moments) along
         """
         if axis is None:
-            axis = self.rec
+            axis = self.rec_dim
         return self.new_like(dxduave=self.dxduave.reduce(axis=axis, *args, **kwargs))
 
     def resample(
@@ -947,7 +969,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         indices=None,
         nrep=None,
         axis=None,
-        rep="rep",
+        rep_dim="rep",
         parallel=True,
         resample_kws=None,
         **kwargs,
@@ -964,9 +986,9 @@ class DataCentralMoments(DataCentralMomentsBase):
             if specified and `freq` is None, construct frequency table from this.
         nrep : int
             if `freq` and `indices` is None, construct frequency table from this.
-        axis : int or string, default=self.rec
+        axis : int or string, default=self.rec_dim
             axis or dimension to resample along
-        rep : str, default='rep'
+        rep_dim : str, default='rep'
             Name of repetition dimension
         parallel : bool, default=True
             If true, perform resampling in parallel
@@ -975,33 +997,33 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
 
         if axis is None:
-            axis = self.rec
+            axis = self.rec_dim
 
         dxdu_new = self.dxduave.resample_and_reduce(
             freq=freq,
             indices=indices,
             nrep=nrep,
             axis=axis,
-            rep_dim=rep,
+            rep_dim=rep_dim,
             resample_kws=resample_kws,
             parallel=parallel,
             **kwargs,
         )
-        return self.new_like(dxduave=dxdu_new, rec=rep)
+        return self.new_like(dxduave=dxdu_new, rec_dim=rep_dim)
 
     # TODO : update from_raw from_data to
     # include a mom_dims arguments
-    # that defaults to (mom_x, mom_u)
+    # that defaults to (xmom_dim, umom_dim)
     # so if things are in wrong order, stuff still works out
 
     @classmethod
     def from_raw(
         cls,
         raw,
-        rec="rec",
-        mom_x="mom_x",
-        mom_u="mom_u",
-        deriv=None,
+        rec_dim="rec",
+        xmom_dim="xmom",
+        umom_dim="umom",
+        deriv_dim=None,
         central=False,
         mom=None,
         val_shape=None,
@@ -1011,7 +1033,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         coords=None,
         indexes=None,
         name=None,
-        **kws,
+        meta=None,
     ):
         """
         Parameters
@@ -1034,17 +1056,17 @@ class DataCentralMoments(DataCentralMomentsBase):
             coords=coords,
             indexes=indexes,
             name=name,
-            mom_dims=(mom_x, mom_u),
+            mom_dims=(xmom_dim, umom_dim),
         )
 
         return cls(
             dxduave=dxduave,
-            mom_x=mom_x,
-            mom_u=mom_u,
-            rec=rec,
-            deriv=deriv,
+            xmom_dim=xmom_dim,
+            umom_dim=umom_dim,
+            rec_dim=rec_dim,
+            deriv_dim=deriv_dim,
             central=central,
-            **kws,
+            meta=meta,
         )
 
     @classmethod
@@ -1053,10 +1075,10 @@ class DataCentralMoments(DataCentralMomentsBase):
         xv,
         uv,
         order,
-        mom_x="mom_x",
-        mom_u="mom_u",
-        rec="rec",
-        deriv=None,
+        xmom_dim="xmom",
+        umom_dim="umom",
+        rec_dim="rec",
+        deriv_dim=None,
         central=False,
         w=None,
         axis=0,
@@ -1068,7 +1090,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         coords=None,
         indexes=None,
         name=None,
-        **kws,
+        meta=None,
     ):
         """
         create DataCentralMoments object from individual (unaveraged) samples
@@ -1089,27 +1111,27 @@ class DataCentralMoments(DataCentralMomentsBase):
             coords=coords,
             indexes=indexes,
             name=name,
-            mom_dims=(mom_x, mom_u),
+            mom_dims=(xmom_dim, umom_dim),
         )
 
         return cls(
             dxduave=dxduave,
-            mom_x=mom_x,
-            mom_u=mom_u,
-            rec=rec,
-            deriv=deriv,
+            xmom_dim=xmom_dim,
+            umom_dim=umom_dim,
+            rec_dim=rec_dim,
+            deriv_dim=deriv_dim,
             central=central,
-            **kws,
+            meta=meta,
         )
 
     @classmethod
     def from_data(
         cls,
         data,
-        rec="rec",
-        mom_x="mom_x",
-        mom_u="mom_u",
-        deriv=None,
+        rec_dim="rec",
+        xmom_dim="xmom",
+        umom_dim="umom",
+        deriv_dim=None,
         central=False,
         mom=None,
         val_shape=None,
@@ -1119,7 +1141,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         coords=None,
         indexes=None,
         name=None,
-        **kws,
+        meta=None,
     ):
         """
         Create DataCentralMoments object from data
@@ -1139,17 +1161,17 @@ class DataCentralMoments(DataCentralMomentsBase):
             coords=coords,
             indexes=indexes,
             name=name,
-            mom_dims=(mom_x, mom_u),
+            mom_dims=(xmom_dim, umom_dim),
         )
 
         return cls(
             dxduave=dxduave,
-            mom_x=mom_x,
-            mom_u=mom_u,
-            rec=rec,
-            deriv=deriv,
+            xmom_dim=xmom_dim,
+            umom_dim=umom_dim,
+            rec_dim=rec_dim,
+            deriv_dim=deriv_dim,
             central=central,
-            **kws,
+            meta=meta,
         )
 
     @classmethod
@@ -1161,10 +1183,10 @@ class DataCentralMoments(DataCentralMomentsBase):
         freq=None,
         indices=None,
         nrep=None,
-        mom_x="mom_x",
-        mom_u="mom_u",
-        rep="rep",
-        deriv=None,
+        xmom_dim="xmom",
+        umom_dim="umom",
+        rep_dim="rep",
+        deriv_dim=None,
         central=False,
         w=None,
         axis=0,
@@ -1177,7 +1199,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         name=None,
         resample_kws=None,
         parallel=True,
-        **kws,
+        meta=None,
     ):
 
         """
@@ -1187,8 +1209,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         ----------
         axis : string or int
             axis or dimension to resample along
-        rep : string, default='rep'
-            name of repetition dimension.  This will be the rec dimension of the resulting object
+        rep_dim : string, default='rep'
+            name of repetition dimension.  This will be the rec_dim dimension of the resulting object
 
         """
 
@@ -1205,22 +1227,22 @@ class DataCentralMoments(DataCentralMomentsBase):
             broadcast=broadcast,
             dtype=dtype,
             dims=dims,
-            rep_dim=rep,
+            rep_dim=rep_dim,
             attrs=attrs,
             coords=coords,
             indexes=indexes,
             name=name,
-            mom_dims=(mom_x, mom_u),
+            mom_dims=(xmom_dim, umom_dim),
         )
 
         return cls(
             dxduave=dxduave,
-            mom_x=mom_x,
-            mom_u=mom_u,
-            rec=rep,
-            deriv=deriv,
+            xmom_dim=xmom_dim,
+            umom_dim=umom_dim,
+            rec_dim=rep_dim,
+            deriv_dim=deriv_dim,
             central=central,
-            **kws,
+            meta=meta,
         )
 
     @classmethod
@@ -1230,22 +1252,22 @@ class DataCentralMoments(DataCentralMomentsBase):
         xu,
         w=None,
         axis=-1,
-        axis_mom_u=None,
-        axis_mom_xu=None,
-        rec="rec",
-        mom_x="mom_x",
-        mom_u="mom_u",
-        deriv=None,
+        umom_axis=None,
+        xumom_axis=None,
+        rec_dim="rec",
+        xmom_dim="xmom",
+        umom_dim="umom",
+        deriv_dim=None,
         central=False,
         mom=None,
-        shape=None,
+        val_shape=None,
         dtype=None,
         dims=None,
         attrs=None,
         coords=None,
         indexes=None,
         name=None,
-        **kws,
+        meta=None,
     ):
         """
         create object with <u**n>, <x * u**n> arrays
@@ -1258,33 +1280,33 @@ class DataCentralMoments(DataCentralMomentsBase):
             xu[n] = <x * u**n>.
         w : array-like, optional
             sample weights
-        axis_mom_u : int, optional
+        umom_axis : int, optional
             axis of `u` array corresponding to moments.
             Ignored if xu is an xarray.DataArray object
-        axis_mom_xu : int, optional
+        xumom_axis : int, optional
             axis of `xu` array corresponding to moments
             Ignored if xu is an xarray.DataArray object
         axis : int, default=-1
-            if `axis_mom_u` or `axis_mom_xu` is None, set to axis
+            if `umom_axis` or `xumom_axis` is None, set to axis
             Ignored if xu is an xarray.DataArray object
         """
 
         if isinstance(xu, xr.DataArray):
-            raw = xr.concat((u, xu), dim=mom_x)
+            raw = xr.concat((u, xu), dim=xmom_dim)
             if w is not None:
-                raw.loc[{mom_u: 0, mom_x: 0}] = w
+                raw.loc[{umom_dim: 0, xmom_dim: 0}] = w
             # make sure in correct order
-            raw = raw.transpose(..., mom_x, mom_u)
+            raw = raw.transpose(..., xmom_dim, umom_dim)
         else:
             if axis is None:
                 axis = -1
-            if axis_mom_u is None:
-                axis_mom_u = axis
-            if axis_mom_xu is None:
-                axis_mom_xu = axis
+            if umom_axis is None:
+                umom_axis = axis
+            if xumom_axis is None:
+                xumom_axis = axis
 
-            u = np.swapaxes(u, axis_mom_u, -1)
-            xu = np.swapaxes(xu, axis_mom_xu, -1)
+            u = np.swapaxes(u, umom_axis, -1)
+            xu = np.swapaxes(xu, xumom_axis, -1)
 
             shape = xu.shape[:-1]
             shape_moments = (2, min(u.shape[-1], xu.shape[-1]))
@@ -1301,20 +1323,20 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         return cls.from_raw(
             raw=raw,
-            deriv=deriv,
-            rec=rec,
-            mom_x=mom_x,
-            mom_u=mom_u,
+            deriv_dim=deriv_dim,
+            rec_dim=rec_dim,
+            xmom_dim=xmom_dim,
+            umom_dim=umom_dim,
             mom=mom,
             central=central,
-            shape=shape,
+            val_shape=val_shape,
             dtype=dtype,
             dims=dims,
             attrs=attrs,
             coords=coords,
             indexes=indexes,
             name=name,
-            **kws,
+            meta=meta,
         )
 
     @classmethod
@@ -1326,12 +1348,12 @@ class DataCentralMoments(DataCentralMomentsBase):
         xave=None,
         uave=None,
         axis=-1,
-        axis_mom_u=None,
-        axis_mom_xu=None,
-        rec="rec",
-        mom_x="mom_x",
-        mom_u="mom_u",
-        deriv=None,
+        umom_axis=None,
+        xumom_axis=None,
+        rec_dim="rec",
+        xmom_dim="xmom",
+        umom_dim="umom",
+        deriv_dim=None,
         central=False,
         mom=None,
         val_shape=None,
@@ -1341,7 +1363,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         coords=None,
         indexes=None,
         name=None,
-        **kws,
+        meta=None,
     ):
         """
         constructor from central moments, with reduction along axis
@@ -1361,38 +1383,38 @@ class DataCentralMoments(DataCentralMomentsBase):
             if present, set dxdu[0] to xave
         uave : array-like, optional
             if present, set du[0] to uave
-        axis_mom_u : int, optional
+        umom_axis : int, optional
             axis of `u` array corresponding to moments.
             Ignored if xu is an xarray.DataArray object
-        axis_mom_xu : int, optional
+        xumom_axis : int, optional
             axis of `xu` array corresponding to moments
             Ignored if xu is an xarray.DataArray object
         axis : int, default=-1
-            if `axis_mom_u` or `axis_mom_xu` is None, set to axis
+            if `umom_axis` or `xumom_axis` is None, set to axis
             Ignored if xu is an xarray.DataArray object
 
         """
 
         if isinstance(dxdu, xr.DataArray):
-            data = xr.concat((du, dxdu), dim=mom_x)
+            data = xr.concat((du, dxdu), dim=xmom_dim)
             if w is not None:
-                data.loc[{mom_u: 0, mom_x: 0}] = w
+                data.loc[{umom_dim: 0, xmom_dim: 0}] = w
             if xave is not None:
-                data.loc[{mom_u: 0, mom_x: 1}] = xave
+                data.loc[{umom_dim: 0, xmom_dim: 1}] = xave
             if uave is not None:
-                data.loc[{mom_u: 1, mom_x: 0}] = uave
-            data = data.transpose(..., mom_x, mom_u)
+                data.loc[{umom_dim: 1, xmom_dim: 0}] = uave
+            data = data.transpose(..., xmom_dim, umom_dim)
 
         else:
             if axis is None:
                 axis = -1
-            if axis_mom_u is None:
-                axis_mom_u = axis
-            if axis_mom_xu is None:
-                axis_mom_xu = axis
+            if umom_axis is None:
+                umom_axis = axis
+            if xumom_axis is None:
+                xumom_axis = axis
 
-            du = np.swapaxes(du, axis_mom_u, -1)
-            dxdu = np.swapaxes(dxdu, axis_mom_xu, -1)
+            du = np.swapaxes(du, umom_axis, -1)
+            dxdu = np.swapaxes(dxdu, xumom_axis, -1)
 
             shape = dxdu.shape[:-1]
             shape_moments = (2, min(du.shape[-1], dxdu.shape[-1]))
@@ -1422,17 +1444,17 @@ class DataCentralMoments(DataCentralMomentsBase):
             coords=coords,
             indexes=indexes,
             name=name,
-            mom_dims=(mom_x, mom_u),
+            mom_dims=(xmom_dim, umom_dim),
         )
 
         return cls(
             dxduave=dxduave,
-            mom_x=mom_x,
-            mom_u=mom_u,
-            rec=rec,
-            deriv=deriv,
+            xmom_dim=xmom_dim,
+            umom_dim=umom_dim,
+            rec_dim=rec_dim,
+            deriv_dim=deriv_dim,
             central=central,
-            **kws,
+            meta=meta,
         )
 
 
@@ -1444,13 +1466,13 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         order=None,
         dxduave=None,
         w=None,
-        rec="rec",
-        mom_u="mom_u",
-        mom_x="mom_x",
-        deriv=None,
+        rec_dim="rec",
+        umom_dim="umom",
+        xmom_dim="xmom",
+        deriv_dim=None,
         central=False,
         from_vals_kws=None,
-        **kws,
+        meta=None,
     ):
         """
         Parameters
@@ -1463,21 +1485,21 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             optional weigth array.  Note that this array/xarray must be conformable to uv, xv
         order : int
             maximum order of moments to calculate
-        rec : str, default='rec'
+        rec_dim : str, default='rec'
             Name of dimension to average along.
-        mom_u : str, default='mom_u'
-            Name of moment dimension <u**mom_u>
-        mom_x : str, default='mom_x'
-            Name of the x moment dimension <u**mom_u * x**mom_x>
-        deriv : str, default=None
-            if deriv is a string, then this is the name of the derivative dimension
+        umom_dim : str, default='umom'
+            Name of moment dimension <u**umom_dim>
+        xmom_dim : str, default='xmom'
+            Name of the x moment dimension <u**umom_dim * x**xmom_dim>
+        deriv_dim : str, default=None
+            if deriv_dim is a string, then this is the name of the derivative dimension
             and xarray objects will have a derivative
         central : bool, default=False
             Whether this is for central or raw moments
         from_vals_kws : dict, optional
             extra arguments passed to xcentral.xCentralMoments.from_vals
-        **kws : dict
-            extra keyword arguments
+        meta : dict, optional
+            extra keyword arguments.  To be used in subclasses with care.
         """
 
         assert isinstance(uv, xr.DataArray)
@@ -1498,21 +1520,21 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             dxduave = xcentral.xCentralMoments.from_vals(
                 x=(self.xv, self.uv),
                 w=self.w,
-                axis=rec,
+                axis=rec_dim,
                 mom=(1, order),
                 broadcast=True,
-                mom_dims=(mom_x, mom_u),
+                mom_dims=(xmom_dim, umom_dim),
                 **self.from_vals_kws,
             )
 
         super(DataCentralMomentsVals, self).__init__(
             dxduave=dxduave,
-            mom_x=mom_x,
-            mom_u=mom_u,
-            rec=rec,
-            deriv=deriv,
+            xmom_dim=xmom_dim,
+            umom_dim=umom_dim,
+            rec_dim=rec_dim,
+            deriv_dim=deriv_dim,
             central=central,
-            **kws,
+            meta=meta,
         )
 
     @classmethod
@@ -1522,15 +1544,15 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         uv,
         order,
         w=None,
-        rec="rec",
-        mom_u="mom_u",
-        mom_x="mom_x",
-        rep="rep",
-        deriv=None,
-        val="val",
+        rec_dim="rec",
+        umom_dim="umom",
+        xmom_dim="xmom",
+        rep_dim="rep",
+        deriv_dim=None,
+        val_dims="val",
         central=False,
         from_vals_kws=None,
-        **kws,
+        meta=None,
     ):
         """
         Constructor from arrays
@@ -1547,46 +1569,48 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             maximum order of moments to calculate
         w : array-like, optional
             optional weigth array.  Note that this array/xarray must be conformable to uv, xv
-        rec : str, default='rec'
+        rec_dim : str, default='rec'
             Name of dimension to average along.
-        mom_u : str, default='mom_u',
-            Name of moment dimension <u**mom_u>
-        mom_x : str, default='mom_x'
+        umom_dim : str, default='umom',
+            Name of moment dimension <u**umom>
+        xmom_dim : str, default='xmom'
             Name of moment dimension on x
-        val : str or list-like
+        val_dims : str or list-like
             names of extra dimensions
-        deriv : str, default=None
-            if deriv is a string, then this is the name of the derivative dimension
+        deriv_dim : str, default=None
+            if deriv_dim is a string, then this is the name of the derivative dimension
             and xarray objects will have a derivative
         central : bool, default=False
             Whether this is for central or raw moments
         from_vals_kws : dict, optional
             extra arguments passed to xcentral.xCentralMoments.from_vals
-        **kws : dict
+        meta : dict
             extra keyword arguments
         """
 
         # make sure "val" is a list
-        if isinstance(val, str):
-            val = [val]
-        elif not isinstance(val, list):
-            val = list(val)
+        if isinstance(val_dims, str):
+            val_dims = [val_dims]
+        elif not isinstance(val_dims, list):
+            val_dims = list(val_dims)
 
-        uv = xrwrap_uv(uv, rec=rec, rep=rep)
-        xv = xrwrap_xv(xv, rec=rec, rep=rep, deriv=deriv, val=val)
+        uv = xrwrap_uv(uv, rec_dim=rec_dim, rep_dim=rep_dim)
+        xv = xrwrap_xv(
+            xv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=deriv_dim, val_dims=val_dims
+        )
 
         return cls(
             uv=uv,
             xv=xv,
             order=order,
             w=w,
-            rec=rec,
-            mom_u=mom_u,
-            mom_x=mom_x,
-            deriv=deriv,
+            rec_dim=rec_dim,
+            umom_dim=umom_dim,
+            xmom_dim=xmom_dim,
+            deriv_dim=deriv_dim,
             central=central,
             from_vals_kws=from_vals_kws,
-            **kws,
+            meta=meta,
         )
 
     def new_like(self, **kws):
@@ -1597,19 +1621,19 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
                 w=self.w,
                 dxduave=self.dxduave,
                 order=self.order,
-                rec=self.rec,
-                mom_u=self.mom_u,
-                mom_x=self.mom_x,
-                deriv=self.deriv,
+                rec_dim=self.rec_dim,
+                umom_dim=self.umom_dim,
+                xmom_dim=self.xmom_dim,
+                deriv_dim=self.deriv_dim,
                 central=self.central,
-                **self.kws,
+                meta=self.meta,
             ),
             **kws,
         )
         return type(self)(**kws)
 
     def __len__(self):
-        return len(self.uv[self.rec])
+        return len(self.uv[self.rec_dim])
 
     def resample(
         self,
@@ -1619,14 +1643,14 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         resample_kws=None,
         parallel=True,
         axis=None,
-        rep="rep",
+        rep_dim="rep",
     ):
         """
         Resample data
         """
 
         if axis is None:
-            axis = self.rec
+            axis = self.rec_dim
 
         dxduave = xcentral.xCentralMoments.from_resample_vals(
             x=(self.xv, self.uv),
@@ -1639,8 +1663,8 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             parallel=parallel,
             resample_kws=resample_kws,
             broadcast=True,
-            rep_dim=rep,
-            mom_dims=(self.mom_x, self.mom_u),
+            rep_dim=rep_dim,
+            mom_dims=(self.xmom_dim, self.umom_dim),
         )
 
-        return self.new_like(dxduave=dxduave, rec=rep)
+        return self.new_like(dxduave=dxduave, rec_dim=rep_dim)
