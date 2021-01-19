@@ -351,7 +351,7 @@ class StateCollection(object):
                     state.resample(indices=idx, nrep=nrep, freq=fq, **kws)
                     for state, idx, fq in zip(self.states, indices, freq)
                 ),
-                **self.kws
+                **self.kws,
             )
 
         else:
@@ -360,7 +360,7 @@ class StateCollection(object):
                     state.resample(indices=idx, nrep=nrep, **kws)
                     for state, idx in zip(self.states, indices)
                 ),
-                **self.kws
+                **self.kws,
             )
 
     def map(self, func, *args, **kwargs):
@@ -369,13 +369,26 @@ class StateCollection(object):
         """
         return [func(s, *args, **kwargs) for s in self]
 
-    @gcached()
+    @property
     def order(self):
         return min([m.order for m in self])
 
-    @gcached()
+    @property
     def alpha0(self):
         return [m.alpha0 for m in self]
+
+    def _check_alpha(self, alpha, bounded=False):
+        if bounded:
+            try:
+                seq = iter(alpha)
+            except TypeError:
+                seq = [alpha]
+
+            lb, ub = self[0].alpha0, self[-1].alpha0
+
+            for a in seq:
+                if a < lb or a > ub:
+                    raise ValueError(f"{a} outside of bounds [{lb}, {ub}]")
 
 
 def xr_weights_minkowski(deltas, m=20, dim="state"):
@@ -383,30 +396,60 @@ def xr_weights_minkowski(deltas, m=20, dim="state"):
     return 1.0 - deltas_m / deltas_m.sum(dim)
 
 
-class ExtrapWeightedModel(StateCollection):
-    def _states_between_alpha(self, alpha):
+class PiecewiseMixin:
+    """
+    Provide methods for Piecewise state collection
+    """
+
+    def _indices_between_alpha(self, alpha):
         idx = np.digitize(alpha, self.alpha0, right=False) - 1
         if idx < 0:
             idx = 0
         elif idx == len(self) - 1:
             idx = len(self) - 2
+        return [idx, idx + 1]
 
-        return self.states[idx : idx + 2]
-
-    def _states_nearest_alpha(self, alpha):
+    def _indices_nearest_alpha(self, alpha):
         dalpha = np.abs(np.array(self.alpha0) - alpha)
         # two lowest
         idx = np.argsort(dalpha)[:2]
-        return [self[i] for i in idx]
+        return idx
 
-    def _states_alpha(self, alpha, method):
+    def _indices_alpha(self, alpha, method):
         if method is None or method == "between":
-            return self._states_between_alpha(alpha)
+            return self._indices_between_alpha(alpha)
         elif method == "nearest":
-            return self._states_nearest_alpha(alpha)
+            return self._indices_nearest_alpha(alpha)
         else:
             raise ValueError("unknown method {}".format(method))
 
+    def _states_alpha(self, alpha, method):
+        return [self[i] for i in self._indices_alpha(alpha, method)]
+
+    # def _states_between_alpha(self, alpha):
+    #     idx = np.digitize(alpha, self.alpha0, right=False) - 1
+    #     if idx < 0:
+    #         idx = 0
+    #     elif idx == len(self) - 1:
+    #         idx = len(self) - 2
+
+    #     return self.states[idx : idx + 2]
+
+    # def _states_nearest_alpha(self, alpha):
+    #     dalpha = np.abs(np.array(self.alpha0) - alpha)
+    #     # two lowest
+    #     idx = np.argsort(dalpha)[:2]
+    #     return [self[i] for i in idx]
+    # def _states_alpha(self, alpha, method):
+    #     if method is None or method == "between":
+    #         return self._states_between_alpha(alpha)
+    #     elif method == "nearest":
+    #         return self._states_nearest_alpha(alpha)
+    #     else:
+    #         raise ValueError("unknown method {}".format(method))
+
+
+class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
     def predict(
         self,
         alpha,
@@ -416,6 +459,7 @@ class ExtrapWeightedModel(StateCollection):
         minus_log=None,
         alpha_name=None,
         method=None,
+        bounded=False,
     ):
         """
         Parameters
@@ -433,8 +477,7 @@ class ExtrapWeightedModel(StateCollection):
         This requires that self.states are ordered in ascending alpha0 order
         """
 
-        if alpha_name is None:
-            alpha_name = self.alpha_name
+        self._check_alpha(alpha, bounded)
 
         if order is None:
             order = self.order
@@ -560,6 +603,77 @@ class InterpModel(StateCollection):
         prefac = alpha ** p
 
         out = (prefac * xcoefs).sum(order_dim)
+        return out
+
+
+class InterpModelPiecewise(StateCollection, PiecewiseMixin):
+    """
+    Apposed to the multiple model InterpModel, perform a piecewise interpolation
+    """
+
+    @gcached(prop=False)
+    def single_interpmodel(self, state0, state1):
+        return InterpModel([state0, state1])
+
+    def predict(
+        self,
+        alpha,
+        order=None,
+        order_dim="porder",
+        minus_log=None,
+        alpha_name=None,
+        method=None,
+        bounded=False,
+    ):
+        """
+        Parameters
+        ----------
+        alpha : float or sequence of floats
+
+        """
+
+        self._check_alpha(alpha, bounded)
+
+        if alpha_name is None:
+            alpha_name = self.alpha_name
+
+        if len(self) == 2:
+            model = self.single_interpmodel(self[0], self[1])
+
+            out = model.predict(
+                alpha=alpha,
+                order=order,
+                order_dim=order_dim,
+                minus_log=minus_log,
+                alpha_name=alpha_name,
+            )
+
+        else:
+            try:
+                seq = iter(alpha)
+            except TypeError:
+                seq = [alpha]
+
+            out = []
+            for a in seq:
+                state0, state1 = self._states_alpha(a, method)
+                model = self.single_interpmodel(state0, state1)
+
+                out.append(
+                    model.predict(
+                        alpha=a,
+                        order=order,
+                        order_dim=order_dim,
+                        minus_log=minus_log,
+                        alpha_name=alpha_name,
+                    )
+                )
+
+            if len(out) == 1:
+                out = out[0]
+            else:
+                out = xr.concat(out, dim=alpha_name)
+
         return out
 
 

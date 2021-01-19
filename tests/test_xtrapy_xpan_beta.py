@@ -388,6 +388,37 @@ def test_interpmodel(fixture):
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
+def test_interpmodelpiecewise(fixture):
+
+    beta0 = [0.05, 0.2, 1.0]
+    betas = [0.3, 0.4, 0.6, 0.7]
+
+    xems_r = [
+        xpan_beta.factory_extrapmodel(
+            beta=beta,
+            data=xpan_beta.factory_data(
+                xv=np.random.rand(*fixture.x.shape),
+                uv=np.random.rand(*fixture.u.shape),
+                central=False,
+                order=fixture.order,
+            ),
+        )
+        for beta in beta0
+    ]
+
+    # test picking models
+    # xemw_r should pick the two models closest to beta value
+    xemw_a = xtrapy_core.InterpModel([xems_r[0], xems_r[1]])
+    xemw_b = xtrapy_core.InterpModel([xems_r[1], xems_r[2]])
+    xemw_r = xtrapy_core.InterpModelPiecewise(xems_r)
+
+    vals = [0.2, 0.4]
+    fixture.xr_test(xemw_a.predict(vals), xemw_r.predict(vals, method="nearest"))
+
+    vals = [0.4, 0.8]
+    fixture.xr_test(xemw_b.predict(vals), xemw_r.predict(vals, method="between"))
+
+
 def test_interpmodel_polynomial():
     # Test 1st, 2nd, and 3rd order polynomials at [-1.0, 1.0] points
     xdat2 = xr.DataArray([0.5, 1.5], dims=["rec"])
@@ -906,8 +937,8 @@ def test_extrapmodel_alphadep_minuslog_ig():
         # Must be good way to do this, but not sure what it is
         # As long as well-control random number seed and number of samples, should work
         np.testing.assert_allclose(
-            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err * 2
         )
         np.testing.assert_allclose(
-            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err
+            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err * 2
         )
