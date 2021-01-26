@@ -11,7 +11,7 @@ import tensorflow as tf
 import xarray as xr
 from gpflow.ci_utils import ci_niter
 
-# from .core import StateCollection
+# from .models import StateCollection
 from .cached_decorators import gcached
 from .xstack import GPRData, multiindex_to_array
 

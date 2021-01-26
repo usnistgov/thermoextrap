@@ -220,6 +220,10 @@ class AbstractData(ABC):
     def xcoefs_args(self):
         pass
 
+    # @abstractproperty
+    # def derivs_args(self):
+    #     pass
+
     @abstractmethod
     def __len__(self):
         pass

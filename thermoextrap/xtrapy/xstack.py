@@ -1,5 +1,9 @@
 """
 A set of routines to stack data for gpflow analysis
+
+
+
+
 """
 
 
@@ -8,7 +12,7 @@ import pandas as pd
 import xarray as xr
 
 from .cached_decorators import gcached
-from .core import StateCollection
+from .models import StateCollection
 
 
 def stack_dataarray(
@@ -97,9 +101,57 @@ def wrap_like_dataarray(x, da):
 
 def multiindex_to_array(idx):
     """
-    turn xarray multiindex to numpy arrayj
+    turn xarray multiindex to numpy array
     """
     return np.array(list(idx.values))
+
+
+def apply_reduction(
+    da, dim, funcs, concat=True, concat_dim=None, concat_kws=None, **kws
+):
+    """
+    apply multiple reductions to DataArray
+
+
+    Parameters
+    ----------
+    da : DataArray
+    dim : str
+        dimension to reduce along
+    funcs : callable or string or sequence of callables or strings
+        If callable, funcs(da, dim=dim, **kws)
+        If str, then da.funcs(dim=dim, **kws)
+        If sequence, then performe reductions sequentially
+    concat_dim : str, optional
+        if not `None`, and multple funcs, call xr.concat(out, dim=concat_dim, **concat_kws)
+    concat_kws : dict, optional
+    kws : dict
+        optional keyword arguments to func.  Note that this is passed to all reduction functions
+
+    Returns
+    -------
+    out : DataArray or list of DataArray
+        if concat_dim is None and multiple funcs, then list of DataArrays corresponding to each reduction.  Otherwise, single DataArray
+    """
+
+    if not isinstance(funcs, (tuple, list)):
+        funcs = [funcs]
+
+    out = []
+    for func in funcs:
+        if callable(func):
+            y = func(da, dim=dim, **kws)
+        else:
+            y = getattr(da, func)(dim=dim, **kws)
+        out.append(y)
+
+    if len(out) == 1:
+        out = out[0]
+    elif concat_dim is not None:
+        if concat_kws is None:
+            concat_kws = {}
+        out = xr.concat(out, dim=concat_dim, **concat_kws)
+    return out
 
 
 def to_mean_var(da, dim, concat_dim=None, concat_kws=None, **kws):
@@ -161,6 +213,263 @@ def states_xcoefs_concat(states, dim=None, concat_kws=None, **kws):
     kws.setdefault("norm", False)
 
     return xr.concat((s.xcoefs(**kws) for s in states), dim=dim, **concat_kws)
+
+
+class StackedDerivativeMeanVar:
+    """
+    Data object for gpflow analysis
+
+    Parameters
+    ----------
+    da : DataArray
+        DataArray containing mean and variance of derivatives.
+        This array should have dimensions indicated in `x_dims`, `y_dims`,
+        and `stats_dim`
+    x_dims : str or sequence of str
+        Dimensions which make up the "x" part of the data.
+        For example, this would be things like "beta" or "volume".
+        x_dims[-1] should be the order of the derivative
+    y_dims : str or sequence of str, optional
+        Dimensions making up the "y" part of the data.  Defaults to all dimenions not specified
+        by `x_dims` or `stats_dim`
+    stats_dim : str, default='stats'
+        Name of dimensions with mean and variance.  It is assumed that
+        `mean_var.isel(**{stats_dim: 0})` is the mean and
+        `mean_var.isel(**{stats_dim: 1})` is the variance
+    xstack_dim, ystack_dim : str
+        name of new stacked dimensions
+    policy : str, default='infer'
+        policy for coordinates.  See stack_dataarray
+
+    """
+
+    def __init__(
+        self,
+        da,
+        x_dims,
+        y_dims=None,
+        xstack_dim="xstack",
+        ystack_dim="ystack",
+        stats_dim="stats",
+        policy="infer",
+    ):
+
+        if isinstance(x_dims, str):
+            x_dims = [x_dims]
+        if isinstance(y_dims, str):
+            y_dims = [y_dims]
+
+        self.da = da
+        self.x_dims = x_dims
+        self.y_dims = y_dims
+        self.xstack_dim = xstack_dim
+        self.ystack_dim = ystack_dim
+        self.stats_dim = stats_dim
+        self.policy = policy
+
+    @property
+    def order_dim(self):
+        return self.x_dims[-1]
+
+    @gcached(prop=False)
+    def _stacked(self, order):
+
+        da = self.da
+        if order is not None:
+            # select orders upto and including order
+            da = da.isel(**{self.order_dim: slice(None, order + 1)})
+
+        return stack_dataarray(
+            da,
+            x_dims=self.x_dims,
+            y_dims=self.y_dims,
+            xstack_dim=self.xstack_dim,
+            ystack_dim=self.ystack_dim,
+            stats_dim=self.stats_dim,
+            policy=self.policy,
+        )
+
+    def stacked(self, order=None):
+        if order is None:
+            order = self.order
+        return self._stacked(order)
+
+    def array_data(self, order=None):
+        """
+        get X and Y data for gpflow analysis
+        """
+        stacked = self.stacked(order=order)
+        xdata = multiindex_to_array(stacked.indexes[self.xstack_dim])
+
+        ydata = [g.values for _, g in stacked.groupby(self.ystack_dim)]
+
+        return xdata, ydata
+
+    def xindexer_from_arrays(self, **kwargs):
+        """
+        create indexer for indexing into gpflow trained object by name
+
+        Parameters
+        ----------
+        kwargs : dict
+            should include all names in `self.x_dims[:-1]`
+            sets self.x_dims[-1] (the order dimension) to 0
+        """
+        return self.xindexer_from_dataframe(pd.DataFrame(kwargs))
+
+    def xindexer_from_dataframe(self, df):
+        """
+        create indexer from frame
+
+        Example
+        -------
+        x_dims = ['beta', 'order']
+
+        df = pd.DataFrame([{'beta': 1}, {'beta': 2}, ...])
+        """
+
+        assert set(df.columns) == set(self.x_dims[:-1])
+
+        index = df.assign(**{self.order_dim: 0}).set_index(self.x_dims).index
+        return index
+
+    @classmethod
+    def from_mean_var(
+        cls,
+        mean,
+        var,
+        x_dims,
+        y_dims=None,
+        xstack_dim="xstack",
+        ystack_dim="ystack",
+        policy="infer",
+        concat_dim=None,
+        concat_kws=None,
+    ):
+        """
+        create object from mean and variance.
+        """
+
+        if concat_dim is None:
+            concat_dim = pd.Index(["mean", "var"], name="stats")
+
+        if isinstance(concat_dim, str):
+            stats_dim = concat_dim
+        elif hasattr(concat_dim, "name"):
+            stats_dim = concat_dim.name
+        else:
+            raise ValueError("concat_dim must be string, pandas.Index, order DataArray")
+
+        if concat_kws is None:
+            concat_kws = {}
+
+        da = xr.concat((mean, var), dim=concat_dim, **concat_kws)
+        return cls(
+            da=da,
+            x_dims=x_dims,
+            y_dims=y_dims,
+            xstack_dim=xstack_dim,
+            ystack_dim=ystack_dim,
+            stats_dim=stats_dim,
+            policy=policy,
+        )
+
+    @classmethod
+    def from_derivatives(
+        cls,
+        derivs,
+        x_dims,
+        reduce_dim,
+        reduce_funcs=None,
+        y_dims=None,
+        xstack_dim="xstack",
+        ystack_dim="ystack",
+        policy="infer",
+        concat_dim=None,
+        concat_kws=None,
+        reduce_kws=None,
+    ):
+        """
+        Create object from DataArray of derivatives
+
+        Parameters
+        ----------
+        derivs : DataArray
+            DataArray containing derivative information
+        reduce_dim : str
+            dimension to reduce along
+        reduce_funcs : list of callables or str
+            Functions applied to `derivs` to calculate statistics.
+            See apply_reduction.
+        concat_dim : str, optional
+            dimension of concatonated results.
+            That is out.isel(**{concat_dim : i}) = reduce_funcs[i](derivs, **reduce_kws)
+            Default is pd.Index(['mean','var'], name='stats)
+        reduce_kws : dict, optional
+            optional arguments to `reduce_funcs`
+        """
+        if reduce_funcs is None:
+            reduce_funcs = ["mean", "var"]
+        if concat_dim is None:
+            concat_dim = pd.Index(["mean", "var"], name="stats")
+
+        if isinstance(concat_dim, str):
+            stats_dim = concat_dim
+        else:
+            stats_dim = concat_dim.name
+
+        if reduce_kws is None:
+            reduce_kws = {}
+
+        da = apply_reduction(
+            derivs,
+            dim=reduce_dim,
+            funcs=reduce_funcs,
+            concat=True,
+            concat_dim=concat_dim,
+            concat_kws=concat_kws,
+            **reduce_kws
+        )
+
+        return cls(
+            da,
+            x_dims=x_dims,
+            y_dims=y_dims,
+            xstack_dim=xstack_dim,
+            ystack_dim=ystack_dim,
+            stats_dim=stats_dim,
+            policy=policy,
+        )
+
+    @classmethod
+    def from_statcollection(
+        cls,
+        statecollection,
+        x_dims,
+        y_dims=None,
+        xstack_dim="xstack",
+        ystack_dim="ystack",
+        derivs_func=None,
+        reduce_funcs=None,
+        derivs_kws=None,
+        reduce_kws=None,
+    ):
+        """
+        create object from StateCollection object
+        """
+
+        if derivs_kws is None:
+            derivs_kws = {"norm": False}
+
+        if derivs_func is None:
+            derivs_func = "xcoefs"
+
+    # @classmethod
+    # def from_statescollection_xcoefs(cls,
+    #                                  statescollection,
+    #                                  funcs=None,
+
+    #                                  )
 
 
 class GPRData(StateCollection):

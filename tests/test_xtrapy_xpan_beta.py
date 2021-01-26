@@ -3,9 +3,9 @@ import pytest
 import xarray as xr
 
 import thermoextrap
-import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
 import thermoextrap.xtrapy.idealgas as idealgas
+import thermoextrap.xtrapy.models as xtrapy_models
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
 from thermoextrap.xtrapy.cached_decorators import gcached
 
@@ -178,7 +178,7 @@ def test_extrapmodel_weighted_slow(fixture):
         ),
     )
 
-    xemw = xtrapy_core.ExtrapWeightedModel([xem0, xem1])
+    xemw = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
 
     np.testing.assert_allclose(
         emw.predict(betas, order=3), xemw.predict(betas, order=3)
@@ -199,7 +199,7 @@ def test_extrapmodel_weighted(fixture):
         ),
     )
 
-    xemw = xtrapy_core.ExtrapWeightedModel([xem0, xem1])
+    xemw = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
 
     a = xemw.predict(betas, order=3)
 
@@ -215,7 +215,7 @@ def test_extrapmodel_weighted(fixture):
         ),
     )
 
-    xemw1 = xtrapy_core.ExtrapWeightedModel([xem0, xem1])
+    xemw1 = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
     b = xemw1.predict(betas, order=3)
     fixture.xr_test(a, b)
 
@@ -232,7 +232,7 @@ def test_extrapmodel_weighted(fixture):
         ),
     )
 
-    xemw1 = xtrapy_core.ExtrapWeightedModel([xem0, xem1])
+    xemw1 = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
     b = xemw1.predict(betas, order=3)
     fixture.xr_test(a, b)
 
@@ -277,9 +277,9 @@ def test_extrapmodel_weighted_multi(fixture):
 
     # test picking models
     # xemw_r should pick the two models closest to beta value
-    xemw_a = xtrapy_core.ExtrapWeightedModel([xems_r[0], xems_r[1]])
-    xemw_b = xtrapy_core.ExtrapWeightedModel([xems_r[1], xems_r[2]])
-    xemw_r = xtrapy_core.ExtrapWeightedModel(xems_r)
+    xemw_a = xtrapy_models.ExtrapWeightedModel([xems_r[0], xems_r[1]])
+    xemw_b = xtrapy_models.ExtrapWeightedModel([xems_r[1], xems_r[2]])
+    xemw_r = xtrapy_models.ExtrapWeightedModel(xems_r)
 
     vals = [0.2, 0.4]
     fixture.xr_test(xemw_a.predict(vals), xemw_r.predict(vals, method="nearest"))
@@ -288,8 +288,8 @@ def test_extrapmodel_weighted_multi(fixture):
     fixture.xr_test(xemw_b.predict(vals), xemw_r.predict(vals, method="between"))
 
     # other data models
-    xemw_c = xtrapy_core.ExtrapWeightedModel(xems_c)
-    xemw_x = xtrapy_core.ExtrapWeightedModel(xems_x)
+    xemw_c = xtrapy_models.ExtrapWeightedModel(xems_c)
+    xemw_x = xtrapy_models.ExtrapWeightedModel(xems_x)
 
     fixture.xr_test(xemw_r.predict(betas, order=3), xemw_c.predict(betas, order=3))
     fixture.xr_test(xemw_r.predict(betas, order=3), xemw_x.predict(betas, order=3))
@@ -326,7 +326,7 @@ def test_interpmodel_slow(fixture):
         for beta, u, x in zip(beta0, U, X)
     ]
 
-    xemi = xtrapy_core.InterpModel(xems)
+    xemi = xtrapy_models.InterpModel(xems)
 
     np.testing.assert_allclose(emi.predict(betas), xemi.predict(betas))
 
@@ -369,9 +369,9 @@ def test_interpmodel(fixture):
         for xem in xems_r
     ]
 
-    xemi_r = xtrapy_core.InterpModel(xems_r)
-    xemi_c = xtrapy_core.InterpModel(xems_c)
-    xemi_x = xtrapy_core.InterpModel(xems_x)
+    xemi_r = xtrapy_models.InterpModel(xems_r)
+    xemi_c = xtrapy_models.InterpModel(xems_c)
+    xemi_x = xtrapy_models.InterpModel(xems_x)
 
     fixture.xr_test(xemi_r.predict(betas, order=3), xemi_c.predict(betas, order=3))
     fixture.xr_test(xemi_r.predict(betas, order=3), xemi_x.predict(betas, order=3))
@@ -408,9 +408,9 @@ def test_interpmodelpiecewise(fixture):
 
     # test picking models
     # xemw_r should pick the two models closest to beta value
-    xemw_a = xtrapy_core.InterpModel([xems_r[0], xems_r[1]])
-    xemw_b = xtrapy_core.InterpModel([xems_r[1], xems_r[2]])
-    xemw_r = xtrapy_core.InterpModelPiecewise(xems_r)
+    xemw_a = xtrapy_models.InterpModel([xems_r[0], xems_r[1]])
+    xemw_b = xtrapy_models.InterpModel([xems_r[1], xems_r[2]])
+    xemw_r = xtrapy_models.InterpModelPiecewise(xems_r)
 
     vals = [0.2, 0.4]
     fixture.xr_test(xemw_a.predict(vals), xemw_r.predict(vals, method="nearest"))
@@ -437,7 +437,7 @@ def test_interpmodel_polynomial():
 
         ex1 = xpan_beta.factory_extrapmodel(-1.0, dat1, xalpha=False, minus_log=False)
         ex2 = xpan_beta.factory_extrapmodel(1.0, dat2, xalpha=False, minus_log=False)
-        interp = xtrapy_core.InterpModel([ex1, ex2])
+        interp = xtrapy_models.InterpModel([ex1, ex2])
         check_array = np.zeros(4)
         check_array[i + 1] = 1.0
         np.testing.assert_array_equal(interp.xcoefs().values, check_array)
@@ -463,7 +463,7 @@ def test_mbar(fixture):
         ),
     )
 
-    xemi = xtrapy_core.MBARModel([xem0, xem1])
+    xemi = xtrapy_models.MBARModel([xem0, xem1])
 
     # NOTE: in old class, can't specify order after train
     # so just use the max order here

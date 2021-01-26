@@ -11,7 +11,7 @@ import tensorflow as tf
 import xarray as xr
 from gpflow.ci_utils import ci_niter
 
-from .core import StateCollection
+from .models import StateCollection
 
 
 # First define classes needed for a GPR model

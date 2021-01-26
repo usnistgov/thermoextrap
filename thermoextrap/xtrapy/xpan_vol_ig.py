@@ -6,8 +6,8 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
-# from .core import DataTemplateValues, DatasetSelector
-from .core import Coefs, ExtrapModel
+# from .models import DataTemplateValues, DatasetSelector
+from .models import Coefs, ExtrapModel
 from .xpan_beta import factory_data
 
 # from .data import DataCentralMoments, DataCentralMomentsVals

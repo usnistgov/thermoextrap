@@ -6,7 +6,7 @@ from functools import lru_cache
 import sympy as sp
 
 from .cached_decorators import gcached
-from .core import (
+from .models import (
     Coefs,
     SymSubs,
     _get_default_function,
