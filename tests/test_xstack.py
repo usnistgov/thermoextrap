@@ -4,7 +4,7 @@ import pytest
 import xarray as xr
 from numpy.core import multiarray
 
-import thermoextrap.xtrapy.core as xtrapy_core
+import thermoextrap.xtrapy.models as xtrapy_models
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
 import thermoextrap.xtrapy.xstack as xstack
 
@@ -22,7 +22,7 @@ def states():
         u = xr.DataArray(np.random.rand(shape[0]), dims=dims[0])
         data = xpan_beta.DataCentralMomentsVals.from_vals(x, u, order=3, central=True)
         xems.append(xpan_beta.factory_extrapmodel(beta, data))
-    s = xtrapy_core.StateCollection(xems)
+    s = xtrapy_models.StateCollection(xems)
 
     return s.resample(nrep=3)
 

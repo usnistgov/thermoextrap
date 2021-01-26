@@ -9,20 +9,20 @@ from functools import lru_cache
 import sympy as sp
 
 from .cached_decorators import gcached
-from .core import (
-    Coefs,
-    ExtrapModel,
-    PerturbModel,
-    SymSubs,
-    _get_default_indexed,
-    _get_default_symbol,
-)
 from .data import (  # noqa: F401
     DataCentralMoments,
     DataCentralMomentsVals,
     DataValues,
     DataValuesCentral,
     resample_indicies,
+)
+from .models import (
+    Coefs,
+    ExtrapModel,
+    PerturbModel,
+    SymSubs,
+    _get_default_indexed,
+    _get_default_symbol,
 )
 
 ##############################################################################
@@ -413,7 +413,7 @@ def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     alpha_name : str, default='beta'
         name of expansion parameter
     kws : dict
-        extra arguments to `core.Data`
+        extra arguments to `models.Data`
 
     Returns
     -------

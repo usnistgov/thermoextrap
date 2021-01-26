@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from functools import lru_cache
 
 import numpy as np
+import pandas as pd
 import sympy as sp
 import xarray as xr
 from scipy.special import factorial as sp_factorial
@@ -141,7 +142,10 @@ class Lambdify(object):
 
 # -log<X>
 class SymMinusLog(object):
-    """class to take -log(X)"""
+    """
+    class to take compute derivatives of Y = -log(<X>)
+
+    """
 
     X, dX = _get_default_indexed("X", "dX")
 
@@ -165,6 +169,54 @@ class SymMinusLog(object):
 def factory_minus_log():
     s = SymMinusLog()
     return Lambdify(s, (s.X,))
+
+
+class Derivatives:
+    """
+    Class to wrap functions calculating derivatives to specified order
+
+
+    Parameters
+    ----------
+    funcs : seqeunce of callables
+        funcs[i](*args) gives the ith derivative
+    exprs : sequence sympy expresions, optional
+        expressions corresponding to the `funcs`
+        Mostly for debuggin purposes.
+    """
+
+    def __init__(self, funcs, exprs=None):
+        self.funcs = funcs
+        self.exprs = exprs
+
+    def _apply_minus_log(self, X, order):
+        func = factory_minus_log()
+        return [func[i](X) for i in range(order + 1)]
+
+    def derivs(self, data=None, order=None, args=None, minus_log=False, as_coefs=False):
+        """
+        Calculate derivatives for orders range(0, order+1)
+
+        Parameters
+        ----------
+        data : BaseData object
+        """
+        pass
+
+    def coefs(self, *args, order, norm=True, minus_log=False):
+        out = [self.funcs[i](*args) for i in range(order + 1)]
+        if minus_log:
+            out = self._apply_minus_log(X=out, order=order)
+
+        if norm:
+            out = [x / np.math.factorial(i) for i, x in enumerate(out)]
+        return out
+
+    def xcoefs(self, data, order=None, norm=True, minus_log=False, order_dim="order"):
+        if order is None:
+            order = data.order
+        out = self.coefs(*data.xcoefs_args, order=order, norm=norm, minus_log=minus_log)
+        return xr.concat(out, dim=order_dim)
 
 
 class Coefs(object):
@@ -366,8 +418,65 @@ class StateCollection(object):
     def map(self, func, *args, **kwargs):
         """
         apply a function to elements self.
+        out = [func(s, *args, **kwargs) for s in self]
+
+        if func is a str, then
+        out = [getattr(s, func)(*args, **kwargs) for s in self]
         """
-        return [func(s, *args, **kwargs) for s in self]
+
+        if isinstance(func, str):
+            out = [getattr(s, func)(*args, **kwargs) for s in self]
+        else:
+            out = [func(s, *args, **kwargs) for s in self]
+
+        return out
+
+    def map_concat(self, func, concat_dim=None, concat_kws=None, *args, **kwargs):
+        """
+        apply function and concat output
+
+        defaults to concat with dim=pd.Index(self.alpha0, name=self.alpha_name)
+        """
+
+        out = self.map(func, *args, **kwargs)
+        if isinstance(out[0], (xr.DataArray, xr.Dataset)):
+            if concat_dim is None:
+                concat_dim = pd.Index(self.alpha0, name=self.alpha_name)
+            if concat_kws is None:
+                concat_kws = {}
+            out = xr.concat(out, dim=concat_dim, **concat_kws)
+        return out
+
+    def append(self, states, sort=True, key=None, **kws):
+        """
+        create new object with states appended to self.states
+
+        Parameters
+        ----------
+        states : list
+            states to append to self.states
+        sort : bool, default=True
+            if true, sort states by key `alpha0`
+        key : callable, optional
+            callable function to use as key.
+            Default is `lambda x: x.alpha0`
+            see `sorted` function
+        kws : dict
+            extra arguments to `sorted`
+
+        Returns
+        -------
+        out : type(self)
+            same type as `self` with new states added to self.states
+        """
+
+        new_states = list(self.states) + list(states)
+
+        if sort:
+            if key is None:
+                key = lambda x: x.alpha0
+            new_states = sorted(new_states, key=key, **kws)
+        return type(self)(new_states, **self.kws)
 
     @property
     def order(self):

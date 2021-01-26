@@ -35,42 +35,31 @@ def relative_fluctuations(da, dim):
     """
     Calculate relative fluctuations (std / |mean|) of DataArray
     """
+
     out = da.std(dim) / np.abs(da.mean(dim))
     out = out.where(~np.isinf(out))
     return out
 
 
-def train_single_interation(
+def test_relative_fluctuations(
     alphas,
-    factory_state,
-    factory_statecollection,
-    states=None,
+    model,
+    states,
     reduce_dim="rep",
     states_avail=None,
-    state_kws=None,
-    statecollection_kws=None,
     predict_kws=None,
     tol=0.003,
     alpha_tol=0.01,
 ):
+    """
+    test relative fluctuations of model
+    """
 
-    if state_kws is None:
-        state_kws = {}
-    if statecollection_kws is None:
-        statecollection_kws = {}
     if predict_kws is None:
         predict_kws = {}
 
-    if states is None:
-        states = [
-            factory_state(alphas[0], **state_kws),
-            factory_state(alphas[-1], **state_kws),
-        ]
-
-    alpha_name = states[0].alpha_name
+    alpha_name = model.alpha_name
     alphas_states_dim = f"_{alpha_name}_states"
-
-    model = factory_statecollection(states, **statecollection_kws)
 
     err_rel = model.predict(alphas, **predict_kws).pipe(
         relative_fluctuations, dim=reduce_dim
@@ -88,23 +77,22 @@ def train_single_interation(
     err_rel = err_rel.where(err_rel > tol, drop=True)
 
     # only consider values sufficiently far from current states
-    alphas_states = xr.DataArray([s.alpha0 for s in states], dims=alphas_states_dim)
-    err_rel = err_rel.where(
-        np.abs(err_rel[alpha_name] - alphas_states).min(alphas_states_dim) > alpha_tol,
-        drop=True,
-    )
+    if len(err_rel) > 0 and len(states) > 0 and alpha_tol > 0:
+        alphas_states = xr.DataArray([s.alpha0 for s in states], dims=alphas_states_dim)
+        err_rel = err_rel.where(
+            np.abs(err_rel[alpha_name] - alphas_states).min(alphas_states_dim)
+            > alpha_tol,
+            drop=True,
+        )
 
     if len(err_rel) > 0:
         alpha_new = err_rel.idxmax(alpha_name).values[()]
-        state_new = factory_state(alpha_new, **state_kws)
-
         info["alpha_new"] = alpha_new
-        info["err_rel_max"] = err_rel.max().values[()]
-
+        info["err_max"] = err_rel.max().values[()]
     else:
-        state_new = None
+        alpha_new = None
 
-    return model, state_new, info
+    return alpha_new, info
 
 
 def train_iterative(
@@ -120,6 +108,7 @@ def train_iterative(
     predict_kws=None,
     tol=0.003,
     alpha_tol=0.01,
+    callback=None,
 ):
     """
     add states to satisfy some tolerance.
@@ -163,6 +152,16 @@ def train_iterative(
         relative tolerance.  If `max err_rel < tol` then not new state added
     alpha_tol : float, default=0.01
         new states must have `abs(alpha_new - alpha) > alpha_tol` for all existing states.
+    callback : callable
+        stop = callback(model, alphas, info_dict).
+        If callback returns something that evaluates True, then the iteration stops.
+        `model` is the current model.
+        `alphas` is the sequence of alphas
+        `info_dict` dictionary containing
+        `info_dict['alpha0']` the alpha0 values in the model
+        `info_dict['err']` the normalized error in the model
+        `info_dict['depth']` the depth of interation
+
 
 
     Returns
@@ -189,47 +188,33 @@ def train_iterative(
 
     assert maxiter > 0
 
-    alpha_name = states[0].alpha_name
-    alphas_states_dim = f"_{alpha_name}_states"
-
     # work with copy
     states = list(states)
     info = []
 
-    for count in range(maxiter):
+    for depth in range(maxiter):
         model = factory_statecollection(states, **statecollection_kws)
 
-        err_rel = model.predict(alphas, **predict_kws).pipe(
-            relative_fluctuations, dim=reduce_dim
+        alpha_new, info_dict = test_relative_fluctuations(
+            alphas=alphas,
+            model=model,
+            states=states,
+            reduce_dim=reduce_dim,
+            states_avail=states_avail,
+            predict_kws=predict_kws,
+            tol=tol,
+            alpha_tol=alpha_tol,
         )
 
-        # take maximum over all dimenensions but alpha_name
-        max_dims = set(err_rel.dims) - {alpha_name}
-        if len(max_dims) > 0:
-            err_rel = err_rel.max(dims=max_dims)
+        info_dict["depth"] = depth
+        if callback is not None:
+            if callback(model, alphas, info_dict):
+                break
 
-        # collect info before reduce err_rel below
-        # info.append({"alpha0": model.alpha0, "err": err_rel})
-        info.append({"alpha0": model.alpha0, "err": err_rel})
-
-        # only consider values > tol
-        err_rel = err_rel.where(err_rel > tol, drop=True)
-
-        # only consider values sufficiently far from current states
-        alphas_states = xr.DataArray([s.alpha0 for s in states], dims=alphas_states_dim)
-        err_rel = err_rel.where(
-            np.abs(err_rel[alpha_name] - alphas_states).min(alphas_states_dim)
-            > alpha_tol,
-            drop=True,
-        )
-
-        if len(err_rel) > 0:
-            alpha_new = err_rel.idxmax(alpha_name).values[()]
+        info.append(info_dict)
+        if alpha_new is not None:
             state_new = factory_state(alpha_new, **state_kws)
-            info[-1]["alpha_new"] = alpha_new
-
             states = sorted(states + [state_new], key=lambda x: x.alpha0)
-
         else:
             break
 
@@ -253,6 +238,7 @@ def train_recursive(
     predict_kws=None,
     tol=0.003,
     alpha_tol=0.01,
+    callback=None,
 ):
     """
     add states to satisfy some tolerance.
@@ -277,6 +263,9 @@ def train_recursive(
     factory_statecollection : callable
         state collection factory.
         `model = factory_statecollection(states)`
+    state0, state1 : states
+        states to be used for building model.
+        defaults to building states at `alphas[0]` and `alphas[-1]`
     states : list of states, optional
         initial states list.  If not passed, first guess at states is
         `[factory_state(alphas[0]), factory_state(alphas[-1])]`
@@ -296,12 +285,21 @@ def train_recursive(
         relative tolerance.  If `max err_rel < tol` then not new state added
     alpha_tol : float, default=0.01
         new states must have `abs(alpha_new - alpha) > alpha_tol` for all existing states.
+    callback : callable
+        stop = callback(model, alphas, info_dict).
+        If callback returns something that evaluates True, then the iteration stops.
+        `model` is the current model.
+        `alphas` is the sequence of alphas
+        `info_dict` dictionary containing
+        `info_dict['alpha0']` the alpha0 values in the model
+        `info_dict['err']` the normalized error in the model
+        `info_dict['depth']` the depth of interation
 
 
     Returns
     -------
-    model : statecollection
-        final output of `factory_statecollection`
+    states : list of states
+        list of states
     info : list of dict
         Information from each iteration
 
@@ -339,38 +337,30 @@ def train_recursive(
     if state1 is None:
         state1 = get_state(alphas[-1], states)
 
-    alpha_name = state0.alpha_name
-    alphas_states_dim = f"_{alpha_name}_states"
+    # alpha_name = state0.alpha_name
+    # alphas_states_dim = f"_{alpha_name}_states"
 
     model = factory_statecollection([state0, state1], **statecollection_kws)
     alpha0, alpha1 = model.alpha0
 
-    err_rel = model.predict(alphas, **predict_kws).pipe(
-        relative_fluctuations, dim=reduce_dim
+    alpha_new, info_dict = test_relative_fluctuations(
+        alphas=alphas,
+        model=model,
+        states=states,
+        reduce_dim=reduce_dim,
+        states_avail=states_avail,
+        predict_kws=predict_kws,
+        tol=tol,
+        alpha_tol=alpha_tol,
     )
 
-    # take maximum over all dimenensions but alpha_name
-    max_dims = set(err_rel.dims) - {alpha_name}
-    if len(max_dims) > 0:
-        err_rel = err_rel.max(dims=max_dims)
+    info_dict["depth"] = depth
 
-    # collect info before reduce err_rel below
-    info.append({"depth": depth, "alpha0": model.alpha0, "err": err_rel})
+    if callback is not None:
+        if callback(model, alphas, info_dict):
+            alpha_new = None
 
-    # only consider values > tol
-    err_rel = err_rel.where(err_rel > tol, drop=True)
-
-    if len(err_rel) > 0 and len(states) > 0:
-        # only consider values sufficiently far from current states
-        alphas_states = xr.DataArray([s.alpha0 for s in states], dims=alphas_states_dim)
-        err_rel = err_rel.where(
-            np.abs(err_rel[alpha_name] - alphas_states).min(alphas_states_dim)
-            > alpha_tol,
-            drop=True,
-        )
-
-    if len(err_rel) > 0:
-        alpha_new = err_rel.idxmax(alpha_name).values[()]
+    if alpha_new is not None:
         state_new = get_state(alpha_new, states)
 
         alphas_left = alphas[(alpha0 <= alphas) & (alphas < alpha_new)]
@@ -391,6 +381,7 @@ def train_recursive(
             predict_kws=predict_kws,
             tol=tol,
             alpha_tol=alpha_tol,
+            callback=callback,
         )
 
         alphas_right = alphas[(alpha_new <= alphas) & (alphas <= alpha1)]
@@ -411,6 +402,7 @@ def train_recursive(
             predict_kws=predict_kws,
             tol=tol,
             alpha_tol=alpha_tol,
+            callback=callback,
         )
 
     else:
@@ -418,15 +410,44 @@ def train_recursive(
         for alpha, state in zip([alpha0, alpha1], [state0, state1]):
             if alpha not in alphas_states:
                 states.append(state)
-
         states = sorted(states, key=lambda x: x.alpha0)
 
     return states, info
 
 
 def check_polynomial_consistency(
-    states, factory_statecollection, reduce_dim="rep", order=None
+    states,
+    factory_statecollection,
+    reduce_dim="rep",
+    order=None,
+    statecollection_kws=None,
 ):
+    """
+    Check polynomial consistency across subsegments
+
+    Parameters
+    ----------
+    states : sequence
+        sequence of states
+    factory_statecollection : callable
+        `model = factory_statecollection(states, **statecollection_kws)`
+    reduce_dim : str, default="rep"
+        dimension to reduce along
+    order : int, optional
+        order passed to `model.predict`
+    statecollection_kws : dict, optional
+        extra arguments to `factory_statecollection`
+
+    Returns
+    -------
+    p_values : dict
+        p value for pairs of models.  Keys will be of the form
+        ((alpha0, alpha1), (alpha2, alpha3))
+    models : dict
+        collection of models created.  Keys are of the form
+        (alpha0, alpha1)
+    """
+
     ave = {}
     var = {}
     models = {}
@@ -450,13 +471,14 @@ def check_polynomial_consistency(
         keys02 = keys[0], keys[2]
 
         for key0, key1 in [(keys01, keys12), (keys01, keys02), (keys12, keys02)]:
-            z = (ave[key0] - ave[key1]) / np.sqrt(var[key0] + var[key1])
-            p = xr.DataArray(
-                stats.norm.cdf(np.abs(z)) - stats.norm.cdf(-np.abs(z)),
-                dims=z.dims,
-                coords=z.coords,
-            )
-
-            ps[key0, key1] = p
+            key = key0, key1
+            if key not in ps:
+                z = (ave[key0] - ave[key1]) / np.sqrt(var[key0] + var[key1])
+                p = xr.DataArray(
+                    stats.norm.cdf(np.abs(z)) - stats.norm.cdf(-np.abs(z)),
+                    dims=z.dims,
+                    coords=z.coords,
+                )
+                ps[key] = p
 
     return ps, models

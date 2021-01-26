@@ -11,7 +11,7 @@ from scipy import stats
 
 from thermoextrap.ig import IGmodel
 
-from .core import ExtrapModel, InterpModel
+from .models import ExtrapModel, InterpModel
 from .xpan_beta import factory_data
 
 try:
