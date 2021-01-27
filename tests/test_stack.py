@@ -58,7 +58,7 @@ def test_stack(states):
     Y_unstack = stack.states_derivs_concat(states).pipe(stack.to_mean_var, "rep")
     Y = stack.stack_dataarray(Y_unstack, x_dims=["beta", "order"], stats_dim="stats")
 
-    X = stack.multiindex_to_array(Y.indexes["stack"])
+    X = stack.multiindex_to_array(Y.indexes["xstack"])
 
     ij = 0
     for i, beta in enumerate(Y_unstack.beta):
