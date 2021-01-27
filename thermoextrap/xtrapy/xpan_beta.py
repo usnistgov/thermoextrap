@@ -17,7 +17,7 @@ from .data import (  # noqa: F401
     resample_indicies,
 )
 from .models import (
-    Coefs,
+    Derivatives,
     ExtrapModel,
     PerturbModel,
     SymSubs,
@@ -315,9 +315,9 @@ def factory_data(
 
 
 @lru_cache(5)
-def factory_coefs(xalpha=False, central=False):
+def factory_derivatives(xalpha=False, central=False):
     """
-    factory function to provide coefficients of expansion
+    factory function to provide derivative function for expansion
 
     Parameters
     ----------
@@ -328,14 +328,14 @@ def factory_coefs(xalpha=False, central=False):
 
     Returns
     -------
-    coefs : Coefs object used to calculate moments
+    derivatives : Derivatives object used to calculate taylor series coefficients
     """
 
     derivs = SymDerivBeta(xalpha=xalpha, central=central)
     exprs = SymSubs(
         derivs, subs_all={derivs.beta: "None"}, expand=False, simplify=False
     )
-    return Coefs.from_sympy(exprs, args=derivs.args)
+    return Derivatives.from_sympy(exprs, args=derivs.args)
 
 
 def factory_extrapmodel(
@@ -389,11 +389,11 @@ def factory_extrapmodel(
     assert central == data.central
     assert order <= data.order
 
-    coefs = factory_coefs(xalpha=xalpha, central=central)
+    derivatives = factory_derivatives(xalpha=xalpha, central=central)
     return ExtrapModel(
         alpha0=beta,
         data=data,
-        coefs=coefs,
+        derivatives=derivatives,
         order=order,
         minus_log=minus_log,
         alpha_name=alpha_name,

@@ -11,28 +11,28 @@ from thermoextrap.xtrapy.cached_decorators import gcached
 
 
 @pytest.mark.slow
-def test_xpan_beta_coefs_slow(fixture):
-    a = np.array(fixture.coefs_list)
-    s = xpan_beta.factory_coefs(xalpha=False, central=False)
-    b = s.xcoefs(fixture.rdata, norm=False)
+def test_xpan_beta_derivs_slow(fixture):
+    a = np.array(fixture.derivs_list)
+    s = xpan_beta.factory_derivatives(xalpha=False, central=False)
+    b = s.derivs(fixture.rdata, norm=False)
     np.testing.assert_allclose(a, b)
 
-    s = xpan_beta.factory_coefs(xalpha=False, central=True)
-    b = s.xcoefs(fixture.cdata, norm=False)
+    s = xpan_beta.factory_derivatives(xalpha=False, central=True)
+    b = s.derivs(fixture.cdata, norm=False)
     np.testing.assert_allclose(a, b)
 
 
-def test_xpan_beta_coefs(fixture):
-    s = xpan_beta.factory_coefs(xalpha=False, central=False)
-    b = s.xcoefs(fixture.rdata, norm=False)
-    fixture.xr_test(b, s.xcoefs(fixture.xrdata, norm=False))
-    fixture.xr_test(b, s.xcoefs(fixture.xrdata_val, norm=False))
+def test_xpan_beta_derivs(fixture):
+    s = xpan_beta.factory_derivatives(xalpha=False, central=False)
+    b = s.derivs(fixture.rdata, norm=False)
+    fixture.xr_test(b, s.derivs(fixture.xrdata, norm=False))
+    fixture.xr_test(b, s.derivs(fixture.xrdata_val, norm=False))
 
     # central
-    s = xpan_beta.factory_coefs(xalpha=False, central=True)
-    b = s.xcoefs(fixture.cdata, norm=False)
-    fixture.xr_test(b, s.xcoefs(fixture.xdata, norm=False))
-    fixture.xr_test(b, s.xcoefs(fixture.xdata_val, norm=False))
+    s = xpan_beta.factory_derivatives(xalpha=False, central=True)
+    b = s.derivs(fixture.cdata, norm=False)
+    fixture.xr_test(b, s.derivs(fixture.xdata, norm=False))
+    fixture.xr_test(b, s.derivs(fixture.xdata_val, norm=False))
 
 
 @pytest.mark.slow
@@ -98,10 +98,10 @@ def test_extrapmodel_ig():
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order
-        test_derivs = ex.xcoefs(order=o, norm=False).values
+        test_derivs = ex.derivs(order=o, norm=False).values
         # And extrapolations
         test_extrap = ex.predict(test_betas, order=o).values
-        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_derivs_err = ex_res.derivs(order=o, norm=False).std("rep").values
         test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
         # Redefine as confidence interval, and just for the highest derivative order
         test_derivs_err = 2.0 * test_derivs_err[-1]
@@ -440,7 +440,7 @@ def test_interpmodel_polynomial():
         interp = xtrapy_models.InterpModel([ex1, ex2])
         check_array = np.zeros(4)
         check_array[i + 1] = 1.0
-        np.testing.assert_array_equal(interp.xcoefs().values, check_array)
+        np.testing.assert_array_equal(interp.coefs().values, check_array)
 
 
 def test_mbar(fixture):
@@ -525,7 +525,7 @@ def test_extrapmodel_minuslog_slow(fixture):
 
     # test coefs
     a = em.params
-    b = xem.coefs.xcoefs(xem.data, norm=False, minus_log=True)
+    b = xem.derivatives.derivs(xem.data, norm=False, minus_log=True)
     np.testing.assert_allclose(a, b)
 
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
@@ -579,10 +579,10 @@ def test_extrapmodel_minuslog_ig():
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order
-        test_derivs = ex.xcoefs(order=o, norm=False).values
+        test_derivs = ex.derivs(order=o, norm=False).values
         # And extrapolations
         test_extrap = ex.predict(test_betas, order=o).values
-        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_derivs_err = ex_res.derivs(order=o, norm=False).std("rep").values
         test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
         # Redefine as confidence interval, and just for the highest derivative order
         test_derivs_err = 2.0 * test_derivs_err[-1]
@@ -742,10 +742,10 @@ def test_extrapmodel_alphadep_ig():
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order
-        test_derivs = ex.xcoefs(order=o, norm=False).values
+        test_derivs = ex.derivs(order=o, norm=False).values
         # And extrapolations
         test_extrap = ex.predict(test_betas, order=o).values
-        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_derivs_err = ex_res.derivs(order=o, norm=False).std("rep").values
         test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
         # Redefine as confidence interval, and just for the highest derivative order
         test_derivs_err = 2.0 * test_derivs_err[-1]
@@ -840,7 +840,7 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
 
     # test coefs
     a = em.params
-    b = xem.coefs.xcoefs(xem.data, minus_log=True, norm=False)
+    b = xem.derivatives.derivs(xem.data, minus_log=True, norm=False)
     np.testing.assert_allclose(a, b)
 
     # test prediction
@@ -923,10 +923,10 @@ def test_extrapmodel_alphadep_minuslog_ig():
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order
-        test_derivs = ex.xcoefs(order=o, norm=False).values
+        test_derivs = ex.derivs(order=o, norm=False).values
         # And extrapolations
         test_extrap = ex.predict(test_betas, order=o).values
-        test_derivs_err = ex_res.xcoefs(order=o, norm=False).std("rep").values
+        test_derivs_err = ex_res.derivs(order=o, norm=False).std("rep").values
         test_extrap_err = ex_res.predict(test_betas, order=o).std("rep").values
         # Redefine as confidence interval, and just for the highest derivative order
         test_derivs_err = 2.0 * test_derivs_err[-1]

@@ -7,7 +7,7 @@ import sympy as sp
 
 from .cached_decorators import gcached
 from .models import (
-    Coefs,
+    Derivs,
     SymSubs,
     _get_default_function,
     _get_default_indexed,
@@ -360,7 +360,7 @@ class _SubsBeta_xalpha(_SubsBeta):
 
 
 @lru_cache(5)
-def factory_coefs(xalpha=False, central=False):
+def factory_derivs(xalpha=False, central=False):
     derivs = _SymDerivBeta()
 
     if xalpha:
@@ -377,4 +377,4 @@ def factory_coefs(xalpha=False, central=False):
 
     exprs = SymSubs(derivs, subs, recursive=False, simplify=False, expand=True)
 
-    return Coefs.from_sympy(exprs, args=args)
+    return Derivs.from_sympy(exprs, args=args)

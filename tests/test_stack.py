@@ -5,8 +5,8 @@ import xarray as xr
 from numpy.core import multiarray
 
 import thermoextrap.xtrapy.models as xtrapy_models
+import thermoextrap.xtrapy.stack as stack
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
-import thermoextrap.xtrapy.xstack as xstack
 
 
 @pytest.fixture
@@ -29,36 +29,36 @@ def states():
 
 def test_mean_var(states):
 
-    x = states[0].xcoefs(norm=False)
+    x = states[0].derivs(norm=False)
 
-    out = xstack.to_mean_var(x, dim="rep")
+    out = stack.to_mean_var(x, dim="rep")
 
     xr.testing.assert_allclose(out.sel(stats="mean", drop=True), x.mean("rep"))
     xr.testing.assert_allclose(out.sel(stats="var", drop=True), x.var("rep"))
 
     # test concat_dim
-    out = xstack.to_mean_var(x, dim="rep", concat_dim="var")
+    out = stack.to_mean_var(x, dim="rep", concat_dim="var")
 
     xr.testing.assert_allclose(out.sel(var=0, drop=True), x.mean("rep"))
     xr.testing.assert_allclose(out.sel(var=1, drop=True), x.var("rep"))
 
 
-def test_xcoefs_concat(states):
+def test_derivs_concat(states):
 
     a = xr.concat(
-        (s.xcoefs(norm=False) for s in states),
+        (s.derivs(norm=False) for s in states),
         dim=pd.Index(states.alpha0, name=states.alpha_name),
     )
-    b = xstack.states_xcoefs_concat(states)
+    b = stack.states_derivs_concat(states)
     xr.testing.assert_allclose(a, b)
 
 
 def test_stack(states):
 
-    Y_unstack = xstack.states_xcoefs_concat(states).pipe(xstack.to_mean_var, "rep")
-    Y = xstack.stack_dataarray(Y_unstack, x_dims=["beta", "order"], stats_dim="stats")
+    Y_unstack = stack.states_derivs_concat(states).pipe(stack.to_mean_var, "rep")
+    Y = stack.stack_dataarray(Y_unstack, x_dims=["beta", "order"], stats_dim="stats")
 
-    X = xstack.multiindex_to_array(Y.indexes["xstack"])
+    X = stack.multiindex_to_array(Y.indexes["stack"])
 
     ij = 0
     for i, beta in enumerate(Y_unstack.beta):

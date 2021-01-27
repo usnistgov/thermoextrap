@@ -13,9 +13,9 @@ from gpflow.ci_utils import ci_niter
 
 # from .models import StateCollection
 from .cached_decorators import gcached
-from .xstack import GPRData, multiindex_to_array
+from .stack import GPRData, StackedDerivatives, multiindex_to_array
 
-__all__ = ("GPRData", "GPRModel", "factory_gprmodel")
+__all__ = ("GPRData", "GPRModel", "StackedDerivatives", "factory_gprmodel")
 
 # First define classes needed for a GPR model
 # A general derivative kernel based on a sympy expression
@@ -294,7 +294,7 @@ class GPRModel:
 
     Parameters
     ----------
-    data : xstack.GPRData
+    data : stack.GPRData
         data object to analyze
     kernel_expr : sympy expression
     kernel_params : dict
@@ -398,7 +398,7 @@ class GPRModel:
         x_pred = multiindex_to_array(xindex)
 
         out = np.array([np.hstack(g.predict_f(x_pred)) for g in gp])
-        # out has form: out[ystack, xstack, stats_dim]
+        # out has form: out[ystack, stack, stats_dim]
 
         # wrap output
         template = self.data.stacked(order=order)
