@@ -147,7 +147,7 @@ class FixtureData:
         return ufunc, xufunc
 
     @gcached()
-    def coefs_list(self):
+    def derivs_list(self):
         fs = [thermoextrap.symDerivAvgX(i) for i in range(self.order + 1)]
         ufunc, xufunc = self.u_xu_funcs
         return [fs[i](ufunc, xufunc) for i in range(self.order + 1)]

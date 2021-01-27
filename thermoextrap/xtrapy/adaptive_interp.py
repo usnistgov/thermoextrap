@@ -456,7 +456,7 @@ def check_polynomial_consistency(
 
         model = factory_statecollection(list(state_pair))
         key = tuple(model.alpha0)
-        coef = model.xcoefs(order=None)
+        coef = model.coefs(order=None)
 
         ave[key] = coef.mean(reduce_dim)
         var[key] = coef.var(reduce_dim)

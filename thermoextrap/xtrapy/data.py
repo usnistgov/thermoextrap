@@ -216,13 +216,13 @@ class AbstractData(ABC):
     def central(self):
         pass
 
-    @abstractproperty
-    def xcoefs_args(self):
-        pass
-
     # @abstractproperty
     # def derivs_args(self):
     #     pass
+
+    @abstractproperty
+    def derivs_args(self):
+        pass
 
     @abstractmethod
     def __len__(self):
@@ -703,7 +703,7 @@ class DataValues(DataValuesBase):
         return DatasetSelector(self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim)
 
     @property
-    def xcoefs_args(self):
+    def derivs_args(self):
         return (self.u_selector, self.xu_selector)
 
 
@@ -777,7 +777,7 @@ class DataValuesCentral(DataValuesBase):
             return DatasetSelector(self.xave, dims=[self.deriv_dim])
 
     @property
-    def xcoefs_args(self):
+    def derivs_args(self):
         return (self.xave_selector, self.du_selector, self.dxdu_selector)
 
 
@@ -906,7 +906,7 @@ class DataCentralMomentsBase(AbstractData):
         )
 
     @property
-    def xcoefs_args(self):
+    def derivs_args(self):
         if self.central:
             return (self.xave_selector, self.du_selector, self.dxdu_selector)
 

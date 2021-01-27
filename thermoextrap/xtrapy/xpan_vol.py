@@ -11,7 +11,7 @@ from functools import lru_cache
 
 from .cached_decorators import gcached
 from .data import DataValues, xrwrap_xv
-from .models import Coefs, ExtrapModel
+from .models import Derivatives, ExtrapModel
 
 # Lazily imported everything above - will trim down later
 # Need funcs to pass to Coefs class
@@ -73,7 +73,7 @@ class VolumeDerivFuncs(object):
 
 
 @lru_cache(5)
-def factory_coefs():
+def factory_derivatives():
     """
     factory function to provide coefficients of expansion
 
@@ -86,7 +86,7 @@ def factory_coefs():
     coefs : Coefs object used to calculate moments
     """
     deriv_funcs = VolumeDerivFuncs()
-    return Coefs(deriv_funcs)
+    return Derivatives(deriv_funcs)
 
 
 # make a special data class
@@ -138,7 +138,7 @@ class DataValuesVolume(DataValues):
         return out
 
     @property
-    def xcoefs_args(self):
+    def derivs_args(self):
         return (
             self.u_selector,
             self.xu_selector,
@@ -210,11 +210,11 @@ def factory_extrapmodel(
         **kws
     )
 
-    coefs = factory_coefs()
+    derivatives = factory_derivatives()
     return ExtrapModel(
         alpha0=volume,
         data=data,
-        coefs=coefs,
+        derivatives=derivatives,
         order=order,
         minus_log=False,
         alpha_name=alpha_name,

@@ -36,12 +36,12 @@ def test_xdata_val(fix_cdata, fix_xdata_val):
     fix_cdata.xr_test_central(fix_xdata_val.data)
 
 
-def test_rdata_coefs(fix_old, fix_rdata):
+def test_rdata_derivs(fix_old, fix_rdata):
 
     a = fix_old
     b = fix_rdata
 
     vala = a.em.params
-    valb = b.xem.coefs.xcoefs(b.data, norm=False)
+    valb = b.xem.derivatives.derivs(data=b.data)
 
     np.testing.assert_allclose(vala, valb)

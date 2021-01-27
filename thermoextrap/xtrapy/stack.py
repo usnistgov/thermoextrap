@@ -1,9 +1,5 @@
 """
 A set of routines to stack data for gpflow analysis
-
-
-
-
 """
 
 
@@ -183,9 +179,9 @@ def to_mean_var(da, dim, concat_dim=None, concat_kws=None, **kws):
     )
 
 
-def states_xcoefs_concat(states, dim=None, concat_kws=None, **kws):
+def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
     """
-    concatanate [s.xcoefs(norm=False) for s in states]
+    concatanate [s.derivs(norm=False) for s in states]
 
     Parameters
     ----------
@@ -198,7 +194,7 @@ def states_xcoefs_concat(states, dim=None, concat_kws=None, **kws):
         extra arguments to xarray.concat
 
     kws : dict
-        extra arguments to `states[i].xcoefs` method
+        extra arguments to `states[i].derivs` method
         Note, default is `norm = False`
     Returns
     -------
@@ -212,10 +208,10 @@ def states_xcoefs_concat(states, dim=None, concat_kws=None, **kws):
 
     kws.setdefault("norm", False)
 
-    return xr.concat((s.xcoefs(**kws) for s in states), dim=dim, **concat_kws)
+    return xr.concat((s.derivs(**kws) for s in states), dim=dim, **concat_kws)
 
 
-class StackedDerivativeMeanVar:
+class StackedDerivatives:
     """
     Data object for gpflow analysis
 
@@ -229,6 +225,7 @@ class StackedDerivativeMeanVar:
         Dimensions which make up the "x" part of the data.
         For example, this would be things like "beta" or "volume".
         x_dims[-1] should be the order of the derivative
+        x_dims[0] should be `alpha_name`.  That is, variable taking the derivative of.
     y_dims : str or sequence of str, optional
         Dimensions making up the "y" part of the data.  Defaults to all dimenions not specified
         by `x_dims` or `stats_dim`
@@ -270,6 +267,15 @@ class StackedDerivativeMeanVar:
     @property
     def order_dim(self):
         return self.x_dims[-1]
+
+    @property
+    def order(self):
+        """maximum order available"""
+        return self.da.sizes[self.order_dim] - 1
+
+    @property
+    def alpha_name(self):
+        return self.x_dims[0]
 
     @gcached(prop=False)
     def _stacked(self, order):
@@ -375,12 +381,13 @@ class StackedDerivativeMeanVar:
         )
 
     @classmethod
-    def from_derivatives(
+    def from_derivs(
         cls,
         derivs,
         x_dims,
         reduce_dim,
         reduce_funcs=None,
+        alpha_name="alpha",
         y_dims=None,
         xstack_dim="xstack",
         ystack_dim="ystack",
@@ -401,6 +408,7 @@ class StackedDerivativeMeanVar:
         reduce_funcs : list of callables or str
             Functions applied to `derivs` to calculate statistics.
             See apply_reduction.
+            Defaults to ['mean', 'var']
         concat_dim : str, optional
             dimension of concatonated results.
             That is out.isel(**{concat_dim : i}) = reduce_funcs[i](derivs, **reduce_kws)
@@ -441,31 +449,8 @@ class StackedDerivativeMeanVar:
             policy=policy,
         )
 
-    @classmethod
-    def from_statcollection(
-        cls,
-        statecollection,
-        x_dims,
-        y_dims=None,
-        xstack_dim="xstack",
-        ystack_dim="ystack",
-        derivs_func=None,
-        reduce_funcs=None,
-        derivs_kws=None,
-        reduce_kws=None,
-    ):
-        """
-        create object from StateCollection object
-        """
-
-        if derivs_kws is None:
-            derivs_kws = {"norm": False}
-
-        if derivs_func is None:
-            derivs_func = "xcoefs"
-
     # @classmethod
-    # def from_statescollection_xcoefs(cls,
+    # def from_statescollection_derivs(cls,
     #                                  statescollection,
     #                                  funcs=None,
 
@@ -494,7 +479,7 @@ class GPRData(StateCollection):
     order_dim : str, default='order'
         name of derivative order dimension
     deriv_kws : dict, optional
-        optional arguments to be passed to `collection[i].xcoefs`
+        optional arguments to be passed to `collection[i].derivs`
     """
 
     # reduce_dim -> dimension to reduce alo
@@ -548,7 +533,7 @@ class GPRData(StateCollection):
         order : int
             order of derivatives to consider
         kws : dict
-            extra arguments to `self.xcoefs`
+            extra arguments to `self.derivs`
 
         Returns
         -------
@@ -557,13 +542,13 @@ class GPRData(StateCollection):
 
         See Also
         --------
-        states_xcoefs_concat, to_mean_var, stack_dataarray
+        states_derivs_concat, to_mean_var, stack_dataarray
 
         """
 
         kws = dict(self.deriv_kws, order_dim=self.order_dim)
         return (
-            states_xcoefs_concat(self, order=order, **kws)
+            states_derivs_concat(self, order=order, **kws)
             .pipe(
                 to_mean_var,
                 dim=self.reduce_dim,

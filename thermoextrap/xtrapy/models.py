@@ -193,72 +193,196 @@ class Derivatives:
         func = factory_minus_log()
         return [func[i](X) for i in range(order + 1)]
 
-    def derivs(self, data=None, order=None, args=None, minus_log=False, as_coefs=False):
+    def __call__(
+        self,
+        data=None,
+        order=None,
+        args=None,
+        minus_log=False,
+        order_dim="order",
+        concat_kws=None,
+        norm=False,
+    ):
+        """
+        alias to self.derivs
+        """
+
+    def derivs(
+        self,
+        data=None,
+        order=None,
+        args=None,
+        minus_log=False,
+        order_dim="order",
+        concat_kws=None,
+        norm=False,
+    ):
         """
         Calculate derivatives for orders range(0, order+1)
 
         Parameters
         ----------
-        data : BaseData object
-        """
-        pass
+        data : AbstracData subclass
+            If passed, use `args=data.derivs_args`
+        order : int, optional
+            If pass `data` and `order` is `None`, then `order=data.order`
+            Otherwise, must mass order
+        args : tuple
+            arguments passed to self.funcs[i](*args)
+        minus_log : bool, default=False
+            If `True`, apply tranform for `Y = -log(<X>)`
+        order_dim : str, default='order'
+            If `None`, output will be a list
+            If `order_dim` is a string, then apply `xarray.concat` to output
+            To yield a single DataArray
+        concat_kws : dict, optional
+            extra arguments to `xarray.concat`
+        norm : bool, default=False
+            If true, then normalize derivatives by `1/n!`, where `n` is the order of
+            the derivative.  That is, transform derivatives to taylor series coefficients
+            See also taylor_series_norm
 
-    def coefs(self, *args, order, norm=True, minus_log=False):
+        Returns
+        -------
+        output : list of xarray.DataArray
+            See above for nature of output
+        """
+
+        if data is not None:
+            args = data.derivs_args
+            if order is None:
+                order = data.order
+
+        if args is None:
+            raise ValueError("must specify args or data")
+
+        if order is None:
+            raise ValueError("must specify order or data")
+
         out = [self.funcs[i](*args) for i in range(order + 1)]
+
         if minus_log:
             out = self._apply_minus_log(X=out, order=order)
 
         if norm:
             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
+
+        if order_dim is not None:
+            if concat_kws is None:
+                concat_kws = {}
+            out = xr.concat(out, dim=order_dim, **concat_kws)
         return out
 
-    def xcoefs(self, data, order=None, norm=True, minus_log=False, order_dim="order"):
-        if order is None:
-            order = data.order
-        out = self.coefs(*data.xcoefs_args, order=order, norm=norm, minus_log=minus_log)
-        return xr.concat(out, dim=order_dim)
-
-
-class Coefs(object):
-    """class to handle coefficients in taylor expansion"""
-
-    def __init__(self, funcs, exprs=None):
+    def coefs(
+        self, data=None, args=None, order=None, minus_log=False, order_dim="order"
+    ):
         """
-        Parameters
-        ----------
-        funcs : array-like
-            array of functions.
-            funcs[n] is the nth derivative of function
-        exprs : array-like, optional
-            optional placeholder for sympy expressions corresponding to the
-            lambdified functions in `funcs`
+        same as `self.derivs(..., norm=True)`
         """
-        self.funcs = funcs
-        self.exprs = exprs
 
-    def _apply_minus_log(self, X, order):
-        func = factory_minus_log()
-        return [func[i](X) for i in range(order + 1)]
-
-    def coefs(self, *args, order, norm=True, minus_log=False):
-        out = [self.funcs[i](*args) for i in range(order + 1)]
-        if minus_log:
-            out = self._apply_minus_log(X=out, order=order)
-
-        if norm:
-            out = [x / np.math.factorial(i) for i, x in enumerate(out)]
-        return out
-
-    def xcoefs(self, data, order=None, norm=True, minus_log=False, order_dim="order"):
-        if order is None:
-            order = data.order
-        out = self.coefs(*data.xcoefs_args, order=order, norm=norm, minus_log=minus_log)
-        return xr.concat(out, dim=order_dim)
+        return self.derivs(
+            data=data,
+            args=args,
+            order=order,
+            minus_log=minus_log,
+            order_dim=order_dim,
+            norm=True,
+        )
 
     @classmethod
     def from_sympy(cls, exprs, args):
         funcs = Lambdify(exprs, args=args)
         return cls(funcs=funcs, exprs=exprs)
+
+
+@lru_cache(10)
+def taylor_series_norm(order, order_dim="order"):
+    """
+    taylor_series_coefficients = derivs * taylor_series_norm
+    """
+    out = np.array([1 / np.math.factorial(i) for i in range(order + 1)])
+    if order_dim is not None:
+        out = xr.DataArray(out, dims=order_dim)
+    return out
+
+
+# @lru_cache(10):
+# def _get_p_value(order, order_dim='order'):
+#     p = np.arange(order + 1)
+#     if order_dim is not None:
+#         p = xr.DataArray(p, dims=order_dim)
+
+
+# def apply_xr_taylor_series(alpha0, alphas, order, derivs, normed=False, order_dim="order"):
+#     """
+#     apply taylor series
+
+#     sum (alpha - alpha0) ** i * derivs[i] / i!
+
+#     Parameters
+#     ----------
+#     alpha0 : float
+#         reference alpha value
+#     alphas : xarray.DataArray
+#         values to predict along
+#     order : int
+#         order of taylor series
+#     derivs : xarray.DataArray
+#         derivatives to be used in taylor series
+#         `derivs.isel(**{order_dim : i})` is the ith derivative
+#     normed : bool, default=True
+#         Whether `derivs` have been normalized by i!
+#     order_dim : str, default='order
+#         dimension indicating derivative order
+#     """
+
+#     dalpha = alpha - alpha0
+
+#     p = _get_p_value(order, order_dim)
+#     if not normed:
+#         derivs = derivs * taylor_series_norm(order, order_dim)
+
+
+# class Coefs(object):
+#     """class to handle coefficients in taylor expansion"""
+
+#     def __init__(self, funcs, exprs=None):
+#         """
+#         Parameters
+#         ----------
+#         funcs : array-like
+#             array of functions.
+#             funcs[n] is the nth derivative of function
+#         exprs : array-like, optional
+#             optional placeholder for sympy expressions corresponding to the
+#             lambdified functions in `funcs`
+#         """
+#         self.funcs = funcs
+#         self.exprs = exprs
+
+#     def _apply_minus_log(self, X, order):
+#         func = factory_minus_log()
+#         return [func[i](X) for i in range(order + 1)]
+
+#     def coefs(self, *args, order, norm=True, minus_log=False):
+#         out = [self.funcs[i](*args) for i in range(order + 1)]
+#         if minus_log:
+#             out = self._apply_minus_log(X=out, order=order)
+
+#         if norm:
+#             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
+#         return out
+
+#     def derivs(self, data, order=None, norm=True, minus_log=False, order_dim="order"):
+#         if order is None:
+#             order = data.order
+#         out = self.coefs(*data.derivs_args, order=order, norm=norm, minus_log=minus_log)
+#         return xr.concat(out, dim=order_dim)
+
+#     @classmethod
+#     def from_sympy(cls, exprs, args):
+#         funcs = Lambdify(exprs, args=args)
+#         return cls(funcs=funcs, exprs=exprs)
 
 
 class ExtrapModel(object):
@@ -267,11 +391,12 @@ class ExtrapModel(object):
     """
 
     def __init__(
-        self, alpha0, data, coefs, order=None, minus_log=False, alpha_name="alpha"
+        self, alpha0, data, derivatives, order=None, minus_log=False, alpha_name="alpha"
     ):
+
         self.alpha0 = alpha0
         self.data = data
-        self.coefs = coefs
+        self.derivatives = derivatives
 
         if order is None:
             order = data.order
@@ -286,17 +411,28 @@ class ExtrapModel(object):
         self.alpha_name = alpha_name
 
     @gcached(prop=False)
-    def xcoefs(self, order=None, order_dim="order", norm=True, minus_log=None):
+    def _derivs(self, order, order_dim, minus_log):
+        return self.derivatives.derivs(
+            data=self.data,
+            order=order,
+            norm=False,
+            minus_log=minus_log,
+            order_dim=order_dim,
+        )
+
+    def derivs(self, order=None, order_dim="order", minus_log=None, norm=False):
         if minus_log is None:
             minus_log = self.minus_log
         if order is None:
             order = self.order
-        return self.coefs.xcoefs(
-            self.data,
-            order=order,
-            order_dim=order_dim,
-            norm=norm,
-            minus_log=minus_log,
+        out = self._derivs(order=order, order_dim=order_dim, minus_log=minus_log)
+        if norm:
+            out = out * taylor_series_norm(order, order_dim)
+        return out
+
+    def coefs(self, order=None, order_dim="order", minus_log=None):
+        return self.derivs(
+            order=order, order_dim=order_dim, minus_log=minus_log, norm=True
         )
 
     def __call__(self, *args, **kwargs):
@@ -310,26 +446,39 @@ class ExtrapModel(object):
         cumsum=False,
         minus_log=None,
         alpha_name=None,
+        dalpha_coords="dalpha",
+        alpha0_coords=True,
     ):
+        """
+        Calculate taylor series at values "alpha"
+
+        """
         if order is None:
             order = self.order
 
         if alpha_name is None:
             alpha_name = self.alpha_name
 
-        xcoefs = self.xcoefs(
-            order=order, order_dim=order_dim, norm=True, minus_log=minus_log
-        )
+        coefs = self.coefs(order=order, order_dim=order_dim, minus_log=minus_log)
 
         alpha = xrwrap_alpha(alpha, name=alpha_name)
         dalpha = alpha - self.alpha0
         p = xr.DataArray(np.arange(order + 1), dims=order_dim)
         prefac = dalpha ** p
 
-        # TODO : this should be an option, same for xcoefs
-        coords = {"dalpha": dalpha, alpha_name + "0": self.alpha0}
+        # TODO : this should be an option, same for derivs
+        coords = {}
+        if dalpha_coords is not None:
+            coords[dalpha_coords] = dalpha
 
-        out = (prefac * xcoefs.sel(**{order_dim: prefac[order_dim]})).assign_coords(
+        if alpha0_coords:
+            if not isinstance(alpha0_coords, str):
+                alpha0_coords = alpha_name + "0"
+            coords[alpha0_coords] = self.alpha0
+
+        # coords = {"dalpha": dalpha, alpha_name + "0": self.alpha0}
+
+        out = (prefac * coefs.sel(**{order_dim: prefac[order_dim]})).assign_coords(
             **coords
         )
 
@@ -344,7 +493,7 @@ class ExtrapModel(object):
         return self.__class__(
             order=self.order,
             alpha0=self.alpha0,
-            coefs=self.coefs,
+            derivatives=self.derivatives,
             data=self.data.resample(nrep=nrep, indices=indices, **kws),
             minus_log=self.minus_log,
             alpha_name=self.alpha_name,
@@ -641,7 +790,7 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
 
 class InterpModel(StateCollection):
     @gcached(prop=False)
-    def xcoefs(self, order=None, order_dim="porder", minus_log=None):
+    def coefs(self, order=None, order_dim="porder", minus_log=None):
 
         if order is None:
             order = self.order
@@ -684,7 +833,10 @@ class InterpModel(StateCollection):
         )
 
         coefs = xr.concat(
-            [m.xcoefs(order, norm=False, minus_log=minus_log) for m in self.states],
+            [
+                m.derivs(order, norm=False, minus_log=minus_log, order_dim="order")
+                for m in self.states
+            ],
             dim="state",
         )
         if isinstance(coefs, xr.Dataset):
@@ -703,15 +855,15 @@ class InterpModel(StateCollection):
         if alpha_name is None:
             alpha_name = self.alpha_name
 
-        xcoefs = self.xcoefs(order=order, order_dim=order_dim, minus_log=minus_log)
+        coefs = self.coefs(order=order, order_dim=order_dim, minus_log=minus_log)
         alpha = xrwrap_alpha(alpha, name=alpha_name)
 
-        porder = len(xcoefs[order_dim]) - 1
+        porder = len(coefs[order_dim]) - 1
 
         p = xr.DataArray(np.arange(porder + 1), dims=order_dim)
         prefac = alpha ** p
 
-        out = (prefac * xcoefs).sum(order_dim)
+        out = (prefac * coefs).sum(order_dim)
         return out
 
 
