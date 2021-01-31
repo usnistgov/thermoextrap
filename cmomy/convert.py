@@ -17,26 +17,23 @@ def _central_to_raw_moments(central, raw):
     order = central.shape[1] - 1
 
     for v in range(nv):
-        c = central[v]
-        r = raw[v]
+        ave = central[v, 1]
 
-        ave = c[1]
-
-        r[0] = c[0]
-        r[1] = ave
+        raw[v, 0] = central[v, 0]
+        raw[v, 1] = ave
 
         for n in range(2, order + 1):
             tmp = 0.0
             ave_i = 1.0
             for i in range(0, n - 1):
-                tmp += c[n - i] * ave_i * _bfac[n, i]
+                tmp += central[v, n - i] * ave_i * _bfac[n, i]
                 ave_i *= ave
 
             # last two
             # <dx> = 0 so skip i = n-1
             # i = n
             tmp += ave_i * ave
-            r[n] = tmp
+            raw[v, n] = tmp
 
 
 @myjit
@@ -45,19 +42,16 @@ def _raw_to_central_moments(raw, central):
     order = central.shape[1] - 1
 
     for v in range(nv):
-        c = central[v]
-        r = raw[v]
+        ave = raw[v, 1]
 
-        ave = r[1]
-
-        c[0] = r[0]
-        c[1] = ave
+        central[v, 0] = raw[v, 0]
+        central[v, 1] = ave
 
         for n in range(2, order + 1):
             tmp = 0.0
             ave_i = 1.0
             for i in range(0, n - 1):
-                tmp += r[n - i] * ave_i * _bfac[n, i]
+                tmp += raw[v, n - i] * ave_i * _bfac[n, i]
                 ave_i *= -ave
 
             # last two
@@ -67,7 +61,7 @@ def _raw_to_central_moments(raw, central):
             # i = n
             # 1 * (-ave) * ave_i
             tmp += ave * ave_i * (n - 1)
-            c[n] = tmp
+            central[v, n] = tmp
 
 
 # comoments
@@ -78,17 +72,14 @@ def _central_to_raw_comoments(central, raw):
     order1 = central.shape[2] - 1
 
     for v in range(nv):
-        c = central[v]
-        r = raw[v]
-
-        ave0 = c[1, 0]
-        ave1 = c[0, 1]
+        ave0 = central[v, 1, 0]
+        ave1 = central[v, 0, 1]
 
         for n in range(0, order0 + 1):
             for m in range(0, order1 + 1):
                 nm = n + m
                 if nm <= 1:
-                    r[n, m] = c[n, m]
+                    raw[v, n, m] = central[v, n, m]
                 else:
                     tmp = 0.0
                     ave_i = 1.0
@@ -104,7 +95,7 @@ def _central_to_raw_comoments(central, raw):
                                 pass
                             else:
                                 tmp += (
-                                    c[n - i, m - j]
+                                    central[v, n - i, m - j]
                                     * ave_i
                                     * ave_j
                                     * _bfac[n, i]
@@ -112,7 +103,7 @@ def _central_to_raw_comoments(central, raw):
                                 )
                             ave_j *= ave1
                         ave_i *= ave0
-                    r[n, m] = tmp
+                    raw[v, n, m] = tmp
 
 
 @myjit
@@ -122,17 +113,14 @@ def _raw_to_central_comoments(raw, central):
     order1 = central.shape[2] - 1
 
     for v in range(nv):
-        c = central[v]
-        r = raw[v]
-
-        ave0 = r[1, 0]
-        ave1 = r[0, 1]
+        ave0 = raw[v, 1, 0]
+        ave1 = raw[v, 0, 1]
 
         for n in range(0, order0 + 1):
             for m in range(0, order1 + 1):
                 nm = n + m
                 if nm <= 1:
-                    c[n, m] = r[n, m]
+                    central[v, n, m] = raw[v, n, m]
                 else:
                     tmp = 0.0
                     ave_i = 1.0
@@ -145,7 +133,7 @@ def _raw_to_central_comoments(raw, central):
                                 tmp += ave_i * ave_j
                             else:
                                 tmp += (
-                                    r[n - i, m - j]
+                                    raw[v, n - i, m - j]
                                     * ave_i
                                     * ave_j
                                     * _bfac[n, i]
@@ -153,7 +141,7 @@ def _raw_to_central_comoments(raw, central):
                                 )
                             ave_j *= -ave1
                         ave_i *= -ave0
-                    c[n, m] = tmp
+                    central[v, n, m] = tmp
 
 
 def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=None):
@@ -181,17 +169,20 @@ def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=
         data_r = data
         out_r = out
 
-    shape = data_r.shape[: -len(axis)]
-    if shape == ():
-        reshape = (1,) + data_r.shape[-len(axis) :]
+    shape = data_r.shape
+    mom_shape = shape[-len(axis) :]
+    val_shape = shape[: -len(axis)]
+
+    if val_shape == ():
+        reshape = (1,) + mom_shape
     else:
-        reshape = (np.prod(shape),) + data_r.shape[-len(axis) :]
+        reshape = (np.prod(val_shape),) + mom_shape
 
     data_r = data_r.reshape(reshape)
     out_r = out_r.reshape(reshape)
 
     func(data_r, out_r)
-    return out
+    return out_r.reshape(shape)
 
 
 def to_raw_moments(x, axis=-1, dtype=None, order=None, out=None):

@@ -255,8 +255,10 @@ class CentralMoments(object):
         if data.ndim < self.mom_ndim:
             raise ValueError("not enough dimensions in data")
 
-        self._data = data
+        # if not data.flags['C_CONTIGUOUS']:
+        #     raise ValueError('data must be c contiguous')
 
+        self._data = data
         # check moments make sense
         # skip this as it comes from array shape
         # if not all([x > 0 for x in self.mom]):
