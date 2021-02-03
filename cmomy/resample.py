@@ -190,7 +190,7 @@ def resample_data(
     outr.fill(0.0)
     resample(datar, freq, outr)
 
-    return out
+    return outr.reshape(out.shape)
 
 
 def resample_vals(
@@ -283,7 +283,7 @@ def resample_vals(
     else:
         resample(wr, xr, freq, outr)
 
-    return out
+    return outr.reshape(out.shape)
 
 
 def bootstrap_confidence_interval(
