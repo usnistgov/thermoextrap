@@ -244,7 +244,6 @@ class CentralMoments(object):
     )
 
     def __init__(self, data, mom_ndim=1):
-
         if mom_ndim not in (1, 2):
             raise ValueError(
                 "mom_ndim must be either 1 (for central moments)"
@@ -382,7 +381,14 @@ class CentralMoments(object):
     # SECTION: top level creation/copy/new
     ###########################################################################
     def new_like(
-        self, data=None, verify=False, check=False, copy=False, copy_kws=None, **kws
+        self,
+        data=None,
+        copy=False,
+        copy_kws=None,
+        verify=True,
+        check_shape=True,
+        strict=False,
+        **kws,
     ):
         """create new object like self, with new data
 
@@ -399,34 +405,46 @@ class CentralMoments(object):
         copy_kws : dict, optional
             key-word arguments to `self.data.copy`
         **kws : extra arguments
-            arguments to `type(self).__init__`
+            arguments to classmethod `from_data`
         """
 
         if data is None:
-            data = np.zeros_like(self._data)
-        else:
-            if verify:
-                data = np.asarray(data, dtype=self.dtype)
+            data = np.zeros_like(self._data, order="c")
+            copy = verify = check_shape = False
 
-            if check:
-                assert data.shape == self.shape
+        kws.setdefault("mom_ndim", self.mom_ndim)
 
-            if copy:
-                if copy_kws is None:
-                    copy_kws = {}
-                data = data.copy(**copy_kws)
-        return type(self)(data=data, mom_ndim=self.mom_ndim, **kws)
+        if strict:
+            kws = dict(
+                dict(
+                    mom=self.mom,
+                    val_shape=self.val_shape,
+                    dtype=self.dtype,
+                ),
+                **kws,
+            )
 
-    def zeros_like(self, zeros_kws=None, **kws):
+        return type(self).from_data(
+            data=data,
+            copy=copy,
+            copy_kws=copy_kws,
+            verify=verify,
+            check_shape=check_shape,
+            **kws,
+        )
+
+    def zeros_like(self):
         """create new object empty object like self"""
-        if zeros_kws is None:
-            zeros_kws = {}
-        return self.new_like(data=np.zeros_like(self._data, **zeros_kws), **kws)
+        return self.new_like()
 
     def copy(self, **copy_kws):
         """create a new object with copy of data"""
         return self.new_like(
-            data=self.values, verify=False, check=False, copy=True, copy_kws=copy_kws
+            data=self.values,
+            verify=False,
+            check_shape=False,
+            copy=True,
+            copy_kws=copy_kws,
         )
 
     @classmethod
@@ -437,7 +455,6 @@ class CentralMoments(object):
         mom_ndim=None,
         shape=None,
         dtype=None,
-        zeros_kws=None,
         **kws,
     ):
         """create a new base object
@@ -458,10 +475,9 @@ class CentralMoments(object):
             number of variables.
             if pass `shape`, then must pass mom_ndim
         dtype : nunpy dtype, default=float
-        zeros_kws : dict
-        extra arguments to `np.zeros`
-        kws : dict
-            extra arguments to `__init__`
+
+        **kws : dict
+            extra arguments to cls.from_data
 
         Returns
         -------
@@ -471,9 +487,6 @@ class CentralMoments(object):
         -----
         the resulting total shape of data is shape + (mom + 1)
         """
-
-        if zeros_kws is None:
-            zeros_kws = {}
 
         if shape is None:
             assert mom is not None
@@ -492,14 +505,10 @@ class CentralMoments(object):
         else:
             assert mom_ndim is not None
 
-        if dtype is None:
-            dtype = np.float
+        data = np.zeros(shape=shape, dtype=dtype, order="c")
 
-        if zeros_kws is None:
-            zeros_kws = {}
-        data = np.zeros(shape=shape, dtype=dtype, **zeros_kws)
-
-        return cls(data=data, mom_ndim=mom_ndim, **kws)
+        kws = dict(kws, verify=False, copy=False, check_shape=False)
+        return cls.from_data(data=data, mom_ndim=mom_ndim, **kws)
 
     ###########################################################################
     # SECTION: Access to underlying statistics
@@ -999,8 +1008,9 @@ class CentralMoments(object):
         copy=True,
         copy_kws=None,
         verify=True,
+        check_shape=True,
         dtype=None,
-        **kws,
+        # **kws,
     ):
         """
         create new object with additional checks
@@ -1012,21 +1022,26 @@ class CentralMoments(object):
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
         if verify:
-            data = np.asarray(data, dtype=dtype)
+            data_verified = np.asarray(data, dtype=dtype, order="c")
+        else:
+            data_verified = data
 
-        if val_shape is None:
-            val_shape = data.shape[:-mom_ndim]
-        mom = cls._check_mom(mom, mom_ndim, data.shape)
+        if check_shape:
+            if val_shape is None:
+                val_shape = data_verified.shape[:-mom_ndim]
+            mom = cls._check_mom(mom, mom_ndim, data_verified.shape)
 
-        if data.shape != val_shape + tuple(x + 1 for x in mom):
-            raise ValueError(f"{data.shape} does not conform to {val_shape} and {mom}")
+            if data_verified.shape != val_shape + tuple(x + 1 for x in mom):
+                raise ValueError(
+                    f"{data.shape} does not conform to {val_shape} and {mom}"
+                )
 
-        if copy:
+        if copy and data_verified is data:
             if copy_kws is None:
                 copy_kws = {}
-            data = data.copy(**copy_kws)
+            data_verified = data_verified.copy(**copy_kws)
 
-        return cls(data=data, mom_ndim=mom_ndim, **kws)
+        return cls(data=data_verified, mom_ndim=mom_ndim)
 
     @classmethod
     def from_datas(
@@ -1038,6 +1053,7 @@ class CentralMoments(object):
         val_shape=None,
         dtype=None,
         verify=True,
+        check_shape=True,
         **kws,
     ):
         """
@@ -1053,12 +1069,12 @@ class CentralMoments(object):
         if verify:
             datas = np.asarray(datas, dtype=dtype)
         datas, axis = cls._datas_axis_to_first(datas, axis, mom_ndim)
+        if check_shape:
+            if val_shape is None:
+                val_shape = datas.shape[1:-mom_ndim]
 
-        if val_shape is None:
-            val_shape = datas.shape[1:-mom_ndim]
-
-        mom = cls._check_mom(mom, mom_ndim, datas.shape)
-        assert datas.shape[1:] == val_shape + tuple(x + 1 for x in mom)
+            mom = cls._check_mom(mom, mom_ndim, datas.shape)
+            assert datas.shape[1:] == val_shape + tuple(x + 1 for x in mom)
 
         if dtype is None:
             dtype = datas.dtype
@@ -1133,13 +1149,33 @@ class CentralMoments(object):
             **resample_kws,
             broadcast=broadcast,
         )
-        return cls.from_data(data, mom_ndim=mom_ndim, copy=False, **kws)
+        return cls.from_data(
+            data,
+            mom_ndim=mom_ndim,
+            mom=mom,
+            verify=True,
+            check_shape=True,
+            copy=False,
+            **kws,
+        )
 
     @classmethod
-    def from_raw(cls, raw, mom_ndim=None, mom=None, val_shape=None, dtype=None, **kws):
+    def from_raw(
+        cls,
+        raw,
+        mom_ndim=None,
+        mom=None,
+        val_shape=None,
+        dtype=None,
+        convert_kws=None,
+        **kws,
+    ):
         """create object from raw
 
         must specify either `mom_ndim` or `mom`
+
+        kws : dict
+        extra arguments to from_data
         """
 
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
@@ -1148,7 +1184,13 @@ class CentralMoments(object):
             func = convert.to_central_moments
         elif mom_ndim == 2:
             func = convert.to_central_comoments
-        data = func(raw)
+
+        if convert_kws is None:
+            convert_kws = {}
+
+        data = func(raw, dtype=dtype, **convert_kws)
+
+        kws = dict(dict(verify=True, check_shape=True), **kws)
 
         return cls.from_data(
             data,
@@ -1162,7 +1204,15 @@ class CentralMoments(object):
 
     @classmethod
     def from_raws(
-        cls, raws, mom_ndim=None, mom=None, axis=0, val_shape=None, dtype=None, **kws
+        cls,
+        raws,
+        mom_ndim=None,
+        mom=None,
+        axis=0,
+        val_shape=None,
+        dtype=None,
+        convert_kws=None,
+        **kws,
     ):
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
@@ -1170,7 +1220,11 @@ class CentralMoments(object):
             func = convert.to_central_moments
         elif mom_ndim == 2:
             func = convert.to_central_comoments
-        datas = func(raws)
+
+        if convert_kws is None:
+            convert_kws = {}
+        datas = func(raws, dtype=dtype, **convert_kws)
+
         return cls.from_datas(
             datas=datas,
             axis=axis,
@@ -1223,9 +1277,7 @@ class CentralMoments(object):
             flags to `numba.njit`
         resample_kws : dict
             extra arguments to `cmomy.resample.resample_and_reduce`
-        args : tuple
-            extra positional arguments to from_data method
-        kwargs : dict
+        kws : dict
             extra key-word arguments to from_data method
         """
         self._raise_if_scalar()
@@ -1268,7 +1320,15 @@ class CentralMoments(object):
             axis = 0
 
         out = np.take(data, indices, axis=axis)
-        return type(self)(data=out, mom_ndim=self.mom_ndim, **kws)
+
+        return type(self).from_data(
+            data=out,
+            mom_ndim=self.mom_ndim,
+            mom=self.mom,
+            copy=False,
+            verify=True,
+            **kws,
+        )
 
     def reduce(self, axis=0, **kws):
         """
@@ -1329,9 +1389,22 @@ class CentralMoments(object):
         self._raise_if_scalar()
         new_shape = shape + self.mom_shape
         data = self._data.reshape(new_shape)
-        return self.new_like(
-            data=data, verify=False, check=False, copy=copy, copy_kws=copy_kws, **kws
+
+        return type(self).from_data(
+            data=data,
+            mom_ndim=self.mom_ndim,
+            mom=self.mom,
+            val_shape=None,
+            copy=copy,
+            copy_kws=copy_kws,
+            verify=True,
+            check_shape=True,
+            dtype=self.dtype,
+            **kws,
         )
+        # return self.new_like(
+        #     data=data, verify=False, check=False, copy=copy, copy_kws=copy_kws, **kws
+        # )
 
     def moveaxis(self, source, destination, copy=True, copy_kws=None, **kws):
         """

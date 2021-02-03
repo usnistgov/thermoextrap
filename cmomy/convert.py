@@ -169,6 +169,9 @@ def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=
         data_r = data
         out_r = out
 
+    # make sure out_r is in correct order
+    out_r = np.asarray(out_r, order="c")
+
     shape = data_r.shape
     mom_shape = shape[-len(axis) :]
     val_shape = shape[: -len(axis)]

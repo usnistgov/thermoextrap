@@ -169,7 +169,10 @@ def resample_data(
     out_shape = (nrep,) + data.shape[1:]
     if out is None:
         out = np.empty(out_shape, dtype=dtype)
-    assert out.shape == out_shape
+    else:
+        assert out.shape == out_shape
+        # make sure out is in correct order
+        out = np.asarray(out, dtype=dtype, order="c")
 
     # resahpe
     if shape == ():
@@ -260,7 +263,9 @@ def resample_vals(
     out_shape = (nrep,) + shape + mom_shape
     if out is None:
         out = np.empty(out_shape, dtype=dtype)
-    assert out.shape == out_shape
+    else:
+        assert out.shape == out_shape
+        out = np.asarray(out, dtype=dtype, order="c")
 
     # reshape
     if shape == ():
