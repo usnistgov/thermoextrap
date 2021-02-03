@@ -10,7 +10,7 @@ from .central import CentralMoments
 
 
 def compile_numba_funcs():
-    dtype = np.float
+    dtype = float
     for val_shape in [(), (1,), (1, 1)]:
         for mom in [(1,), (1, 1)]:
             s = CentralMoments.zeros(val_shape=val_shape, mom=mom)

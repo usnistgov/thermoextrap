@@ -37,7 +37,7 @@ def _binom(n, k):
         return 0.0
 
 
-def factory_binomial(order, dtype=np.float):
+def factory_binomial(order, dtype=float):
     out = np.zeros((order + 1, order + 1), dtype=dtype)
     for n in range(order + 1):
         for k in range(order + 1):

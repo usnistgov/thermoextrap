@@ -493,7 +493,7 @@ class CentralMoments(object):
             assert mom_ndim is not None
 
         if dtype is None:
-            dtype = np.float
+            dtype = float
 
         if zeros_kws is None:
             zeros_kws = {}
