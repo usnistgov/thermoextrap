@@ -1301,6 +1301,7 @@ class DataCentralMoments(DataCentralMomentsBase):
                 raw.loc[{umom_dim: 0, xmom_dim: 0}] = w
             # make sure in correct order
             raw = raw.transpose(..., xmom_dim, umom_dim)
+            # raw.data = np.ascontiguousarray(raw.data)
         else:
             if axis is None:
                 axis = -1
@@ -1324,6 +1325,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             raw[..., 1, :] = xu
             if w is not None:
                 raw[..., 0, 0] = w
+            # raw = np.ascontiguousarray(raw)
 
         return cls.from_raw(
             raw=raw,
