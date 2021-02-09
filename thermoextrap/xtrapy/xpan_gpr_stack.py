@@ -388,6 +388,8 @@ class GPRModel:
             #    natgrad.minimize(gp[i].training_loss, [variational_params[i]])
             adam.minimize(tot_loss, trainable_params)
 
+        return self
+
     def predict(self, alpha, order=None, unstack=False, drop_order=True):
 
         if order is None:
