@@ -10,14 +10,6 @@ import numpy as np
 import xarray as xr
 from scipy import stats
 
-# try:
-#     import matplotlib.pyplot as plt
-# except ImportError:
-#     print(
-#         "Could not find matplotlib - plotting will fail, so ensure that all"
-#         " doPlot options are set to False, which is the default."
-#     )
-
 
 def window(seq, n=2):
     "Returns a sliding window (of width n) over data from the iterable"
@@ -33,12 +25,13 @@ def window(seq, n=2):
 
 def relative_fluctuations(da, dim):
     """
-    Calculate relative fluctuations (std / |mean|) of DataArray
+    Calculate relative mean and relative error of DataArray along dimension
     """
+    ave = da.mean(dim)
+    err = da.std(dim) / np.abs(ave)
+    err = err.where(~np.isinf(err))
 
-    out = da.std(dim) / np.abs(da.mean(dim))
-    out = out.where(~np.isinf(out))
-    return out
+    return ave, err
 
 
 def test_relative_fluctuations(
@@ -61,7 +54,7 @@ def test_relative_fluctuations(
     alpha_name = model.alpha_name
     alphas_states_dim = f"_{alpha_name}_states"
 
-    err_rel = model.predict(alphas, **predict_kws).pipe(
+    ave, err_rel = model.predict(alphas, **predict_kws).pipe(
         relative_fluctuations, dim=reduce_dim
     )
 
@@ -71,7 +64,7 @@ def test_relative_fluctuations(
         err_rel = err_rel.max(dims=max_dims)
 
     # collect info before reduce err_rel below
-    info = {"alpha0": model.alpha0, "err": err_rel}
+    info = {"alpha0": model.alpha0, "err": err_rel, "ave": ave}
 
     # only consider values > tol
     err_rel = err_rel.where(err_rel > tol, drop=True)
@@ -109,6 +102,7 @@ def train_iterative(
     tol=0.003,
     alpha_tol=0.01,
     callback=None,
+    callback_kws=None,
 ):
     """
     add states to satisfy some tolerance.
@@ -153,15 +147,17 @@ def train_iterative(
     alpha_tol : float, default=0.01
         new states must have `abs(alpha_new - alpha) > alpha_tol` for all existing states.
     callback : callable
-        stop = callback(model, alphas, info_dict).
+        stop = callback(model, alphas, info_dict, **callback_kws).
         If callback returns something that evaluates True, then the iteration stops.
-        `model` is the current model.
-        `alphas` is the sequence of alphas
-        `info_dict` dictionary containing
-        `info_dict['alpha0']` the alpha0 values in the model
-        `info_dict['err']` the normalized error in the model
-        `info_dict['depth']` the depth of interation
-
+        * model : current model.
+        * alphas : sequence of alphas
+        * info_dict : dictionary containing current estimate information
+        * info_dict['alpha0'] : alpha0 values in the model
+        * info_dict['err'] : relative error in the model
+        * info_dict['ave'] : average estimate of the model
+        * info_dict['depth'] : depth of interation
+    callback_kws : dict, optional
+        extra arguments to `callback`
 
 
     Returns
@@ -179,6 +175,8 @@ def train_iterative(
         statecollection_kws = {}
     if predict_kws is None:
         predict_kws = {}
+    if callback is not None and callback_kws is None:
+        callback_kws = {}
 
     if states is None:
         states = [
@@ -207,11 +205,12 @@ def train_iterative(
         )
 
         info_dict["depth"] = depth
+        info.append(info_dict)
+
         if callback is not None:
-            if callback(model, alphas, info_dict):
+            if callback(model, alphas, info_dict, **callback_kws):
                 break
 
-        info.append(info_dict)
         if alpha_new is not None:
             state_new = factory_state(alpha_new, **state_kws)
             states = sorted(states + [state_new], key=lambda x: x.alpha0)
@@ -239,6 +238,7 @@ def train_recursive(
     tol=0.003,
     alpha_tol=0.01,
     callback=None,
+    callback_kws=None,
 ):
     """
     add states to satisfy some tolerance.
@@ -286,7 +286,7 @@ def train_recursive(
     alpha_tol : float, default=0.01
         new states must have `abs(alpha_new - alpha) > alpha_tol` for all existing states.
     callback : callable
-        stop = callback(model, alphas, info_dict).
+        stop = callback(model, alphas, info_dict, **callback_kws).
         If callback returns something that evaluates True, then the iteration stops.
         `model` is the current model.
         `alphas` is the sequence of alphas
@@ -294,6 +294,8 @@ def train_recursive(
         `info_dict['alpha0']` the alpha0 values in the model
         `info_dict['err']` the normalized error in the model
         `info_dict['depth']` the depth of interation
+    callback_kws : dict, optional
+        extra arguments to `callback`
 
 
     Returns
@@ -324,6 +326,8 @@ def train_recursive(
         statecollection_kws = {}
     if predict_kws is None:
         predict_kws = {}
+    if callback is not None and callback_kws is None:
+        callback_kws = {}
 
     def get_state(alpha, states):
         states_dict = {s.alpha0: s for s in states}
@@ -355,9 +359,10 @@ def train_recursive(
     )
 
     info_dict["depth"] = depth
+    info = info + [info_dict]
 
     if callback is not None:
-        if callback(model, alphas, info_dict):
+        if callback(model, alphas, info_dict, **callback_kws):
             alpha_new = None
 
     if alpha_new is not None:
@@ -382,6 +387,7 @@ def train_recursive(
             tol=tol,
             alpha_tol=alpha_tol,
             callback=callback,
+            callback_kws=callback_kws,
         )
 
         alphas_right = alphas[(alpha_new <= alphas) & (alphas <= alpha1)]
@@ -403,6 +409,7 @@ def train_recursive(
             tol=tol,
             alpha_tol=alpha_tol,
             callback=callback,
+            callback_kws=callback_kws,
         )
 
     else:
@@ -482,3 +489,138 @@ def check_polynomial_consistency(
                 ps[key] = p
 
     return ps, models
+
+
+# Utility functions for Examples/testing
+# need a function to create states
+def factory_state_idealgas(
+    beta,
+    order,
+    nrep=100,
+    rep_dim="rep",
+    seed_from_beta=True,
+    nconfig=10_000,
+    npart=1_000,
+):
+    """
+    Example factory function to create single state.
+
+    This particular state function returns the a `beta` extrapolation model for the position
+    of an ideal gas particle in an external field.
+
+    This can be as complicated as you want.  It just needs to return a state at the given value of alpha.
+    It also should have a dimension with the same name as `reduce_dim` below
+    Here, that dimension is 'rep', the resampled/replicated dimension
+
+    Extra arguments can be passed via the state_kws dictionary
+
+    Parameters
+    ----------
+    seed_from_beta : bool, default=True
+        If `True`, then set np.random.seed based on beta value.
+        For testing purposes
+
+    See Also
+    --------
+    thermoextrap.xtrapy.idealgas
+    thermoextrap.xtrapy.xpan_beta.factory_extrapmodel
+    """
+
+    import thermoextrap.xtrapy.idealgas as idealgas
+    import thermoextrap.xtrapy.xpan_beta as xpan_beta
+
+    # NOTE: this is for reproducable results.
+    if seed_from_beta:
+        np.random.seed(int(beta * 1000))
+
+    xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
+    data = xpan_beta.DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
+
+    # use indices for reproducability
+    nrec = len(xdata)
+    indices = np.random.choice(nrec, (nrep, nrec))
+    return xpan_beta.factory_extrapmodel(beta=beta, data=data).resample(
+        indices=indices, rep_dim=rep_dim
+    )
+
+
+def callback_plot_progress(
+    model, alphas, info_dict, verbose=True, maxdepth_stop=None, ax=None
+):
+    """
+    The callback function is called each iteration after model is created
+
+    Optionally, it can return value `True` to stop iteration
+
+
+    Parameters
+    ----------
+    verbose : bool, default=True
+    maxdepth_stop : int, optional
+        Note that this is redundant with `maxdepth`, but for demostration
+        purposes
+    ax : matplotlib axes, optional
+    """
+
+    import matplotlib.pyplot as plt
+
+    import thermoextrap.xtrapy.idealgas as idealgas
+
+    if verbose:
+        print("depth:", info_dict["depth"])
+        print("alphas:", model.alpha0)
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    pred = info_dict["ave"]
+    pred.plot(ax=ax)
+
+    # absolute:
+    idealgas.x_ave(pred.beta).plot(ls=":", color="k", ax=ax)
+
+    alpha_new = info_dict.get("alpha_new", None)
+    if alpha_new is not None:
+        if verbose:
+            print("alpha_new:", alpha_new)
+        ax.axvline(x=alpha_new, ls=":")
+    plt.show()
+
+    # demo of coding in stop criteria
+    if maxdepth_stop is not None:
+        stop = info_dict["depth"] > maxdepth_stop
+        if stop and verbose:
+            print("reached maxdepth_stop in callback")
+    else:
+        stop = False
+    return stop
+
+
+def plot_polynomial_consistency(alphas, states, factory_statecollection):
+
+    import matplotlib.pyplot as plt
+
+    P, models_dict = check_polynomial_consistency(states, factory_statecollection)
+
+    hit = set()
+    for (key0, key1), p in P.items():
+        print(
+            "range0: {} range1:{} p01: {}".format(
+                *map(lambda x: np.round(x, 3), [key0, key1, p.values])
+            )
+        )
+
+        lb = min(k[0] for k in (key0, key1))
+        ub = max(k[1] for k in (key0, key1))
+
+        alphas_lim = alphas[(lb <= alphas) & (alphas <= ub)]
+
+        for key in key0, key1:
+            if key not in hit:
+                models_dict[key].predict(alphas_lim).mean("rep").plot(
+                    label=str(np.round(key, 3))
+                )
+                hit.add(key)
+
+    plt.legend()
+    return P, models_dict
