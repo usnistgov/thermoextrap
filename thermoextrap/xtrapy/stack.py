@@ -385,16 +385,16 @@ class StackedDerivatives:
         cls,
         derivs,
         x_dims,
-        reduce_dim,
+        reduce_dim="rep",
         reduce_funcs=None,
-        alpha_name="alpha",
+        reduce_kws=None,
+        concat_dim=None,
+        concat_kws=None,
+        # alpha_name="alpha",
         y_dims=None,
         xstack_dim="xstack",
         ystack_dim="ystack",
         policy="infer",
-        concat_dim=None,
-        concat_kws=None,
-        reduce_kws=None,
     ):
         """
         Create object from DataArray of derivatives
@@ -403,7 +403,7 @@ class StackedDerivatives:
         ----------
         derivs : DataArray
             DataArray containing derivative information
-        reduce_dim : str
+        reduce_dim : str, default='rep'
             dimension to reduce along
         reduce_funcs : list of callables or str
             Functions applied to `derivs` to calculate statistics.
@@ -449,12 +449,78 @@ class StackedDerivatives:
             policy=policy,
         )
 
-    # @classmethod
-    # def from_statescollection_derivs(cls,
-    #                                  statescollection,
-    #                                  funcs=None,
+    @classmethod
+    def from_states(
+        cls,
+        states,
+        x_dims,
+        resample=True,
+        resample_kws=None,
+        map_func="derivs",
+        map_kws=None,
+        reduce_dim="rep",
+        reduce_funcs=None,
+        reduce_kws=None,
+        concat_dim=None,
+        concat_kws=None,
+        # alpha_name=None,
+        y_dims=None,
+        xstack_dim="xstack",
+        ystack_dim="ystack",
+        policy="infer",
+    ):
+        """
+        create data object for StateCollection or list of states
 
-    #                                  )
+        Parameter
+        ---------
+        states : StateCollection of sequence of states
+            If sequence of states, `states = StateCollection(states)`
+        x_dims : sequence of strings
+            Note that if `resample` is `True`, then `x_dims` should reflect the dimensions
+            of the resampled data
+        resample : bool, default=False
+            If `True`, then `states = states.resample(**resample_kws)`
+        resample_kws : dict, optional
+            key word arguments to `states.resample`
+        map_func : callable or str, default='deriv
+            Set derivatives by `derivs = states.map_concat(map_func, **map_kws)`
+        map_kws : dict, optional
+            keyword arguments to `states.map_concat`
+
+
+        See also
+        --------
+        `StackedDerivatives.from_derivs`
+        """
+
+        from .models import StateCollection
+
+        if not isinstance(states, StateCollection):
+            states = StateCollection(states)
+
+        if resample:
+            if resample_kws is None:
+                resample_kws = {}
+            states = states.resample(**resample_kws)
+
+        if map_kws is None:
+            map_kws = {}
+        derivs = states.map_concat(map_func, **map_kws)
+
+        return cls.from_derivs(
+            derivs=derivs,
+            x_dims=x_dims,
+            reduce_dim=reduce_dim,
+            reduce_funcs=reduce_funcs,
+            reduce_kws=reduce_kws,
+            concat_dim=concat_dim,
+            concat_kws=concat_kws,
+            y_dims=y_dims,
+            xstack_dim=xstack_dim,
+            ystack_dim=ystack_dim,
+            policy=policy,
+        )
 
 
 class GPRData(StateCollection):
