@@ -233,6 +233,10 @@ class AbstractData(ABC):
 
     @property
     def xalpha(self):
+        """Whether X has explicit dependence on `alpha`
+
+        That is, if `self.deriv_dim` is not `None`
+        """
         return self.deriv_dim is not None
 
 
