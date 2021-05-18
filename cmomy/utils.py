@@ -37,7 +37,7 @@ def _binom(n, k):
         return 0.0
 
 
-def factory_binomial(order, dtype=np.float):
+def factory_binomial(order, dtype=float):
     out = np.zeros((order + 1, order + 1), dtype=dtype)
     for n in range(order + 1):
         for k in range(order + 1):
@@ -144,7 +144,7 @@ def _xr_order_like(template, *others):
         key_map = {dim: i for i, dim in enumerate(dims)}
 
         def key(x):
-            key_map[x]
+            return key_map[x]
 
         out = []
         for other in others:
