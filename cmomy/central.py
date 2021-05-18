@@ -265,6 +265,9 @@ class CentralMoments(object):
 
         self._data_flat = self._data.reshape(self.shape_flat)
 
+        if any(m <= 0 for m in self.mom):
+            raise ValueError("moments must be positive")
+
         # setup pushers
         vec = len(self.val_shape) > 0
         cov = self.mom_ndim == 2
