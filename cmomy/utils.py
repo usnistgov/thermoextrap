@@ -144,7 +144,7 @@ def _xr_order_like(template, *others):
         key_map = {dim: i for i, dim in enumerate(dims)}
 
         def key(x):
-            key_map[x]
+            return key_map[x]
 
         out = []
         for other in others:
