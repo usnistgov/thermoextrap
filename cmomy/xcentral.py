@@ -291,7 +291,8 @@ def _optional_wrap_data(
             coords=coords,
             attrs=attrs,
             name=name,
-            indexes=indexes,
+            # skip this option.  Breaks with some versions of xarray
+            # indexes=indexes,
         )
 
     # if verify_mom_dims:
@@ -1123,7 +1124,7 @@ class xCentralMoments(central.CentralMoments):
             axis=axis,
             val_shape=val_shape,
             dtype=dtype,
-            convert_kws=convert_kws ** kws,
+            convert_kws=convert_kws**kws,
         )
 
     @classmethod
