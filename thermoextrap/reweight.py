@@ -83,9 +83,9 @@ class PerturbModel:
             mbarObj = mbar.MBAR(np.array([refB * U]), [U.shape[0]])
             predictVals = np.zeros((len(B), x.shape[1]))
             for i in range(len(B)):
-                predictVals[i, :] = mbarObj.computeMultipleExpectations(x.T, B[i] * U)[
-                    0
-                ]
+                predictVals[i, :] = mbarObj.compute_multiple_expectations(
+                    x.T, B[i] * U
+                )[0]
 
         else:
             # Compute what goes in the exponent and subtract out the maximum
@@ -218,6 +218,8 @@ class MBARModel(InterpModel):
         x = np.reshape(self.x, (self.x.shape[0] * self.x.shape[1], self.x.shape[2]))
 
         for i in range(len(B)):
-            predictVals[i, :] = params.computeMultipleExpectations(x.T, B[i] * allU)[0]
+            predictVals[i, :] = params.compute_multiple_expectations(x.T, B[i] * allU)[
+                0
+            ]
 
         return predictVals
