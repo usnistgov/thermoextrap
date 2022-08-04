@@ -829,7 +829,12 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
 
     em = LogAvgExtrapModelDependent(order, beta0, xData=x, uData=u)
 
+    # test coefs
+    a = em.params
+
+    #                                              use false here because defined above
     # by passign a derivative name, we are
+    # set minus_log here, so expressions will have log part in them
     xem = xpan_beta.factory_extrapmodel(
         beta0,
         minus_log=True,
@@ -837,14 +842,23 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
-
-    # test coefs
-    a = em.params
-    b = xem.derivatives.derivs(xem.data, minus_log=True, norm=False)
+    b = xem.derivatives.derivs(xem.data, minus_log=False, norm=False)
     np.testing.assert_allclose(a, b)
-
     # test prediction
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
+
+    # alternatively, define without minus_log, then call with minus_log later
+    xem = xpan_beta.factory_extrapmodel(
+        beta0,
+        minus_log=False,
+        data=xpan_beta.factory_data(
+            uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
+        ),
+    )
+    b = xem.derivatives.derivs(xem.data, minus_log=True, norm=False)
+    np.testing.assert_allclose(a, b)
+    # test prediction
+    np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
 
 
 def test_extrapmodel_alphadep_minuslog(fixture):

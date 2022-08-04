@@ -66,6 +66,28 @@ class du_func(sp.Function):
         return out
 
 
+class u_func_central(sp.Function):
+    """
+    energy function
+    """
+
+    nargs = 1
+    u = _get_default_indexed("u")
+
+    def fdiff(self, argindex=1):
+        (beta,) = self.args
+        out = -du_func(beta, 2)
+        return out
+
+    @classmethod
+    def eval(cls, beta):
+        if beta is None:
+            return cls.u
+        else:
+            out = None
+        return out
+
+
 class dxdu_func(sp.Function):
     """
     dxdu_func(beta, n, d) = <du**n * (x^(d) - <x^(d)>)> = dxdu[n, d]
@@ -203,14 +225,56 @@ class xu_func(sp.Function):
         return out
 
 
+# class SymDerivBeta(object):
+#     """
+#     provide expressions for d^n <x> / d(beta)^n
+#     """
+
+#     beta = _get_default_symbol("beta")
+
+#     def __init__(self, xalpha=False, central=False, expand=True):
+#         if central:
+#             if xalpha:
+#                 x = x_central_func(self.beta, 0)
+#                 args = [x.x1_indexed]
+#             else:
+#                 x = x_central_func(self.beta)
+#                 args = [x.x1_symbol]
+#             args += _get_default_indexed("du", "dxdu")
+
+#         else:
+#             if xalpha:
+#                 x = xu_func(self.beta, 0, 0)
+#             else:
+#                 x = xu_func(self.beta, 0)
+#             args = _get_default_indexed("u", "xu")
+
+#         self.xave = x
+#         self.args = args
+#         self.expand = expand
+
+#     @gcached(prop=False)
+#     def __getitem__(self, order):
+#         if order == 0:
+#             out = self.xave
+#         else:
+#             out = self[order - 1].diff(self.beta, 1)
+#             if self.expand:
+#                 out = out.expand()
+#         return out
+
+
 class SymDerivBeta(object):
     """
     provide expressions for d^n <x> / d(beta)^n
+
+    includes ability to use -ln(<x>) directly
+
     """
 
     beta = _get_default_symbol("beta")
 
-    def __init__(self, xalpha=False, central=False, expand=True):
+    def __init__(self, xalpha=False, central=False, expand=True, minus_log=False):
         if central:
             if xalpha:
                 x = x_central_func(self.beta, 0)
@@ -226,6 +290,9 @@ class SymDerivBeta(object):
             else:
                 x = xu_func(self.beta, 0)
             args = _get_default_indexed("u", "xu")
+
+        if minus_log:
+            x = -sp.log(x)
 
         self.xave = x
         self.args = args
@@ -315,7 +382,7 @@ def factory_data(
 
 
 @lru_cache(5)
-def factory_derivatives(xalpha=False, central=False):
+def factory_derivatives(xalpha=False, central=False, minus_log=False):
     """
     factory function to provide derivative function for expansion
 
@@ -331,9 +398,12 @@ def factory_derivatives(xalpha=False, central=False):
     derivatives : Derivatives object used to calculate taylor series coefficients
     """
 
-    derivs = SymDerivBeta(xalpha=xalpha, central=central)
+    derivs = SymDerivBeta(xalpha=xalpha, central=central, minus_log=minus_log)
     exprs = SymSubs(
-        derivs, subs_all={derivs.beta: "None"}, expand=False, simplify=False
+        derivs,
+        subs_all={derivs.beta: "None"},
+        expand=False,
+        simplify=False,
     )
     return Derivatives.from_sympy(exprs, args=derivs.args)
 
@@ -389,13 +459,15 @@ def factory_extrapmodel(
     assert central == data.central
     assert order <= data.order
 
-    derivatives = factory_derivatives(xalpha=xalpha, central=central)
+    derivatives = factory_derivatives(
+        xalpha=xalpha, central=central, minus_log=minus_log
+    )
     return ExtrapModel(
         alpha0=beta,
         data=data,
         derivatives=derivatives,
         order=order,
-        minus_log=minus_log,
+        # minus_log=minus_log,
         alpha_name=alpha_name,
     )
 
