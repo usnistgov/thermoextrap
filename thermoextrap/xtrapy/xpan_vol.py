@@ -104,6 +104,7 @@ class DataValuesVolume(DataValues):
         chunk=None,
         compute=None,
         build_aves_kws=None,
+        x_is_u=None,
     ):
 
         for k in ["volume", "dxdqv"]:
@@ -125,6 +126,7 @@ class DataValuesVolume(DataValues):
             build_aves_kws=build_aves_kws,
             # meta data:
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @gcached()
