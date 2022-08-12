@@ -185,9 +185,10 @@ class Derivatives:
         Mostly for debuggin purposes.
     """
 
-    def __init__(self, funcs, exprs=None):
+    def __init__(self, funcs, exprs=None, args=None):
         self.funcs = funcs
         self.exprs = exprs
+        self.args = args
 
     def _apply_minus_log(self, X, order):
         func = factory_minus_log()
@@ -292,7 +293,7 @@ class Derivatives:
     @classmethod
     def from_sympy(cls, exprs, args):
         funcs = Lambdify(exprs, args=args)
-        return cls(funcs=funcs, exprs=exprs)
+        return cls(funcs=funcs, exprs=exprs, args=args)
 
 
 @lru_cache(10)
@@ -464,7 +465,7 @@ class ExtrapModel(object):
         alpha = xrwrap_alpha(alpha, name=alpha_name)
         dalpha = alpha - self.alpha0
         p = xr.DataArray(np.arange(order + 1), dims=order_dim)
-        prefac = dalpha ** p
+        prefac = dalpha**p
 
         # TODO : this should be an option, same for derivs
         coords = {}
@@ -650,7 +651,7 @@ class StateCollection(object):
 
 
 def xr_weights_minkowski(deltas, m=20, dim="state"):
-    deltas_m = deltas ** m
+    deltas_m = deltas**m
     return 1.0 - deltas_m / deltas_m.sum(dim)
 
 
@@ -861,7 +862,7 @@ class InterpModel(StateCollection):
         porder = len(coefs[order_dim]) - 1
 
         p = xr.DataArray(np.arange(porder + 1), dims=order_dim)
-        prefac = alpha ** p
+        prefac = alpha**p
 
         out = (prefac * coefs).sum(order_dim)
         return out

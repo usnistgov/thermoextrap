@@ -25,6 +25,9 @@ from .models import (
     _get_default_symbol,
 )
 
+# from cmomy.options import set_options
+
+
 ##############################################################################
 # recursive deriatives for beta expansion
 ###############################################################################
@@ -47,6 +50,11 @@ class du_func(sp.Function):
 
     nargs = 2
     du = _get_default_indexed("du")
+
+    @classmethod
+    def deriv_args(cls):
+        """list of arguments to function evaluation"""
+        return [cls.du]
 
     def fdiff(self, argindex=1):
         beta, n = self.args
@@ -72,7 +80,11 @@ class u_func_central(sp.Function):
     """
 
     nargs = 1
-    u = _get_default_indexed("u")
+    u = _get_default_symbol("u")
+
+    @classmethod
+    def deriv_args(cls):
+        return [cls.u] + du_func.deriv_args()
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
@@ -88,78 +100,158 @@ class u_func_central(sp.Function):
         return out
 
 
-class dxdu_func(sp.Function):
+class dxdu_func_nobeta(sp.Function):
     """
-    dxdu_func(beta, n, d) = <du**n * (x^(d) - <x^(d)>)> = dxdu[n, d]
-    or (if x != x(alpha))
-    dxdu_func(beta, n) = <du**n * (x - <x>)>
+    for use when x is not a funciton of beta
+    dxdu_func_nobeta(beta, n) = <du**n * dx> = dxdu[n]
     """
 
-    nargs = (2, 3)
+    nargs = 2
     dxdu = _get_default_indexed("dxdu")
 
-    def fdiff(self, argindex=1):
-        if len(self.args) == 2:
-            beta, n = self.args
-            out = (
-                -dxdu_func(beta, n + 1)
-                + n * dxdu_func(beta, n - 1) * du_func(beta, 2)
-                + dxdu_func(beta, 1) * du_func(beta, n)
-            )
+    @classmethod
+    def deriv_args(cls):
+        return du_func.deriv_args() + [cls.dxdu]
 
-        else:
-            beta, n, d = self.args
-            out = (
-                -dxdu_func(beta, n + 1, d)
-                + n * dxdu_func(beta, n - 1, d) * du_func(beta, 2)
-                + dxdu_func(beta, n, d + 1)
-                + dxdu_func(beta, 1, d) * du_func(beta, n)
-            )
+    def fdiff(self, argindex=1):
+        beta, n = self.args
+        out = (
+            -dxdu_func_nobeta(beta, n + 1)
+            + n * dxdu_func_nobeta(beta, n - 1) * du_func(beta, 2)
+            + dxdu_func_nobeta(beta, 1) * du_func(beta, n)
+        )
         return out
 
     @classmethod
-    def eval(cls, beta, n, deriv=None):
+    def eval(cls, beta, n):
         if n == 0:
             out = 0
         elif beta is None:
-            if deriv is None:
-                out = cls.dxdu[n]
-            else:
-                out = cls.dxdu[n, deriv]
+            out = cls.dxdu[n]
         else:
             out = None
-
         return out
 
 
-class x_central_func(sp.Function):
-    nargs = (1, 2)
+class dxdu_func_beta(sp.Function):
+    """
+    for use when x is a funciton of beta
+    dxdu_func(beta, n, d) = <du**n * (x^(d) - <x^(d)>)> = dxdu[n, d]
+    where x^(d) is the dth derivative of x
+    """
 
-    x1_indexed = _get_default_indexed("x1")
-    x1_symbol = _get_default_symbol("x1")
-
-    def fdiff(self, argindex=1):
-        if len(self.args) == 1:
-            (beta,) = self.args
-            return -dxdu_func(beta, 1)
-
-        else:
-            # xalpha
-            beta, d = self.args
-            out = -dxdu_func(beta, 1, d) + x_central_func(beta, d + 1)
-            return out
+    nargs = 3
+    dxdu = _get_default_indexed("dxdu")
 
     @classmethod
-    def eval(cls, beta, deriv=None):
-        if beta is None:
-            if deriv is None:
-                out = cls.x1_symbol
-            else:
-                out = cls.x1_indexed[deriv]
+    def deriv_args(cls):
+        return du_func.deriv_args() + [cls.dxdu]
+
+    def fdiff(self, argindex=1):
+        beta, n, d = self.args
+        out = (
+            -dxdu_func_beta(beta, n + 1, d)
+            + n * dxdu_func_beta(beta, n - 1, d) * du_func(beta, 2)
+            + dxdu_func_beta(beta, n, d + 1)
+            + dxdu_func_beta(beta, 1, d) * du_func(beta, n)
+        )
+        return out
+
+    @classmethod
+    def eval(cls, beta, n, deriv):
+        if n == 0:
+            out = 0
+        elif beta is None:
+            out = cls.dxdu[n, deriv]
         else:
             out = None
-
         return out
+
+
+class x_func_central_nobeta(sp.Function):
+    """
+    function for calculating <x> where x != func(beta)
+    """
+
+    nargs = 1
+    x1_symbol = _get_default_symbol("x1")
+
+    @classmethod
+    def deriv_args(cls):
+        return [cls.x1_symbol] + dxdu_func_nobeta.deriv_args()
+
+    def fdiff(self, argindex=1):
+        (beta,) = self.args
+        return -dxdu_func_nobeta(beta, 1)
+
+    @classmethod
+    def eval(cls, beta):
+        if beta is None:
+            out = cls.x1_symbol
+        else:
+            out = None
+        return out
+
+
+class x_func_central_beta(sp.Function):
+    """
+    function for calculation <x(beta)>
+    """
+
+    nargs = 2
+    x1_indexed = _get_default_indexed("x1")
+
+    @classmethod
+    def deriv_args(cls):
+        return [cls.x1_indexed] + dxdu_func_beta.deriv_args()
+
+    def fdiff(self, argindex=1):
+        # xalpha
+        beta, d = self.args
+        out = -dxdu_func_beta(beta, 1, d) + x_func_central_beta(beta, d + 1)
+        return out
+
+    @classmethod
+    def eval(cls, beta, deriv):
+        if beta is None:
+            out = cls.x1_indexed[deriv]
+        else:
+            out = None
+        return out
+
+
+# class dxdu_func_gen_nobeta(sp.Function):
+#     """
+#     Function to calculate derivs of <dx**k * du**n>
+#     """
+
+#     nargs = 3
+#     dxdu = _get_default_indexed('dxdu')
+
+#     @classmethod
+#     def deriv_args(cls):
+#         return du_func.deriv_args() + [cls.dxdu]
+
+#     def fdiff(self, argindex=1):
+#         beta, n, k = self.args
+
+#         out = (
+#             +k * dxdu_func_gen_nobeta(beta, )
+
+
+# class dx_func_nobeta(sp.Function):
+#     """
+#     funciton for calculating derivs of <dx**n>
+#     """
+#     nargs = 2
+
+#     def fdiff(self, argindex=1):
+#         beta, n = self.args
+
+#         out = (
+#             n * dx_func_nobeta(beta, n-1) * dxdu_func_nobeta(beta, 1)
+#             -dxdu_func_nobeta(beta, n)
+#         )
 
 
 ####################
@@ -172,6 +264,10 @@ class u_func(sp.Function):
 
     nargs = 2
     u = _get_default_indexed("u")
+
+    @classmethod
+    def deriv_args(cls):
+        return [cls.u]
 
     def fdiff(self, argindex=1):
         beta, n = self.args
@@ -199,6 +295,10 @@ class xu_func(sp.Function):
     nargs = (2, 3)
     xu = _get_default_indexed("xu")
 
+    @classmethod
+    def deriv_args(cls):
+        return u_func.deriv_args() + [cls.xu]
+
     def fdiff(self, argindex=1):
         if len(self.args) == 2:
             beta, n = self.args
@@ -225,45 +325,6 @@ class xu_func(sp.Function):
         return out
 
 
-# class SymDerivBeta(object):
-#     """
-#     provide expressions for d^n <x> / d(beta)^n
-#     """
-
-#     beta = _get_default_symbol("beta")
-
-#     def __init__(self, xalpha=False, central=False, expand=True):
-#         if central:
-#             if xalpha:
-#                 x = x_central_func(self.beta, 0)
-#                 args = [x.x1_indexed]
-#             else:
-#                 x = x_central_func(self.beta)
-#                 args = [x.x1_symbol]
-#             args += _get_default_indexed("du", "dxdu")
-
-#         else:
-#             if xalpha:
-#                 x = xu_func(self.beta, 0, 0)
-#             else:
-#                 x = xu_func(self.beta, 0)
-#             args = _get_default_indexed("u", "xu")
-
-#         self.xave = x
-#         self.args = args
-#         self.expand = expand
-
-#     @gcached(prop=False)
-#     def __getitem__(self, order):
-#         if order == 0:
-#             out = self.xave
-#         else:
-#             out = self[order - 1].diff(self.beta, 1)
-#             if self.expand:
-#                 out = out.expand()
-#         return out
-
-
 class SymDerivBeta(object):
     """
     provide expressions for d^n <x> / d(beta)^n
@@ -274,39 +335,215 @@ class SymDerivBeta(object):
 
     beta = _get_default_symbol("beta")
 
-    def __init__(self, xalpha=False, central=False, expand=True, minus_log=False):
+    def __init__(self, func, args=None, expand=True, minus_log=False):
+        if args is None:
+            args = func.deriv_args()
+        if minus_log:
+            self._func_orig = func
+            func = -sp.log(func)
+        self.func = func
+        self.args = args
+        self.expand = expand
+
+    @classmethod
+    def x_ave(cls, xalpha=False, central=False, expand=True, minus_log=False):
+        """
+        General method to find derivatives of <x>
+
+        Paremeters
+        ----------
+        xalapha : bool, default=False
+            If True, then x is a function of the derivative variable
+        central : bool, default=False
+            If True, work with central moments.  Otherwise, use raw moments.
+        expand : bool, default=True
+            Whether to expand expressions
+        minus_log : bool, default=False
+            wether x <- -log(<x>)
+        """
+
         if central:
             if xalpha:
-                x = x_central_func(self.beta, 0)
-                args = [x.x1_indexed]
+                func = x_func_central_beta(cls.beta, 0)
+
             else:
-                x = x_central_func(self.beta)
-                args = [x.x1_symbol]
-            args += _get_default_indexed("du", "dxdu")
+                func = x_func_central_nobeta(cls.beta)
 
         else:
             if xalpha:
-                x = xu_func(self.beta, 0, 0)
+                func = xu_func(cls.beta, 0, 0)
             else:
-                x = xu_func(self.beta, 0)
-            args = _get_default_indexed("u", "xu")
+                func = xu_func(cls.beta, 0)
 
-        if minus_log:
-            x = -sp.log(x)
+        return cls(func=func, expand=expand, minus_log=minus_log)
 
-        self.xave = x
-        self.args = args
-        self.expand = expand
+    @classmethod
+    def u_ave(cls, central=True, expand=True, minus_log=False):
+        """
+        General method to find derivatives of <u>
+        """
+
+        if central:
+            func = u_func_central(cls.beta)
+        else:
+            func = u_func(cls.beta, 1)
+
+        return cls(func=func, expand=expand, minus_log=minus_log)
+
+    @classmethod
+    def dun_ave(cls, n, expand=True, minus_log=False):
+        """
+        constructor for derivatives of  <(u - <u>)**n> = <du**n>
+        """
+        n = int(n)
+        assert n > 1
+        func = du_func(cls.beta, n)
+
+        # special case for args.
+        # for consistency between uave and dun_ave, also include u variable
+        args = u_func_central.deriv_args()
+        return cls(func=func, args=args, expand=expand, minus_log=minus_log)
+
+    @classmethod
+    def dxdun_ave(cls, n, xalpha=False, expand=True, minus_log=False, d=None):
+        """
+        constructor for derivatives of <dx * du**n>
+
+        if xalpha is True, must also specify d, which is the order of deriative on `x`
+        """
+
+        # special case for args
+        # for consistency between xave and dxdun_ave, also include x1
+
+        assert isinstance(n, int) and n > 0
+        if xalpha:
+            assert isinstance(d, int)
+            func = dxdu_func_beta(cls.beta, n, d)
+            args = x_func_central_beta.deriv_args()
+
+        else:
+            func = dxdu_func_nobeta(cls.beta, n)
+            args = x_func_central_nobeta.deriv_args()
+
+        return cls(func=func, args=args, expand=expand, minus_log=minus_log)
+
+    @classmethod
+    def un_ave(cls, n, expand=True, minus_log=False):
+        """
+        constructor for derivatives of <x> = <u**n>
+        """
+        n = int(n)
+        assert n >= 1
+
+        func = u_func(cls.beta, n)
+        return cls(func=func, expand=expand, minus_log=minus_log)
+
+    @classmethod
+    def xun_ave(cls, n, d=None, xalpha=False, expand=True, minus_log=False):
+        """
+        x = <x^(d) * u **n>.
+        """
+
+        assert isinstance(n, int) and n >= 0
+
+        if xalpha:
+            assert isinstance(d, int) and d >= 0
+            func = xu_func(cls.beta, n, d)
+        else:
+            func = xu_func(cls.beta, n)
+
+        return cls(func=func, expand=expand, minus_log=minus_log)
+
+    @classmethod
+    def from_name(
+        cls,
+        name,
+        xalpha=False,
+        central=False,
+        expand=True,
+        minus_log=False,
+        n=None,
+        d=None,
+    ):
+        """
+        create a derivative expressions indexer by name
+
+        Parameters
+        ----------
+        name : {'xave', 'uave', 'dun_ave', 'un_ave'}
+        All properties use minus_log and expand parameters.
+            * x_ave: general average of <x>(central, xalpha)
+            * u_ave: <u>(central)
+            * dun_ave: derivative of <(u - <u>)**n>(central, n)
+            * dxdun_ave: derivatives of <dx^(d) * du**n>(xalpha, n, d)
+
+            * un_ave: derivative of <u**n>(n)
+            * xun_ave: derivative of <x^(d) * u**n>(xalpha, n, [d])
+
+        xalpha : bool, default=False
+            Whether property depends on alpha (beta)
+        central : bool, default=False
+            Whether central moments expansion should be used
+        expand : bool, default=True
+            Whether expressions should be expanded
+        minus_log : bool, default=False
+            Actual functions is `-log(func)`
+        n : int, optional
+            n parameter used for dun_ave or un_ave
+        d : int, optional
+            d parameter for dxdun_ave
+        """
+
+        func = getattr(cls, name, None)
+
+        if func is None:
+            raise ValueError("{name} not found")
+
+        kws = {"expand": expand, "minus_log": minus_log}
+        if name == "x_ave":
+            kws.update(xalpha=xalpha, central=central)
+        elif name == "u_ave":
+            kws.update(central=central)
+        elif name in ["dun_ave", "un_ave"]:
+            kws.update(n=n)
+        elif name in ["dxdun_ave", "xun_ave"]:
+            kws.update(n=n, xalpha=xalpha, d=d)
+
+        return func(**kws)
 
     @gcached(prop=False)
     def __getitem__(self, order):
         if order == 0:
-            out = self.xave
+            out = self.func
         else:
             out = self[order - 1].diff(self.beta, 1)
             if self.expand:
                 out = out.expand()
         return out
+
+    # def _init_old(self, xalpha=False, central=False, expand=True, _minus_log=False):
+    #     if central:
+    #         if xalpha:
+    #             x = x_func_central(self.beta, 0)
+    #             args = [x.x1_indexed]
+    #         else:
+    #             x = x_func_central(self.beta)
+    #             args = [x.x1_symbol]
+    #         args += _get_default_indexed("du", "dxdu")
+
+    #     else:
+    #         if xalpha:
+    #             x = xu_func(self.beta, 0, 0)
+    #         else:
+    #             x = xu_func(self.beta, 0)
+    #         args = _get_default_indexed("u", "xu")
+
+    #     if minus_log:
+    #         x = -sp.log(x)
+
+    #     self.xave = x
+    #     self.args = args
+    #     self.expand = expand
 
 
 ###############################################################################
@@ -382,12 +619,15 @@ def factory_data(
 
 
 @lru_cache(5)
-def factory_derivatives(xalpha=False, central=False, minus_log=False):
+def factory_derivatives(
+    name="x_ave", n=None, d=None, xalpha=False, central=False, minus_log=False
+):
     """
     factory function to provide derivative function for expansion
 
     Parameters
     ----------
+    name : {x_ave, u_ave, dxdun_ave, dun_ave, un_ave, xun_ave}
     xalpha : bool, default=False
         whether x = func(beta) or not
     central : bool, default=False
@@ -398,7 +638,9 @@ def factory_derivatives(xalpha=False, central=False, minus_log=False):
     derivatives : Derivatives object used to calculate taylor series coefficients
     """
 
-    derivs = SymDerivBeta(xalpha=xalpha, central=central, minus_log=minus_log)
+    derivs = SymDerivBeta.from_name(
+        name=name, n=n, d=d, xalpha=xalpha, central=central, minus_log=minus_log
+    )
     exprs = SymSubs(
         derivs,
         subs_all={derivs.beta: "None"},
@@ -411,6 +653,9 @@ def factory_derivatives(xalpha=False, central=False, minus_log=False):
 def factory_extrapmodel(
     beta,
     data,
+    name="x_ave",
+    n=None,
+    d=None,
     xalpha=None,
     central=None,
     order=None,
@@ -459,15 +704,18 @@ def factory_extrapmodel(
     assert central == data.central
     assert order <= data.order
 
+    if name in ["u_ave", "un_ave", "dun_ave"]:
+        assert data.x_is_u
+
     derivatives = factory_derivatives(
-        xalpha=xalpha, central=central, minus_log=minus_log
+        name=name, n=n, d=d, xalpha=xalpha, central=central, minus_log=minus_log
     )
     return ExtrapModel(
         alpha0=beta,
         data=data,
         derivatives=derivatives,
         order=order,
-        # minus_log=minus_log,
+        # minus_log=mineus_log,
         alpha_name=alpha_name,
     )
 

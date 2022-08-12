@@ -254,6 +254,7 @@ class DataValuesBase(AbstractData):
         compute=None,
         build_aves_kws=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         Parameters
@@ -283,14 +284,18 @@ class DataValuesBase(AbstractData):
         """
 
         assert isinstance(uv, xr.DataArray)
-        assert isinstance(xv, (xr.DataArray, xr.Dataset))
+        self.x_is_u = x_is_u
+
+        if xv is not None:
+            assert isinstance(xv, (xr.DataArray, xr.Dataset))
 
         if chunk is not None:
             if isinstance(chunk, int):
                 chunk = {rec_dim: chunk}
 
             uv = uv.chunk(chunk)
-            xv = xv.chunk(chunk)
+            if xv is not None or self.x_isnot_u:
+                xv = xv.chunk(chunk)
 
         if compute is None:
             # default compute
@@ -307,7 +312,10 @@ class DataValuesBase(AbstractData):
         self.build_aves_kws = build_aves_kws
 
         self.uv = uv
+        if xv is None or self.x_is_u:
+            xv = uv
         self.xv = xv
+
         self._order = order
 
         self.chunk = chunk
@@ -318,8 +326,11 @@ class DataValuesBase(AbstractData):
         self.rec_dim = rec_dim
         self.umom_dim = umom_dim
         self.deriv_dim = deriv_dim
-
         self.meta = meta
+
+    @property
+    def x_isnot_u(self):
+        return not self.x_is_u
 
     @classmethod
     def from_vals(
@@ -337,6 +348,7 @@ class DataValuesBase(AbstractData):
         compute=None,
         build_aves_kws=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         Constructor from arrays
@@ -377,9 +389,15 @@ class DataValuesBase(AbstractData):
             val_dims = list(val_dims)
 
         uv = xrwrap_uv(uv, rec_dim=rec_dim, rep_dim=rep_dim)
-        xv = xrwrap_xv(
-            xv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=deriv_dim, val_dims=val_dims
-        )
+
+        if xv is not None:
+            xv = xrwrap_xv(
+                xv,
+                rec_dim=rec_dim,
+                rep_dim=rep_dim,
+                deriv_dim=deriv_dim,
+                val_dims=val_dims,
+            )
 
         return cls(
             uv=uv,
@@ -393,6 +411,7 @@ class DataValuesBase(AbstractData):
             compute=compute,
             build_aves_kws=build_aves_kws,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @property
@@ -462,7 +481,10 @@ class DataValuesBase(AbstractData):
         assert indices.sizes[self.rec_dim] == len(self)
 
         uv = self.uv.compute()[indices]
-        xv = self.xv.compute().isel(**{self.rec_dim: indices})
+        if self.x_isnot_u:
+            xv = self.xv.compute().isel(**{self.rec_dim: indices})
+        else:
+            xv = None
         meta = self.resample_meta(indices)
 
         return self.__class__(
@@ -477,6 +499,7 @@ class DataValuesBase(AbstractData):
             compute=compute,
             build_aves_kws=self.build_aves_kws,
             meta=meta,
+            x_is_u=self.x_is_u,
         )
 
 
@@ -660,6 +683,20 @@ def build_aves_dxdu(
         return xave, duave, dxduave
 
 
+def _xu_to_u(xu, dim="umom"):
+    """
+    for case where x = u, shift umom and add umom=0
+    """
+
+    n = xu.sizes[dim]
+
+    out = xu.assign_coords(**{dim: lambda x: x[dim] + 1}).reindex(**{dim: range(n + 1)})
+
+    # add 0th element
+    out.loc[{dim: 0}] = 1.0
+    return out
+
+
 class DataValues(DataValuesBase):
     """
     Class to hold uv/xv data
@@ -684,17 +721,21 @@ class DataValues(DataValuesBase):
         )
 
     @gcached()
-    def u(self):
-        out = self._mean()[0]
+    def xu(self):
+        out = self._mean()[1]
         if self.compute:
             out = out.compute()
         return out
 
     @gcached()
-    def xu(self):
-        out = self._mean()[1]
-        if self.compute:
-            out = out.compute()
+    def u(self):
+        if self.x_isnot_u:
+            out = self._mean()[0]
+            if self.compute:
+                out = out.compute()
+        else:
+            out = _xu_to_u(self.xu, self.umom_dim)
+
         return out
 
     @gcached()
@@ -707,7 +748,10 @@ class DataValues(DataValuesBase):
 
     @property
     def derivs_args(self):
-        return (self.u_selector, self.xu_selector)
+        if self.x_isnot_u:
+            return (self.u_selector, self.xu_selector)
+        else:
+            return (self.u_selector,)
 
 
 class DataValuesCentral(DataValuesBase):
@@ -749,17 +793,21 @@ class DataValuesCentral(DataValuesBase):
         return out
 
     @gcached()
-    def du(self):
-        out = self._mean()[1]
+    def dxdu(self):
+        out = self._mean()[2]
         if self.compute:
             out = out.compute()
         return out
 
     @gcached()
-    def dxdu(self):
-        out = self._mean()[2]
-        if self.compute:
-            out = out.compute()
+    def du(self):
+        if self.x_isnot_u:
+            out = self._mean()[1]
+            if self.compute:
+                out = out.compute()
+        else:
+            out = _xu_to_u(self.dxdu, dim=self.umom_dim)
+
         return out
 
     @gcached()
@@ -781,7 +829,10 @@ class DataValuesCentral(DataValuesBase):
 
     @property
     def derivs_args(self):
-        return (self.xave_selector, self.du_selector, self.dxdu_selector)
+        if self.x_isnot_u:
+            return (self.xave_selector, self.du_selector, self.dxdu_selector)
+        else:
+            return (self.xave_selector, self.du_selector)
 
 
 ################################################################################
@@ -797,6 +848,7 @@ class DataCentralMomentsBase(AbstractData):
         deriv_dim=None,
         central=False,
         meta=None,
+        x_is_u=False,
     ):
         """
         Data object based on central co-moments array
@@ -819,7 +871,11 @@ class DataCentralMomentsBase(AbstractData):
             if False, use raw moments
         meta : dict, optional
             extra meta data/parameters to be passed to child objects.  To be used with care.
+        x_is_u : bool, default=False
+            If `True` treat x as the same as u, and expose special methods
         """
+
+        self.x_is_u = x_is_u
 
         self.dxduave = dxduave
         self.umom_dim = umom_dim
@@ -828,6 +884,10 @@ class DataCentralMomentsBase(AbstractData):
         self.deriv_dim = deriv_dim
         self._central = central
         self.meta = meta
+
+    @property
+    def x_isnot_u(self):
+        return not self.x_is_u
 
     @property
     def central(self):
@@ -856,15 +916,19 @@ class DataCentralMomentsBase(AbstractData):
         return self.dxduave.cmom()
 
     @gcached()
-    def u(self):
-        out = self.rmom().sel(**{self.xmom_dim: 0}, drop=True)
-        if self.xalpha:
-            out = out.sel(**{self.deriv_dim: 0}, drop=True)
-        return out
-
-    @gcached()
     def xu(self):
         return self.rmom().sel(**{self.xmom_dim: 1}, drop=True)
+
+    @gcached()
+    def u(self):
+        if self.x_isnot_u:
+            out = self.rmom().sel(**{self.xmom_dim: 0}, drop=True)
+            if self.xalpha:
+                out = out.sel(**{self.deriv_dim: 0}, drop=True)
+        else:
+            out = _xu_to_u(self.xu, self.umom_dim)
+
+        return out
 
     @gcached()
     def xave(self):
@@ -873,15 +937,19 @@ class DataCentralMomentsBase(AbstractData):
         )
 
     @gcached()
-    def du(self):
-        out = self.cmom().sel(**{self.xmom_dim: 0}, drop=True)
-        if self.xalpha:
-            out = out.sel(**{self.deriv_dim: 0}, drop=True)
-        return out
-
-    @gcached()
     def dxdu(self):
         return self.cmom().sel(**{self.xmom_dim: 1}, drop=True)
+
+    @gcached()
+    def du(self):
+        if self.x_isnot_u:
+            out = self.cmom().sel(**{self.xmom_dim: 0}, drop=True)
+            if self.xalpha:
+                out = out.sel(**{self.deriv_dim: 0}, drop=True)
+        else:
+            out = _xu_to_u(self.dxdu, self.umom_dim)
+
+        return out
 
     @gcached()
     def u_selector(self):
@@ -910,11 +978,17 @@ class DataCentralMomentsBase(AbstractData):
 
     @property
     def derivs_args(self):
-        if self.central:
-            return (self.xave_selector, self.du_selector, self.dxdu_selector)
+        if self.x_isnot_u:
+            if self.central:
+                return (self.xave_selector, self.du_selector, self.dxdu_selector)
 
+            else:
+                return (self.u_selector, self.xu_selector)
         else:
-            return (self.u_selector, self.xu_selector)
+            if self.central:
+                return (self.xave_selector, self.du_selector)
+            else:
+                return (self.u_selector,)
 
 
 class DataCentralMoments(DataCentralMomentsBase):
@@ -932,6 +1006,7 @@ class DataCentralMoments(DataCentralMomentsBase):
                 deriv_dim=self.deriv_dim,
                 central=self.central,
                 meta=self.meta,
+                x_is_u=self.x_is_u,
             ),
             **kws,
         )
@@ -1041,6 +1116,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         indexes=None,
         name=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         Parameters
@@ -1074,6 +1150,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             deriv_dim=deriv_dim,
             central=central,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @classmethod
@@ -1098,12 +1175,16 @@ class DataCentralMoments(DataCentralMomentsBase):
         indexes=None,
         name=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         create DataCentralMoments object from individual (unaveraged) samples
 
         uv, xv are wrapped before execution
         """
+
+        if xv is None or x_is_u:
+            xv = uv
 
         dxduave = xcentral.xCentralMoments.from_vals(
             x=(xv, uv),
@@ -1129,6 +1210,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             deriv_dim=deriv_dim,
             central=central,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @classmethod
@@ -1149,6 +1231,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         indexes=None,
         name=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         Create DataCentralMoments object from data
@@ -1158,6 +1241,23 @@ class DataCentralMoments(DataCentralMomentsBase):
                         = < u >                           i = 0 and j = 1
                         = <(x - <x>)**i * (u - <u>)**j >  otherwise
         """
+
+        if x_is_u:
+            # convert from central moments to central co-moments
+            # out_0 = data.sel(**{umom_dim: slice(None, -1)})
+            # out_1 = data.sel(**{umom_dim: slice(1, None)})
+            data = xr.concat(
+                [
+                    (
+                        data.sel(**{umom_dim: s}).assign_coords(
+                            **{umom_dim: lambda x: range(x.sizes[umom_dim])}
+                        )
+                    )
+                    for s in [slice(None, -1), slice(1, None)]
+                ],
+                dim=xmom_dim,
+            )
+
         dxduave = xcentral.xCentralMoments.from_data(
             data=data,
             mom_ndim=2,
@@ -1179,6 +1279,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             deriv_dim=deriv_dim,
             central=central,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @classmethod
@@ -1207,6 +1308,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         resample_kws=None,
         parallel=True,
         meta=None,
+        x_is_u=False,
     ):
 
         """
@@ -1220,6 +1322,8 @@ class DataCentralMoments(DataCentralMomentsBase):
             name of repetition dimension.  This will be the rec_dim dimension of the resulting object
 
         """
+        if xv is None or x_is_u:
+            xv = uv
 
         dxduave = xcentral.xCentralMoments.from_resample_vals(
             x=(xv, uv),
@@ -1250,6 +1354,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             deriv_dim=deriv_dim,
             central=central,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @classmethod
@@ -1275,6 +1380,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         indexes=None,
         name=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         create object with <u**n>, <x * u**n> arrays
@@ -1297,6 +1403,16 @@ class DataCentralMoments(DataCentralMomentsBase):
             if `umom_axis` or `xumom_axis` is None, set to axis
             Ignored if xu is an xarray.DataArray object
         """
+
+        if xu is None or x_is_u:
+            xu, u = [
+                (
+                    u.isel(**{umom_dim: s}).assign_coords(
+                        **{umom_dim: lambda x: range(x.sizes[umom_dim])}
+                    )
+                )
+                for s in [slice(1, None), slice(None, -1)]
+            ]
 
         if isinstance(xu, xr.DataArray):
             raw = xr.concat((u, xu), dim=xmom_dim)
@@ -1346,6 +1462,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             indexes=indexes,
             name=name,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @classmethod
@@ -1373,6 +1490,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         indexes=None,
         name=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         constructor from central moments, with reduction along axis
@@ -1403,6 +1521,19 @@ class DataCentralMoments(DataCentralMomentsBase):
             Ignored if xu is an xarray.DataArray object
 
         """
+
+        if dxdu is None or x_is_u:
+            dxdu, du = [
+                (
+                    du.sel(**{umom_dim: s}).assign_coords(
+                        **{umom_dim: lambda x: range(x.sizes[umom_dim])}
+                    )
+                )
+                for s in [slice(1, None), slice(None, -1)]
+            ]
+
+        if (xave is None or x_is_u) and uave is not None:
+            xave = uave
 
         if isinstance(dxdu, xr.DataArray):
             data = xr.concat((du, dxdu), dim=xmom_dim)
@@ -1464,6 +1595,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             deriv_dim=deriv_dim,
             central=central,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
 
@@ -1482,6 +1614,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         central=False,
         from_vals_kws=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         Parameters
@@ -1511,11 +1644,17 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             extra keyword arguments.  To be used in subclasses with care.
         """
 
-        assert isinstance(uv, xr.DataArray)
-        assert isinstance(xv, xr.DataArray)
+        self.x_is_u = x_is_u
 
+        assert isinstance(uv, xr.DataArray)
         self.uv = uv
+
+        if xv is None or self.x_is_u:
+            xv = uv
+        else:
+            assert isinstance(xv, xr.DataArray)
         self.xv = xv
+
         self.w = w
 
         if from_vals_kws is None:
@@ -1544,6 +1683,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             deriv_dim=deriv_dim,
             central=central,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     @classmethod
@@ -1562,6 +1702,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         central=False,
         from_vals_kws=None,
         meta=None,
+        x_is_u=False,
     ):
         """
         Constructor from arrays
@@ -1604,9 +1745,15 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             val_dims = list(val_dims)
 
         uv = xrwrap_uv(uv, rec_dim=rec_dim, rep_dim=rep_dim)
-        xv = xrwrap_xv(
-            xv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=deriv_dim, val_dims=val_dims
-        )
+
+        if xv is not None and not x_is_u:
+            xv = xrwrap_xv(
+                xv,
+                rec_dim=rec_dim,
+                rep_dim=rep_dim,
+                deriv_dim=deriv_dim,
+                val_dims=val_dims,
+            )
 
         return cls(
             uv=uv,
@@ -1620,6 +1767,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             central=central,
             from_vals_kws=from_vals_kws,
             meta=meta,
+            x_is_u=x_is_u,
         )
 
     def new_like(self, **kws):
@@ -1636,6 +1784,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
                 deriv_dim=self.deriv_dim,
                 central=self.central,
                 meta=self.meta,
+                x_is_u=self.x_is_u,
             ),
             **kws,
         )
