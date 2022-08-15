@@ -445,6 +445,7 @@ class ExtrapModel(object):
         order=None,
         order_dim="order",
         cumsum=False,
+        no_sum=False,
         minus_log=None,
         alpha_name=None,
         dalpha_coords="dalpha",
@@ -483,7 +484,9 @@ class ExtrapModel(object):
             **coords
         )
 
-        if cumsum:
+        if no_sum:
+            pass
+        elif cumsum:
             out = out.cumsum(order_dim)
         else:
             out = out.sum(order_dim)

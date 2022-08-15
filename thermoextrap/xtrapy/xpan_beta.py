@@ -335,18 +335,29 @@ class SymDerivBeta(object):
 
     beta = _get_default_symbol("beta")
 
-    def __init__(self, func, args=None, expand=True, minus_log=False):
+    def __init__(self, func, args=None, expand=True, minus_log=False, post_func=None):
+
         if args is None:
             args = func.deriv_args()
+
         if minus_log:
-            self._func_orig = func
-            func = -sp.log(func)
+            post_func = lambda f: -sp.log(f)
+
+        func_orig = func
+        if post_func is not None:
+            func = post_func(func)
+
+        self._func_orig = func_orig
+        self._post_func = post_func
+
         self.func = func
         self.args = args
         self.expand = expand
 
     @classmethod
-    def x_ave(cls, xalpha=False, central=False, expand=True, minus_log=False):
+    def x_ave(
+        cls, xalpha=False, central=False, expand=True, minus_log=False, post_func=None
+    ):
         """
         General method to find derivatives of <x>
 
@@ -375,10 +386,10 @@ class SymDerivBeta(object):
             else:
                 func = xu_func(cls.beta, 0)
 
-        return cls(func=func, expand=expand, minus_log=minus_log)
+        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
 
     @classmethod
-    def u_ave(cls, central=True, expand=True, minus_log=False):
+    def u_ave(cls, central=True, expand=True, minus_log=False, post_func=None):
         """
         General method to find derivatives of <u>
         """
@@ -388,10 +399,10 @@ class SymDerivBeta(object):
         else:
             func = u_func(cls.beta, 1)
 
-        return cls(func=func, expand=expand, minus_log=minus_log)
+        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
 
     @classmethod
-    def dun_ave(cls, n, expand=True, minus_log=False):
+    def dun_ave(cls, n, expand=True, minus_log=False, post_func=None):
         """
         constructor for derivatives of  <(u - <u>)**n> = <du**n>
         """
@@ -402,10 +413,18 @@ class SymDerivBeta(object):
         # special case for args.
         # for consistency between uave and dun_ave, also include u variable
         args = u_func_central.deriv_args()
-        return cls(func=func, args=args, expand=expand, minus_log=minus_log)
+        return cls(
+            func=func,
+            args=args,
+            expand=expand,
+            minus_log=minus_log,
+            post_func=post_func,
+        )
 
     @classmethod
-    def dxdun_ave(cls, n, xalpha=False, expand=True, minus_log=False, d=None):
+    def dxdun_ave(
+        cls, n, xalpha=False, expand=True, minus_log=False, post_func=None, d=None
+    ):
         """
         constructor for derivatives of <dx * du**n>
 
@@ -425,10 +444,16 @@ class SymDerivBeta(object):
             func = dxdu_func_nobeta(cls.beta, n)
             args = x_func_central_nobeta.deriv_args()
 
-        return cls(func=func, args=args, expand=expand, minus_log=minus_log)
+        return cls(
+            func=func,
+            args=args,
+            expand=expand,
+            minus_log=minus_log,
+            post_func=post_func,
+        )
 
     @classmethod
-    def un_ave(cls, n, expand=True, minus_log=False):
+    def un_ave(cls, n, expand=True, minus_log=False, post_func=None):
         """
         constructor for derivatives of <x> = <u**n>
         """
@@ -436,10 +461,12 @@ class SymDerivBeta(object):
         assert n >= 1
 
         func = u_func(cls.beta, n)
-        return cls(func=func, expand=expand, minus_log=minus_log)
+        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
 
     @classmethod
-    def xun_ave(cls, n, d=None, xalpha=False, expand=True, minus_log=False):
+    def xun_ave(
+        cls, n, d=None, xalpha=False, expand=True, minus_log=False, post_func=None
+    ):
         """
         x = <x^(d) * u **n>.
         """
@@ -452,7 +479,7 @@ class SymDerivBeta(object):
         else:
             func = xu_func(cls.beta, n)
 
-        return cls(func=func, expand=expand, minus_log=minus_log)
+        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
 
     @classmethod
     def from_name(
@@ -462,6 +489,7 @@ class SymDerivBeta(object):
         central=False,
         expand=True,
         minus_log=False,
+        post_func=None,
         n=None,
         d=None,
     ):
@@ -499,7 +527,7 @@ class SymDerivBeta(object):
         if func is None:
             raise ValueError("{name} not found")
 
-        kws = {"expand": expand, "minus_log": minus_log}
+        kws = {"expand": expand, "minus_log": minus_log, "post_func": post_func}
         if name == "x_ave":
             kws.update(xalpha=xalpha, central=central)
         elif name == "u_ave":
@@ -620,7 +648,13 @@ def factory_data(
 
 @lru_cache(5)
 def factory_derivatives(
-    name="x_ave", n=None, d=None, xalpha=False, central=False, minus_log=False
+    name="x_ave",
+    n=None,
+    d=None,
+    xalpha=False,
+    central=False,
+    minus_log=False,
+    post_func=None,
 ):
     """
     factory function to provide derivative function for expansion
@@ -639,7 +673,13 @@ def factory_derivatives(
     """
 
     derivs = SymDerivBeta.from_name(
-        name=name, n=n, d=d, xalpha=xalpha, central=central, minus_log=minus_log
+        name=name,
+        n=n,
+        d=d,
+        xalpha=xalpha,
+        central=central,
+        minus_log=minus_log,
+        post_func=post_func,
     )
     exprs = SymSubs(
         derivs,
@@ -661,6 +701,8 @@ def factory_extrapmodel(
     order=None,
     minus_log=False,
     alpha_name="beta",
+    derivatives=None,
+    derivatives_kws=None,
 ):
     """
     factory function to create Extrapolation model for beta expansion
@@ -704,12 +746,21 @@ def factory_extrapmodel(
     assert central == data.central
     assert order <= data.order
 
-    if name in ["u_ave", "un_ave", "dun_ave"]:
-        assert data.x_is_u
+    if derivatives is None:
+        if name in ["u_ave", "un_ave", "dun_ave"]:
+            assert data.x_is_u
 
-    derivatives = factory_derivatives(
-        name=name, n=n, d=d, xalpha=xalpha, central=central, minus_log=minus_log
-    )
+        if derivatives_kws is None:
+            derivatives_kws = {}
+        derivatives = factory_derivatives(
+            name=name,
+            n=n,
+            d=d,
+            xalpha=xalpha,
+            central=central,
+            minus_log=minus_log,
+            **derivatives_kws
+        )
     return ExtrapModel(
         alpha0=beta,
         data=data,
