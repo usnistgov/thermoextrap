@@ -86,7 +86,7 @@ def test_extrapmodel_ig():
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=False, minus_log=False)
+    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=False)
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
     ex_res = ex.resample(nrep=100)
@@ -435,8 +435,8 @@ def test_interpmodel_polynomial():
             order=1, xv=xdat2, uv=udat2, central=True
         )
 
-        ex1 = xpan_beta.factory_extrapmodel(-1.0, dat1, xalpha=False, minus_log=False)
-        ex2 = xpan_beta.factory_extrapmodel(1.0, dat2, xalpha=False, minus_log=False)
+        ex1 = xpan_beta.factory_extrapmodel(-1.0, dat1, xalpha=False)
+        ex2 = xpan_beta.factory_extrapmodel(1.0, dat2, xalpha=False)
         interp = xtrapy_models.InterpModel([ex1, ex2])
         check_array = np.zeros(4)
         check_array[i + 1] = 1.0
@@ -520,15 +520,19 @@ def test_extrapmodel_minuslog_slow(fixture):
         xData=x,
         uData=u,
     )
-
-    xem = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, minus_log=True)
+    a = em.params
 
     # test coefs
-    a = em.params
+    xem = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
+    b = xem.derivatives.derivs(xem.data, norm=False, minus_log=False)
+    np.testing.assert_allclose(a, b)
+    np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
+
+    # or passing minus_log to predict
+    xem = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, post_func=None)
     b = xem.derivatives.derivs(xem.data, norm=False, minus_log=True)
     np.testing.assert_allclose(a, b)
-
-    np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
+    np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
 
 
 def test_extrapmodel_minuslog_slow(fixture):
@@ -536,7 +540,7 @@ def test_extrapmodel_minuslog_slow(fixture):
     betas = [0.2, 0.3]
     u, x, order = fixture.u, fixture.x, fixture.order
 
-    xem0 = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, minus_log=True)
+    xem0 = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
 
     for data in [
         fixture.cdata,
@@ -546,7 +550,7 @@ def test_extrapmodel_minuslog_slow(fixture):
         fixture.xrdata_val,
     ]:
         xem1 = xpan_beta.factory_extrapmodel(
-            beta=fixture.beta0, data=fixture.cdata, minus_log=True
+            beta=fixture.beta0, data=fixture.cdata, post_func="minus_log"
         )
         fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
@@ -566,7 +570,9 @@ def test_extrapmodel_minuslog_ig():
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=False, minus_log=True)
+    ex = xpan_beta.factory_extrapmodel(
+        ref_beta, dat, xalpha=False, post_func="minus_log"
+    )
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
     ex_res = ex.resample(nrep=100)
@@ -730,7 +736,7 @@ def test_extrapmodel_alphadep_ig():
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=True, minus_log=False)
+    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=True)
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
     ex_res = ex.resample(nrep=100)
@@ -837,20 +843,21 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
     # set minus_log here, so expressions will have log part in them
     xem = xpan_beta.factory_extrapmodel(
         beta0,
-        minus_log=True,
+        post_func="minus_log",
         data=xpan_beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
     b = xem.derivatives.derivs(xem.data, minus_log=False, norm=False)
     np.testing.assert_allclose(a, b)
+
     # test prediction
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
 
     # alternatively, define without minus_log, then call with minus_log later
     xem = xpan_beta.factory_extrapmodel(
         beta0,
-        minus_log=False,
+        post_func=None,
         data=xpan_beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
@@ -876,7 +883,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     # by passign a derivative name, we are
     xem0 = xpan_beta.factory_extrapmodel(
         beta0,
-        minus_log=True,
+        post_func="minus_log",
         data=xpan_beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
@@ -884,24 +891,26 @@ def test_extrapmodel_alphadep_minuslog(fixture):
 
     xem1 = xpan_beta.factory_extrapmodel(
         beta0,
-        minus_log=True,
+        post_func=None,
         data=xpan_beta.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
-    fixture.xr_test(xem0.predict(betas), xem1.predict(betas))
+    fixture.xr_test(xem0.predict(betas), xem1.predict(betas, minus_log=True))
 
     # for central, only test up to third order
     xem1 = xpan_beta.factory_extrapmodel(
         beta0,
-        minus_log=True,
+        post_func=None,
         data=xpan_beta.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=True, deriv_dim="deriv"
         ),
     )
 
-    fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
+    fixture.xr_test(
+        xem0.predict(betas, order=3), xem1.predict(betas, order=3, minus_log=True)
+    )
 
 
 def test_extrapmodel_alphadep_minuslog_ig():
@@ -925,7 +934,9 @@ def test_extrapmodel_alphadep_minuslog_ig():
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=True, minus_log=True)
+    ex = xpan_beta.factory_extrapmodel(
+        ref_beta, dat, xalpha=True, post_func="minus_log"
+    )
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
     ex_res = ex.resample(nrep=100)
