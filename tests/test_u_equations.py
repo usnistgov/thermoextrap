@@ -30,8 +30,9 @@ def data(request):
     return data
 
 
-@pytest.fixture(params=[False, True])
-def minus_log(request):
+@pytest.fixture(params=[None, "minus_log"])
+def post_func(request):
+
     return request.param
 
 
@@ -40,12 +41,12 @@ def central(request):
     return request.param
 
 
-def test_x_ave(data, central, minus_log):
+def test_x_ave(data, central, post_func):
 
     n, subs = data.n, data.subs[central]
 
-    f0 = factory_derivatives(name="x_ave", central=central, minus_log=minus_log)
-    f1 = factory_derivatives(name="u_ave", central=central, minus_log=minus_log)
+    f0 = factory_derivatives(name="x_ave", central=central, post_func=post_func)
+    f1 = factory_derivatives(name="u_ave", central=central, post_func=post_func)
 
     for i in range(0, n + 1):
         assert f0.exprs[i].subs(subs) - f1.exprs[i] == 0

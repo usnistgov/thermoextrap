@@ -335,7 +335,7 @@ class SymDerivBeta(object):
 
     beta = _get_default_symbol("beta")
 
-    def __init__(self, func, args=None, expand=True, minus_log=False, post_func=None):
+    def __init__(self, func, args=None, expand=True, post_func=None):
         """
         Parameters
         ----------
@@ -343,8 +343,6 @@ class SymDerivBeta(object):
             Function to differentiate
         args : Sequence of arguments to func
         expand : bool
-        minus_log : bool (will be depricated)
-            Note that this has precidence over post_func
         post_func : str or callable
         function to perform on funciton.
             For example, `post_fuc = -sympy.log` is equivalent to passing `minus_log=True`
@@ -356,9 +354,6 @@ class SymDerivBeta(object):
 
         if args is None:
             args = func.deriv_args()
-
-        if minus_log:
-            post_func = lambda f: -sp.log(f)
 
         self._func_orig = func
         self._post_func = post_func
@@ -381,9 +376,7 @@ class SymDerivBeta(object):
         self.expand = expand
 
     @classmethod
-    def x_ave(
-        cls, xalpha=False, central=False, expand=True, minus_log=False, post_func=None
-    ):
+    def x_ave(cls, xalpha=False, central=False, expand=True, post_func=None):
         """
         General method to find derivatives of <x>
 
@@ -395,8 +388,6 @@ class SymDerivBeta(object):
             If True, work with central moments.  Otherwise, use raw moments.
         expand : bool, default=True
             Whether to expand expressions
-        minus_log : bool, default=False
-            wether x <- -log(<x>)
         """
 
         if central:
@@ -412,10 +403,10 @@ class SymDerivBeta(object):
             else:
                 func = xu_func(cls.beta, 0)
 
-        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
+        return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    def u_ave(cls, central=True, expand=True, minus_log=False, post_func=None):
+    def u_ave(cls, central=True, expand=True, post_func=None):
         """
         General method to find derivatives of <u>
         """
@@ -425,10 +416,10 @@ class SymDerivBeta(object):
         else:
             func = u_func(cls.beta, 1)
 
-        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
+        return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    def dun_ave(cls, n, expand=True, minus_log=False, post_func=None):
+    def dun_ave(cls, n, expand=True, post_func=None):
         """
         constructor for derivatives of  <(u - <u>)**n> = <du**n>
         """
@@ -443,14 +434,11 @@ class SymDerivBeta(object):
             func=func,
             args=args,
             expand=expand,
-            minus_log=minus_log,
             post_func=post_func,
         )
 
     @classmethod
-    def dxdun_ave(
-        cls, n, xalpha=False, expand=True, minus_log=False, post_func=None, d=None
-    ):
+    def dxdun_ave(cls, n, xalpha=False, expand=True, post_func=None, d=None):
         """
         constructor for derivatives of <dx * du**n>
 
@@ -474,12 +462,11 @@ class SymDerivBeta(object):
             func=func,
             args=args,
             expand=expand,
-            minus_log=minus_log,
             post_func=post_func,
         )
 
     @classmethod
-    def un_ave(cls, n, expand=True, minus_log=False, post_func=None):
+    def un_ave(cls, n, expand=True, post_func=None):
         """
         constructor for derivatives of <x> = <u**n>
         """
@@ -487,12 +474,10 @@ class SymDerivBeta(object):
         assert n >= 1
 
         func = u_func(cls.beta, n)
-        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
+        return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    def xun_ave(
-        cls, n, d=None, xalpha=False, expand=True, minus_log=False, post_func=None
-    ):
+    def xun_ave(cls, n, d=None, xalpha=False, expand=True, post_func=None):
         """
         x = <x^(d) * u **n>.
         """
@@ -505,7 +490,7 @@ class SymDerivBeta(object):
         else:
             func = xu_func(cls.beta, n)
 
-        return cls(func=func, expand=expand, minus_log=minus_log, post_func=post_func)
+        return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
     def from_name(
@@ -514,7 +499,6 @@ class SymDerivBeta(object):
         xalpha=False,
         central=False,
         expand=True,
-        minus_log=False,
         post_func=None,
         n=None,
         d=None,
@@ -525,7 +509,7 @@ class SymDerivBeta(object):
         Parameters
         ----------
         name : {'xave', 'uave', 'dun_ave', 'un_ave'}
-        All properties use minus_log and expand parameters.
+        All properties use post_func and expand parameters.
             * x_ave: general average of <x>(central, xalpha)
             * u_ave: <u>(central)
             * dun_ave: derivative of <(u - <u>)**n>(central, n)
@@ -540,8 +524,6 @@ class SymDerivBeta(object):
             Whether central moments expansion should be used
         expand : bool, default=True
             Whether expressions should be expanded
-        minus_log : bool, default=False
-            Actual functions is `-log(func)`
         n : int, optional
             n parameter used for dun_ave or un_ave
         d : int, optional
@@ -553,7 +535,7 @@ class SymDerivBeta(object):
         if func is None:
             raise ValueError("{name} not found")
 
-        kws = {"expand": expand, "minus_log": minus_log, "post_func": post_func}
+        kws = {"expand": expand, "post_func": post_func}
         if name == "x_ave":
             kws.update(xalpha=xalpha, central=central)
         elif name == "u_ave":
@@ -679,7 +661,6 @@ def factory_derivatives(
     d=None,
     xalpha=False,
     central=False,
-    minus_log=False,
     post_func=None,
 ):
     """
@@ -692,6 +673,7 @@ def factory_derivatives(
         whether x = func(beta) or not
     central : bool, default=False
         whether to use central moments or not
+    post_func : str or callable
 
     Returns
     -------
@@ -704,7 +686,6 @@ def factory_derivatives(
         d=d,
         xalpha=xalpha,
         central=central,
-        minus_log=minus_log,
         post_func=post_func,
     )
     exprs = SymSubs(
@@ -725,9 +706,9 @@ def factory_extrapmodel(
     xalpha=None,
     central=None,
     order=None,
-    minus_log=False,
     alpha_name="beta",
     derivatives=None,
+    post_func=None,
     derivatives_kws=None,
 ):
     """
@@ -749,8 +730,8 @@ def factory_extrapmodel(
     central : bool, optional
         Whether or not to use central moments
         If not specified, infer from `data`
-    minus_log : bool, default=False
-        Wheter or not we are expanding x = -log <x>
+    post_func : str or callable
+        apply function to x.  For example, post_func = 'minus_log' or post_func = lambda x: -sympy.log(x)
     alpha_name, str, default='beta'
         name of expansion parameter
     kws : dict
@@ -784,7 +765,7 @@ def factory_extrapmodel(
             d=d,
             xalpha=xalpha,
             central=central,
-            minus_log=minus_log,
+            post_func=post_func,
             **derivatives_kws
         )
     return ExtrapModel(
