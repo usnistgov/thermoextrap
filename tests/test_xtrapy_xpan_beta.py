@@ -599,10 +599,10 @@ def test_extrapmodel_minuslog_ig():
         # Must be good way to do this, but not sure what it is
         # As long as well-control random number seed and number of samples, should work
         np.testing.assert_allclose(
-            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err * 4
         )
         np.testing.assert_allclose(
-            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err
+            true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err * 4
         )
 
 

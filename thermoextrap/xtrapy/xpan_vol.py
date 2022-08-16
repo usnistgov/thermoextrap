@@ -90,63 +90,113 @@ def factory_derivatives():
 
 
 # make a special data class
-class DataValuesVolume(DataValues):
-    def __init__(
-        self,
-        uv,
-        xv,
-        order,
-        meta,
-        rec_dim="rec",
-        umom_dim="umom",
-        deriv_dim=None,
-        skipna=False,
-        chunk=None,
-        compute=None,
-        build_aves_kws=None,
-        x_is_u=None,
-    ):
+# class DataValuesVolume(DataValues):
+#     def __init__(
+#         self,
+#         uv,
+#         xv,
+#         order,
+#         meta,
+#         rec_dim="rec",
+#         umom_dim="umom",
+#         deriv_dim=None,
+#         skipna=False,
+#         chunk=None,
+#         compute=None,
+#         build_aves_kws=None,
+#         x_is_u=None,
+#     ):
 
-        for k in ["volume", "dxdqv"]:
-            assert k in meta
+#         for k in ["volume", "dxdqv"]:
+#             assert k in meta
 
-        if "ndim" not in meta:
-            meta["ndim"] = 3
+#         if "ndim" not in meta:
+#             meta["ndim"] = 3
 
-        super(DataValuesVolume, self).__init__(
-            uv=uv,
-            xv=xv,
-            order=order,
-            skipna=skipna,
-            rec_dim=rec_dim,
-            umom_dim=umom_dim,
-            deriv_dim=deriv_dim,
-            chunk=chunk,
-            compute=compute,
-            build_aves_kws=build_aves_kws,
-            # meta data:
-            meta=meta,
-            x_is_u=x_is_u,
-        )
+#         super(DataValuesVolume, self).__init__(
+#             uv=uv,
+#             xv=xv,
+#             order=order,
+#             skipna=skipna,
+#             rec_dim=rec_dim,
+#             umom_dim=umom_dim,
+#             deriv_dim=deriv_dim,
+#             chunk=chunk,
+#             compute=compute,
+#             build_aves_kws=build_aves_kws,
+#             # meta data:
+#             meta=meta,
+#             x_is_u=x_is_u,
+#         )
 
-    @gcached()
-    def dxdq(self):
-        return self.meta["dxdqv"].mean(self.rec_dim, skipna=self.skipna)
+#     @gcached()
+#     def dxdq(self):
+#         return self.meta["dxdqv"].mean(self.rec_dim, skipna=self.skipna)
 
-    def resample_meta(self, indices):
-        # resample "other" arrays
-        out = self.meta.copy()
-        out["dxdqv"] = out["dxdqv"][indices]
-        return out
+#     def resample_meta(self, indices):
+#         # resample "other" arrays
+#         out = self.meta.copy()
+#         out["dxdqv"] = out["dxdqv"][indices]
+#         return out
+
+#     @property
+#     def derivs_args(self):
+#         return (
+#             self.u_selector,
+#             self.xu_selector,
+#             self.dxdq,
+#             self.meta["volume"],
+#             self.meta["ndim"],
+#         )
+
+
+class VolumeValsMeta:
+    """
+    object to handle callbacks of metadata
+    """
+
+    def __init__(self, volume, dxdqv, ndim=3):
+
+        self.volume = volume
+        self.dxdqv = dxdqv
+        self.ndim = ndim
 
     @property
-    def derivs_args(self):
-        return (
-            self.u_selector,
-            self.xu_selector,
-            self.dxdq,
-            self.meta["volume"],
-            self.meta["ndim"],
+    def meta(self):
+        return {
+            "meta_resample": self._meta_resample,
+            "meta_derivs_args": self._meta_derivs_args,
+            "obj": self,
+        }
+
+    def new_like(self, **kws):
+        kws = dict(
+            dict(parent=self.parent, volume=self.volume, dxdqv=self.dxdqv), **kws
+        )
+
+        return type(self)(**kws)
+
+    @gcached(prop=False)
+    def dxdq(self, rec_dim, skipna):
+        return self.dxdqv.mean(rec_dim, skipna=skipna)
+
+    # General signature is
+    # def _meta_something(self, data, meta, meta_kws, **kws): ...
+    #
+    # data: is the calling data objects
+    # meta: alternative dict of metadata
+    # meta_kws: kwargs for meta function
+    # kws : top level kwargs
+
+    def _meta_resample(self, data, indices, meta=None, meta_kws=None, **kws):
+        new = self.new_like(dxdqv=self.dxdqv[indices])
+        return new.meta
+
+    def _meta_derivs_args(self, data, deriv_args):
+        return tuple(deriv_args) + (
+            self.dxdq(data.rec_dim, data.skipna),
+            self.volume,
+            self.ndim,
         )
 
 
@@ -196,15 +246,19 @@ def factory_extrapmodel(
     dxdqv = xrwrap_xv(
         dxdqv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=None, val_dims=val_dims
     )
-    data = DataValuesVolume.from_vals(
+
+    meta_obj = VolumeValsMeta(volume=volume, dxdqv=dxdqv, ndim=ndim)
+
+    data = DataValues.from_vals(
         uv=uv,
         xv=xv,
         order=order,
-        meta=dict(
-            dxdqv=dxdqv,
-            volume=volume,
-            ndim=ndim,
-        ),
+        meta=meta_obj.meta,
+        # meta=dict(
+        #     dxdqv=dxdqv,
+        #     volume=volume,
+        #     ndim=ndim,
+        # ),
         rec_dim=rec_dim,
         rep_dim=rep_dim,
         val_dims=val_dims,
