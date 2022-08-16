@@ -5,10 +5,11 @@ Routines for beta expansion(s)
 from __future__ import absolute_import
 
 from functools import lru_cache
+from typing import Literal
 
 import sympy as sp
 
-from .cached_decorators import gcached
+# from .cached_decorators import gcached
 from .data import (  # noqa: F401
     DataCentralMoments,
     DataCentralMomentsVals,
@@ -20,6 +21,7 @@ from .models import (
     Derivatives,
     ExtrapModel,
     PerturbModel,
+    SymDerivBase,
     SymSubs,
     _get_default_indexed,
     _get_default_symbol,
@@ -220,40 +222,6 @@ class x_func_central_beta(sp.Function):
         return out
 
 
-# class dxdu_func_gen_nobeta(sp.Function):
-#     """
-#     Function to calculate derivs of <dx**k * du**n>
-#     """
-
-#     nargs = 3
-#     dxdu = _get_default_indexed('dxdu')
-
-#     @classmethod
-#     def deriv_args(cls):
-#         return du_func.deriv_args() + [cls.dxdu]
-
-#     def fdiff(self, argindex=1):
-#         beta, n, k = self.args
-
-#         out = (
-#             +k * dxdu_func_gen_nobeta(beta, )
-
-
-# class dx_func_nobeta(sp.Function):
-#     """
-#     funciton for calculating derivs of <dx**n>
-#     """
-#     nargs = 2
-
-#     def fdiff(self, argindex=1):
-#         beta, n = self.args
-
-#         out = (
-#             n * dx_func_nobeta(beta, n-1) * dxdu_func_nobeta(beta, 1)
-#             -dxdu_func_nobeta(beta, n)
-#         )
-
-
 ####################
 # raw moments
 ####################
@@ -325,7 +293,7 @@ class xu_func(sp.Function):
         return out
 
 
-class SymDerivBeta(object):
+class SymDerivBeta(SymDerivBase):
     """
     provide expressions for d^n <x> / d(beta)^n
 
@@ -335,48 +303,8 @@ class SymDerivBeta(object):
 
     beta = _get_default_symbol("beta")
 
-    def __init__(self, func, args=None, expand=True, post_func=None):
-        """
-        Parameters
-        ----------
-        func : sympy function
-            Function to differentiate
-        args : Sequence of arguments to func
-        expand : bool
-        post_func : str or callable
-        function to perform on funciton.
-            For example, `post_fuc = -sympy.log` is equivalent to passing `minus_log=True`
-            If a string, then apply the following standard functions
-
-            * minus_log : post_func = -sympy.log
-            * pow_{i} : post_func = lambda f: pow(f, i).  E.g., `pow_2` => pow(f, 2)
-        """
-
-        if args is None:
-            args = func.deriv_args()
-
-        self._func_orig = func
-        self._post_func = post_func
-
-        if post_func is not None:
-            if isinstance(post_func, str):
-                if post_func == "minus_log":
-                    post_func = lambda f: -sp.log(f)
-                elif post_func.startswith("pow_"):
-                    i = int(post_func.split("_")[-1])
-                    post_func = lambda f: pow(f, i)
-                else:
-                    raise ValueError(
-                        "post_func must be callable or in {minus_log, pow_1, pow_2, ...}"
-                    )
-            func = post_func(func)
-
-        self.func = func
-        self.args = args
-        self.expand = expand
-
     @classmethod
-    def x_ave(cls, xalpha=False, central=False, expand=True, post_func=None):
+    def x_ave(cls, xalpha=False, central=None, expand=True, post_func=None):
         """
         General method to find derivatives of <x>
 
@@ -389,6 +317,8 @@ class SymDerivBeta(object):
         expand : bool, default=True
             Whether to expand expressions
         """
+        if central is None:
+            central = False
 
         if central:
             if xalpha:
@@ -406,10 +336,12 @@ class SymDerivBeta(object):
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    def u_ave(cls, central=True, expand=True, post_func=None):
+    def u_ave(cls, central=None, expand=True, post_func=None):
         """
         General method to find derivatives of <u>
         """
+        if central is None:
+            central = False
 
         if central:
             func = u_func_central(cls.beta)
@@ -419,10 +351,14 @@ class SymDerivBeta(object):
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    def dun_ave(cls, n, expand=True, post_func=None):
+    def dun_ave(cls, n, expand=True, post_func=None, central=None):
         """
         constructor for derivatives of  <(u - <u>)**n> = <du**n>
         """
+
+        if central is not None:
+            assert central
+
         n = int(n)
         assert n > 1
         func = du_func(cls.beta, n)
@@ -438,7 +374,9 @@ class SymDerivBeta(object):
         )
 
     @classmethod
-    def dxdun_ave(cls, n, xalpha=False, expand=True, post_func=None, d=None):
+    def dxdun_ave(
+        cls, n, xalpha=False, expand=True, post_func=None, d=None, central=None
+    ):
         """
         constructor for derivatives of <dx * du**n>
 
@@ -447,6 +385,8 @@ class SymDerivBeta(object):
 
         # special case for args
         # for consistency between xave and dxdun_ave, also include x1
+        if central is not None:
+            assert central
 
         assert isinstance(n, int) and n > 0
         if xalpha:
@@ -466,10 +406,12 @@ class SymDerivBeta(object):
         )
 
     @classmethod
-    def un_ave(cls, n, expand=True, post_func=None):
+    def un_ave(cls, n, expand=True, post_func=None, central=None):
         """
         constructor for derivatives of <x> = <u**n>
         """
+        if central is not None:
+            assert not central
         n = int(n)
         assert n >= 1
 
@@ -477,10 +419,14 @@ class SymDerivBeta(object):
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    def xun_ave(cls, n, d=None, xalpha=False, expand=True, post_func=None):
+    def xun_ave(
+        cls, n, d=None, xalpha=False, expand=True, post_func=None, central=None
+    ):
         """
         x = <x^(d) * u **n>.
         """
+        if central is not None:
+            assert not central
 
         assert isinstance(n, int) and n >= 0
 
@@ -495,9 +441,11 @@ class SymDerivBeta(object):
     @classmethod
     def from_name(
         cls,
-        name,
+        name: Literal[
+            "x_ave", "u_ave", "dun_ave", "dxdun_ave", "un_ave", "xun_ave", "lnPi_energy"
+        ],
         xalpha=False,
-        central=False,
+        central=None,
         expand=True,
         post_func=None,
         n=None,
@@ -517,6 +465,7 @@ class SymDerivBeta(object):
 
             * un_ave: derivative of <u**n>(n)
             * xun_ave: derivative of <x^(d) * u**n>(xalpha, n, [d])
+            * lnPi_correction: derivatives of <lnPi - beta * mu * N>(central)
 
         xalpha : bool, default=False
             Whether property depends on alpha (beta)
@@ -535,51 +484,21 @@ class SymDerivBeta(object):
         if func is None:
             raise ValueError("{name} not found")
 
-        kws = {"expand": expand, "post_func": post_func}
+        kws = {"expand": expand, "post_func": post_func, "central": central}
         if name == "x_ave":
-            kws.update(xalpha=xalpha, central=central)
-        elif name == "u_ave":
-            kws.update(central=central)
+            kws.update(xalpha=xalpha)
+        # elif name in ["u_ave", "lnPi_correction":
+        #     kws.update(central=central)
         elif name in ["dun_ave", "un_ave"]:
             kws.update(n=n)
         elif name in ["dxdun_ave", "xun_ave"]:
             kws.update(n=n, xalpha=xalpha, d=d)
 
+        elif name == "lnPi_correction":
+            # aleady have central
+            pass
+
         return func(**kws)
-
-    @gcached(prop=False)
-    def __getitem__(self, order):
-        if order == 0:
-            out = self.func
-        else:
-            out = self[order - 1].diff(self.beta, 1)
-            if self.expand:
-                out = out.expand()
-        return out
-
-    # def _init_old(self, xalpha=False, central=False, expand=True, _minus_log=False):
-    #     if central:
-    #         if xalpha:
-    #             x = x_func_central(self.beta, 0)
-    #             args = [x.x1_indexed]
-    #         else:
-    #             x = x_func_central(self.beta)
-    #             args = [x.x1_symbol]
-    #         args += _get_default_indexed("du", "dxdu")
-
-    #     else:
-    #         if xalpha:
-    #             x = xu_func(self.beta, 0, 0)
-    #         else:
-    #             x = xu_func(self.beta, 0)
-    #         args = _get_default_indexed("u", "xu")
-
-    #     if minus_log:
-    #         x = -sp.log(x)
-
-    #     self.xave = x
-    #     self.args = args
-    #     self.expand = expand
 
 
 ###############################################################################
@@ -799,3 +718,13 @@ def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     """
     data = factory_data(uv=uv, xv=xv, order=0, central=False, **kws)
     return PerturbModel(alpha0=beta, data=data, alpha_name=alpha_name)
+
+
+# def factory_lnPi_extrapmodel(
+#         beta,
+#         data_u,
+#         name='u_ave',
+#         central=None,
+#         order=None,
+
+# ):

@@ -47,6 +47,75 @@ def _get_default_indexed(*args):
 #     return out
 
 
+class SympyDerivFuncBase(sp.Function):
+    @classmethod
+    def deriv_args(cls):
+        raise NotImplementedError("must specify in sublcass")
+
+    def fdiff(self, argindex=1):
+        raise NotImplementedError("must specify in subclass")
+
+    @classmethod
+    def eval(cls, beta):
+        raise NotImplementedError("must specify in subclass")
+
+
+class SymDerivBase(object):
+    """
+    Base class for working with recursive derivatives in expansions
+    """
+
+    def __init__(self, func, args=None, expand=True, post_func=None):
+        """
+        Parameters
+        ----------
+        func : sympy function
+            Function to differentiate
+        args : Sequence of arguments to func
+        expand : bool
+        post_func : str or callable
+        function to perform on funciton.
+            For example, `post_fuc = -sympy.log` is equivalent to passing `minus_log=True`
+            If a string, then apply the following standard functions
+
+            * minus_log : post_func = -sympy.log
+            * pow_{i} : post_func = lambda f: pow(f, i).  E.g., `pow_2` => pow(f, 2)
+        """
+
+        if args is None:
+            args = func.deriv_args()
+
+        self._func_orig = func
+        self._post_func = post_func
+
+        if post_func is not None:
+            if isinstance(post_func, str):
+                if post_func == "minus_log":
+                    post_func = lambda f: -sp.log(f)
+                elif post_func.startswith("pow_"):
+                    i = int(post_func.split("_")[-1])
+                    post_func = lambda f: pow(f, i)
+                else:
+                    raise ValueError(
+                        "post_func must be callable or in {minus_log, pow_1, pow_2, ...}"
+                    )
+            func = post_func(func)
+
+        self.func = func
+        self.args = args
+        self.expand = expand
+
+    @gcached(prop=False)
+    def __getitem__(self, order):
+        if order == 0:
+            out = self.func
+        else:
+            out = self[order - 1].diff(self.beta, 1)
+            if self.expand:
+                out = out.expand()
+        return out
+
+
 class SymSubs(object):
     def __init__(
         self,

@@ -117,7 +117,7 @@ def test_extrapmodel_ig():
         print(true_derivs[-1], test_derivs[-1])
         print(true_extrap, test_extrap)
         np.testing.assert_allclose(
-            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err
+            true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err * 5
         )
         np.testing.assert_allclose(
             true_extrap, test_extrap, rtol=0.0, atol=test_extrap_err

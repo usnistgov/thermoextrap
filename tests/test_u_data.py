@@ -42,11 +42,6 @@ def order(request):
     return request.param
 
 
-@pytest.fixture(params=[True, False])
-def central(request):
-    return request.param
-
-
 @pytest.fixture
 def data(nsamp):
     x = np.random.rand(nsamp)
@@ -57,8 +52,14 @@ def data(nsamp):
     return data
 
 
+@pytest.fixture(params=[True, False])
+def central(request):
+    return request.param
+
+
+# test all other data constructors
 @pytest.fixture
-def data_x(request, data, order, central):
+def data_x(data, order, central):
     return xpan_beta.factory_data(xv=data.u, uv=data.u, order=order, central=central)
 
 
@@ -153,5 +154,151 @@ def test_em_x_is_u(em_x_out, em_x_is_u_out):
 
 
 # # test a higher moment?
-# @pytest.fixture
-# def em_x_i
+# <u**2>, <du**2>
+# <du**2> = <u**2> - <u>**2
+
+
+@pytest.fixture
+def data_u(data, order, central):
+    return xpan_beta.factory_data(
+        xv=None, uv=data.u, order=order, central=central, x_is_u=True
+    )
+
+
+@pytest.fixture
+def em_u(data_u, central, beta):
+    return xpan_beta.factory_extrapmodel(
+        beta=beta, data=data_u, central=central, name="u_ave"
+    )
+
+
+@pytest.fixture
+def em_u_out(em_u, betas_extrap):
+    return em_u.predict(betas_extrap, cumsum=True)
+
+
+def test_data_u(em_u_out, em_x_is_u_out):
+    np.testing.assert_allclose(em_u_out, em_x_is_u_out)
+
+
+@pytest.fixture
+def data_x2(data, order, central):
+    return xpan_beta.factory_data(
+        xv=data.u**2, uv=data.u, order=order, central=central
+    )
+
+
+@pytest.fixture
+def em_x2(beta, order, central, data_x2):
+    return xpan_beta.factory_extrapmodel(
+        beta=beta, data=data_x2, order=order - 1, central=central, name="x_ave"
+    )
+
+
+@pytest.fixture
+def em_x2_out(em_x2, betas_extrap):
+    return em_x2.predict(betas_extrap, cumsum=True)
+
+
+@pytest.fixture
+def em_u2(beta, data_u, order, central):
+    if not central:
+        return xpan_beta.factory_extrapmodel(
+            beta=beta,
+            data=data_u,
+            order=order - 1,
+            central=central,
+            name="un_ave",
+            n=2,
+        )
+
+    else:
+        return None
+
+
+@pytest.fixture
+def em_u2_out(em_u2, betas_extrap, central):
+    if not central:
+        return em_u2.predict(betas_extrap, cumsum=True)
+    else:
+        return None
+
+
+def test_x2_u2(em_x2_out, em_u2_out, central):
+    if not central:
+        np.testing.assert_allclose(em_x2_out, em_u2_out)
+
+
+def test_du2_3(beta, order, data, betas_extrap):
+
+    data_u = xpan_beta.factory_data(
+        uv=data.u, xv=None, x_is_u=True, order=order, central=True
+    )
+    data_u_r = xpan_beta.factory_data(
+        uv=data.u, xv=None, x_is_u=True, order=order, central=False
+    )
+
+    em_du2 = xpan_beta.factory_extrapmodel(
+        beta=beta, data=data_u, central=True, name="dun_ave", n=2, order=order - 1
+    )
+    em_du3 = xpan_beta.factory_extrapmodel(
+        beta=beta, data=data_u, central=True, name="dun_ave", n=3, order=order - 2
+    )
+
+    em_u1 = xpan_beta.factory_extrapmodel(
+        beta=beta, data=data_u_r, central=False, name="u_ave", order=order - 1
+    )
+    em_u1_sq = xpan_beta.factory_extrapmodel(
+        beta=beta,
+        data=data_u_r,
+        central=False,
+        name="u_ave",
+        order=order - 1,
+        post_func="pow_2",
+    )
+    em_u1_cube = xpan_beta.factory_extrapmodel(
+        beta=beta,
+        data=data_u_r,
+        central=False,
+        name="u_ave",
+        order=order - 1,
+        post_func="pow_3",
+    )
+
+    em_u2 = xpan_beta.factory_extrapmodel(
+        beta=beta, data=data_u_r, central=False, name="un_ave", n=2, order=order - 1
+    )
+    em_u3 = xpan_beta.factory_extrapmodel(
+        beta=beta, data=data_u_r, central=False, name="un_ave", n=3, order=order - 2
+    )
+
+    # <du**2> = <u**2> - <u>**2
+    a = em_du2.predict(betas_extrap, cumsum=True)
+    b = em_u2.predict(betas_extrap, cumsum=True) - em_u1_sq.predict(
+        betas_extrap, cumsum=True
+    )
+
+    np.testing.assert_allclose(a, b)
+
+    # <du**3> = <u**3> - 3 * <u**2><u> + 2<u>**3
+    # need to be carful with product <u**2> * <u>
+    # <u**2> * <u>
+    o = order - (3 - 1)
+    kws = {"alpha": betas_extrap, "no_sum": True, "order": o}
+
+    t_u3 = em_u3.predict(**kws)
+    t_u2 = em_u2.predict(**kws)
+    t_u1 = em_u1.predict(**kws)
+    t_u1_cube = em_u1_cube.predict(**kws)
+
+    t_u2_u1 = (
+        (t_u2.rename(order="order_a") * t_u1.rename(order="order_b"))
+        .assign_coords(order=lambda x: x["order_a"] + x["order_b"])
+        .groupby("order")
+        .sum()
+        .reindex(order=t_u3.order)
+    )
+
+    b = (t_u3 - 3 * t_u2_u1 + 2 * t_u1_cube).cumsum("order")
+    a = em_du3.predict(betas_extrap, cumsum=True)
+    np.testing.assert_allclose(a, b)
