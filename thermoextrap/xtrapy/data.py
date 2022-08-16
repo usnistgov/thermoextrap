@@ -205,6 +205,54 @@ class DatasetSelector(object):
         return self.data.isel(**selector, drop=True)
 
 
+class MetaCallbackBase(ABC):
+    """
+    Base class for handling callbacks to adjust data.
+
+    For some cases, the default Data classes don't quite cut it.
+    For example, for volume extrapolation, extrap parameters need to
+    be included in the derivatives.  To handle this generally,
+    the Data class include `self.meta` which performs these actions.
+
+    MetaCallbackBase can be subclassed to fine tune things.
+    """
+
+    _params = ()
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def new_like(self, **kws):
+        kws_default = {k: getattr(self, k) for k in self._params}
+        kws = dict(kws_default, **kws)
+        return type(self)(**kws)
+
+    def deriv_args(self, data, derivs_args):
+        """
+        adjust derivs args from data class
+
+        should return a tuple
+        """
+        return derivs_args
+
+    def resample(self, data, meta_kws, data_kws):
+        """
+        adjust create new object
+
+        Should return new instance of class or self no change
+        """
+        return self
+
+    def block(self, data, meta_kws, data_kws):
+        return self
+
+    def reduce(self, data, meta_kws, data_kws):
+        return self
+
+
+DEFAULT_METACALLBACK = MetaCallbackBase()
+
+
 class AbstractData(ABC):
     @abstractproperty
     def order(self):
@@ -254,20 +302,20 @@ class AbstractData(ABC):
             m["meta_checker"](self, m)
         self._meta = m
 
-    def _meta_derivs_args(self, deriv_args):
-        """look for callback function of the form deriv_args = meta['meta_deriv_args'](self, deriv_args) -> tuple
+    def _meta_derivs_args(self, derivs_args):
+        """look for callback function of the form derivs_args = meta['meta_deriv_args'](self, deriv_args) -> tuple
 
         Parameters
         ----------
-        deriv_args : tuple of arguments.  These are the base arguments
+        derivs_args : tuple of arguments.  These are the base arguments
 
         Returns
         -------
-        deriv_args
+        derivs_args
         """
-        if "meta_deriv_args" in self.meta:
-            deriv_args = self.meta["meta_deriv_args"](self, deriv_args)
-        return deriv_args
+        if "meta_derivs_args" in self.meta:
+            derivs_args = self.meta["meta_derivs_args"](self, derivs_args)
+        return derivs_args
 
     def _meta_callback(self, _name__, meta=None, meta_kws=None, **kws):
         """
@@ -488,7 +536,7 @@ class DataValuesBase(AbstractData):
     def __len__(self):
         return len(self.uv[self.rec_dim])
 
-    def resample_meta(self, meta_kws=None, resample_kws=None):
+    def resample_meta(self, meta_kws=None, **kws):
         """
         incase any other values are to be considered,
         then this is where they should be resampled
@@ -498,7 +546,7 @@ class DataValuesBase(AbstractData):
         other_params : transformed version of self.other_params
         """
 
-        return self._meta_resample(meta_kws=meta_kws, resample_kws=resample_kws)
+        return self._meta_resample(meta_kws=meta_kws, **kws)
 
     def resample(
         self,
@@ -558,13 +606,11 @@ class DataValuesBase(AbstractData):
 
         meta = self.resample_meta(
             meta_kws=meta_kws,
-            resample_kws=dict(
-                indices=indices,
-                nrep=nrep,
-                rep_dim=rep_dim,
-                chunk=chunk,
-                compute=compute,
-            ),
+            indices=indices,
+            nrep=nrep,
+            rep_dim=rep_dim,
+            chunk=chunk,
+            compute=compute,
         )
 
         return self.__class__(
@@ -1238,6 +1284,7 @@ class DataCentralMoments(DataCentralMomentsBase):
                 ],
                 dim=xmom_dim,
             )
+            raw = raw.transpose(..., xmom_dim, umom_dim)
 
         dxduave = xcentral.xCentralMoments.from_raw(
             raw=raw,
@@ -1523,21 +1570,28 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
 
         if xu is None or x_is_u:
-            xu, u = [
-                (
-                    u.isel(**{umom_dim: s}).assign_coords(
-                        **{umom_dim: lambda x: range(x.sizes[umom_dim])}
-                    )
-                )
-                for s in [slice(1, None), slice(None, -1)]
-            ]
 
-        if isinstance(xu, xr.DataArray):
+            raw = u
+
+            if w is not None:
+                raw.loc[{umom_dim: 0}] = w
+            raw = raw.transpose(..., umom_dim)
+            # xu, u = [
+            #     (
+            #         u.isel(**{umom_dim: s}).assign_coords(
+            #             **{umom_dim: lambda x: range(x.sizes[umom_dim])}
+            #         )
+            #     )
+            #     for s in [slice(1, None), slice(None, -1)]
+            # ]
+
+        elif isinstance(xu, xr.DataArray):
             raw = xr.concat((u, xu), dim=xmom_dim)
             if w is not None:
                 raw.loc[{umom_dim: 0, xmom_dim: 0}] = w
             # make sure in correct order
             raw = raw.transpose(..., xmom_dim, umom_dim)
+            # return raw
             # raw.data = np.ascontiguousarray(raw.data)
         else:
             if axis is None:
