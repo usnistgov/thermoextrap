@@ -69,8 +69,8 @@ def test_raw_un(data):
     n, subs = data.n, data.subs[False]
 
     for m in range(1, n):
-        f0 = factory_derivatives(name="xun_ave", n=m, central=True)
-        f1 = factory_derivatives(name="un_ave", n=m + 1, central=True)
+        f0 = factory_derivatives(name="xun_ave", n=m, central=False)
+        f1 = factory_derivatives(name="un_ave", n=m + 1, central=False)
 
         for i in range(0, n + 1):
             assert f0.exprs[i].subs(subs) - f1.exprs[i] == 0

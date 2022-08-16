@@ -1,5 +1,4 @@
-"""
-Routines to handle data objects
+""" to handle data objects
 """
 
 
@@ -239,6 +238,66 @@ class AbstractData(ABC):
         """
         return self.deriv_dim is not None
 
+    # metheds for working with meta
+    @property
+    def meta(self):
+        return self._meta
+
+    @meta.setter
+    def meta(self, m):
+        """
+        call m['meta_checker](self, m) if avialable
+        """
+        if m is None:
+            m = {}
+        elif "meta_checker" in m:
+            m["meta_checker"](self, m)
+        self._meta = m
+
+    def _meta_derivs_args(self, deriv_args):
+        """look for callback function of the form deriv_args = meta['meta_deriv_args'](self, deriv_args) -> tuple
+
+        Parameters
+        ----------
+        deriv_args : tuple of arguments.  These are the base arguments
+
+        Returns
+        -------
+        deriv_args
+        """
+        if "meta_deriv_args" in self.meta:
+            deriv_args = self.meta["meta_deriv_args"](self, deriv_args)
+        return deriv_args
+
+    def _meta_callback(self, _name__, meta=None, meta_kws=None, **kws):
+        """
+        perform a generic callback of the form self.meta[_name__](self, meta, meta_kws, **kws)
+        """
+        if meta is None:
+            meta = self.meta
+        if _name__ in meta:
+            meta = meta[_name__](self, meta=meta, meta_kws=meta_kws, **kws)
+        return meta
+
+    def _meta_resample(self, meta=None, meta_kws=None, **kws):
+        """
+        meta resampling
+        """
+        return self._meta_callback(
+            _name__="meta_resample", meta=meta, meta_kws=meta_kws, **kws
+        )
+
+    def _meta_block(self, meta=None, meta_kws=None, **kws):
+        """meta = self.meta['meta_block](self, meta, meta_kws, **kws)"""
+        return self._meta_callback(
+            _name__="meta_block", meta=meta, meta_kws=meta_kws, **kws
+        )
+
+    def _meta_reduce(self, meta=None, meta_kws=None, **kws):
+        return self._meta_callback(
+            _name__="meta_reduce", meta=meta, meta_kws=meta_kws, **kws
+        )
+
 
 class DataValuesBase(AbstractData):
     def __init__(
@@ -280,6 +339,10 @@ class DataValuesBase(AbstractData):
             whether to perform compute step on xarray outputs
         meta : dict, optional
             extra meta data/parameters to be caried along with object and child objects.
+            if 'checker' in meta, then perform a callback of the form meta['checker](self, meta)
+            this can also be used to hotwire things like deriv_args.
+        x_is_u : bool, default=False
+            if True, treat `xv = uv` and do adjust u/du accordingly
         Values passed through method `resample_meta`
         """
 
@@ -425,7 +488,7 @@ class DataValuesBase(AbstractData):
     def __len__(self):
         return len(self.uv[self.rec_dim])
 
-    def resample_meta(self, indices):
+    def resample_meta(self, meta_kws=None, resample_kws=None):
         """
         incase any other values are to be considered,
         then this is where they should be resampled
@@ -434,10 +497,17 @@ class DataValuesBase(AbstractData):
         -------
         other_params : transformed version of self.other_params
         """
-        return self.meta
+
+        return self._meta_resample(meta_kws=meta_kws, resample_kws=resample_kws)
 
     def resample(
-        self, indices=None, nrep=None, rep_dim="rep", chunk=None, compute="None"
+        self,
+        indices=None,
+        nrep=None,
+        rep_dim="rep",
+        chunk=None,
+        compute="None",
+        meta_kws=None,
     ):
         """
         resample object
@@ -485,7 +555,17 @@ class DataValuesBase(AbstractData):
             xv = self.xv.compute().isel(**{self.rec_dim: indices})
         else:
             xv = None
-        meta = self.resample_meta(indices)
+
+        meta = self.resample_meta(
+            meta_kws=meta_kws,
+            resample_kws=dict(
+                indices=indices,
+                nrep=nrep,
+                rep_dim=rep_dim,
+                chunk=chunk,
+                compute=compute,
+            ),
+        )
 
         return self.__class__(
             uv=uv,
@@ -749,9 +829,10 @@ class DataValues(DataValuesBase):
     @property
     def derivs_args(self):
         if self.x_isnot_u:
-            return (self.u_selector, self.xu_selector)
+            out = (self.u_selector, self.xu_selector)
         else:
-            return (self.u_selector,)
+            out = (self.u_selector,)
+        return self._meta_derivs_args(out)
 
 
 class DataValuesCentral(DataValuesBase):
@@ -830,9 +911,11 @@ class DataValuesCentral(DataValuesBase):
     @property
     def derivs_args(self):
         if self.x_isnot_u:
-            return (self.xave_selector, self.du_selector, self.dxdu_selector)
+            out = (self.xave_selector, self.du_selector, self.dxdu_selector)
         else:
-            return (self.xave_selector, self.du_selector)
+            out = (self.xave_selector, self.du_selector)
+
+        return self._meta_derivs_args(out)
 
 
 ################################################################################
@@ -980,15 +1063,17 @@ class DataCentralMomentsBase(AbstractData):
     def derivs_args(self):
         if self.x_isnot_u:
             if self.central:
-                return (self.xave_selector, self.du_selector, self.dxdu_selector)
+                out = (self.xave_selector, self.du_selector, self.dxdu_selector)
 
             else:
-                return (self.u_selector, self.xu_selector)
+                out = (self.u_selector, self.xu_selector)
         else:
             if self.central:
-                return (self.xave_selector, self.du_selector)
+                out = (self.xave_selector, self.du_selector)
             else:
-                return (self.u_selector,)
+                out = (self.u_selector,)
+
+        return self._meta_derivs_args(out)
 
 
 class DataCentralMoments(DataCentralMomentsBase):
@@ -1012,7 +1097,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
         return type(self)(**kws)
 
-    def block(self, block_size, axis=None, **kwargs):
+    def block(self, block_size, axis=None, meta_kws=None, **kwargs):
         """
         block resample along axis
 
@@ -1028,11 +1113,14 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         if axis is None:
             axis = self.rec_dim
+
+        kws = dict(block_size=block_size, axis=axis, **kwargs)
         return self.new_like(
-            dxduave=self.dxduave.block(block_size=block_size, axis=axis, **kwargs)
+            dxduave=self.dxduave.block(**kws),
+            meta=self._meta_block(meta_kws=meta_kws, **kws),
         )
 
-    def reduce(self, axis=None, *args, **kwargs):
+    def reduce(self, axis=None, meta_kws=None, **kwargs):
         """
         reduce along axis
 
@@ -1043,7 +1131,12 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
         if axis is None:
             axis = self.rec_dim
-        return self.new_like(dxduave=self.dxduave.reduce(axis=axis, *args, **kwargs))
+        kws = dict(axis=axis, **kwargs)
+
+        return self.new_like(
+            dxduave=self.dxduave.reduce(**kws),
+            meta=self._meta_reduce(meta_kws=meta_kws, **kws),
+        )
 
     def resample(
         self,
@@ -1054,6 +1147,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         rep_dim="rep",
         parallel=True,
         resample_kws=None,
+        meta_kws=None,
         **kwargs,
     ):
 
@@ -1081,17 +1175,21 @@ class DataCentralMoments(DataCentralMomentsBase):
         if axis is None:
             axis = self.rec_dim
 
-        dxdu_new = self.dxduave.resample_and_reduce(
+        kws = dict(
             freq=freq,
             indices=indices,
             nrep=nrep,
             axis=axis,
             rep_dim=rep_dim,
-            resample_kws=resample_kws,
-            parallel=parallel,
+            parallel=True,
+            resample_kws=None,
             **kwargs,
         )
-        return self.new_like(dxduave=dxdu_new, rec_dim=rep_dim)
+
+        dxdu_new = self.dxduave.resample_and_reduce(**kws)
+
+        meta = self._meta_resample(meta_kws=meta_kws, **kws)
+        return self.new_like(dxduave=dxdu_new, rec_dim=rep_dim, meta=meta)
 
     # TODO : update from_raw from_data to
     # include a mom_dims arguments
@@ -1127,6 +1225,19 @@ class DataCentralMoments(DataCentralMomentsBase):
                            = <x**i * u**j>, otherwise
            The shape should be (..., 2, order+1)
         """
+
+        if x_is_u:
+            raw = xr.concat(
+                [
+                    (
+                        raw.sel(**{umom_dim: s}).assign_coords(
+                            **{umom_dim: lambda x: range(x.sizes[umom_dim])}
+                        )
+                    )
+                    for s in [slice(None, -1), slice(1, None)]
+                ],
+                dim=xmom_dim,
+            )
 
         dxduave = xcentral.xCentralMoments.from_raw(
             raw=raw,
@@ -1308,6 +1419,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         resample_kws=None,
         parallel=True,
         meta=None,
+        meta_kws=None,
         x_is_u=False,
     ):
 
@@ -1325,7 +1437,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         if xv is None or x_is_u:
             xv = uv
 
-        dxduave = xcentral.xCentralMoments.from_resample_vals(
+        kws = dict(
             x=(xv, uv),
             w=w,
             freq=freq,
@@ -1346,7 +1458,9 @@ class DataCentralMoments(DataCentralMomentsBase):
             mom_dims=(xmom_dim, umom_dim),
         )
 
-        return cls(
+        dxduave = xcentral.xCentralMoments.from_resample_vals(**kws)
+
+        out = cls(
             dxduave=dxduave,
             xmom_dim=xmom_dim,
             umom_dim=umom_dim,
@@ -1356,6 +1470,10 @@ class DataCentralMoments(DataCentralMomentsBase):
             meta=meta,
             x_is_u=x_is_u,
         )
+
+        out.meta = out._meta_resample(meta_kws=meta_kws, **kws)
+
+        return out
 
     @classmethod
     def from_ave_raw(
@@ -1802,6 +1920,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         parallel=True,
         axis=None,
         rep_dim="rep",
+        meta_kws=None,
     ):
         """
         Resample data
@@ -1810,19 +1929,25 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         if axis is None:
             axis = self.rec_dim
 
+        kws = dict(
+            indices=indices,
+            nrep=nrep,
+            freq=freq,
+            resample_kws=resample_kws,
+            parallel=True,
+            axis=axis,
+            rep_dim=rep_dim,
+        )
+
         dxduave = xcentral.xCentralMoments.from_resample_vals(
             x=(self.xv, self.uv),
             w=self.w,
-            freq=freq,
-            indices=indices,
-            nrep=nrep,
-            axis=axis,
             mom=(1, self.order),
-            parallel=parallel,
-            resample_kws=resample_kws,
             broadcast=True,
-            rep_dim=rep_dim,
             mom_dims=(self.xmom_dim, self.umom_dim),
+            **kws,
         )
 
-        return self.new_like(dxduave=dxduave, rec_dim=rep_dim)
+        meta = self._meta_resample(meta_kws=meta_kws, **kws)
+
+        return self.new_like(dxduave=dxduave, rec_dim=rep_dim, meta=meta)
