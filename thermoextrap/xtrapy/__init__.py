@@ -1,4 +1,4 @@
-from . import data, xpan_beta
+from . import data, xpan_beta, xpan_lnPi, xpan_vol
 from .data import (
     DataCentralMoments,
     DataCentralMomentsVals,
@@ -20,6 +20,8 @@ from .models import (
 __all__ = [
     data,
     xpan_beta,
+    xpan_vol,
+    xpan_lnPi,
     ExtrapModel,
     ExtrapWeightedModel,
     InterpModel,
