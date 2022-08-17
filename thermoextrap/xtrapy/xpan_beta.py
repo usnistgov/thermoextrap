@@ -579,8 +579,9 @@ def factory_derivatives(
     n=None,
     d=None,
     xalpha=False,
-    central=False,
+    central=None,
     post_func=None,
+    expand=True,
 ):
     """
     factory function to provide derivative function for expansion
@@ -590,8 +591,8 @@ def factory_derivatives(
     name : {x_ave, u_ave, dxdun_ave, dun_ave, un_ave, xun_ave}
     xalpha : bool, default=False
         whether x = func(beta) or not
-    central : bool, default=False
-        whether to use central moments or not
+    central : bool, optional
+        Defaults to the default behavior of SymDerivBeta style
     post_func : str or callable
 
     Returns
@@ -606,6 +607,7 @@ def factory_derivatives(
         xalpha=xalpha,
         central=central,
         post_func=post_func,
+        expand=expand,
     )
     exprs = SymSubs(
         derivs,

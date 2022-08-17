@@ -4,7 +4,7 @@
 
 from __future__ import absolute_import
 
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 
 import numpy as np
 import xarray as xr
@@ -204,8 +204,49 @@ class DatasetSelector(object):
         selector = dict(zip(self.dims, idx))
         return self.data.isel(**selector, drop=True)
 
+    def __repr__(self):
+        return repr(self.data)
 
-class MetaCallbackBase(ABC):
+
+class NewLikeAssignMixin(ABC):
+    @property
+    @abstractmethod
+    def param_names(self):
+        """
+        returns sequence of string names to be copied over
+        """
+        raise NotImplementedError
+
+    def new_like(self, **kws):
+        """
+        create new object with optional parameters
+        """
+        kws_default = {k: getattr(self, k) for k in self.param_names}
+        kws = dict(kws_default, **kws)
+        return type(self)(**kws)
+
+    def assign_params(self, **kws):
+        """
+        create new object with optional parameters
+
+        Same as self.new_like
+        """
+        return self.new_like(**kws)
+
+    def set_params(self, **kws):
+        """
+        set parameters of self, and retun self (for chaining)
+        """
+
+        for name in kws.keys():
+            assert hasattr(self, name)
+
+        for name, val in kws.items():
+            setattr(self, name, val)
+        return self
+
+
+class DataCallbackABC(NewLikeAssignMixin):
     """
     Base class for handling callbacks to adjust data.
 
@@ -214,59 +255,99 @@ class MetaCallbackBase(ABC):
     be included in the derivatives.  To handle this generally,
     the Data class include `self.meta` which performs these actions.
 
-    MetaCallbackBase can be subclassed to fine tune things.
+    DataCallback can be subclassed to fine tune things.
     """
 
-    _params = ()
-
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    def new_like(self, **kws):
-        kws_default = {k: getattr(self, k) for k in self._params}
-        kws = dict(kws_default, **kws)
-        return type(self)(**kws)
+    @abstractmethod
+    def check(self, data):
+        """Perform any consistency checks between self and data"""
+        pass
 
-    def deriv_args(self, data, derivs_args):
-        """
-        adjust derivs args from data class
+    @abstractmethod
+    def derivs_args(self, data, derivs_args):
+        """adjust derivs args from data class
 
         should return a tuple
         """
         return derivs_args
 
-    def resample(self, data, meta_kws, data_kws):
+    # define these to raise error instead
+    # of forcing usage.
+    def resample(self, data, meta_kws, **kws):
+        """adjust create new object
+
+        Should return new instance of class or self no change
         """
-        adjust create new object
+        raise NotImplementedError
+
+    def block(self, data, meta_kws, **kws):
+        raise NotImplementedError
+
+    def reduce(self, data, meta_kws, **kws):
+        raise NotImplementedError
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>"
+
+
+class DataCallback(DataCallbackABC):
+    """
+    Basic version of DataCallbackABC.
+
+    Implemented to pass things through unchanged.  Will be used for default construction
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def check(self, data):
+        """Perform any consistency checks between self and data"""
+        pass
+
+    @property
+    def param_names(self):
+        """returns sequence of string names to be copied over"""
+        return ()
+
+    def derivs_args(self, data, derivs_args):
+        """adjust derivs args from data class
+
+        should return a tuple
+        """
+        return derivs_args
+
+    def resample(self, data, meta_kws, **kws):
+        """adjust create new object
 
         Should return new instance of class or self no change
         """
         return self
 
-    def block(self, data, meta_kws, data_kws):
+    def block(self, data, meta_kws, **kws):
         return self
 
-    def reduce(self, data, meta_kws, data_kws):
+    def reduce(self, data, meta_kws, **kws):
         return self
 
 
-DEFAULT_METACALLBACK = MetaCallbackBase()
-
-
-class AbstractData(ABC):
-    @abstractproperty
+class AbstractData(NewLikeAssignMixin):
+    @property
+    @abstractmethod
     def order(self):
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def central(self):
         pass
 
-    # @abstractproperty
-    # def derivs_args(self):
-    #     pass
-
-    @abstractproperty
+    @property
+    @abstractmethod
     def derivs_args(self):
         pass
 
@@ -294,57 +375,24 @@ class AbstractData(ABC):
     @meta.setter
     def meta(self, m):
         """
-        call m['meta_checker](self, m) if avialable
+        set value and check meta
         """
         if m is None:
-            m = {}
-        elif "meta_checker" in m:
-            m["meta_checker"](self, m)
+            m = DataCallback()
+        elif not isinstance(m, DataCallbackABC):
+            raise ValueError("meta must be None or subclass of DataCallbackABC")
+        m.check(data=self)
         self._meta = m
 
-    def _meta_derivs_args(self, derivs_args):
-        """look for callback function of the form derivs_args = meta['meta_deriv_args'](self, deriv_args) -> tuple
+    @property
+    def x_isnot_u(self):
+        return not self.x_is_u
 
-        Parameters
-        ----------
-        derivs_args : tuple of arguments.  These are the base arguments
+    def pipe(self, func, *args, **kwargs):
+        return func(self, *args, **kwargs)
 
-        Returns
-        -------
-        derivs_args
-        """
-        if "meta_derivs_args" in self.meta:
-            derivs_args = self.meta["meta_derivs_args"](self, derivs_args)
-        return derivs_args
-
-    def _meta_callback(self, _name__, meta=None, meta_kws=None, **kws):
-        """
-        perform a generic callback of the form self.meta[_name__](self, meta, meta_kws, **kws)
-        """
-        if meta is None:
-            meta = self.meta
-        if _name__ in meta:
-            meta = meta[_name__](self, meta=meta, meta_kws=meta_kws, **kws)
-        return meta
-
-    def _meta_resample(self, meta=None, meta_kws=None, **kws):
-        """
-        meta resampling
-        """
-        return self._meta_callback(
-            _name__="meta_resample", meta=meta, meta_kws=meta_kws, **kws
-        )
-
-    def _meta_block(self, meta=None, meta_kws=None, **kws):
-        """meta = self.meta['meta_block](self, meta, meta_kws, **kws)"""
-        return self._meta_callback(
-            _name__="meta_block", meta=meta, meta_kws=meta_kws, **kws
-        )
-
-    def _meta_reduce(self, meta=None, meta_kws=None, **kws):
-        return self._meta_callback(
-            _name__="meta_reduce", meta=meta, meta_kws=meta_kws, **kws
-        )
+    # def __repr__(self):
+    #     return f'<{self.__class__.__name__}>'
 
 
 class DataValuesBase(AbstractData):
@@ -388,7 +436,7 @@ class DataValuesBase(AbstractData):
         meta : dict, optional
             extra meta data/parameters to be caried along with object and child objects.
             if 'checker' in meta, then perform a callback of the form meta['checker](self, meta)
-            this can also be used to hotwire things like deriv_args.
+            this can also be used to hotwire things like derivs_args.
         x_is_u : bool, default=False
             if True, treat `xv = uv` and do adjust u/du accordingly
         Values passed through method `resample_meta`
@@ -440,8 +488,21 @@ class DataValuesBase(AbstractData):
         self.meta = meta
 
     @property
-    def x_isnot_u(self):
-        return not self.x_is_u
+    def param_names(self):
+        return [
+            "uv",
+            "xv",
+            "order",
+            "rec_dim",
+            "umom_dim",
+            "deriv_dim",
+            "skipna",
+            "chunk",
+            "compute",
+            "build_aves_kws",
+            "meta",
+            "x_is_u",
+        ]
 
     @classmethod
     def from_vals(
@@ -489,7 +550,7 @@ class DataValuesBase(AbstractData):
             chunking of xarray objects
         compute : bool, optional
             whether to perform compute step on xarray outputs
-        meta : dict, optional
+        meta : DataCallback, optional
             extra keyword arguments
         """
 
@@ -535,18 +596,6 @@ class DataValuesBase(AbstractData):
 
     def __len__(self):
         return len(self.uv[self.rec_dim])
-
-    def resample_meta(self, meta_kws=None, **kws):
-        """
-        incase any other values are to be considered,
-        then this is where they should be resampled
-
-        Returns
-        -------
-        other_params : transformed version of self.other_params
-        """
-
-        return self._meta_resample(meta_kws=meta_kws, **kws)
 
     def resample(
         self,
@@ -604,7 +653,8 @@ class DataValuesBase(AbstractData):
         else:
             xv = None
 
-        meta = self.resample_meta(
+        meta = self.meta.resample(
+            data=self,
             meta_kws=meta_kws,
             indices=indices,
             nrep=nrep,
@@ -878,7 +928,7 @@ class DataValues(DataValuesBase):
             out = (self.u_selector, self.xu_selector)
         else:
             out = (self.u_selector,)
-        return self._meta_derivs_args(out)
+        return self.meta.derivs_args(data=self, derivs_args=out)
 
 
 class DataValuesCentral(DataValuesBase):
@@ -961,7 +1011,7 @@ class DataValuesCentral(DataValuesBase):
         else:
             out = (self.xave_selector, self.du_selector)
 
-        return self._meta_derivs_args(out)
+        return self.meta.derivs_args(self, out)
 
 
 ################################################################################
@@ -1011,16 +1061,29 @@ class DataCentralMomentsBase(AbstractData):
         self.xmom_dim = xmom_dim
         self.rec_dim = rec_dim
         self.deriv_dim = deriv_dim
-        self._central = central
+        self.central = central
         self.meta = meta
 
     @property
-    def x_isnot_u(self):
-        return not self.x_is_u
+    def param_names(self):
+        return (
+            "dxduave",
+            "xmom_dim",
+            "umom_dim",
+            "rec_dim",
+            "deriv_dim",
+            "central",
+            "meta",
+            "x_is_u",
+        )
 
     @property
     def central(self):
         return self._central
+
+    @central.setter
+    def central(self, val):
+        self._central = val
 
     @property
     def order(self):
@@ -1119,29 +1182,12 @@ class DataCentralMomentsBase(AbstractData):
             else:
                 out = (self.u_selector,)
 
-        return self._meta_derivs_args(out)
+        return self.meta.derivs_args(data=self, derivs_args=out)
 
 
 class DataCentralMoments(DataCentralMomentsBase):
     def __len__(self):
         return self.values.sizes[self.rec_dim]
-
-    def new_like(self, **kws):
-        kws = dict(
-            # default dict
-            dict(
-                dxduave=self.dxduave,
-                xmom_dim=self.xmom_dim,
-                umom_dim=self.umom_dim,
-                rec_dim=self.rec_dim,
-                deriv_dim=self.deriv_dim,
-                central=self.central,
-                meta=self.meta,
-                x_is_u=self.x_is_u,
-            ),
-            **kws,
-        )
-        return type(self)(**kws)
 
     def block(self, block_size, axis=None, meta_kws=None, **kwargs):
         """
@@ -1163,7 +1209,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         kws = dict(block_size=block_size, axis=axis, **kwargs)
         return self.new_like(
             dxduave=self.dxduave.block(**kws),
-            meta=self._meta_block(meta_kws=meta_kws, **kws),
+            meta=self.meta.block(data=self, meta_kws=meta_kws, **kws),
         )
 
     def reduce(self, axis=None, meta_kws=None, **kwargs):
@@ -1181,7 +1227,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         return self.new_like(
             dxduave=self.dxduave.reduce(**kws),
-            meta=self._meta_reduce(meta_kws=meta_kws, **kws),
+            meta=self.meta.reduce(data=self, meta_kws=meta_kws, **kws),
         )
 
     def resample(
@@ -1518,7 +1564,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             x_is_u=x_is_u,
         )
 
-        out.meta = out._meta_resample(meta_kws=meta_kws, **kws)
+        out = out.set_params(meta=out.meta.resample(data=out, meta_kws=meta_kws, **kws))
 
         return out
 
@@ -1858,6 +1904,23 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             x_is_u=x_is_u,
         )
 
+    @property
+    def param_names(self):
+        return (
+            "uv",
+            "xv",
+            "w",
+            "dxduave",
+            "order",
+            "rec_dim",
+            "umom_dim",
+            "xmom_dim",
+            "deriv_dim",
+            "central",
+            "meta",
+            "x_is_u",
+        )
+
     @classmethod
     def from_vals(
         cls,
@@ -1942,26 +2005,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             x_is_u=x_is_u,
         )
 
-    def new_like(self, **kws):
-        kws = dict(
-            dict(
-                uv=self.uv,
-                xv=self.xv,
-                w=self.w,
-                dxduave=self.dxduave,
-                order=self.order,
-                rec_dim=self.rec_dim,
-                umom_dim=self.umom_dim,
-                xmom_dim=self.xmom_dim,
-                deriv_dim=self.deriv_dim,
-                central=self.central,
-                meta=self.meta,
-                x_is_u=self.x_is_u,
-            ),
-            **kws,
-        )
-        return type(self)(**kws)
-
     def __len__(self):
         return len(self.uv[self.rec_dim])
 
@@ -2002,6 +2045,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             **kws,
         )
 
-        meta = self._meta_resample(meta_kws=meta_kws, **kws)
+        meta = self.meta.resample(data=self, meta_kws=meta_kws, **kws)
 
         return self.new_like(dxduave=dxduave, rec_dim=rep_dim, meta=meta)
