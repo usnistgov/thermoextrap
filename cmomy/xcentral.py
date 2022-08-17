@@ -254,7 +254,13 @@ def _optional_wrap_data(
         #     mom_dims = (mom_dims,)
         # else:
         #     mom_dims = tuple(mom_dims)
-        pass
+        # pass
+
+        if mom_dims is not None:
+            if isinstance(mom_dims, str):
+                mom_dims = (mom_dims,)
+            else:
+                mom_dims = tuple(mom_dims)
 
     elif template is not None:
         data = template.copy(data=data)
@@ -1124,7 +1130,8 @@ class xCentralMoments(central.CentralMoments):
             axis=axis,
             val_shape=val_shape,
             dtype=dtype,
-            convert_kws=convert_kws**kws,
+            convert_kws=convert_kws,
+            **kws,
         )
 
     @classmethod
