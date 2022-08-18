@@ -15,7 +15,7 @@ except ImportError:
         "Could not find pymbar - will not import and functions involving this will not work."
     )
 
-from utilities import buildAvgFuncs, symDerivAvgX
+from .utilities import buildAvgFuncs, symDerivAvgX
 
 
 def extrapWithSamples(B, B0, x, U, order):
@@ -65,7 +65,7 @@ def extrapWithSamples(B, B0, x, U, order):
         outvec[o] = oDeriv(avgUfunc, avgXUfunc)
         # Perform extrapolation using same deriatives and averages, just have many dBeta
         # Taking the tensor product of two (really should be) 1D arrays to get the right shape
-        outval += np.tensordot((dBeta ** o), outvec[o], axes=0) / np.math.factorial(o)
+        outval += np.tensordot((dBeta**o), outvec[o], axes=0) / np.math.factorial(o)
 
     return (outval, outvec)
 
@@ -76,8 +76,8 @@ def extrapWeighted(B, refB1, refB2, x1, x2, u1, u2, order1, order2, m=20):
     """
 
     def weightsMinkowski(d1, d2, m=20):
-        w1 = 1.0 - (d1 ** m) / ((d1 ** m) + (d2 ** m))
-        w2 = 1.0 - (d2 ** m) / ((d1 ** m) + (d2 ** m))
+        w1 = 1.0 - (d1**m) / ((d1**m) + (d2**m))
+        w2 = 1.0 - (d2**m) / ((d1**m) + (d2**m))
         return [w1, w2]
 
     ext1, derivs1 = extrapWithSamples(B, refB1, x1, u1, order1)

@@ -28,8 +28,8 @@ def buildAvgFuncs(xvals, uvals, order):
     dictxu = {}
 
     for o in range(order + 1):
-        dictu[o] = np.average(uvals ** o)
-        dictxu[o] = np.average(xvals * (uvalsT ** o), axis=0)
+        dictu[o] = np.average(uvals**o)
+        dictxu[o] = np.average(xvals * (uvalsT**o), axis=0)
 
     class ufunc(sym.Function):
         """Modified sympy Function class to output powers of potential energies."""
@@ -140,9 +140,9 @@ def buildAvgFuncsDependent(xvals, uvals, order):
     dictxu = {}
 
     for o in range(order + 1):
-        dictu[o] = np.average(uvals ** o)
+        dictu[o] = np.average(uvals**o)
         for j in range(order + 1):
-            dictxu[(j, o)] = np.average(xvals[:, j, :] * (uvalsT ** o), axis=0)
+            dictxu[(j, o)] = np.average(xvals[:, j, :] * (uvalsT**o), axis=0)
 
     class ufunc(sym.Function):
         """Modified sympy Function class to output powers of potential energies."""

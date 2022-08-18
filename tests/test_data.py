@@ -2,11 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-import thermoextrap
-import thermoextrap.xtrapy.data as xtrapy_data
-import thermoextrap.xtrapy.models as xtrapy_models
-import thermoextrap.xtrapy.xpan_beta as xpan_beta
-from thermoextrap.xtrapy.cached_decorators import gcached
+import thermoextrap as xtrap
 
 
 def test_rdata(fixture):
@@ -35,14 +31,14 @@ def test_xdata_from_ave_raw(fixture):
     a = fixture.rdata
 
     # base on raw arrays
-    b = xtrapy_data.DataCentralMoments.from_ave_raw(
+    b = xtrap.DataCentralMoments.from_ave_raw(
         u=a.u.values, xu=a.xu.values, w=len(a.uv), axis=0, dims=["val"]
     )
 
     fixture.xr_test_raw(b)
 
     # base on xarray
-    b = xtrapy_data.DataCentralMoments.from_ave_raw(
+    b = xtrap.DataCentralMoments.from_ave_raw(
         u=a.u,
         xu=a.xu,
         w=len(a.uv),
@@ -54,7 +50,7 @@ def test_xdata_from_ave_central(fixture):
     a = fixture.cdata
 
     # base on raw values
-    b = xtrapy_data.DataCentralMoments.from_ave_central(
+    b = xtrap.DataCentralMoments.from_ave_central(
         du=a.du.values,
         dxdu=a.dxdu.values,
         xave=a.xave.values,
@@ -67,7 +63,7 @@ def test_xdata_from_ave_central(fixture):
     fixture.xr_test_central(b)
 
     # base on xarray
-    b = xtrapy_data.DataCentralMoments.from_ave_central(
+    b = xtrap.DataCentralMoments.from_ave_central(
         du=a.du, dxdu=a.dxdu, xave=a.xave, uave=fixture.rdata.u[1], w=len(a.uv)
     )
 

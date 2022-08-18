@@ -4,7 +4,7 @@
 import numpy as np
 from scipy.special import factorial
 
-from thermoextrap.extrap import ExtrapModel
+from .extrap import ExtrapModel
 
 
 class ExtrapWeightedModel(ExtrapModel):
@@ -76,8 +76,8 @@ class ExtrapWeightedModel(ExtrapModel):
         """
 
         def weightsMinkowski(d1, d2, m=20):
-            w1 = 1.0 - (d1 ** m) / ((d1 ** m) + (d2 ** m))
-            w2 = 1.0 - (d2 ** m) / ((d1 ** m) + (d2 ** m))
+            w1 = 1.0 - (d1**m) / ((d1**m) + (d2**m))
+            w2 = 1.0 - (d2**m) / ((d1**m) + (d2**m))
             return [w1, w2]
 
         # Use parameters for estimate - for extrapolation, the parameters are the derivatives

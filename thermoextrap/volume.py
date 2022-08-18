@@ -9,9 +9,10 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
-from .cached_decorators import gcached
-from .data import DataCallbackABC, DataValues, xrwrap_xv
-from .models import Derivatives, ExtrapModel
+from .core.cached_decorators import gcached
+from .core.data import DataCallbackABC, DataValues
+from .core.models import Derivatives, ExtrapModel
+from .core.xrutils import xrwrap_xv
 
 # Lazily imported everything above - will trim down later
 # Need funcs to pass to Coefs class

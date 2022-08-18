@@ -12,8 +12,8 @@ import xarray as xr
 from gpflow.ci_utils import ci_niter
 
 # from .models import StateCollection
-from .cached_decorators import gcached
-from .stack import GPRData, StackedDerivatives, multiindex_to_array
+from .core.cached_decorators import gcached
+from .core.stack import GPRData, StackedDerivatives, multiindex_to_array
 
 __all__ = ("GPRData", "GPRModel", "StackedDerivatives", "factory_gprmodel")
 

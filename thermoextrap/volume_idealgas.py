@@ -6,9 +6,10 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
+from .beta import factory_data
+
 # from .models import DataTemplateValues, DatasetSelector
-from .models import Derivatives, ExtrapModel
-from .xpan_beta import factory_data
+from .core.models import Derivatives, ExtrapModel
 
 # from .data import DataCentralMoments, DataCentralMomentsVals
 

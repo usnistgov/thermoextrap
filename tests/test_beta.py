@@ -2,34 +2,31 @@ import numpy as np
 import pytest
 import xarray as xr
 
-import thermoextrap
-import thermoextrap.xtrapy.data as xtrapy_data
-import thermoextrap.xtrapy.idealgas as idealgas
-import thermoextrap.xtrapy.models as xtrapy_models
-import thermoextrap.xtrapy.xpan_beta as xpan_beta
-from thermoextrap.xtrapy.cached_decorators import gcached
+import thermoextrap as xtrap
+import thermoextrap.legacy
+from thermoextrap.core.cached_decorators import gcached
 
 
 @pytest.mark.slow
-def test_xpan_beta_derivs_slow(fixture):
+def test_beta_derivs_slow(fixture):
     a = np.array(fixture.derivs_list)
-    s = xpan_beta.factory_derivatives(xalpha=False, central=False)
+    s = xtrap.beta.factory_derivatives(xalpha=False, central=False)
     b = s.derivs(fixture.rdata, norm=False)
     np.testing.assert_allclose(a, b)
 
-    s = xpan_beta.factory_derivatives(xalpha=False, central=True)
+    s = xtrap.beta.factory_derivatives(xalpha=False, central=True)
     b = s.derivs(fixture.cdata, norm=False)
     np.testing.assert_allclose(a, b)
 
 
-def test_xpan_beta_derivs(fixture):
-    s = xpan_beta.factory_derivatives(xalpha=False, central=False)
+def test_beta_derivs(fixture):
+    s = xtrap.beta.factory_derivatives(xalpha=False, central=False)
     b = s.derivs(fixture.rdata, norm=False)
     fixture.xr_test(b, s.derivs(fixture.xrdata, norm=False))
     fixture.xr_test(b, s.derivs(fixture.xrdata_val, norm=False))
 
     # central
-    s = xpan_beta.factory_derivatives(xalpha=False, central=True)
+    s = xtrap.beta.factory_derivatives(xalpha=False, central=True)
     b = s.derivs(fixture.cdata, norm=False)
     fixture.xr_test(b, s.derivs(fixture.xdata, norm=False))
     fixture.xr_test(b, s.derivs(fixture.xdata_val, norm=False))
@@ -39,7 +36,7 @@ def test_xpan_beta_derivs(fixture):
 def test_extrapmodel_slow(fixture):
     betas = [0.3, 0.4]
     em = fixture.em
-    xem = xpan_beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
+    xem = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
     np.testing.assert_allclose(em.predict(betas, order=3), xem.predict(betas, order=3))
 
 
@@ -47,7 +44,7 @@ def test_extrapmodel_slow(fixture):
 def test_extrapmodel_resample_slow(fixture):
     betas = [0.3, 0.4]
     em = fixture.em
-    xem = xpan_beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
+    xem = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
 
     a = em.bootstrap(betas, n=10, order=3)
     b = xem.resample(nrep=10).predict(betas).std("rep")
@@ -57,7 +54,7 @@ def test_extrapmodel_resample_slow(fixture):
 
 def test_extrapmodel(fixture):
     betas = [0.3, 0.4]
-    xem0 = xpan_beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
+    xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
 
     for data in [
         fixture.cdata,
@@ -66,7 +63,7 @@ def test_extrapmodel(fixture):
         fixture.xdata_val,
         fixture.xrdata_val,
     ]:
-        xem1 = xpan_beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
+        xem1 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
         fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
@@ -78,15 +75,15 @@ def test_extrapmodel_ig():
 
     # Get ideal gas data to compare to analytical results
     # Should consider moving ideal-gas generated data to conftest.py and use as type of fixture
-    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, central=True
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=False)
+    ex = xtrap.beta.factory_extrapmodel(ref_beta, dat, xalpha=False)
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
     ex_res = ex.resample(nrep=100)
@@ -94,7 +91,7 @@ def test_extrapmodel_ig():
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):
         # Get the exact values we're shooting for
-        true_extrap, true_derivs = idealgas.x_beta_extrap(
+        true_extrap, true_derivs = xtrap.idealgas.x_beta_extrap(
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order
@@ -131,7 +128,7 @@ def test_extrapmodel_resample(fixture):
     nrep = 10
     idx = np.random.choice(ndat, (nrep, ndat), replace=True)
 
-    xem0 = xpan_beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
+    xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
     a = xem0.resample(indices=idx).predict(betas, order=3)
 
     for data in [
@@ -141,7 +138,7 @@ def test_extrapmodel_resample(fixture):
         fixture.xdata_val,
         fixture.xrdata_val,
     ]:
-        xem1 = xpan_beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
+        xem1 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
         b = xem1.resample(indices=idx).predict(betas, order=3)
         fixture.xr_test(a, b)
 
@@ -150,9 +147,9 @@ def test_perturbmodel(fixture):
     beta0 = 0.5
 
     betas = [0.3, 0.7]
-    pm = thermoextrap.PerturbModel(beta0, xData=fixture.x, uData=fixture.u)
+    pm = thermoextrap.legacy.PerturbModel(beta0, xData=fixture.x, uData=fixture.u)
 
-    xpm = xpan_beta.factory_perturbmodel(beta0, uv=fixture.u, xv=fixture.x)
+    xpm = xtrap.beta.factory_perturbmodel(beta0, uv=fixture.u, xv=fixture.x)
 
     np.testing.assert_allclose(pm.predict(betas), xpm.predict(betas))
 
@@ -165,20 +162,22 @@ def test_extrapmodel_weighted_slow(fixture):
     X = np.array((fixture.x, fixture.xb))
     U = np.array((fixture.u, fixture.ub))
 
-    emw = thermoextrap.ExtrapWeightedModel(fixture.order, beta0, xData=X, uData=U)
+    emw = thermoextrap.legacy.ExtrapWeightedModel(
+        fixture.order, beta0, xData=X, uData=U
+    )
 
     betas = [0.3, 0.4]
 
     # stateB
-    xem0 = xpan_beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xpan_beta.factory_data(
+        data=xtrap.beta.factory_data(
             uv=fixture.ub, xv=fixture.xb, order=fixture.order, central=False
         ),
     )
 
-    xemw = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
+    xemw = xtrap.ExtrapWeightedModel([xem0, xem1])
 
     np.testing.assert_allclose(
         emw.predict(betas, order=3), xemw.predict(betas, order=3)
@@ -191,23 +190,23 @@ def test_extrapmodel_weighted(fixture):
     betas = [0.3, 0.4]
 
     # stateB
-    xem0 = xpan_beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xpan_beta.factory_data(
+        data=xtrap.beta.factory_data(
             uv=fixture.ub, xv=fixture.xb, order=fixture.order, central=False
         ),
     )
 
-    xemw = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
+    xemw = xtrap.ExtrapWeightedModel([xem0, xem1])
 
     a = xemw.predict(betas, order=3)
 
     # central
-    xem0 = xpan_beta.factory_extrapmodel(beta=beta0[0], data=fixture.cdata)
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.cdata)
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xpan_beta.factory_data(
+        data=xtrap.beta.factory_data(
             uv=fixture.ub,
             xv=fixture.xb,
             order=fixture.order,
@@ -215,15 +214,15 @@ def test_extrapmodel_weighted(fixture):
         ),
     )
 
-    xemw1 = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
+    xemw1 = xtrap.ExtrapWeightedModel([xem0, xem1])
     b = xemw1.predict(betas, order=3)
     fixture.xr_test(a, b)
 
     # xdata
-    xem0 = xpan_beta.factory_extrapmodel(beta=beta0[0], data=fixture.xdata)
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.xdata)
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xpan_beta.DataCentralMoments.from_vals(
+        data=xtrap.beta.DataCentralMoments.from_vals(
             uv=fixture.ub,
             xv=fixture.xb,
             order=fixture.order,
@@ -232,7 +231,7 @@ def test_extrapmodel_weighted(fixture):
         ),
     )
 
-    xemw1 = xtrapy_models.ExtrapWeightedModel([xem0, xem1])
+    xemw1 = xtrap.ExtrapWeightedModel([xem0, xem1])
     b = xemw1.predict(betas, order=3)
     fixture.xr_test(a, b)
 
@@ -243,9 +242,9 @@ def test_extrapmodel_weighted_multi(fixture):
     betas = [0.3, 0.4, 0.6, 0.7]
 
     xems_r = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xpan_beta.factory_data(
+            data=xtrap.beta.factory_data(
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
@@ -256,9 +255,9 @@ def test_extrapmodel_weighted_multi(fixture):
     ]
 
     xems_c = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xpan_beta.factory_data(
+            data=xtrap.beta.factory_data(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
@@ -266,9 +265,9 @@ def test_extrapmodel_weighted_multi(fixture):
     ]
 
     xems_x = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xpan_beta.DataCentralMomentsVals.from_vals(
+            data=xtrap.beta.DataCentralMomentsVals.from_vals(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
@@ -277,9 +276,9 @@ def test_extrapmodel_weighted_multi(fixture):
 
     # test picking models
     # xemw_r should pick the two models closest to beta value
-    xemw_a = xtrapy_models.ExtrapWeightedModel([xems_r[0], xems_r[1]])
-    xemw_b = xtrapy_models.ExtrapWeightedModel([xems_r[1], xems_r[2]])
-    xemw_r = xtrapy_models.ExtrapWeightedModel(xems_r)
+    xemw_a = xtrap.ExtrapWeightedModel([xems_r[0], xems_r[1]])
+    xemw_b = xtrap.ExtrapWeightedModel([xems_r[1], xems_r[2]])
+    xemw_r = xtrap.ExtrapWeightedModel(xems_r)
 
     vals = [0.2, 0.4]
     fixture.xr_test(xemw_a.predict(vals), xemw_r.predict(vals, method="nearest"))
@@ -288,8 +287,8 @@ def test_extrapmodel_weighted_multi(fixture):
     fixture.xr_test(xemw_b.predict(vals), xemw_r.predict(vals, method="between"))
 
     # other data models
-    xemw_c = xtrapy_models.ExtrapWeightedModel(xems_c)
-    xemw_x = xtrapy_models.ExtrapWeightedModel(xems_x)
+    xemw_c = xtrap.ExtrapWeightedModel(xems_c)
+    xemw_x = xtrap.ExtrapWeightedModel(xems_x)
 
     fixture.xr_test(xemw_r.predict(betas, order=3), xemw_c.predict(betas, order=3))
     fixture.xr_test(xemw_r.predict(betas, order=3), xemw_x.predict(betas, order=3))
@@ -313,20 +312,22 @@ def test_interpmodel_slow(fixture):
 
     X = np.array([np.random.rand(*fixture.x.shape) for _ in beta0])
     U = np.array([np.random.rand(*fixture.u.shape) for _ in beta0])
-    emi = thermoextrap.InterpModel(fixture.order, beta0, xData=X, uData=U)
+    emi = thermoextrap.legacy.InterpModel(fixture.order, beta0, xData=X, uData=U)
 
     betas = [0.3, 0.4, 0.6, 0.7]
 
     # stateB
     xems = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xpan_beta.factory_data(uv=u, xv=x, order=fixture.order, central=False),
+            data=xtrap.beta.factory_data(
+                uv=u, xv=x, order=fixture.order, central=False
+            ),
         )
         for beta, u, x in zip(beta0, U, X)
     ]
 
-    xemi = xtrapy_models.InterpModel(xems)
+    xemi = xtrap.InterpModel(xems)
 
     np.testing.assert_allclose(emi.predict(betas), xemi.predict(betas))
 
@@ -337,9 +338,9 @@ def test_interpmodel(fixture):
     betas = [0.3, 0.4, 0.6, 0.7]
 
     xems_r = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xpan_beta.factory_data(
+            data=xtrap.beta.factory_data(
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
@@ -350,9 +351,9 @@ def test_interpmodel(fixture):
     ]
 
     xems_c = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xpan_beta.factory_data(
+            data=xtrap.beta.factory_data(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
@@ -360,18 +361,18 @@ def test_interpmodel(fixture):
     ]
 
     xems_x = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xpan_beta.DataCentralMomentsVals.from_vals(
+            data=xtrap.beta.DataCentralMomentsVals.from_vals(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
         for xem in xems_r
     ]
 
-    xemi_r = xtrapy_models.InterpModel(xems_r)
-    xemi_c = xtrapy_models.InterpModel(xems_c)
-    xemi_x = xtrapy_models.InterpModel(xems_x)
+    xemi_r = xtrap.InterpModel(xems_r)
+    xemi_c = xtrap.InterpModel(xems_c)
+    xemi_x = xtrap.InterpModel(xems_x)
 
     fixture.xr_test(xemi_r.predict(betas, order=3), xemi_c.predict(betas, order=3))
     fixture.xr_test(xemi_r.predict(betas, order=3), xemi_x.predict(betas, order=3))
@@ -394,9 +395,9 @@ def test_interpmodelpiecewise(fixture):
     betas = [0.3, 0.4, 0.6, 0.7]
 
     xems_r = [
-        xpan_beta.factory_extrapmodel(
+        xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xpan_beta.factory_data(
+            data=xtrap.beta.factory_data(
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
@@ -408,9 +409,9 @@ def test_interpmodelpiecewise(fixture):
 
     # test picking models
     # xemw_r should pick the two models closest to beta value
-    xemw_a = xtrapy_models.InterpModel([xems_r[0], xems_r[1]])
-    xemw_b = xtrapy_models.InterpModel([xems_r[1], xems_r[2]])
-    xemw_r = xtrapy_models.InterpModelPiecewise(xems_r)
+    xemw_a = xtrap.InterpModel([xems_r[0], xems_r[1]])
+    xemw_b = xtrap.InterpModel([xems_r[1], xems_r[2]])
+    xemw_r = xtrap.InterpModelPiecewise(xems_r)
 
     vals = [0.2, 0.4]
     fixture.xr_test(xemw_a.predict(vals), xemw_r.predict(vals, method="nearest"))
@@ -428,16 +429,16 @@ def test_interpmodel_polynomial():
         udat1 = (i + 1) * xr.DataArray([-2.0, 2.0], dims=["rec"])
         udat2 = (i + 1) * xr.DataArray([2.0, -2.0], dims=["rec"])
         print(udat1, udat2)
-        dat1 = xpan_beta.DataCentralMomentsVals.from_vals(
+        dat1 = xtrap.beta.DataCentralMomentsVals.from_vals(
             order=1, xv=xdat1, uv=udat1, central=True
         )
-        dat2 = xpan_beta.DataCentralMomentsVals.from_vals(
+        dat2 = xtrap.beta.DataCentralMomentsVals.from_vals(
             order=1, xv=xdat2, uv=udat2, central=True
         )
 
-        ex1 = xpan_beta.factory_extrapmodel(-1.0, dat1, xalpha=False)
-        ex2 = xpan_beta.factory_extrapmodel(1.0, dat2, xalpha=False)
-        interp = xtrapy_models.InterpModel([ex1, ex2])
+        ex1 = xtrap.beta.factory_extrapmodel(-1.0, dat1, xalpha=False)
+        ex2 = xtrap.beta.factory_extrapmodel(1.0, dat2, xalpha=False)
+        interp = xtrap.InterpModel([ex1, ex2])
         check_array = np.zeros(4)
         check_array[i + 1] = 1.0
         np.testing.assert_array_equal(interp.coefs().values, check_array)
@@ -450,20 +451,20 @@ def test_mbar(fixture):
     X = np.array((fixture.x, fixture.xb))
     U = np.array((fixture.u, fixture.ub))
 
-    emi = thermoextrap.MBARModel(fixture.order, beta0, xData=X, uData=U)
+    emi = thermoextrap.legacy.MBARModel(fixture.order, beta0, xData=X, uData=U)
 
     betas = [0.3, 0.4]
 
     # stateB
-    xem0 = xpan_beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xpan_beta.factory_data(
+        data=xtrap.beta.factory_data(
             uv=fixture.ub, xv=fixture.xb, order=fixture.order, central=False
         ),
     )
 
-    xemi = xtrapy_models.MBARModel([xem0, xem1])
+    xemi = xtrap.MBARModel([xem0, xem1])
 
     # NOTE: in old class, can't specify order after train
     # so just use the max order here
@@ -473,10 +474,10 @@ def test_mbar(fixture):
 from sympy import bell
 
 # Test log
-from thermoextrap.utilities import buildAvgFuncs
+from thermoextrap.legacy.utilities import buildAvgFuncs
 
 
-class LogAvgExtrapModel(thermoextrap.ExtrapModel):
+class LogAvgExtrapModel(thermoextrap.legacy.ExtrapModel):
     def calcDerivVals(self, refB, x, U):
 
         if x.shape[0] != U.shape[0]:
@@ -486,7 +487,7 @@ class LogAvgExtrapModel(thermoextrap.ExtrapModel):
             )
             return
 
-        avgUfunc, avgXUfunc = thermoextrap.buildAvgFuncs(x, U, self.maxOrder)
+        avgUfunc, avgXUfunc = thermoextrap.legacy.buildAvgFuncs(x, U, self.maxOrder)
         derivVals = np.zeros((self.maxOrder + 1, x.shape[1]))
         for o in range(self.maxOrder + 1):
             if o == 0:
@@ -523,13 +524,13 @@ def test_extrapmodel_minuslog_slow(fixture):
     a = em.params
 
     # test coefs
-    xem = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
+    xem = xtrap.beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
     b = xem.derivatives.derivs(xem.data, norm=False, minus_log=False)
     np.testing.assert_allclose(a, b)
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
 
     # or passing minus_log to predict
-    xem = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, post_func=None)
+    xem = xtrap.beta.factory_extrapmodel(beta0, fixture.rdata, post_func=None)
     b = xem.derivatives.derivs(xem.data, norm=False, minus_log=True)
     np.testing.assert_allclose(a, b)
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
@@ -540,7 +541,7 @@ def test_extrapmodel_minuslog_slow(fixture):
     betas = [0.2, 0.3]
     u, x, order = fixture.u, fixture.x, fixture.order
 
-    xem0 = xpan_beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
+    xem0 = xtrap.beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
 
     for data in [
         fixture.cdata,
@@ -549,7 +550,7 @@ def test_extrapmodel_minuslog_slow(fixture):
         fixture.xdata_val,
         fixture.xrdata_val,
     ]:
-        xem1 = xpan_beta.factory_extrapmodel(
+        xem1 = xtrap.beta.factory_extrapmodel(
             beta=fixture.beta0, data=fixture.cdata, post_func="minus_log"
         )
         fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
@@ -562,15 +563,15 @@ def test_extrapmodel_minuslog_ig():
     ref_vol = 1.0
 
     # Get ideal gas data to compare to analytical results
-    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, central=True
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(
+    ex = xtrap.beta.factory_extrapmodel(
         ref_beta, dat, xalpha=False, post_func="minus_log"
     )
     # Will need estimate of uncertainty for test data so can check if within that bound
@@ -581,7 +582,7 @@ def test_extrapmodel_minuslog_ig():
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):
         # Get the exact values we're shooting for
-        true_extrap, true_derivs = idealgas.x_beta_extrap_minuslog(
+        true_extrap, true_derivs = xtrap.idealgas.x_beta_extrap_minuslog(
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order
@@ -608,10 +609,10 @@ def test_extrapmodel_minuslog_ig():
 
 # depend on alpha/betas
 # Need to import from utilities
-from thermoextrap.utilities import buildAvgFuncsDependent, symDerivAvgXdependent
+from thermoextrap.legacy.utilities import buildAvgFuncsDependent, symDerivAvgXdependent
 
 
-class ExtrapModelDependent(thermoextrap.ExtrapModel):
+class ExtrapModelDependent(thermoextrap.legacy.ExtrapModel):
     """Class to hold information about an extrapolation that is dependent on the extrapolation variable."""
 
     # Calculates symbolic derivatives up to maximum order given data
@@ -665,9 +666,9 @@ def test_extrapmodel_alphadep_slow(fixture):
     em = ExtrapModelDependent(order, beta0, xData=x, uData=u)
 
     # by passign a derivative name, we are
-    xem = xpan_beta.factory_extrapmodel(
+    xem = xtrap.beta.factory_extrapmodel(
         beta0,
-        xpan_beta.factory_data(
+        xtrap.beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -688,16 +689,16 @@ def test_extrapmodel_alphadep(fixture):
     u = fixture.u
 
     # by passign a derivative name, we are
-    xem0 = xpan_beta.factory_extrapmodel(
+    xem0 = xtrap.beta.factory_extrapmodel(
         beta0,
-        xpan_beta.factory_data(
+        xtrap.beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
-        data=xpan_beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.beta.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -705,9 +706,9 @@ def test_extrapmodel_alphadep(fixture):
     fixture.xr_test(xem0.predict(betas), xem1.predict(betas))
 
     # for central, only test up to third order
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
-        data=xpan_beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.beta.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=True, deriv_dim="deriv"
         ),
     )
@@ -722,7 +723,7 @@ def test_extrapmodel_alphadep_ig():
     ref_vol = 1.0
 
     # Get ideal gas data to compare to analytical results
-    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     xdata = (
         xr.concat([xdata * ref_beta, xdata], dim="deriv")
@@ -731,12 +732,12 @@ def test_extrapmodel_alphadep_ig():
         .fillna(0.0)
     )
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, deriv_dim="deriv", central=True
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(ref_beta, dat, xalpha=True)
+    ex = xtrap.beta.factory_extrapmodel(ref_beta, dat, xalpha=True)
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
     ex_res = ex.resample(nrep=100)
@@ -744,7 +745,7 @@ def test_extrapmodel_alphadep_ig():
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):
         # Get the exact values we're shooting for
-        true_extrap, true_derivs = idealgas.x_beta_extrap_depend(
+        true_extrap, true_derivs = xtrap.idealgas.x_beta_extrap_depend(
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order
@@ -772,7 +773,7 @@ def test_extrapmodel_alphadep_ig():
 # minus_log, alphadep
 
 
-from thermoextrap.utilities import buildAvgFuncsDependent
+from thermoextrap.legacy.utilities import buildAvgFuncsDependent
 
 
 class LogAvgExtrapModelDependent(ExtrapModelDependent):
@@ -841,10 +842,10 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
     #                                              use false here because defined above
     # by passign a derivative name, we are
     # set minus_log here, so expressions will have log part in them
-    xem = xpan_beta.factory_extrapmodel(
+    xem = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func="minus_log",
-        data=xpan_beta.factory_data(
+        data=xtrap.beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -855,10 +856,10 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
 
     # alternatively, define without minus_log, then call with minus_log later
-    xem = xpan_beta.factory_extrapmodel(
+    xem = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func=None,
-        data=xpan_beta.factory_data(
+        data=xtrap.beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -881,18 +882,18 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     u = fixture.u
 
     # by passign a derivative name, we are
-    xem0 = xpan_beta.factory_extrapmodel(
+    xem0 = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func="minus_log",
-        data=xpan_beta.factory_data(
+        data=xtrap.beta.factory_data(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func=None,
-        data=xpan_beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.beta.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -900,10 +901,10 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     fixture.xr_test(xem0.predict(betas), xem1.predict(betas, minus_log=True))
 
     # for central, only test up to third order
-    xem1 = xpan_beta.factory_extrapmodel(
+    xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func=None,
-        data=xpan_beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.beta.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=True, deriv_dim="deriv"
         ),
     )
@@ -920,7 +921,7 @@ def test_extrapmodel_alphadep_minuslog_ig():
     ref_vol = 1.0
 
     # Get ideal gas data to compare to analytical results
-    xdata, udata = idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
+    xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     xdata = (
         xr.concat([xdata * ref_beta, xdata], dim="deriv")
@@ -929,12 +930,12 @@ def test_extrapmodel_alphadep_minuslog_ig():
         .fillna(0.0)
     )
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xpan_beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, deriv_dim="deriv", central=True
     )
 
     # Create extrapolation model to test against analytical
-    ex = xpan_beta.factory_extrapmodel(
+    ex = xtrap.beta.factory_extrapmodel(
         ref_beta, dat, xalpha=True, post_func="minus_log"
     )
     # Will need estimate of uncertainty for test data so can check if within that bound
@@ -944,7 +945,7 @@ def test_extrapmodel_alphadep_minuslog_ig():
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):
         # Get the exact values we're shooting for
-        true_extrap, true_derivs = idealgas.x_beta_extrap_depend_minuslog(
+        true_extrap, true_derivs = xtrap.idealgas.x_beta_extrap_depend_minuslog(
             o, ref_beta, test_betas, ref_vol
         )
         # Get the derivatives up to this order

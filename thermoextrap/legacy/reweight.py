@@ -11,7 +11,7 @@ except ImportError:
         "Could not find pymbar - will not import and functions involving this will not work."
     )
 
-from thermoextrap.interp import InterpModel
+from .interp import InterpModel
 
 
 class PerturbModel:

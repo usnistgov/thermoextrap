@@ -2,8 +2,13 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from thermoextrap.extrap import ExtrapModel
-from thermoextrap.xtrapy import xpan_vol, xpan_vol_ig
+import thermoextrap as xtrap
+from thermoextrap.legacy.extrap import ExtrapModel
+
+# from thermoextrap import xpan_vol as volxtrap
+# from thermoextrap import xpan_vol_ig as volxtrap_ig
+
+# from thermoextrap import xpan_vol, xpan_vol_ig
 
 
 # With original extrapolation package
@@ -55,14 +60,14 @@ def test_extrapmodel_vol(fixture):
 
     em = VolumeExtrapModelIG(1, volume, fixture.x, fixture.u)
 
-    xem_ig = xpan_vol_ig.factory_extrapmodel(
+    xem_ig = xtrap.volume_idealgas.factory_extrapmodel(
         order=1,
         volume=volume,
         uv=fixture.u,
         xv=fixture.x,
     )
 
-    xem = xpan_vol.factory_extrapmodel(
+    xem = xtrap.volume.factory_extrapmodel(
         uv=fixture.u, xv=fixture.x, order=1, dxdqv=fixture.x, volume=volume, ndim=1
     )
 

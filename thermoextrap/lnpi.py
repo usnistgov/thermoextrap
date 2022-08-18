@@ -8,16 +8,17 @@ import numpy as np
 import sympy as sp
 import xarray as xr
 
-from .cached_decorators import gcached
-from .data import (  # DataCentralMoments,; DataCentralMomentsVals,
+from .beta import ExtrapModel, SymDerivBeta
+from .beta import factory_derivatives as factory_derivatives_beta
+from .beta import u_func, u_func_central
+from .core.cached_decorators import gcached
+from .core.data import (  # DataCentralMoments,; DataCentralMomentsVals,
     DataCallbackABC,
     DataValues,
     DataValuesCentral,
 )
-from .models import Derivatives, SymSubs, _get_default_indexed, _get_default_symbol
-from .xpan_beta import ExtrapModel, SymDerivBeta  # , du_func
-from .xpan_beta import factory_derivatives as factory_derivatives_beta
-from .xpan_beta import u_func, u_func_central  # , du_func
+from .core.models import Derivatives, SymSubs
+from .core.sputils import get_default_indexed, get_default_symbol
 
 
 ################################################################################
@@ -41,9 +42,9 @@ class lnPi_func_central(sp.Function):
     """
 
     nargs = 1
-    u = _get_default_symbol("u")
-    lnPi0 = _get_default_symbol("lnPi0")
-    mudotN = _get_default_symbol("mudotN")
+    u = get_default_symbol("u")
+    lnPi0 = get_default_symbol("lnPi0")
+    mudotN = get_default_symbol("mudotN")
 
     @classmethod
     def deriv_args(cls):
@@ -68,9 +69,9 @@ class lnPi_func_raw(sp.Function):
     """
 
     nargs = 1
-    u = _get_default_indexed("u")
-    lnPi0 = _get_default_symbol("lnPi0")
-    mudotN = _get_default_symbol("mudotN")
+    u = get_default_indexed("u")
+    lnPi0 = get_default_symbol("lnPi0")
+    mudotN = get_default_symbol("mudotN")
 
     @classmethod
     def deriv_args(cls):
@@ -104,7 +105,7 @@ def factory_derivatives(
     """
 
     if name == "lnPi":
-        beta = _get_default_symbol("beta")
+        beta = get_default_symbol("beta")
         if central:
             func = lnPi_func_central(beta)
         else:

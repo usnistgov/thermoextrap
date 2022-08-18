@@ -3,9 +3,7 @@ from collections import namedtuple
 import numpy as np
 import pytest
 
-import thermoextrap.xtrapy.data as xdata
-import thermoextrap.xtrapy.xpan_beta as xpan_beta
-from thermoextrap.xtrapy import xpan_vol
+import thermoextrap as xtrap
 
 
 # testing routines
@@ -60,7 +58,7 @@ def central(request):
 # test all other data constructors
 @pytest.fixture
 def data_x(data, order, central):
-    return xpan_beta.factory_data(xv=data.u, uv=data.u, order=order, central=central)
+    return xtrap.beta.factory_data(xv=data.u, uv=data.u, order=order, central=central)
 
 
 @pytest.fixture(params=[True, False])
@@ -76,11 +74,11 @@ def data_other(request, data, xv_fixture, order, central):
     style = request.param
 
     if style == "factory":
-        factory = xpan_beta.factory_data
+        factory = xtrap.beta.factory_data
     elif style == "cmom":
-        factory = xdata.DataCentralMoments.from_vals
+        factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
-        factory = xdata.DataCentralMomentsVals.from_vals
+        factory = xtrap.DataCentralMomentsVals.from_vals
     return factory(xv=xv_fixture, uv=data.u, order=order, central=central)
 
 
@@ -101,7 +99,7 @@ def betas_extrap(request):
 
 @pytest.fixture
 def em_x(data_x, central, beta):
-    return xpan_beta.factory_extrapmodel(beta=beta, data=data_x, central=central)
+    return xtrap.beta.factory_extrapmodel(beta=beta, data=data_x, central=central)
 
 
 @pytest.fixture
@@ -111,7 +109,7 @@ def em_x_out(em_x, betas_extrap):
 
 @pytest.fixture
 def em_other(data_other, central, beta):
-    return xpan_beta.factory_extrapmodel(beta=beta, data=data_other, central=central)
+    return xtrap.beta.factory_extrapmodel(beta=beta, data=data_other, central=central)
 
 
 @pytest.fixture
@@ -129,17 +127,17 @@ def data_x_is_u(request, data, order, central):
     style = request.param
 
     if style == "factory":
-        factory = xpan_beta.factory_data
+        factory = xtrap.beta.factory_data
     elif style == "cmom":
-        factory = xdata.DataCentralMoments.from_vals
+        factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
-        factory = xdata.DataCentralMomentsVals.from_vals
+        factory = xtrap.DataCentralMomentsVals.from_vals
     return factory(xv=None, uv=data.u, order=order, central=central, x_is_u=True)
 
 
 @pytest.fixture
 def em_x_is_u(data_x_is_u, central, beta):
-    return xpan_beta.factory_extrapmodel(
+    return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_x_is_u, central=central, name="u_ave"
     )
 
@@ -160,14 +158,14 @@ def test_em_x_is_u(em_x_out, em_x_is_u_out):
 
 @pytest.fixture
 def data_u(data, order, central):
-    return xpan_beta.factory_data(
+    return xtrap.beta.factory_data(
         xv=None, uv=data.u, order=order, central=central, x_is_u=True
     )
 
 
 @pytest.fixture
 def em_u(data_u, central, beta):
-    return xpan_beta.factory_extrapmodel(
+    return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u, central=central, name="u_ave"
     )
 
@@ -183,14 +181,14 @@ def test_data_u(em_u_out, em_x_is_u_out):
 
 @pytest.fixture
 def data_x2(data, order, central):
-    return xpan_beta.factory_data(
+    return xtrap.beta.factory_data(
         xv=data.u**2, uv=data.u, order=order, central=central
     )
 
 
 @pytest.fixture
 def em_x2(beta, order, central, data_x2):
-    return xpan_beta.factory_extrapmodel(
+    return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_x2, order=order - 1, central=central, name="x_ave"
     )
 
@@ -203,7 +201,7 @@ def em_x2_out(em_x2, betas_extrap):
 @pytest.fixture
 def em_u2(beta, data_u, order, central):
     if not central:
-        return xpan_beta.factory_extrapmodel(
+        return xtrap.beta.factory_extrapmodel(
             beta=beta,
             data=data_u,
             order=order - 1,
@@ -231,24 +229,24 @@ def test_x2_u2(em_x2_out, em_u2_out, central):
 
 def test_du2_3(beta, order, data, betas_extrap):
 
-    data_u = xpan_beta.factory_data(
+    data_u = xtrap.beta.factory_data(
         uv=data.u, xv=None, x_is_u=True, order=order, central=True
     )
-    data_u_r = xpan_beta.factory_data(
+    data_u_r = xtrap.beta.factory_data(
         uv=data.u, xv=None, x_is_u=True, order=order, central=False
     )
 
-    em_du2 = xpan_beta.factory_extrapmodel(
+    em_du2 = xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u, central=True, name="dun_ave", n=2, order=order - 1
     )
-    em_du3 = xpan_beta.factory_extrapmodel(
+    em_du3 = xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u, central=True, name="dun_ave", n=3, order=order - 2
     )
 
-    em_u1 = xpan_beta.factory_extrapmodel(
+    em_u1 = xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u_r, central=False, name="u_ave", order=order - 1
     )
-    em_u1_sq = xpan_beta.factory_extrapmodel(
+    em_u1_sq = xtrap.beta.factory_extrapmodel(
         beta=beta,
         data=data_u_r,
         central=False,
@@ -256,7 +254,7 @@ def test_du2_3(beta, order, data, betas_extrap):
         order=order - 1,
         post_func="pow_2",
     )
-    em_u1_cube = xpan_beta.factory_extrapmodel(
+    em_u1_cube = xtrap.beta.factory_extrapmodel(
         beta=beta,
         data=data_u_r,
         central=False,
@@ -265,10 +263,10 @@ def test_du2_3(beta, order, data, betas_extrap):
         post_func="pow_3",
     )
 
-    em_u2 = xpan_beta.factory_extrapmodel(
+    em_u2 = xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u_r, central=False, name="un_ave", n=2, order=order - 1
     )
-    em_u3 = xpan_beta.factory_extrapmodel(
+    em_u3 = xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u_r, central=False, name="un_ave", n=3, order=order - 2
     )
 
