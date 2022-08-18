@@ -7,6 +7,7 @@ dependencies:
   # testing
   - pytest
   - pytest-cov
+  - pytest-xdist
   - tox-conda
   # specials
   - pre-commit
@@ -14,8 +15,10 @@ dependencies:
   - ipython
   - ipykernel
   # build
+  - build
   - setuptools
   - setuptools-scm
+  - setuptools-scm-git-archive
   - twine
   # conda specific
   - conda-build
