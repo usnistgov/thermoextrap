@@ -14,7 +14,7 @@ import numpy as np
 import sympy as sp
 
 # from .cached_decorators import gcached
-# from .core import _get_default_indexed, _get_default_symbol
+# from .models import _get_default_indexed, _get_default_symbol
 
 beta_sym, vol_sym = sp.symbols("beta_sym vol_sym")
 xave_sym = (1 / beta_sym) - vol_sym / (sp.exp(beta_sym * vol_sym) - 1)
@@ -34,8 +34,8 @@ def x_var(beta, vol=1.0):
     """
     Variance in position, x at the inverse temperature beta with L=vol
     """
-    return 1.0 / beta ** 2 - (
-        vol ** 2 * np.exp(beta * vol) / ((np.exp(beta * vol) - 1) ** 2)
+    return 1.0 / beta**2 - (
+        vol**2 * np.exp(beta * vol) / ((np.exp(beta * vol) - 1) ** 2)
     )
 
 
@@ -153,7 +153,7 @@ def x_beta_extrap(order, beta0, beta, vol=1.0):
     for k in range(order + 1):
         val = dbeta_xave(k)(beta0, vol)
         out.append(val)
-        tot += val / np.math.factorial(k) * (dbeta ** k)
+        tot += val / np.math.factorial(k) * (dbeta**k)
     return tot, np.array(out)
 
 
@@ -235,7 +235,7 @@ def x_vol_extrap(order, vol0, vol, beta=1.0):
     for k in range(order + 1):
         val = dvol_xave(k)(beta, vol0)
         out.append(val)
-        tot += val / np.math.factorial(k) * (dvol ** k)
+        tot += val / np.math.factorial(k) * (dvol**k)
     return tot, np.array(out)
 
 

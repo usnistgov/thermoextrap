@@ -11,7 +11,7 @@ from scipy import stats
 
 from thermoextrap.ig import IGmodel
 
-from .core import ExtrapModel, InterpModel
+from .models import ExtrapModel, InterpModel
 from .xpan_beta import factory_data
 
 try:
@@ -30,11 +30,13 @@ class RecursiveInterp:
     Prediction uses the learned piecewise function.
     """
 
-    def __init__(self, model_cls, coefs, edgeB, maxOrder=1, errTol=0.01):
+    def __init__(self, model_cls, derivatives, edgeB, maxOrder=1, errTol=0.01):
         self.model_cls = (
             model_cls  # The model CLASS used for interpolation, like InterpModel
         )
-        self.coefs = coefs  # Coefs object describing how derivatives will be calculated
+        self.derivatives = (
+            derivatives  # Coefs object describing how derivatives will be calculated
+        )
         self.states = (
             []
         )  # List of ExtrapModel objects sharing same Coefs but different Data
@@ -97,10 +99,10 @@ class RecursiveInterp:
 
         # For each set of data, create an ExtrapModel object
         extrap1 = ExtrapModel(
-            alpha0=B1, data=data1, coefs=self.coefs, order=self.maxOrder
+            alpha0=B1, data=data1, derivatives=self.derivatives, order=self.maxOrder
         )
         extrap2 = ExtrapModel(
-            alpha0=B2, data=data2, coefs=self.coefs, order=self.maxOrder
+            alpha0=B2, data=data2, derivatives=self.derivatives, order=self.maxOrder
         )
 
         # Now create interpolating model based on state collection of the two
@@ -239,7 +241,10 @@ class RecursiveInterp:
             if self.states[i] is None:
                 data1 = self.getData(B1)
                 extrap1 = ExtrapModel(
-                    alpha0=B1, data=data1, coefs=self.coefs, order=self.maxOrder
+                    alpha0=B1,
+                    data=data1,
+                    derivatives=self.derivatives,
+                    order=self.maxOrder,
                 )
                 self.states[i] = extrap1
             else:
@@ -249,7 +254,10 @@ class RecursiveInterp:
             if self.states[i + 1] is None:
                 data2 = self.getData(B2)
                 extrap2 = ExtrapModel(
-                    alpha0=B2, data=data2, coefs=self.coefs, order=self.maxOrder
+                    alpha0=B2,
+                    data=data2,
+                    derivatives=self.derivatives,
+                    order=self.maxOrder,
                 )
                 self.states[i + 1] = extrap2
             else:
@@ -386,15 +394,11 @@ class RecursiveInterp:
         for i, aset in enumerate(edgeSets):
 
             reg1Model = self.model_cls((self.states[aset[0]], self.states[aset[1]]))
-            reg1Coeffs = reg1Model.xcoefs(order=self.maxOrder)
-            reg1Err = (
-                reg1Model.resample(nrep=100).xcoefs(order=self.maxOrder).std("rep")
-            )
+            reg1Coeffs = reg1Model.coefs(order=self.maxOrder)
+            reg1Err = reg1Model.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
             reg2Model = self.model_cls((self.states[aset[1]], self.states[aset[2]]))
-            reg2Coeffs = reg2Model.xcoefs(order=self.maxOrder)
-            reg2Err = (
-                reg2Model.resample(nrep=100).xcoefs(order=self.maxOrder).std("rep")
-            )
+            reg2Coeffs = reg2Model.coefs(order=self.maxOrder)
+            reg2Err = reg2Model.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
             z12 = (reg1Coeffs - reg2Coeffs) / np.sqrt(reg1Err ** 2 + reg2Err ** 2)
             # Assuming Gaussian distributions for coefficients
             # This is implicit in returning bootstrap standard deviation as estimate of uncertainty
@@ -407,10 +411,8 @@ class RecursiveInterp:
 
             # To check full interval, must retrain model with data
             fullModel = self.model_cls((self.states[aset[0]], self.states[aset[2]]))
-            fullCoeffs = fullModel.xcoefs(order=self.maxOrder)
-            fullErr = (
-                fullModel.resample(nrep=100).xcoefs(order=self.maxOrder).std("rep")
-            )
+            fullCoeffs = fullModel.coefs(order=self.maxOrder)
+            fullErr = fullModel.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
             z1full = (reg1Coeffs - fullCoeffs) / np.sqrt(reg1Err ** 2 + fullErr ** 2)
             # p1full = 2.0*stats.norm.cdf(-abs(z1full))
             p1full = stats.norm.cdf(abs(z1full)) - stats.norm.cdf(-abs(z1full))

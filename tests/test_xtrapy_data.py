@@ -3,8 +3,8 @@ import pytest
 import xarray as xr
 
 import thermoextrap
-import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
+import thermoextrap.xtrapy.models as xtrapy_models
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
 from thermoextrap.xtrapy.cached_decorators import gcached
 

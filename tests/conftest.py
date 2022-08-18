@@ -3,8 +3,8 @@ import pytest
 import xarray as xr
 
 import thermoextrap
-import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
+import thermoextrap.xtrapy.models as xtrapy_models
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
 from thermoextrap.xtrapy.cached_decorators import gcached
 
@@ -147,7 +147,7 @@ class FixtureData:
         return ufunc, xufunc
 
     @gcached()
-    def coefs_list(self):
+    def derivs_list(self):
         fs = [thermoextrap.symDerivAvgX(i) for i in range(self.order + 1)]
         ufunc, xufunc = self.u_xu_funcs
         return [fs[i](ufunc, xufunc) for i in range(self.order + 1)]
