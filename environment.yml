@@ -10,12 +10,12 @@ dependencies:
   - numpy
   - scipy
   - xarray
-  - openmm
+#  - openmm
   - cmomy
-  - pymbar
-  - pip
-  - pip:
-      - tensorflow
-      - tensorflow-probability
-      - gpflow
+  - pymbar=3.1.0
+  # - pip
+  # - pip:
+  #     - tensorflow
+  #     - tensorflow-probability
+  #     - gpflow
 # prefix: /Users/wpk/miniforge3/envs/gpflow_test
