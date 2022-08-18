@@ -11,7 +11,7 @@ import tensorflow as tf
 import xarray as xr
 from gpflow.ci_utils import ci_niter
 
-from .core import StateCollection
+from .models import StateCollection
 
 
 # First define classes needed for a GPR model
@@ -281,9 +281,9 @@ class GPRModel(StateCollection):
         y_data_err_xr = []
         for m in self.states:
             # Set norm to False so does not divide by factorial of each derivative order
-            y_data_xr.append(m.xcoefs(order=order, order_dim=order_dim, norm=False))
+            y_data_xr.append(m.derivs(order=order, order_dim=order_dim, norm=False))
             # Obtain variances by bootstrap resampling of original data and compute for each
-            this_boot = m.resample(nrep=n_resample).xcoefs(
+            this_boot = m.resample(nrep=n_resample).derivs(
                 order=order, order_dim=order_dim, norm=False
             )
             y_data_err_xr.append(this_boot.var("rep"))

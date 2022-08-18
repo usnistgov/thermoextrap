@@ -10,8 +10,8 @@ from __future__ import absolute_import
 from functools import lru_cache
 
 from .cached_decorators import gcached
-from .core import Coefs, ExtrapModel
-from .data import DataValues, xrwrap_xv
+from .data import DataCallbackABC, DataValues, xrwrap_xv
+from .models import Derivatives, ExtrapModel
 
 # Lazily imported everything above - will trim down later
 # Need funcs to pass to Coefs class
@@ -73,7 +73,7 @@ class VolumeDerivFuncs(object):
 
 
 @lru_cache(5)
-def factory_coefs():
+def factory_derivatives():
     """
     factory function to provide coefficients of expansion
 
@@ -86,65 +86,38 @@ def factory_coefs():
     coefs : Coefs object used to calculate moments
     """
     deriv_funcs = VolumeDerivFuncs()
-    return Coefs(deriv_funcs)
+    return Derivatives(deriv_funcs)
 
 
-# make a special data class
-class DataValuesVolume(DataValues):
-    def __init__(
-        self,
-        uv,
-        xv,
-        order,
-        meta,
-        rec_dim="rec",
-        umom_dim="umom",
-        deriv_dim=None,
-        skipna=False,
-        chunk=None,
-        compute=None,
-        build_aves_kws=None,
-    ):
+class VolumeDataCallback(DataCallbackABC):
+    """
+    object to handle callbacks of metadata
+    """
 
-        for k in ["volume", "dxdqv"]:
-            assert k in meta
+    def __init__(self, volume, dxdqv, ndim=3):
+        self.volume = volume
+        self.dxdqv = dxdqv
+        self.ndim = ndim
 
-        if "ndim" not in meta:
-            meta["ndim"] = 3
-
-        super(DataValuesVolume, self).__init__(
-            uv=uv,
-            xv=xv,
-            order=order,
-            skipna=skipna,
-            rec_dim=rec_dim,
-            umom_dim=umom_dim,
-            deriv_dim=deriv_dim,
-            chunk=chunk,
-            compute=compute,
-            build_aves_kws=build_aves_kws,
-            # meta data:
-            meta=meta,
-        )
-
-    @gcached()
-    def dxdq(self):
-        return self.meta["dxdqv"].mean(self.rec_dim, skipna=self.skipna)
-
-    def resample_meta(self, indices):
-        # resample "other" arrays
-        out = self.meta.copy()
-        out["dxdqv"] = out["dxdqv"][indices]
-        return out
+    def check(self, data):
+        pass
 
     @property
-    def xcoefs_args(self):
-        return (
-            self.u_selector,
-            self.xu_selector,
-            self.dxdq,
-            self.meta["volume"],
-            self.meta["ndim"],
+    def param_names(self):
+        return ["volume", "dxdqv", "ndim"]
+
+    @gcached(prop=False)
+    def dxdq(self, rec_dim, skipna):
+        return self.dxdqv.mean(rec_dim, skipna=skipna)
+
+    def resample(self, data, meta_kws, indices, **kws):
+        return self.new_like(dxdqv=self.dxdqv[indices])
+
+    def derivs_args(self, data, derivs_args):
+        return tuple(derivs_args) + (
+            self.dxdq(data.rec_dim, data.skipna),
+            self.volume,
+            self.ndim,
         )
 
 
@@ -194,15 +167,19 @@ def factory_extrapmodel(
     dxdqv = xrwrap_xv(
         dxdqv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=None, val_dims=val_dims
     )
-    data = DataValuesVolume.from_vals(
+
+    meta = VolumeDataCallback(volume=volume, dxdqv=dxdqv, ndim=ndim)
+
+    data = DataValues.from_vals(
         uv=uv,
         xv=xv,
         order=order,
-        meta=dict(
-            dxdqv=dxdqv,
-            volume=volume,
-            ndim=ndim,
-        ),
+        meta=meta,
+        # meta=dict(
+        #     dxdqv=dxdqv,
+        #     volume=volume,
+        #     ndim=ndim,
+        # ),
         rec_dim=rec_dim,
         rep_dim=rep_dim,
         val_dims=val_dims,
@@ -210,11 +187,11 @@ def factory_extrapmodel(
         **kws
     )
 
-    coefs = factory_coefs()
+    derivatives = factory_derivatives()
     return ExtrapModel(
         alpha0=volume,
         data=data,
-        coefs=coefs,
+        derivatives=derivatives,
         order=order,
         minus_log=False,
         alpha_name=alpha_name,

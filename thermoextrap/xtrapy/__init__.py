@@ -1,5 +1,4 @@
-from . import data, xpan_beta
-from .core import ExtrapModel, ExtrapWeightedModel, InterpModel, MBARModel, PerturbModel
+from . import data, xpan_beta, xpan_lnPi, xpan_vol
 from .data import (
     DataCentralMoments,
     DataCentralMomentsVals,
@@ -10,10 +9,19 @@ from .data import (
     xrwrap_uv,
     xrwrap_xv,
 )
+from .models import (
+    ExtrapModel,
+    ExtrapWeightedModel,
+    InterpModel,
+    MBARModel,
+    PerturbModel,
+)
 
 __all__ = [
     data,
     xpan_beta,
+    xpan_vol,
+    xpan_lnPi,
     ExtrapModel,
     ExtrapWeightedModel,
     InterpModel,

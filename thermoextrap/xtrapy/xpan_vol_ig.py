@@ -6,8 +6,8 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
-# from .core import DataTemplateValues, DatasetSelector
-from .core import Coefs, ExtrapModel
+# from .models import DataTemplateValues, DatasetSelector
+from .models import Derivatives, ExtrapModel
 from .xpan_beta import factory_data
 
 # from .data import DataCentralMoments, DataCentralMomentsVals
@@ -71,7 +71,7 @@ class VolumeDerivFuncsIG(object):
 
 
 @lru_cache(5)
-def factory_coefs(refV=1.0):
+def factory_derivatives(refV=1.0):
     """
     factory function to provide coefficients of expansion
 
@@ -81,10 +81,10 @@ def factory_coefs(refV=1.0):
 
     Returns
     -------
-    coefs : Coefs object used to calculate moments
+    derivatives : Coefs object used to calculate moments
     """
     deriv_funcs = VolumeDerivFuncsIG(refV=refV)
-    return Coefs(deriv_funcs)
+    return Derivatives(deriv_funcs)
 
 
 def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
@@ -113,11 +113,11 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
         raise ValueError("only first order supported")
 
     data = factory_data(uv=uv, xv=xv, order=order, central=False, xalpha=False, **kws)
-    coefs = factory_coefs(refV=volume)
+    derivatives = factory_derivatives(refV=volume)
     return ExtrapModel(
         alpha0=volume,
         data=data,
-        coefs=coefs,
+        derivatives=derivatives,
         order=order,
         minus_log=False,
         alpha_name=alpha_name,
@@ -150,11 +150,11 @@ def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
     assert not data.central
     assert data.deriv is None
 
-    coefs = factory_coefs(refV=volume)
+    derivatives = factory_derivatives(refV=volume)
     return ExtrapModel(
         alpha0=volume,
         data=data,
-        coefs=coefs,
+        derivatives=derivatives,
         order=order,
         minus_log=False,
         alpha_name=alpha_name,

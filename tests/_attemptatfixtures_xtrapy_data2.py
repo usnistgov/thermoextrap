@@ -3,8 +3,8 @@ import pytest
 import xarray as xr
 
 import thermoextrap
-import thermoextrap.xtrapy.core as xtrapy_core
 import thermoextrap.xtrapy.data as xtrapy_data
+import thermoextrap.xtrapy.models as xtrapy_models
 import thermoextrap.xtrapy.xpan_beta as xpan_beta
 from thermoextrap.xtrapy.cached_decorators import gcached
 
@@ -36,12 +36,12 @@ def test_xdata_val(fix_cdata, fix_xdata_val):
     fix_cdata.xr_test_central(fix_xdata_val.data)
 
 
-def test_rdata_coefs(fix_old, fix_rdata):
+def test_rdata_derivs(fix_old, fix_rdata):
 
     a = fix_old
     b = fix_rdata
 
     vala = a.em.params
-    valb = b.xem.coefs.xcoefs(b.data, norm=False)
+    valb = b.xem.derivatives.derivs(data=b.data)
 
     np.testing.assert_allclose(vala, valb)
