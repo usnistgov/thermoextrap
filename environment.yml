@@ -12,7 +12,7 @@ dependencies:
   - xarray
   - openmm
   - cmomy
-  - pymbar
+  - pymbar<4.0
   - pip
   - pip:
       - tensorflow
