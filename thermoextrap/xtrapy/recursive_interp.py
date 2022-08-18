@@ -34,12 +34,10 @@ class RecursiveInterp:
         self.model_cls = (
             model_cls  # The model CLASS used for interpolation, like InterpModel
         )
-        self.derivatives = (
-            derivatives  # Coefs object describing how derivatives will be calculated
-        )
+        self.derivatives = derivatives  # Derivatives object describing how derivatives will be calculated
         self.states = (
             []
-        )  # List of ExtrapModel objects sharing same Coefs but different Data
+        )  # List of ExtrapModel objects sharing same Derivatives but different Data
         self.edgeB = np.array(
             edgeB
         )  # Values of state points that we interpolate between
@@ -399,7 +397,7 @@ class RecursiveInterp:
             reg2Model = self.model_cls((self.states[aset[1]], self.states[aset[2]]))
             reg2Coeffs = reg2Model.coefs(order=self.maxOrder)
             reg2Err = reg2Model.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
-            z12 = (reg1Coeffs - reg2Coeffs) / np.sqrt(reg1Err ** 2 + reg2Err ** 2)
+            z12 = (reg1Coeffs - reg2Coeffs) / np.sqrt(reg1Err**2 + reg2Err**2)
             # Assuming Gaussian distributions for coefficients
             # This is implicit in returning bootstrap standard deviation as estimate of uncertainty
             # If DON'T want to assume this, boostrap function should return confidence intervals
@@ -413,10 +411,10 @@ class RecursiveInterp:
             fullModel = self.model_cls((self.states[aset[0]], self.states[aset[2]]))
             fullCoeffs = fullModel.coefs(order=self.maxOrder)
             fullErr = fullModel.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
-            z1full = (reg1Coeffs - fullCoeffs) / np.sqrt(reg1Err ** 2 + fullErr ** 2)
+            z1full = (reg1Coeffs - fullCoeffs) / np.sqrt(reg1Err**2 + fullErr**2)
             # p1full = 2.0*stats.norm.cdf(-abs(z1full))
             p1full = stats.norm.cdf(abs(z1full)) - stats.norm.cdf(-abs(z1full))
-            z2full = (reg2Coeffs - fullCoeffs) / np.sqrt(reg2Err ** 2 + fullErr ** 2)
+            z2full = (reg2Coeffs - fullCoeffs) / np.sqrt(reg2Err**2 + fullErr**2)
             # p2full = 2.0*stats.norm.cdf(-abs(z2full))
             p2full = stats.norm.cdf(abs(z2full)) - stats.norm.cdf(-abs(z2full))
 
