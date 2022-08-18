@@ -9,7 +9,8 @@ import xarray as xr
 from scipy.special import factorial as sp_factorial
 
 from .cached_decorators import gcached
-from .data import xrwrap_alpha
+from .sputils import get_default_indexed, get_default_symbol
+from .xrutils import xrwrap_alpha
 
 try:
     from pymbar import mbar
@@ -19,6 +20,7 @@ except ImportError:
     _HAS_PYMBAR = False
 
 
+# __all__ = []
 # from cmomy.xcentral import xCentralMoments
 
 ################################################################################
@@ -26,21 +28,8 @@ except ImportError:
 ################################################################################
 
 
-@lru_cache(100)
-def _get_default_symbol(*args):
-    return sp.symbols(",".join(args))
-
-
-@lru_cache(100)
-def _get_default_indexed(*args):
-    out = [sp.IndexedBase(key) for key in args]
-    if len(out) == 1:
-        out = out[0]
-    return out
-
-
 # @lru_cache(100)
-# def _get_default_function(*args):
+# def get_default_function(*args):
 #     out = [sp.Function(key) for key in args]
 #     if len(out) == 1:
 #         out = out[0]
@@ -194,7 +183,7 @@ class Lambdify(object):
     @classmethod
     def from_u_xu(cls, exprs, **opts):
         """factory for u/xu args"""
-        u, xu = _get_default_indexed("u", "xu")
+        u, xu = get_default_indexed("u", "xu")
         # args = (u, xu)
         return cls(exprs=exprs, args=(u, xu), **opts)
 
@@ -202,10 +191,10 @@ class Lambdify(object):
     def from_du_dxdu(cls, exprs, xalpha=False, **opts):
         """factory for du/dxdu args"""
         if xalpha:
-            x1 = _get_default_indexed("x1")
+            x1 = get_default_indexed("x1")
         else:
-            x1 = _get_default_symbol("x1")
-        du, dxdu = _get_default_indexed("du", "dxdu")
+            x1 = get_default_symbol("x1")
+        du, dxdu = get_default_indexed("du", "dxdu")
         return cls(exprs=exprs, args=(x1, du, dxdu), **opts)
 
 
@@ -216,7 +205,7 @@ class SymMinusLog(object):
 
     """
 
-    X, dX = _get_default_indexed("X", "dX")
+    X, dX = get_default_indexed("X", "dX")
 
     @gcached(prop=False)
     def __getitem__(self, order):

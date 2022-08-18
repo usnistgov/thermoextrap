@@ -10,21 +10,21 @@ from typing import Literal
 import sympy as sp
 
 # from .cached_decorators import gcached
-from .data import (  # noqa: F401
+from .core.data import (  # noqa: F401
     DataCentralMoments,
     DataCentralMomentsVals,
     DataValues,
     DataValuesCentral,
     resample_indicies,
 )
-from .models import (
+from .core.models import (
     Derivatives,
     ExtrapModel,
     PerturbModel,
     SymDerivBase,
     SymSubs,
-    _get_default_indexed,
-    _get_default_symbol,
+    get_default_indexed,
+    get_default_symbol,
 )
 
 # from cmomy.options import set_options
@@ -51,7 +51,7 @@ class du_func(sp.Function):
     """
 
     nargs = 2
-    du = _get_default_indexed("du")
+    du = get_default_indexed("du")
 
     @classmethod
     def deriv_args(cls):
@@ -82,7 +82,7 @@ class u_func_central(sp.Function):
     """
 
     nargs = 1
-    u = _get_default_symbol("u")
+    u = get_default_symbol("u")
 
     @classmethod
     def deriv_args(cls):
@@ -109,7 +109,7 @@ class dxdu_func_nobeta(sp.Function):
     """
 
     nargs = 2
-    dxdu = _get_default_indexed("dxdu")
+    dxdu = get_default_indexed("dxdu")
 
     @classmethod
     def deriv_args(cls):
@@ -143,7 +143,7 @@ class dxdu_func_beta(sp.Function):
     """
 
     nargs = 3
-    dxdu = _get_default_indexed("dxdu")
+    dxdu = get_default_indexed("dxdu")
 
     @classmethod
     def deriv_args(cls):
@@ -176,7 +176,7 @@ class x_func_central_nobeta(sp.Function):
     """
 
     nargs = 1
-    x1_symbol = _get_default_symbol("x1")
+    x1_symbol = get_default_symbol("x1")
 
     @classmethod
     def deriv_args(cls):
@@ -201,7 +201,7 @@ class x_func_central_beta(sp.Function):
     """
 
     nargs = 2
-    x1_indexed = _get_default_indexed("x1")
+    x1_indexed = get_default_indexed("x1")
 
     @classmethod
     def deriv_args(cls):
@@ -231,7 +231,7 @@ class u_func(sp.Function):
     """
 
     nargs = 2
-    u = _get_default_indexed("u")
+    u = get_default_indexed("u")
 
     @classmethod
     def deriv_args(cls):
@@ -261,7 +261,7 @@ class xu_func(sp.Function):
     """
 
     nargs = (2, 3)
-    xu = _get_default_indexed("xu")
+    xu = get_default_indexed("xu")
 
     @classmethod
     def deriv_args(cls):
@@ -301,7 +301,7 @@ class SymDerivBeta(SymDerivBase):
 
     """
 
-    beta = _get_default_symbol("beta")
+    beta = get_default_symbol("beta")
 
     @classmethod
     def x_ave(cls, xalpha=False, central=None, expand=True, post_func=None):

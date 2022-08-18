@@ -14,7 +14,7 @@ import numpy as np
 import sympy as sp
 
 # from .cached_decorators import gcached
-# from .models import _get_default_indexed, _get_default_symbol
+# from .models import get_default_indexed, get_default_symbol
 
 beta_sym, vol_sym = sp.symbols("beta_sym vol_sym")
 xave_sym = (1 / beta_sym) - vol_sym / (sp.exp(beta_sym * vol_sym) - 1)

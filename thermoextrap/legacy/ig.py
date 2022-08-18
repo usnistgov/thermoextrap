@@ -29,8 +29,8 @@ class IGmodel:
     @classmethod
     def varX(cls, B, L=1.0):
         """Variance in position, x at the inverse temperature B"""
-        term1 = 1.0 / (B ** 2)
-        term2 = (L ** 2) * np.exp(B * L) / ((np.exp(B * L) - 1) ** 2)
+        term1 = 1.0 / (B**2)
+        term2 = (L**2) * np.exp(B * L) / ((np.exp(B * L) - 1) ** 2)
         return term1 - term2
 
     @classmethod
@@ -84,7 +84,7 @@ class IGmodel:
         # Really just the same as average of x, but it's a nice check all the math
         def pertNumer(B, B0):
             prefac = B0 / (1.0 - np.exp(-B0 * L))
-            term1 = (1.0 - np.exp(-B * L)) / (B ** 2)
+            term1 = (1.0 - np.exp(-B * L)) / (B**2)
             term2 = L * np.exp(-B * L) / B
             return prefac * (term1 - term2)
 
@@ -106,7 +106,7 @@ class IGmodel:
         for k in range(order + 1):
             thisdiff = sym.diff(self.avgXsym, self.b, k)
             outvec[k] = thisdiff.subs({self.b: B0, self.l: L})
-            outval += outvec[k] * (dBeta ** k) / np.math.factorial(k)
+            outval += outvec[k] * (dBeta**k) / np.math.factorial(k)
         return (outval, outvec)
 
     def extrapAnalyticVolume(self, L, L0, order, B=1.0):
@@ -119,7 +119,7 @@ class IGmodel:
         for k in range(order + 1):
             thisdiff = sym.diff(self.avgXsym, self.l, k)
             outvec[k] = thisdiff.subs({self.b: B, self.l: L0})
-            outval += outvec[k] * (dL ** k) / np.math.factorial(k)
+            outval += outvec[k] * (dL**k) / np.math.factorial(k)
         return (outval, outvec)
 
     # Want to be able to create sample data set we can work with at a reference beta
