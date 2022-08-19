@@ -1,0 +1,37 @@
+dependencies:
+  # development
+  - isort
+  - black
+  - blackdoc
+  - flake8
+  # testing
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - tox-conda
+  # specials
+  - pre-commit
+  # repl
+  - ipython
+  - ipykernel
+  # build
+  - build
+  - setuptools
+  - setuptools-scm
+  - setuptools-scm-git-archive
+  - build
+  - twine
+  # conda specific
+  - conda-build
+  - anaconda-client
+  - greyskull
+  # doc stuff
+  - sphinx
+  - sphinx_rtd_theme
+  - recommonmark # if want markdown
+  - nbsphinx # if want notebooks
+  # lsp stuff
+  - autoflake
+  - pyls-mypy
+  - pyls-black
+  - pyls-isort
