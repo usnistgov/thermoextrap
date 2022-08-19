@@ -1,6 +1,4 @@
-"""
-This sets up optional values
-"""
+"""Sets up optional values."""
 
 NMAX = "nmax"
 FASTMATH = "fastmath"
@@ -35,7 +33,9 @@ _SETTERS = {}
 
 class set_options(object):
     """Set options for xarray in a controlled context.
+
     Currently supported options:
+
     - `NMAX` : max moment size
     You can use ``set_options`` either as a context manager:
     >>> with xr.set_options(use_tqdm=True, tqdm_min_len_calc=50):

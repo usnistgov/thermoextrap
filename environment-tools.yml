@@ -4,6 +4,8 @@ dependencies:
   - black
   - blackdoc
   - flake8
+  # flake8 addons
+  - flake8-docstrings
   # testing
   - pytest
   - pytest-cov

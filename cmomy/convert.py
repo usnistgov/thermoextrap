@@ -1,6 +1,4 @@
-"""
-routines to convert central (co)moments to raw (co)moments
-"""
+"""routines to convert central (co)moments to raw (co)moments."""
 from __future__ import absolute_import
 
 import numpy as np
@@ -189,9 +187,7 @@ def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=
 
 
 def to_raw_moments(x, axis=-1, dtype=None, order=None, out=None):
-    """
-    convert central moments to raw moments
-    """
+    """Convert central moments to raw moments."""
     if axis is None:
         axis = -1
 
@@ -207,9 +203,7 @@ def to_raw_moments(x, axis=-1, dtype=None, order=None, out=None):
 
 
 def to_raw_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
-    """
-    convert central moments to raw moments
-    """
+    """Convert central moments to raw moments."""
 
     if axis is None:
         axis = (-2, -1)
@@ -226,9 +220,7 @@ def to_raw_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
 
 
 def to_central_moments(x, axis=-1, dtype=None, order=None, out=None):
-    """
-    convert central moments to raw moments
-    """
+    """Convert central moments to raw moments."""
 
     if axis is None:
         axis = -1
@@ -245,9 +237,7 @@ def to_central_moments(x, axis=-1, dtype=None, order=None, out=None):
 
 
 def to_central_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
-    """
-    convert raw comoments to central comoments
-    """
+    """Convert raw comoments to central comoments."""
 
     if axis is None:
         axis = (-2, -1)

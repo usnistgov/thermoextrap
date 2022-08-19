@@ -1,6 +1,4 @@
-"""
-Routines to perform resampling
-"""
+"""Routines to perform resampling."""
 from __future__ import absolute_import
 
 from numba import njit, prange
@@ -22,6 +20,7 @@ from .pushers import (
 
 
 def jitter(parallel):
+    """Perform jitting."""
     return njit(fastmath=OPTIONS["fastmath"], cache=OPTIONS["cache"], parallel=parallel)
 
 
@@ -135,6 +134,7 @@ _RESAMPLE_DATA_DICT = {
 
 
 def factory_resample_data(cov, vec, parallel):
+    """Get resampler functions(s)."""
     return _RESAMPLE_DATA_DICT[cov, vec, parallel]
 
 
@@ -216,4 +216,5 @@ _RESAMPLE_VALS_DICT = {
 
 
 def factory_resample_vals(cov, vec, parallel):
+    """Get resample vals functions."""
     return _RESAMPLE_VALS_DICT[cov, vec, parallel]

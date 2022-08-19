@@ -105,7 +105,6 @@ def test_combine(other):
 
 
 def test_from_datas(other):
-
     datas = xr.concat([s.values for s in other.S_xr], dim="rec")
     datas = scramble_xr(datas).transpose(*(...,) + other.s_xr.mom_dims)
     t = other.cls_xr.from_datas(datas, mom=other.mom, axis="rec")
@@ -196,7 +195,6 @@ def test_mult(other):
 
 
 def test_resample_and_reduce(other):
-
     ndim = len(other.val_shape)
 
     if ndim > 0:

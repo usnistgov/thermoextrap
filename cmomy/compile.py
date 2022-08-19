@@ -1,6 +1,4 @@
-"""
-Set of routines to call most cases to pre-compile numba functions
-"""
+"""Set of routines to call most cases to pre-compile numba functions."""
 
 from __future__ import absolute_import
 
@@ -10,6 +8,7 @@ from .central import CentralMoments
 
 
 def compile_numba_funcs():
+    """Attempt at function to compile all funcs."""
     dtype = float
     for val_shape in [(), (1,), (1, 1)]:
         for mom in [(1,), (1, 1)]:

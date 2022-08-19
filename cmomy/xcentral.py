@@ -1,6 +1,4 @@
-"""
-Thin wrapper around central routines with xarray support
-"""
+"""Thin wrapper around central routines with xarray support."""
 from __future__ import absolute_import
 
 import numpy as np
@@ -70,9 +68,7 @@ def _xcentral_comoments(
     broadcast=False,
     mom_dims=None,
 ):
-    """
-    calculate central co-mom (covariance, etc) along axis
-    """
+    """Calculate central co-mom (covariance, etc) along axis."""
 
     if isinstance(mom, int):
         mom = (mom,) * 2
@@ -141,8 +137,7 @@ def xcentral_moments(
     mom_dims=None,
     broadcast=False,
 ):
-    """
-    calculate central mom along axis
+    """Calculate central mom along axis.
 
     Parameters
     ----------
@@ -242,10 +237,7 @@ def _optional_wrap_data(
     verify=True,
     # verify_mom_dims=True,
 ):
-
-    """
-    wrap data with xarray
-    """
+    """Wrap data with xarray."""
 
     if isinstance(data, xr.DataArray):
         # if mom_dims is None:
@@ -329,13 +321,12 @@ def _optional_wrap_data(
 
 
 class xCentralMoments(central.CentralMoments):
-    """
-    xarray.DataArray wrapper of `cmomy.central.CentralMoments`
+    """Wrap cmomy.central.CentralMoments with xarray.
 
-    Most methods are wrapped to accept `xarray.DataArray` object
+    Most methods are wrapped to accept xarray.DataArray object.
 
-    Notes:
-    ------
+    Notes
+    -----
     unlike xarray, most methods take only the `axis` parameter
     instead of both an `axis` (for positional) and `dim` (for names)
     parameter for reduction.  If `axis` is a integer, then positional
@@ -361,31 +352,38 @@ class xCentralMoments(central.CentralMoments):
 
     @property
     def values(self):
+        """Underlying data."""
         return self._xdata
 
     # xarray attriburtes
     @property
     def attrs(self):
+        """Attributes of values."""
         return self._xdata.attrs
 
     @property
     def dims(self):
+        """Dimensions of values."""
         return self._xdata.dims
 
     @property
     def coords(self):
+        """Coordinates of values."""
         return self._xdata.coords
 
     @property
     def name(self):
+        """Name of values."""
         return self._xdata.name
 
     @property
     def indexes(self):
+        """Indexes of values."""
         return self._xdata.indexes
 
     @property
     def sizes(self):
+        """Sizes of values."""
         return self._xdata.sizes
 
     ###########################################################################
@@ -393,7 +391,7 @@ class xCentralMoments(central.CentralMoments):
     ###########################################################################
     @gcached()
     def _template_val(self):
-        """template for values part of data"""
+        """Template for values part of data."""
         return self._xdata[self._weight_index]
 
     # def _wrap_like_template(self, x):
@@ -405,11 +403,12 @@ class xCentralMoments(central.CentralMoments):
 
     @property
     def val_dims(self):
-        """dim names of values"""
+        """Names of value dimensions."""
         return self.dims[: -self.mom_ndim]
 
     @property
     def mom_dims(self):
+        """Names of moment dimensions."""
         return self.dims[-self.mom_ndim :]
 
     @property
@@ -431,9 +430,7 @@ class xCentralMoments(central.CentralMoments):
         strict=False,
         **kws,
     ):
-        """
-        create new object like self, with new data
-
+        """Create new object like self, with new data.
 
         Parameters
         ----------
@@ -482,8 +479,7 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
-        """
-        create a new base object
+        """Create a new base object.
 
         Parameters
         ----------
@@ -529,12 +525,15 @@ class xCentralMoments(central.CentralMoments):
         return self.new_like(data=xdata, strict=False)
 
     def assign_coords(self, coords=None, **coords_kwargs):
+        """Assign coordinates to data and return new object."""
         return self._wrap_xarray_method("assign_coords", coords=coords, **coords_kwargs)
 
     def assign_attrs(self, *args, **kwargs):
+        """Assign attributes to data and return new object."""
         return self._wrap_xarray_method("assign_attrs", *args, **kwargs)
 
     def rename(self, new_name_or_name_dict=None, **names):
+        """Rename object."""
         return self._wrap_xarray_method(
             "rename", new_name_or_name_dict=new_name_or_name_dict, **names
         )
@@ -571,6 +570,10 @@ class xCentralMoments(central.CentralMoments):
         _data_verify=False,
         **dimensions_kwargs,
     ):
+        """Stack dimensions.
+
+        See xarray.DataArray.stack
+        """
         return self._wrap_xarray_method_from_data(
             "stack",
             _data_copy=_data_copy,
@@ -590,6 +593,10 @@ class xCentralMoments(central.CentralMoments):
         _data_order=True,
         _data_verify=False,
     ):
+        """Unstack dimensions.
+
+        See xarray.DataArray.unstack
+        """
         return self._wrap_xarray_method_from_data(
             "unstack",
             _data_copy=_data_copy,
@@ -613,6 +620,10 @@ class xCentralMoments(central.CentralMoments):
         _data_verify=False,
         **indexers_kws,
     ):
+        """Select subset of data.
+
+        See xarray.DataArray.sel
+        """
         return self._wrap_xarray_method_from_data(
             "sel",
             _data_copy=_data_copy,
@@ -635,6 +646,10 @@ class xCentralMoments(central.CentralMoments):
         _data_verify=False,
         **indexers_kws,
     ):
+        """Select subset of data by position.
+
+        See xarray.DataArray.isel
+        """
         return self._wrap_xarray_method_from_data(
             "isel",
             _data_copy=_data_copy,
@@ -790,19 +805,32 @@ class xCentralMoments(central.CentralMoments):
     # have to do some special stuff for mean/var
     # due to xarray special indexing
     def mean(self, dim_combined="variable", coords_combined=None):
+        """Return mean/first moment(s) of data."""
         return self._single_index_selector(
             val=1, dim_combined=dim_combined, coords_combined=coords_combined
         )
 
     def var(self, dim_combined="variable", coords_combined=None):
+        """Return variance (second central moment) of data."""
         return self._single_index_selector(
             val=2, dim_combined=dim_combined, coords_combined=coords_combined
         )
 
     def cmom(self):
+        """Return central moments.
+
+        Structure is cmom[i, j] = <(x-<x>)**i (y-<y>)**u>.
+
+        Note that is strict, so, `cmom[1, 0] = cmom[0, 1] = 0` and
+        `cmom[0, 0] = 1`
+        """
         return self._wrap_like(super(xCentralMoments, self).cmom())
 
     def rmom(self):
+        """Return raw moments.
+
+        Structure is rmom[i, j] = <x**i y**j>.
+        """
         return self._wrap_like(super(xCentralMoments, self).rmom())
 
     def resample_and_reduce(
@@ -816,9 +844,7 @@ class xCentralMoments(central.CentralMoments):
         resample_kws=None,
         **kws,
     ):
-        """
-        bootstrap resample and reduce
-
+        """Bootstrap resample and reduce.
 
         Parameters
         ----------
@@ -857,9 +883,7 @@ class xCentralMoments(central.CentralMoments):
         )
 
     def block(self, block_size, axis=None, coords_policy="first", **kws):
-        """
-
-        block average along an axis
+        """Block average along an axis.
 
         Parameters
         ----------
@@ -955,9 +979,7 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         # verify_mom_dims=True,
     ):
-        """
-        object from data array
-
+        """Object from data array.
 
         Parameters
         ----------
@@ -1014,7 +1036,8 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
-        """
+        """Create object from multiple datas.
+
         Parameters
         ----------
         dims : tuple, optional
@@ -1045,6 +1068,10 @@ class xCentralMoments(central.CentralMoments):
         )
 
     def to_raw(self):
+        """Convert underlying central data to raw data.
+
+        See `CentralMoments.to_raw`
+        """
         return self._wrap_like(super(xCentralMoments, self).to_raw())
 
     @classmethod
@@ -1064,11 +1091,16 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
-        """
+        """Create object from raw moment data.
+
         Parameters
         ----------
         dims : tuple, optional
             dimension names
+
+        See Also
+        --------
+        CentralMoments.from_raw
         """
         kws, _, values = _check_xr_input(
             raw,
@@ -1110,6 +1142,10 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
+        """Create object from multiple raw values.
+
+        See `CentralMoments.from_raw`
+        """
 
         kws, axis, values = _check_xr_input(
             raws,
@@ -1152,6 +1188,10 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
+        """Create object from values.
+
+        See CentralMomentsfrom_vals
+        """
 
         mom_ndim = cls._mom_ndim_from_mom(mom)
         x0 = x if mom_ndim == 1 else x[0]
@@ -1201,6 +1241,10 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
+        """Create from resampling values.
+
+        See CentralMomentsfrom_values
+        """
 
         mom_ndim = cls._mom_ndim_from_mom(mom)
         if mom_ndim == 1:
@@ -1261,6 +1305,10 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
+        """Create from single observation of statisitcs (mean, variance).
+
+        See CentralMoment.from_stat
+        """
 
         kws, *_ = _check_xr_input(
             a,
@@ -1296,6 +1344,10 @@ class xCentralMoments(central.CentralMoments):
         mom_dims=None,
         **kws,
     ):
+        """Create from collection of statisitcs.
+
+        See CentralMoments.from_stats
+        """
 
         kws, axis, values = _check_xr_input(
             a,
@@ -1314,6 +1366,10 @@ class xCentralMoments(central.CentralMoments):
         )
 
     def transpose(self, *dims, transpose_coords=None, copy=False, **kws):
+        """Transpose dimensions of data.
+
+        See xarray.DataArray.transpose
+        """
         # make sure dims are last
         dims = list(dims)
         for k in self.mom_dims:

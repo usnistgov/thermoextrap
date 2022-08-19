@@ -1,6 +1,4 @@
-"""
-Central moments/comoments routines
-"""
+"""Central moments/comoments routines."""
 from __future__ import absolute_import
 
 import numpy as np
@@ -20,7 +18,7 @@ from .utils import _shape_insert_axis, _shape_reduce
 def _central_moments(
     x, mom, w=None, axis=0, last=True, dtype=None, order=None, out=None
 ):
-    """calculate central mom along axis"""
+    """Calculate central mom along axis."""
 
     if isinstance(mom, tuple):
         mom = mom[0]
@@ -80,7 +78,7 @@ def _central_comoments(
     order=None,
     out=None,
 ):
-    """calculate central co-mom (covariance, etc) along axis"""
+    """Calculate central co-mom (covariance, etc) along axis."""
 
     if isinstance(mom, int):
         mom = (mom,) * 2
@@ -160,8 +158,7 @@ def _central_comoments(
 def central_moments(
     x, mom, w=None, axis=0, last=True, dtype=None, order=None, out=None, broadcast=False
 ):
-    """
-    calculate central moments or comoments along axis
+    """Calculate central moments or comoments along axis.
 
     Parameters
     ----------
@@ -218,8 +215,7 @@ def central_moments(
 # Classes
 ###############################################################################
 class CentralMoments(object):
-    """
-    Base class for moments accumulation
+    """Base class for moments accumulation.
 
     Parameters
     ----------
@@ -275,12 +271,12 @@ class CentralMoments(object):
 
     @property
     def values(self):
-        """accessor to underlying central moments data"""
+        """Access underlying central moments data."""
         return self._data
 
     @property
     def data(self):
-        """accessor to numpy underlying data
+        """Accessor to numpy underlying data.
 
         By convention data has the following meaning for the moments indexes
 
@@ -294,48 +290,54 @@ class CentralMoments(object):
 
     @property
     def shape(self):
-        """self.data.shape"""
+        """self.data.shape."""
         return self._data.shape
 
     @property
     def ndim(self):
-        """self.data.ndim"""
+        """self.data.ndim."""
         return self._data.ndim
 
     @property
     def dtype(self):
+        """self.data.dtype."""
         return self._data.dtype
 
     @property
     def mom(self):
-        """number of moments for each variable"""
+        """Number of moments."""  # noqa D401
         return tuple(x - 1 for x in self.mom_shape)
 
     @property
     def mom_shape(self):
-        """shape of moments part"""
+        """Shape of moments part."""
         return self._data.shape[-self.mom_ndim :]
 
     @property
     def mom_ndim(self):
-        """length of moment part
-        if `mom_ndim` == 1, then single variable moments
-        if `mom_ndim` == 2, then co-moments
+        """Length of moments.
+
+        if `mom_ndim` == 1, then single variable
+        moments if `mom_ndim` == 2, then co-moments.
         """
         return self._mom_ndim
 
     @property
     def val_shape(self):
-        """shape, less moments dimensions"""
+        """Shape of values dimensions.
+
+        That is shape less moments dimensions.
+        """
         return self._data.shape[: -self.mom_ndim]
 
     @property
     def val_ndim(self):
+        """Number of value dimensions."""  # noqa D401
         return len(self.val_shape)
 
     @property
     def val_shape_flat(self):
-        """shape of values part flattened"""
+        """Shape of values part flattened."""
         if self.val_shape == ():
             return ()
         else:
@@ -343,21 +345,23 @@ class CentralMoments(object):
 
     @property
     def shape_flat(self):
+        """Shape of flattened data."""
         return self.val_shape_flat + self.mom_shape
 
     @property
     def mom_shape_var(self):
-        """shape of moment part of variance"""
+        """Shape of moment part of variance."""
         return tuple(x - 1 for x in self.mom)
 
     # variance shape
     @property
     def shape_var(self):
-        """total variance shape"""
+        """Total variance shape."""
         return self.val_shape + self.mom_shape_var
 
     @property
     def shape_flat_var(self):
+        """Shape of flat variance."""
         return self.val_shape_flat + self.mom_shape_var
 
     # I think this is for pickling
@@ -374,10 +378,12 @@ class CentralMoments(object):
     #     return self, obj, context
 
     def __repr__(self):
+        """Repr for class."""
         s = "<CentralMoments(val_shape={}, mom={})>\n".format(self.val_shape, self.mom)
         return s + repr(self.values)
 
     def __array__(self, dtype=None):
+        """Used by np.array(self)."""  # noqa D401
         return np.asarray(self._data, dtype=dtype)
 
     ###########################################################################
@@ -393,7 +399,7 @@ class CentralMoments(object):
         strict=False,
         **kws,
     ):
-        """create new object like self, with new data
+        """Create new object like self, with new data.
 
         Parameters
         ----------
@@ -437,11 +443,11 @@ class CentralMoments(object):
         )
 
     def zeros_like(self):
-        """create new object empty object like self"""
+        """Create new object empty object like self."""
         return self.new_like()
 
     def copy(self, **copy_kws):
-        """create a new object with copy of data"""
+        """Create a new object with copy of data."""
         return self.new_like(
             data=self.values,
             verify=False,
@@ -461,7 +467,7 @@ class CentralMoments(object):
         zeros_kws=None,
         **kws,
     ):
-        """create a new base object
+        """Create a new base object.
 
         Parameters
         ----------
@@ -548,20 +554,28 @@ class CentralMoments(object):
         return tuple(index)
 
     def weight(self):
+        """Weight data."""
         return self.values[self._weight_index]
 
     def mean(self):
+        """Mean (first moment)."""
         return self.values[self._single_index(1)]
 
     def var(self):
+        """Variance (second central moment)."""
         return self.values[self._single_index(2)]
 
     def std(self):
+        """Standard deviation."""  # noqa D401
         return np.sqrt(self.var())
 
     def cmom(self):
-        """central moments
-        `cmom[..., i0, i1] = < (x0 - <x0>)**i0 * (x1 - <x1>)**i1>`
+        """Central moments.
+
+        cmom[..., i0, i1] = < (x0 - <x0>)**i0 * (x1 - <x1>)**i1>
+        Note that this is scrict, so `cmom[..., i, j] = 0` if `i+j = 0`
+        and `cmom[...,0, 0] = 1`.
+
         """
         out = self.data.copy()
         # zeroth central moment
@@ -572,7 +586,7 @@ class CentralMoments(object):
 
     # convert to/from raw moments
     def to_raw(self):
-        """convert central moments to raw moments
+        """Convert central moments to raw moments.
 
         raw[...,i, j] = weight,           i = j = 0
                       = <x0**i * x1**j>,  otherwise
@@ -584,7 +598,8 @@ class CentralMoments(object):
         return func(self.data)
 
     def rmom(self):
-        """raw moments
+        """Raw moments.
+
         rmom[..., i, j] = <x0 ** i * x1 ** j>
         """
         out = self.to_raw()
@@ -612,8 +627,7 @@ class CentralMoments(object):
         shape_flat=None,
         other=None,
     ):
-        """
-        verify input values
+        """Verify input values.
 
         Parameters
         ----------
@@ -761,16 +775,16 @@ class CentralMoments(object):
         )[0]
 
     def fill(self, value=0):
-        """fill data with value"""
+        """Fill data with value."""
         self._data.fill(value)
         return self
 
     def zero(self):
-        """zero out underlying data"""
+        """Zero out underlying data."""
         return self.fill(value=0)
 
     def push_data(self, data):
-        """push data object to moments
+        """Push data object to moments.
 
         Parameters
         ----------
@@ -789,7 +803,7 @@ class CentralMoments(object):
         return self
 
     def push_datas(self, datas, axis=0):
-        """push and reduce multiple average central moments
+        """Push and reduce multiple average central moments.
 
         Parameters
         ----------
@@ -808,7 +822,7 @@ class CentralMoments(object):
         return self
 
     def push_val(self, x, w=None, broadcast=False):
-        """dd single sample to central moments
+        """Push single sample to central moments.
 
         Parameters
         ----------
@@ -840,8 +854,7 @@ class CentralMoments(object):
         return self
 
     def push_vals(self, x, w=None, axis=0, broadcast=False):
-        """
-        add multiple samples to central moments
+        """Push multiple samples to central moments.
 
         Parameters
         ----------
@@ -876,19 +889,19 @@ class CentralMoments(object):
     # SECTION: Operators
     ###########################################################################
     def _check_other(self, b):
-        """check other object"""
+        """Check other object."""
         assert type(self) == type(b)
         assert self.mom_ndim == b.mom_ndim
         assert self.shape == b.shape
 
-    def __iadd__(self, b):
+    def __iadd__(self, b):  # noqa D105
         self._check_other(b)
         # self.push_data(b.data)
         # return self
         return self.push_data(b.data)
 
     def __add__(self, b):
-        """add objects to new object"""
+        """Add objects to new object."""
         self._check_other(b)
         # new = self.copy()
         # new.push_data(b.data)
@@ -896,6 +909,7 @@ class CentralMoments(object):
         return self.copy().push_data(b.data)
 
     def __isub__(self, b):
+        """Inplace substraction."""
         # NOTE: consider implementint push_data_scale routine to make this cleaner
         self._check_other(b)
         assert np.all(self.weight() >= b.weight())
@@ -906,6 +920,7 @@ class CentralMoments(object):
         return self.push_data(data)
 
     def __sub__(self, b):
+        """Subtract objects."""
         self._check_other(b)
         assert np.all(self.weight() >= b.weight())
         new = b.copy()
@@ -915,15 +930,14 @@ class CentralMoments(object):
         return new.push_data(self.data)
 
     def __mul__(self, scale):
-        """
-        new object with weights scaled by scale
-        """
+        """New object with weights scaled by scale."""  # noqa D401
         scale = float(scale)
         new = self.copy()
         new._data[self._weight_index] *= scale
         return new
 
     def __imul__(self, scale):
+        """Inplace multiply."""
         scale = float(scale)
         self._data[self._weight_index] *= scale
         return self
@@ -933,9 +947,10 @@ class CentralMoments(object):
     ###########################################################################
     @classmethod
     def _check_mom(cls, moments, mom_ndim, shape=None):
-        """check moments for correct shape
-        if moments is None, infer from shape[-mom_ndim:]
-        if integer, convert to tuple
+        """Check moments for correct shape.
+
+        If moments is None, infer from
+        shape[-mom_ndim:] if integer, convert to tuple.
         """
 
         if moments is None:
@@ -963,7 +978,7 @@ class CentralMoments(object):
 
     @staticmethod
     def _datas_axis_to_first(datas, axis, mom_ndim):
-        """move axis to first first position"""
+        """Move axis to first first position."""
         # NOTE: removinvg this. should be handles elsewhere
         # datas = np.asarray(datas)
         # ndim = datas.ndim - mom_ndim
@@ -976,7 +991,7 @@ class CentralMoments(object):
         return datas, axis
 
     def _wrap_axis(self, axis, default=0, ndim=None):
-        """wrap axis to positive value and check"""
+        """Wrap axis to positive value and check."""
         if axis is None:
             axis = default
         if ndim is None:
@@ -1021,12 +1036,34 @@ class CentralMoments(object):
         dtype=None,
         # **kws,
     ):
-        """
-        create new object with additional checks
+        """Create new object from `data` array with additional checks.
 
-        If pass `mom` and `shape`, make sure data conforms to this
+        Parameters
+        ----------
+        data : np.ndarray
+            shape should be val_shape + mom.
+        mom_ndim : int, optional
+            Number of moment dimensions.
+            `mom_dim=1` for moments, `mom_dim=2` for comoments.
+        mom : int or tuple, optional
+            Moments. Defaults to data.shape[-mom_ndim:].
+            Must specify either `mom_ndim` or `mom`.
+            Verify data has correct shape.
+        val_shape : tuple, optional
+            shape of non-moment dimensions.  Used to check `data`
+        copy : bool, default=True.
+            If True, copy `data`.  If False, try to not copy.
+        copy_kws : dict, optional
+            parameters to np.ndarray.copy
+        verify : bool, default=True
+            If True, force data to have 'c' order
+        check_shape : bool, default=True
+            If True, check that `data` has correct shape (based on `mom` and `val_shape`)
+        dtype : np.dtype, optional
 
-        must pass either mom_ndim or mom
+        Returns
+        -------
+        out : CentralMoments instance
         """
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
@@ -1065,12 +1102,18 @@ class CentralMoments(object):
         check_shape=True,
         **kws,
     ):
-        """
-        Data should have val_shape
+        """Create object from multiple data arrays.
 
-        [..., moments] (axis!= -1)
+        Parameters
+        ----------
+        datas : np.ndarray
+            Array of multiple Moment arrays.
+            datas[..., i, ...] is the ith data array, where i is
+            in position `axis`.
 
-        [..., moment, axis] (axis == -1)
+        See Also
+        --------
+        CentralMoments.from_data
         """
 
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
@@ -1104,6 +1147,30 @@ class CentralMoments(object):
         broadcast=False,
         **kws,
     ):
+        """Create from observations/values.
+
+        Parameters
+        ----------
+        x : array-like or tuple of array-like
+            For moments, pass single array-like objects.
+            For comoments, pass tuple of array-like objects.
+        w : array-like, optional
+            Optional weights.
+        axis : int, default=0
+            axis to reduce along.
+        mom : int or tuple of ints
+            For moments, pass an int.  For comoments, pass a tuple of ints.
+        val_shape : tuple, optional
+            shape array of values part of resulting object
+        broadcast : bool, default=False
+            If True, and doing comoments, broadcast x[1] to x[0]
+        kws : dict
+            optional arguments passed to cls.zeros
+
+        Returns
+        -------
+        out : CentralMoments object
+        """
 
         mom_ndim = cls._mom_ndim_from_mom(mom)
         x0 = x if mom_ndim == 1 else x[0]
@@ -1132,6 +1199,44 @@ class CentralMoments(object):
         resample_kws=None,
         **kws,
     ):
+        """Create from resample observations/values.
+
+        This effectively resamples `x`.
+
+        Parameters
+        ----------
+        x : array or tuple of arrays
+            See CentralMoments.from_vals
+        freq : array, optional
+            Array of shape (nrep, size), where nrep is the number of
+            replicates, and size is `x.shape(axis)`.
+            `freq` is the weight that each sample contributes to the resampled values.
+            See resample.randsamp_freq
+        indices : array, optional
+            Array of shape (nrep, size).  If passed, create `freq` from indices.
+            See randsamp_freq.
+        nrep : int, optional
+            Number of replicates.  Create `freq` with this many replicates.
+            See randsamp_freq
+        w : array, optional.
+            Optional weights associated with `x`.
+        axis : int, default=0.
+            Dimension to reduce/sample along.
+        dtype : np.dtype, optional
+            dtype of created output
+        broadcast : bool, default=False
+            If True, and calculating comoments, broadcast x[1] to x[0].shape
+        parallel : bool, default=True
+            If True, perform resampling in parallel.
+        resample_kws : dict
+            Extra arguments to resample.resample_vals
+        kws : dict
+            Extra arguments to CentralMoments.from_data
+
+        Returns
+        -------
+        out : CentralMoments instance
+        """
 
         mom_ndim = cls._mom_ndim_from_mom(mom)
 
@@ -1179,12 +1284,38 @@ class CentralMoments(object):
         convert_kws=None,
         **kws,
     ):
-        """create object from raw
+        """Create object from raw.
 
-        must specify either `mom_ndim` or `mom`
+        raw[..., i, j] = <x**i y**j>.
+        raw[..., 0, 0] = {weight}
 
+
+        Parameters
+        ----------
+        raw : np.ndarray
+            Raw moment array.
+        mom_ndim : int, optional
+            Number of moment dimensions.
+        mom : int or tuple, optional
+            number of moments.
+            Must specify `mom_ndim` or `mom`.
+        val_shape : tuple, optional
+            shape of non-moment dimensions.
+        dtype : np.dtype
+            dtype of output
+        convert_kws : dict
+            arguments to central to raw converter
         kws : dict
-        extra arguments to from_data
+            Extra arguments to cls.from_data
+
+        Returns
+        -------
+        out : instance of cls
+
+        See Also
+        --------
+        convert.to_central_moments
+        convert.to_central_comoments
         """
 
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
@@ -1223,6 +1354,20 @@ class CentralMoments(object):
         convert_kws=None,
         **kws,
     ):
+        """Create object from multipel `raw` moment arrays.
+
+        Parameters
+        ----------
+        raws : array
+            raws[...,i,...] is the ith sample of a `raw` array,
+        where `i` is in position `axis`
+        axis : int, default=0
+
+        See Also
+        --------
+        CentralMoments.from_raw : called by from_raws
+        CentralMoments.from_datas : similar constructor for central moments
+        """
         mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
 
         if mom_ndim == 1:
@@ -1268,8 +1413,7 @@ class CentralMoments(object):
         resample_kws=None,
         **kws,
     ):
-        """
-        bootstrap resample and reduce
+        """Bootstrap resample and reduce.
 
         Parameter
         ----------
@@ -1303,8 +1447,7 @@ class CentralMoments(object):
         return type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
 
     def resample(self, indices, axis=0, first=True, **kws):
-        """
-        create a new object sampled from index
+        """Create a new object sampled from index.
 
         Parameters
         ----------
@@ -1340,9 +1483,7 @@ class CentralMoments(object):
         )
 
     def reduce(self, axis=0, **kws):
-        """
-        create new object reducealong axis
-        """
+        """Create new object reducealong axis."""
         self._raise_if_scalar()
         axis = self._wrap_axis(axis)
         return type(self).from_datas(
@@ -1350,8 +1491,7 @@ class CentralMoments(object):
         )
 
     def block(self, block_size=None, axis=None, **kws):
-        """
-        block average reduction
+        """Block average reduction.
 
         Parameters
         ----------
@@ -1387,10 +1527,9 @@ class CentralMoments(object):
         return type(self).from_datas(datas=datas, mom_ndim=self.mom_ndim, axis=1, **kws)
 
     def reshape(self, shape, copy=True, copy_kws=None, **kws):
-        """
-        create a new object with reshaped data
+        """Create a new object with reshaped data.
 
-        Parameters
+        Parameter
         ---------
         shape : tuple
             shape of values part of data
@@ -1416,9 +1555,7 @@ class CentralMoments(object):
         # )
 
     def moveaxis(self, source, destination, copy=True, copy_kws=None, **kws):
-        """
-        move axis from source to destination
-        """
+        """Move axis from source to destination."""
         self._raise_if_scalar()
 
         def __check_val(v):
@@ -1455,6 +1592,7 @@ class CentralMoments(object):
 
     # special, 1d only methods
     def push_stat(self, a, v=0.0, w=None, broadcast=True):
+        """Push statisics onto self."""
         self._raise_if_not_1d(self.mom_ndim)
 
         ar, target = self._check_val(a, target="val")
@@ -1464,6 +1602,7 @@ class CentralMoments(object):
         return self
 
     def push_stats(self, a, v=0.0, w=None, axis=0, broadcast=True):
+        """Push multiple statistics onto self."""
         self._raise_if_not_1d(self.mom_ndim)
 
         ar, target = self._check_vals(a, target="vals", axis=axis)
@@ -1474,9 +1613,7 @@ class CentralMoments(object):
 
     @classmethod
     def from_stat(cls, a, v=0.0, w=None, mom=2, val_shape=None, dtype=None, **kws):
-        """
-        object from single weight, average, variance/covariance
-        """
+        """Create object from single weight, average, variance/covariance."""
         mom_ndim = cls._mom_ndim_from_mom(mom)
         cls._raise_if_not_1d(mom_ndim)
 
@@ -1501,8 +1638,10 @@ class CentralMoments(object):
         dtype=None,
         **kws,
     ):
-        """
-        object from several weights, averages, variances/covarainces along axis
+        """Create object from several statistics.
+
+        Weights, averages, variances/covarainces along
+        axis.
         """
 
         mom_ndim = cls._mom_ndim_from_mom(mom)

@@ -25,10 +25,20 @@ repos:
     rev: v0.3.5
     hooks:
       - id: blackdoc
+  # this should be run before flake8 to
+  # this should be run externally
+  # messes up too many things
+  # - repo: https://github.com/PyCQA/docformatter
+  #   rev: v1.5.0
+  #   hooks:
+  #     - id: docformatter
+  #       args: [--in-place]
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.9.2
     hooks:
       - id: flake8
+        additional_dependencies: [flake8-docstrings]
+        exclude: ^cmomy/tests/|^docs/conf.py|^setup.py
   # Note yet implemented
   # - repo: https://github.com/pre-commit/mirrors-mypy
   #   rev: v0.790  # Must match ci/requirements/*.yml

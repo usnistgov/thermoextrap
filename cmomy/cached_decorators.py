@@ -1,6 +1,5 @@
-"""
-routines to define a cached class without needing to subclass Cached class
-"""
+"""Routines to define a cached class."""
+
 from __future__ import absolute_import
 
 from functools import wraps
@@ -10,6 +9,8 @@ __all__ = ["cached", "cached_func", "cached_clear", "gcached"]
 
 
 def gcached(key=None, prop=True):
+    """Cache properties or methods in class."""
+
     def wrapper(func):
         if prop:
             wrapped = property(cached(key)(func))
@@ -21,7 +22,7 @@ def gcached(key=None, prop=True):
 
 
 def cached(key=None):
-    """Decorator to cache a property within a class
+    """Cache property in a class.
 
     Requires the Class to have a cache dict called ``_cache``.
 
@@ -84,13 +85,12 @@ def cached(key=None):
 
 
 def cached_func(key=None):
-    """Decorator to cache a function within a class
+    """Cache method in a class.
 
-    Requires the Class to have a cache dict called ``_cache``.
+    Requires the class to have a cache dict called ``_cache``.
 
-    Notes
+    Usage
     -----
-    Usage::
 
         class A(object):
            def __init__(self):
@@ -115,10 +115,8 @@ def cached_func(key=None):
     See also
     --------
     cached_clear : corresponding decorator to remove cache
-
     cached : decorator for properties
-
-    """
+    """  # noqa D405
 
     def cached_lookup(func):
         if key is None:
@@ -155,8 +153,7 @@ def cached_func(key=None):
 
 
 def cached_clear(*keys):
-    """
-    Decorator to clear self._cache of specified properties
+    """Clear class cache.
 
     Parameters
     ----------

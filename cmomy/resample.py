@@ -1,6 +1,4 @@
-"""
-Routines to perform resampling
-"""
+"""Routines to perform resampling."""
 from __future__ import absolute_import
 
 import numpy as np
@@ -16,7 +14,6 @@ from .utils import _axis_expand_broadcast, myjit
 
 @myjit
 def _randsamp_freq_out(freq):
-
     nrep = freq.shape[0]
     ndat = freq.shape[1]
     for i in range(nrep):
@@ -38,8 +35,7 @@ def _randsamp_freq_indices(indices, freq):
 def randsamp_freq(
     nrep=None, size=None, indices=None, transpose=False, freq=None, check=False
 ):
-    """
-    produce a random sample for bootstrapping
+    """Produce a random sample for bootstrapping.
 
     Parameters
     ----------
@@ -70,7 +66,6 @@ def randsamp_freq(
     output : frequency table
         if not transpose: output.shape == (nrep, size)
         if tranpose, output.shae = (size, nrep)
-
     """
 
     def _array_check(x, name=""):
@@ -115,8 +110,7 @@ def resample_data(
     parallel=True,
     out=None,
 ):
-    """
-    resample data according to frequency table
+    """Resample data according to frequency table.
 
     Parameters
     ----------
@@ -209,9 +203,7 @@ def resample_vals(
     parallel=True,
     out=None,
 ):
-    """
-    resample data according to frequency table
-    """
+    """Resample data according to frequency table."""
 
     if isinstance(mom, int):
         mom = (mom,) * 1
@@ -294,8 +286,7 @@ def resample_vals(
 def bootstrap_confidence_interval(
     distribution, stats_val="mean", axis=0, alpha=0.05, style=None, **kws
 ):
-    """
-    Calculate the error bounds
+    """Calculate the error bounds.
 
     Parameters
     ----------
@@ -372,8 +363,7 @@ def xbootstrap_confidence_interval(
     bootstrap_coords=None,
     **kws
 ):
-    """
-    xarray version of bootstrap_confidence_interval
+    """Bootstrap xarray object.
 
     Parameters
     ----------

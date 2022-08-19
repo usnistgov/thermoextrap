@@ -1,3 +1,5 @@
+"""Public api for cmomy."""
+
 from .central import CentralMoments, central_moments
 from .resample import (
     bootstrap_confidence_interval,

@@ -1,3 +1,4 @@
+"""Utilities."""
 from __future__ import absolute_import
 
 from functools import lru_cache
@@ -11,10 +12,7 @@ from .options import OPTIONS
 
 
 def myjit(func):
-    """
-    "my" jit function
-    uses option inline='always', fastmath=True
-    """
+    """Jitter with option inline='always', fastmath=True."""
     return njit(inline="always", fastmath=OPTIONS["fastmath"], cache=OPTIONS["cache"])(
         func
     )
@@ -38,6 +36,7 @@ def _binom(n, k):
 
 
 def factory_binomial(order, dtype=float):
+    """Create binomial coefs at given order."""
     out = np.zeros((order + 1, order + 1), dtype=dtype)
     for n in range(order + 1):
         for k in range(order + 1):
@@ -54,9 +53,7 @@ def _my_broadcast(x, shape, dtype=None, order=None):
 
 
 def _shape_insert_axis(shape, axis, new_size):
-    """
-    given shape, get new shape with size put in position axis
-    """
+    """Get new shape, given shape, with size put in position axis."""
     n = len(shape)
 
     axis = np.core.numeric.normalize_axis_index(axis, n + 1)
@@ -72,7 +69,7 @@ def _shape_insert_axis(shape, axis, new_size):
 
 
 def _shape_reduce(shape, axis):
-    """given input shape, give shape after reducing along axis"""
+    """Give shape shape after reducing along axis."""
     shape = list(shape)
     shape.pop(axis)
     return tuple(shape)
@@ -89,9 +86,10 @@ def _axis_expand_broadcast(
     dtype=None,
     order=None,
 ):
-    """
-    broadcast x to shape.  If x is 1d, and shape is n-d, but len(x) is same
-    as shape[axis], broadcast x across all dimensions
+    """Broadcast x to shape.
+
+    If x is 1d, and shape is n-d, but len(x) is same as shape[axis],
+    broadcast x across all dimensions
     """
 
     if verify is True:
@@ -119,9 +117,7 @@ def _cached_ones(shape, dtype=None):
 
 
 def _xr_wrap_like(da, x):
-    """
-    wrap x with xarray like da
-    """
+    """Wrap x with xarray like da."""
     x = np.asarray(x)
     assert x.shape == da.shape
 
@@ -131,9 +127,7 @@ def _xr_wrap_like(da, x):
 
 
 def _xr_order_like(template, *others):
-    """
-    given dimensions, order in same manner
-    """
+    """Given dimensions, order in same manner."""
 
     if not isinstance(template, xr.DataArray):
         out = others
