@@ -9,10 +9,12 @@ import numpy as np
 # import xarray as xr
 from scipy import stats
 
-from thermoextrap.ig import IGmodel
+from ..beta import factory_data
 
+# TODO: Change this to point to the "new" ideagas.py
+# TODO: rework this code to be cleaner
+from ..legacy.ig import IGmodel
 from .models import ExtrapModel, InterpModel
-from .xpan_beta import factory_data
 
 try:
     import matplotlib.pyplot as plt
