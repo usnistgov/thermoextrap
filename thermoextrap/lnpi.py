@@ -292,7 +292,7 @@ def factory_extrapmodel_lnPi(
         See data.AbstractData
     order : int, optional
         maximum order.
-        If not specified, infer from `data`
+        If not specified, default to `data.order + 1`
     central : bool, optional
         Whether or not to use central moments
         If not specified, infer from `data`
@@ -313,10 +313,10 @@ def factory_extrapmodel_lnPi(
     if central is None:
         central = data.central
     if order is None:
-        order = data.order
+        order = data.order + 1
 
     assert central == data.central
-    assert order <= data.order
+    assert order <= data.order + 1
 
     if derivatives is None:
         if derivatives_kws is None:
