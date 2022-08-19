@@ -34,12 +34,10 @@ class RecursiveInterp:
         self.model_cls = (
             model_cls  # The model CLASS used for interpolation, like InterpModel
         )
-        self.derivatives = (
-            derivatives  # Coefs object describing how derivatives will be calculated
-        )
+        self.derivatives = derivatives  # Derivatives object describing how derivatives will be calculated
         self.states = (
             []
-        )  # List of ExtrapModel objects sharing same Coefs but different Data
+        )  # List of ExtrapModel objects sharing same Derivatives but different Data
         self.edgeB = np.array(
             edgeB
         )  # Values of state points that we interpolate between

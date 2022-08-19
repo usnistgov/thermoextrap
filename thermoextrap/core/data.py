@@ -1180,13 +1180,17 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         dxdu_new = self.dxduave.resample_and_reduce(**kws)
 
-        # make new with new data
-        new = self.new_like(dxduave=dxdu_new)
+        # <<<<<<< HEAD:thermoextrap/core/data.py
+        #         # make new with new data
+        #         new = self.new_like(dxduave=dxdu_new)
 
-        # set meta of new objects
-        return new.set_params(
-            meta=new.meta.resample(data=new, meta_kws=meta_kws, **kws)
-        )
+        #         # set meta of new objects
+        #         return new.set_params(
+        #             meta=new.meta.resample(data=new, meta_kws=meta_kws, **kws)
+        #         )
+
+        meta = self.meta.resample(data=self, meta_kws=meta_kws, **kws)
+        return self.new_like(dxduave=dxdu_new, rec_dim=rep_dim, meta=meta)
 
     # TODO : update from_raw from_data to
     # include a mom_dims arguments
