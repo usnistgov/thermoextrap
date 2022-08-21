@@ -246,6 +246,14 @@ def generate_data(shape, beta, vol=1.0, r=None):
     Returns tuple of the particle positions in each configuration and the potential energy of each sampled configuration
 
     r may be specified as an array of random numbers instead of shape
+
+    Parameters
+    ----------
+    shape : tuple
+        (nconfig, npart)
+    beta : inverse temperature
+
+
     """
     positions = x_sample(shape, beta, vol, r=r)
     x = positions.mean(axis=-1)

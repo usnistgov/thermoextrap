@@ -13,7 +13,8 @@ from ..beta import factory_data
 
 # TODO: Change this to point to the "new" ideagas.py
 # TODO: rework this code to be cleaner
-from ..legacy.ig import IGmodel
+# from ..legacy.ig import IGmodel
+from . import idealgas
 from .models import ExtrapModel, InterpModel
 
 try:
@@ -58,8 +59,12 @@ class RecursiveInterp:
         only one dimension.
         This function just uses the toy ideal gas model that comes with lib_extrap.
         """
-        datModel = IGmodel(nParticles=1000)
-        xdata, udata = datModel.genData(B, nConfigs=10000)
+
+        npart, nconfig = 1000, 10000
+        xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=B)
+
+        # datModel = IGmodel(nParticles=1000)
+        # xdata, udata = datModel.genData(B, nConfigs=10000)
         # Need to also change data object kwargs based on data when change getData
         data = factory_data(uv=udata, xv=xdata, order=self.maxOrder)
         return data
