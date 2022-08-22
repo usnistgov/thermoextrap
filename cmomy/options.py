@@ -1,5 +1,7 @@
 """Sets up optional values."""
 
+from __future__ import annotations
+
 NMAX = "nmax"
 FASTMATH = "fastmath"
 PARALLEL = "parallel"

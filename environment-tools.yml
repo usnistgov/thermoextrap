@@ -20,7 +20,7 @@ dependencies:
   - build
   - setuptools
   - setuptools-scm
-  - setuptools-scm-git-archive
+  - setuptools_scm_git_archive
   - build
   - twine
   # conda specific
@@ -37,3 +37,13 @@ dependencies:
   - pyls-mypy
   - pyls-black
   - pyls-isort
+  ## annotations
+  - mypy
+  - pytest-mypy
+  # Monkeytype?
+  - MonkeyType
+  - pip
+  - pip:
+      - mypy-extensions
+      - pytest-monkeytype
+      - flake8-mypy

@@ -1,5 +1,5 @@
 """routines to convert central (co)moments to raw (co)moments."""
-from __future__ import absolute_import
+from __future__ import annotations
 
 import numpy as np
 

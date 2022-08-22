@@ -1,5 +1,5 @@
 """Thin wrapper around central routines with xarray support."""
-from __future__ import absolute_import
+from __future__ import annotations
 
 import numpy as np
 import xarray as xr

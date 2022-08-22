@@ -1,5 +1,5 @@
 """Central moments/comoments routines."""
-from __future__ import absolute_import
+from __future__ import annotations
 
 import numpy as np
 from numpy.core.numeric import normalize_axis_index  # , normalize_axis_tuple

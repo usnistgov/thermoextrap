@@ -1,4 +1,7 @@
 """Interface to numba push fuctions."""
+
+from __future__ import annotations
+
 import numpy as np
 
 # from .pushers import factory_pushers

@@ -1,5 +1,5 @@
 """Utilities."""
-from __future__ import absolute_import
+from __future__ import annotations
 
 from functools import lru_cache
 
@@ -85,7 +85,7 @@ def _axis_expand_broadcast(
     roll=True,
     dtype=None,
     order=None,
-):
+) -> np.ndarray:
     """Broadcast x to shape.
 
     If x is 1d, and shape is n-d, but len(x) is same as shape[axis],
