@@ -57,10 +57,13 @@ def factory_binomial(order: int, dtype: DTypeLike = float):
 
 
 def _shape_insert_axis(
-    shape: Sequence[int], axis: int, new_size: int
+    shape: Sequence[int], axis: int | None, new_size: int
 ) -> Tuple[int, ...]:
     """Get new shape, given shape, with size put in position axis."""
     n = len(shape)
+
+    if axis is None:
+        raise ValueError("must specify integre axis")
 
     axis = np.core.numeric.normalize_axis_index(axis, n + 1)  # type: ignore
     # assert -(n+1) <= axis <= n
@@ -87,7 +90,7 @@ def _shape_reduce(shape: Tuple[int, ...], axis: int) -> Tuple[int, ...]:
 def _axis_expand_broadcast(
     x: ArrayLike,
     shape: Tuple[int, ...],
-    axis: int,
+    axis: int | None,
     verify: bool = True,
     expand: bool = True,
     broadcast: bool = True,
@@ -109,6 +112,7 @@ def _axis_expand_broadcast(
     # if array, and 1d with size same as shape[axis]
     # broadcast from here
     if expand:
+        # assert axis is not None
         if x.ndim == 1 and x.ndim != len(shape) and len(x) == shape[axis]:
             # reshape for broadcasting
             reshape = (1,) * (len(shape) - 1)
@@ -117,7 +121,7 @@ def _axis_expand_broadcast(
 
     if broadcast and x.shape != shape:
         x = np.broadcast_to(x, shape)
-    if roll and axis != 0:
+    if roll and axis is not None and axis != 0:
         x = np.moveaxis(x, axis, 0)
     return x
 

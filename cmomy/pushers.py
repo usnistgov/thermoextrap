@@ -6,6 +6,9 @@ from collections import namedtuple
 from .options import OPTIONS
 from .utils import factory_binomial, myjit
 
+# from typing import Any, Callable
+
+
 # from functool import lru_cache
 
 
@@ -551,7 +554,7 @@ pusher_cov_vector = Pusher(
 )
 
 
-def factory_pushers(cov=False, vec=False):
+def factory_pushers(cov: bool = False, vec: bool = False) -> "Pusher":
     """Factory method to get pusher functions."""  # noqa D401
     if cov:
         if vec:
