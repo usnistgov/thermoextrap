@@ -2,10 +2,14 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Sequence, Tuple
 
 import numpy as np
 import xarray as xr
 from numba import njit
+from numpy.typing import ArrayLike, DTypeLike
+
+from ._typing import ASARRAY_ORDER
 
 # from .cached_decorators import gcached  # , cached_clear
 from .options import OPTIONS
@@ -35,7 +39,7 @@ def _binom(n, k):
         return 0.0
 
 
-def factory_binomial(order, dtype=float):
+def factory_binomial(order: int, dtype: DTypeLike = float):
     """Create binomial coefs at given order."""
     out = np.zeros((order + 1, order + 1), dtype=dtype)
     for n in range(order + 1):
@@ -45,46 +49,51 @@ def factory_binomial(order, dtype=float):
     return out
 
 
-def _my_broadcast(x, shape, dtype=None, order=None):
-    x = np.asarray(x, dtype=dtype, order=order)
-    if x.shape != shape:
-        x = np.broadcast(x, shape)
-    return x
+# def _my_broadcast(x, shape, dtype=None, order=None):
+#     x = np.asarray(x, dtype=dtype, order=order)
+#     if x.shape != shape:
+#         x = np.broadcast(x, shape)
+#     return x
 
 
-def _shape_insert_axis(shape, axis, new_size):
+def _shape_insert_axis(
+    shape: Sequence[int], axis: int, new_size: int
+) -> Tuple[int, ...]:
     """Get new shape, given shape, with size put in position axis."""
     n = len(shape)
 
-    axis = np.core.numeric.normalize_axis_index(axis, n + 1)
+    axis = np.core.numeric.normalize_axis_index(axis, n + 1)  # type: ignore
     # assert -(n+1) <= axis <= n
     # if axis < 0:
     #     axis = axis + n + 1
 
     # if axis < 0:
     #     axis += len(shape) + 1
-    shape = list(shape)
-    shape.insert(axis, new_size)
-    return tuple(shape)
+    # shape_list = list(shape)
+    # shape_list.insert(axis, new_size)
+    # return tuple(shape)
+
+    shape = tuple(shape)
+    return shape[:axis] + (new_size,) + shape[axis:]
 
 
-def _shape_reduce(shape, axis):
+def _shape_reduce(shape: Tuple[int, ...], axis: int) -> Tuple[int, ...]:
     """Give shape shape after reducing along axis."""
-    shape = list(shape)
-    shape.pop(axis)
-    return tuple(shape)
+    shape_list = list(shape)
+    shape_list.pop(axis)
+    return tuple(shape_list)
 
 
 def _axis_expand_broadcast(
-    x,
-    shape,
-    axis,
-    verify=True,
-    expand=True,
-    broadcast=True,
-    roll=True,
-    dtype=None,
-    order=None,
+    x: ArrayLike,
+    shape: Tuple[int, ...],
+    axis: int,
+    verify: bool = True,
+    expand: bool = True,
+    broadcast: bool = True,
+    roll: bool = True,
+    dtype: DTypeLike | None = None,
+    order: ASARRAY_ORDER = None,
 ) -> np.ndarray:
     """Broadcast x to shape.
 
@@ -94,13 +103,15 @@ def _axis_expand_broadcast(
 
     if verify is True:
         x = np.asarray(x, dtype=dtype, order=order)
+    else:
+        assert isinstance(x, np.ndarray)
 
     # if array, and 1d with size same as shape[axis]
     # broadcast from here
     if expand:
         if x.ndim == 1 and x.ndim != len(shape) and len(x) == shape[axis]:
             # reshape for broadcasting
-            reshape = [1] * (len(shape) - 1)
+            reshape = (1,) * (len(shape) - 1)
             reshape = _shape_insert_axis(reshape, axis, -1)
             x = x.reshape(*reshape)
 

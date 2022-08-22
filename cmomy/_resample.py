@@ -1,6 +1,8 @@
 """Routines to perform resampling."""
 from __future__ import absolute_import
 
+from typing import Any, Callable, Dict, Hashable
+
 from numba import njit, prange
 
 from .options import OPTIONS
@@ -120,7 +122,7 @@ def _resample_data_cov_vec_parallel(data, freq, out):
         _push_datas_scale_cov_vec(out[irep, ...], data, freq[irep, ...])
 
 
-_RESAMPLE_DATA_DICT = {
+_RESAMPLE_DATA_DICT: Dict[Hashable, Callable[..., Any]] = {
     # cov, vec, parallel
     (False, False, False): _resample_data,
     (False, False, True): _resample_data_parallel,
@@ -133,7 +135,7 @@ _RESAMPLE_DATA_DICT = {
 }
 
 
-def factory_resample_data(cov, vec, parallel):
+def factory_resample_data(cov: bool, vec: bool, parallel: bool) -> Callable[..., Any]:
     """Get resampler functions(s)."""
     return _RESAMPLE_DATA_DICT[cov, vec, parallel]
 
@@ -202,7 +204,7 @@ def _resample_vals_cov_vec_parallel(W, X, Y, freq, out):
         _push_vals_scale_cov_vec(out[irep, ...], W, X, Y, freq[irep, ...])
 
 
-_RESAMPLE_VALS_DICT = {
+_RESAMPLE_VALS_DICT: Dict[Hashable, Callable[..., Any]] = {
     # cov, vec, parallel
     (False, False, False): _resample_vals,
     (False, False, True): _resample_vals_parallel,
@@ -215,6 +217,6 @@ _RESAMPLE_VALS_DICT = {
 }
 
 
-def factory_resample_vals(cov, vec, parallel):
+def factory_resample_vals(cov: bool, vec: bool, parallel: bool) -> Callable[..., Any]:
     """Get resample vals functions."""
     return _RESAMPLE_VALS_DICT[cov, vec, parallel]
