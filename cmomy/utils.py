@@ -113,11 +113,14 @@ def _axis_expand_broadcast(
     # broadcast from here
     if expand:
         # assert axis is not None
-        if x.ndim == 1 and x.ndim != len(shape) and len(x) == shape[axis]:
-            # reshape for broadcasting
-            reshape = (1,) * (len(shape) - 1)
-            reshape = _shape_insert_axis(reshape, axis, -1)
-            x = x.reshape(*reshape)
+        if x.ndim == 1 and x.ndim != len(shape):
+            if axis is None:
+                raise ValueError("trying to expand an exis with axis==None")
+            if len(x) == shape[axis]:
+                # reshape for broadcasting
+                reshape = (1,) * (len(shape) - 1)
+                reshape = _shape_insert_axis(reshape, axis, -1)
+                x = x.reshape(*reshape)
 
     if broadcast and x.shape != shape:
         x = np.broadcast_to(x, shape)

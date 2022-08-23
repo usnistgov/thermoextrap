@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Callable, Dict
+
 NMAX = "nmax"
 FASTMATH = "fastmath"
 PARALLEL = "parallel"
@@ -30,7 +32,7 @@ _VALIDATORS = {
     FASTMATH: _isbool,
 }
 
-_SETTERS = {}
+_SETTERS: Dict[str, Callable] = {}
 
 
 class set_options(object):
