@@ -764,6 +764,7 @@ class CentralMoments(object):
         x: np.ndarray | float,
         target: np.ndarray | Tuple[int, ...] | str | None = None,
         axis: int | None = None,
+        dim: Hashable | None = None,  # included here for consistency
         broadcast: bool = False,
         expand: bool = False,
         shape_flat: Tuple[int, ...] | None = None,
@@ -859,21 +860,26 @@ class CentralMoments(object):
         return self._verify_value(
             w,
             target=target,
-            axis=None,
             broadcast=True,
             expand=True,
             shape_flat=self.val_shape_flat,
         )
 
     def _check_weights(
-        self, w: float | np.ndarray | None, target: np.ndarray, axis: int = 0
-    ):  # type: ignore
+        self,
+        w: float | np.ndarray | None,
+        target: np.ndarray,
+        axis: int = None,
+        dim: Hashable | None = None,
+    ):
+        # type: ignore
         if w is None:
             w = 1.0
         return self._verify_value(
             w,
             target=target,
             axis=axis,
+            dim=dim,
             broadcast=True,
             expand=True,
             shape_flat=self.val_shape_flat,
@@ -893,12 +899,14 @@ class CentralMoments(object):
         x: np.ndarray,
         target: np.ndarray | str,
         axis: int = 0,
+        dim: Hashable | None = None,
         broadcast: bool = False,
     ):  # type: ignore
         return self._verify_value(
             x,
             target=target,
             axis=axis,
+            dim=dim,
             broadcast=broadcast,
             expand=broadcast,
             shape_flat=self.val_shape_flat,
@@ -918,12 +926,14 @@ class CentralMoments(object):
         v: np.ndarray | float,
         target: np.ndarray,
         axis: int = 0,
+        dim: Hashable | None = None,
         broadcast: bool = False,
     ):  # type: ignore
         return self._verify_value(
             v,
             target="vars",
             axis=axis,
+            dim=dim,
             broadcast=broadcast,
             expand=broadcast,
             shape_flat=self.shape_flat_var,
@@ -933,9 +943,9 @@ class CentralMoments(object):
     def _check_data(self, data: np.ndarray):  # type: ignore
         return self._verify_value(data, target="data", shape_flat=self.shape_flat)[0]
 
-    def _check_datas(self, datas: np.ndarray, axis: int = 0):  # type: ignore
+    def _check_datas(self, datas: np.ndarray, axis: int = 0, dim: Hashable | None = None):  # type: ignore
         return self._verify_value(
-            datas, target="datas", axis=axis, shape_flat=self.shape_flat
+            datas, target="datas", axis=axis, dim=dim, shape_flat=self.shape_flat
         )[0]
 
     def fill(self: T_CENTRALMOMENTS, value: Any = 0) -> T_CENTRALMOMENTS:
@@ -967,7 +977,10 @@ class CentralMoments(object):
         return self
 
     def push_datas(
-        self: T_CENTRALMOMENTS, datas: np.ndarray, axis: int = 0
+        self: T_CENTRALMOMENTS,
+        datas: np.ndarray,
+        axis: int = 0,
+        dim: Hashable | None = None,
     ) -> T_CENTRALMOMENTS:
         """Push and reduce multiple average central moments.
 
@@ -983,7 +996,7 @@ class CentralMoments(object):
         -------
         self
         """
-        datas = self._check_datas(datas, axis)
+        datas = self._check_datas(datas, axis=axis, dim=dim)
         self._push.datas(self._data_flat, datas)
         return self
 
@@ -1029,6 +1042,7 @@ class CentralMoments(object):
         x: np.ndarray | Tuple[np.ndarray, np.ndarray],
         w: np.ndarray | None = None,
         axis: int = 0,
+        dim: Hashable | None = None,
         broadcast: bool = False,
     ) -> T_CENTRALMOMENTS:
         """Push multiple samples to central moments.
@@ -1053,9 +1067,9 @@ class CentralMoments(object):
             assert len(x) == self.mom_ndim
             x, *ys = x  # type: ignore
 
-        xr, target = self._check_vals(x, axis=axis, target="vals")  # type: ignore
+        xr, target = self._check_vals(x, axis=axis, dim=dim, target="vals")  # type: ignore
         yr = tuple(  # type: ignore
-            self._check_vals(y, target=target, axis=axis, broadcast=broadcast)  # type: ignore
+            self._check_vals(y, target=target, axis=axis, dim=dim, broadcast=broadcast)  # type: ignore
             for y in ys  # type: ignore
         )  # type: ignore
         wr = self._check_weights(w, target=target, axis=axis)
@@ -1185,14 +1199,16 @@ class CentralMoments(object):
         return datas, axis
 
     def _wrap_axis(
-        self, axis: int | None, default: int = 0, ndim: int | None = None
+        self,
+        axis: int | None,
+        default: int = 0,
+        ndim: int | None = None,
     ) -> int:
         """Wrap axis to positive value and check."""
         if axis is None:
             axis = default
         if ndim is None:
             ndim = self.val_ndim
-
         axis = cast(int, normalize_axis_index(axis, ndim))
         # if axis < 0:
         #     axis += ndim
@@ -1320,7 +1336,7 @@ class CentralMoments(object):
 
         if verify:
             datas = np.asarray(datas, dtype=dtype)
-        datas, axis = cls._datas_axis_to_first(datas, axis, mom_ndim)
+        datas, axis = cls._datas_axis_to_first(datas, axis=axis, mom_ndim=mom_ndim)
         if check_shape:
             if val_shape is None:
                 val_shape = datas.shape[1:-mom_ndim]
@@ -1341,6 +1357,7 @@ class CentralMoments(object):
         x: np.ndarray | Tuple[np.ndarray, np.ndarray],
         w: np.ndarray | None = None,
         axis: int = 0,
+        dim: Hashable | None = None,
         mom: T_MOM = 2,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
@@ -1381,7 +1398,7 @@ class CentralMoments(object):
             dtype = x0.dtype
 
         return cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws).push_vals(
-            x=x, axis=axis, w=w, broadcast=broadcast
+            x=x, axis=axis, dim=dim, w=w, broadcast=broadcast
         )
 
     @classmethod
@@ -1398,8 +1415,9 @@ class CentralMoments(object):
         broadcast: bool = False,
         parallel: bool = True,
         resample_kws: Mapping | None = None,
+        full_output: bool = False,
         **kws,
-    ) -> T_CENTRALMOMENTS:
+    ) -> T_CENTRALMOMENTS | Tuple[T_CENTRALMOMENTS, np.ndarray]:
         """Create from resample observations/values.
 
         This effectively resamples `x`.
@@ -1433,10 +1451,13 @@ class CentralMoments(object):
             Extra arguments to resample.resample_vals
         kws : dict
             Extra arguments to CentralMoments.from_data
+        full_output : bool, default=False
+            If True, also return freq.
 
         Returns
         -------
         out : CentralMoments instance
+        freq : array, optional
         """
 
         mom_ndim = cls._mom_ndim_from_mom(mom)
@@ -1465,7 +1486,7 @@ class CentralMoments(object):
             **resample_kws,
             broadcast=broadcast,
         )
-        return cls.from_data(
+        out = cls.from_data(
             data,
             mom_ndim=mom_ndim,
             mom=mom,
@@ -1474,6 +1495,13 @@ class CentralMoments(object):
             copy=False,
             **kws,
         )
+
+        if full_output:
+            return out, freq
+        else:
+            return out
+
+        return out
 
     @classmethod
     def from_raw(
@@ -1614,8 +1642,9 @@ class CentralMoments(object):
         axis: int | None = None,
         parallel: bool = True,
         resample_kws: Mapping | None = None,
+        full_output: bool = False,
         **kws,
-    ) -> T_CENTRALMOMENTS:
+    ) -> T_CENTRALMOMENTS | Tuple[T_CENTRALMOMENTS, np.ndarray]:
         """Bootstrap resample and reduce.
 
         Parameter
@@ -1647,7 +1676,12 @@ class CentralMoments(object):
         data = resample_data(
             self.data, freq, mom=self.mom, axis=axis, parallel=parallel, **resample_kws
         )
-        return type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
+        out = type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
+
+        if full_output:
+            return out, freq
+        else:
+            return out
 
     def resample(
         self: T_CENTRALMOMENTS,
@@ -1661,6 +1695,7 @@ class CentralMoments(object):
         Parameters
         ----------
         indicies : array-like
+            shape should be (nrep, nrec)
         axis : int, default=0
             axis to resample
         first : bool, default=True
@@ -1885,6 +1920,7 @@ class CentralMoments(object):
         v: np.ndarray,
         w: np.ndarray | float | None = None,
         axis: int = 0,
+        dim=None,
         mom: T_MOM = 2,
         val_shape: Tuple[int, ...] = None,
         dtype: DTypeLike | None = None,
@@ -1906,5 +1942,8 @@ class CentralMoments(object):
         if val_shape is None:
             val_shape = _shape_reduce(a.shape, axis)
         return cls.zeros(val_shape=val_shape, dtype=dtype, mom=mom, **kws).push_stats(
-            a=a, v=v, w=w, axis=axis
+            a=a,
+            v=v,
+            w=w,
+            axis=axis,
         )

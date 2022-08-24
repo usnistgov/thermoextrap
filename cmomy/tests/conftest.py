@@ -94,7 +94,6 @@ def _get_comom(w, x, y, moments, axis=0, broadcast=True):
                 val = (w * dx**i * dy**j).sum(axis) * wsum_inv
 
             out[..., i, j] = val
-
     return out
 
 

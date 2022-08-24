@@ -18,6 +18,7 @@ from typing import (  # TYPE_CHECKING,
     cast,
     no_type_check,
 )
+from warnings import warn
 
 import numpy as np
 import xarray as xr
@@ -48,12 +49,56 @@ _T_XRVALS = Union[xr.DataArray, Tuple[xr.DataArray, xr.DataArray]]
 ###############################################################################
 # central mom/comom routine
 ###############################################################################
+
+
+def _select_axis_dim(
+    dims: Tuple[Hashable, ...],
+    axis: int | str | None = None,
+    dim: Hashable | None = None,
+    default_axis: int | None = None,
+    default_dim: Hashable | None = None,
+) -> Tuple[int, Hashable]:
+
+    if axis is None and dim is None:
+        if default_axis is None and default_dim is None:
+            raise ValueError("must specify axis or dim")
+        elif default_axis is not None and default_dim is not None:
+            raise ValueError("can only specify one of default_axis or default_dim")
+        elif default_axis:
+            axis = default_axis
+        else:
+            dim = default_dim
+
+    elif axis is not None and dim is not None:
+        raise ValueError("can only specify axis or dim")
+
+    if dim is not None:
+        if dim in dims:
+            axis = dims.index(dim)
+        else:
+            raise ValueError(f"did not find '{dim}' in {dims}")
+    elif axis is not None:
+        if isinstance(axis, str):
+            warn(
+                "Using string value for axis is deprecated.  Please use `dim` option instead."
+            )
+            dim = axis
+            axis = dims.index(dim)
+        else:
+            dim = dims[axis]
+    else:
+        raise ValueError(f"unknown dim {dim} and axis {axis}")
+
+    return axis, dim
+
+
 @no_type_check
 def _xcentral_moments(
     vals: xr.DataArray,
     mom: int | Tuple[int],
     w: xr.DataArray | None = None,
-    axis: int | str = 0,
+    axis: int | str | None = None,
+    dim: Hashable | None = None,
     last: bool = True,
     mom_dims: T_MOM_DIMS | None = None,
 ):  # -> xr.DataArray:
@@ -75,10 +120,11 @@ def _xcentral_moments(
     else:
         w = xr.DataArray(w).broadcast_like(x)
 
-    if isinstance(axis, int):
-        dim = x.dims[axis]
-    else:
-        dim = axis
+    axis, dim = _select_axis_dim(x.dims, axis, dim, default_axis=0)
+    # if isinstance(axis, int):
+    #     dim = x.dims[axis]
+    # else:
+    #     dim = axis
 
     wsum = w.sum(dim=dim)
     wsum_inv = 1.0 / wsum
@@ -102,7 +148,8 @@ def _xcentral_comoments(
     vals: Tuple[xr.DataArray, xr.DataArray],
     mom: int | Tuple[int, int],
     w: xr.DataArray | None = None,
-    axis: int | str = 0,
+    axis: int | str | None = None,
+    dim: Hashable | None = None,
     last: bool = True,
     broadcast: bool = False,
     mom_dims: Tuple[Hashable, Hashable] | None = None,
@@ -135,10 +182,7 @@ def _xcentral_comoments(
         assert y.shape == x.shape
         assert x.dims == y.dims
 
-    if isinstance(axis, int):
-        dim = x.dims[axis]
-    else:
-        dim = axis
+    axis, dim = _select_axis_dim(x.dims, axis, dim, default_axis=0)
 
     if mom_dims is None:
         mom_dims = ("mom_0", "mom_1")
@@ -173,7 +217,8 @@ def xcentral_moments(
     x: _T_XRVALS,
     mom: T_MOM,
     w: xr.DataArray | None = None,
-    axis: str | int = 0,
+    axis: int | None = None,
+    dim: Hashable | None = None,
     last: bool = True,
     mom_dims: T_MOM_DIMS | None = None,
     broadcast: bool = False,
@@ -214,7 +259,7 @@ def xcentral_moments(
     if isinstance(mom, int):
         mom = (mom,)
 
-    kws = dict(vals=x, mom=mom, w=w, axis=axis, last=last, mom_dims=mom_dims)
+    kws = dict(vals=x, mom=mom, w=w, axis=axis, dim=dim, last=last, mom_dims=mom_dims)
     if len(mom) == 1:
         out = _xcentral_moments(**kws)  # type: ignore
     else:
@@ -227,7 +272,7 @@ def xcentral_moments(
 @no_type_check
 def _attributes_from_xr(
     da: xr.DataArray | np.ndarray,
-    dim: int | str | None = None,
+    dim: Hashable | None = None,
     mom_dims: T_MOM_DIMS | None = None,
     **kws,
 ) -> Dict[str, Any]:
@@ -247,19 +292,18 @@ def _attributes_from_xr(
 def _check_xr_input(
     x: xr.DataArray | np.ndarray,
     axis: int | str | None = None,
+    dim: Hashable | None = None,
     mom_dims: T_MOM_DIMS | None = None,
     _kws_in: Optional[Dict[Any, Any]] = None,
     **kws,
 ) -> Any:
     if isinstance(x, xr.DataArray):
-        if axis is None:
-            dim = None
-        elif isinstance(axis, str):
-            dim = axis
-            axis = x.get_axis_num(dim)
+        # MIGRATION DIM
+        # axis, dim = _select_axis_dim(x.dims, axis, dim)
+        if axis is None and dim is None:
+            pass
         else:
-            dim = x.dims[axis]
-
+            axis, dim = _select_axis_dim(x.dims, axis, dim)
         values = x.values
     else:
         if axis is None:
@@ -267,13 +311,12 @@ def _check_xr_input(
         else:
             dim = axis  # type: ignore
         values = x
-
     kws = _attributes_from_xr(x, dim=dim, mom_dims=mom_dims, **kws)
 
     if _kws_in is not None and len(_kws_in) > 0:
         kws = dict(kws, **_kws_in)
 
-    return kws, axis, values
+    return kws, axis, dim, values
 
 
 @no_type_check
@@ -738,8 +781,9 @@ class xCentralMoments(CentralMoments):
     def _xverify_value(
         self,
         x: Union[xr.DataArray, float],
-        target: Optional[Union[xr.DataArray, str]] = None,
-        dim: Optional[Union[int, str]] = None,
+        target: xr.DataArray | str | None = None,
+        dim: Hashable | None = None,
+        axis: int | str | None = None,
         broadcast: bool = False,
         expand: bool = False,
         shape_flat: Optional[Any] = None,
@@ -749,9 +793,15 @@ class xCentralMoments(CentralMoments):
 
         if isinstance(target, str):
 
-            if dim is not None:
-                if isinstance(dim, int):
-                    dim = x.dims[dim]
+            # if dim is not None:
+            #     if isinstance(dim, int):
+            #         dim = x.dims[dim]
+
+            if dim is not None and axis is not None:
+                axis = None
+
+            if dim is not None or axis is not None:
+                axis, dim = _select_axis_dim(x.dims, axis, dim)
 
             if target == "val":
                 target = self.val_dims
@@ -781,12 +831,22 @@ class xCentralMoments(CentralMoments):
 
             target_output = None
 
-            if dim is not None:
-                if isinstance(dim, int):
-                    # this is a bit awkward, but
-                    # should work
-                    # assume we already have target in correct order
-                    dim = target_dims[0]
+            if dim is not None and axis is not None:
+                axis = None
+
+            if dim is not None or axis is not None:
+                dim = target_dims[0]
+
+                # axis_a, dim_a = _select_axis_dim(target_dims, axis, dim)
+                # assert dim_a == target_dims[0], f'Error, {axis}, {dim}, {target_dims} {x.dims}'
+                # axis, dim = axis_a, dim_a
+
+            # if dim is not None:
+            #     if isinstance(dim, int):
+            #         # this is a bit awkward, but
+            #         # should work
+            #         # assume we already have target in correct order
+            #         dim = target_dims[0]
 
             if isinstance(x, xr.DataArray):
                 if broadcast:
@@ -838,21 +898,29 @@ class xCentralMoments(CentralMoments):
         x: float | np.ndarray | xr.DataArray,
         target: str | np.ndarray | xr.DataArray = None,
         axis: int | str | None = None,
+        dim: Hashable | None = None,
         broadcast: bool = False,
         expand: bool = False,
         shape_flat: Tuple[int, ...] | None = None,
     ) -> Any:
         if isinstance(x, xr.DataArray) or isinstance(target, xr.DataArray):
+
             return self._xverify_value(
                 x,
                 target=target,
-                dim=axis,
+                axis=axis,
+                dim=dim,
+                # dim=axis,
                 broadcast=broadcast,
                 expand=expand,
                 shape_flat=shape_flat,
             )
 
         else:
+            assert axis is None or isinstance(
+                axis, int
+            ), f"Error with axis value {axis}"
+
             return super(xCentralMoments, self)._verify_value(
                 x,
                 target=target,
@@ -917,9 +985,11 @@ class xCentralMoments(CentralMoments):
         indices: np.ndarray | None = None,
         nrep: int | None = None,
         axis: int | str | None = None,
+        dim: Hashable | None = None,
         rep_dim: str = "rep",
         parallel: bool = True,
         resample_kws: Mapping | None = None,
+        full_output: bool = False,
         **kws,
     ) -> "xCentralMoments":
         """Bootstrap resample and reduce.
@@ -933,11 +1003,12 @@ class xCentralMoments(CentralMoments):
             and all other dimensions have the same names as
             the parent object
         """
+        assert not (axis is None and dim is None)
 
-        axis = self._wrap_axis(axis)
-        kws, *_ = _check_xr_input(
+        kws, axis, *_ = _check_xr_input(
             self._xdata,
             axis=axis,
+            dim=dim,
             mom_dims=None,
             dims=None,
             attrs=None,
@@ -946,6 +1017,8 @@ class xCentralMoments(CentralMoments):
             name=None,
             _kws_in=kws,
         )
+
+        axis = self._wrap_axis(axis)
 
         # new dims after resample
         kws["dims"] = [rep_dim] + list(kws["dims"])
@@ -957,7 +1030,23 @@ class xCentralMoments(CentralMoments):
             axis=axis,
             parallel=parallel,
             resample_kws=resample_kws,
+            full_output=full_output,
             **kws,
+        )
+
+    @no_type_check
+    def reduce(
+        self: T_CENTRALMOMENTS,
+        axis: int | str | None = None,
+        dim: Hashable | None = None,
+        **kws,
+    ) -> T_CENTRALMOMENTS:
+        """Create new object reducealong axis."""
+        self._raise_if_scalar()
+        axis, dim = _select_axis_dim(self.dims, axis, dim)
+        axis = self._wrap_axis(axis)
+        return type(self).from_datas(
+            self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
         )
 
     @no_type_check
@@ -965,6 +1054,7 @@ class xCentralMoments(CentralMoments):
         self,
         block_size: int,
         axis: int | str | None = None,
+        dim: Hashable | None = None,
         coords_policy: Literal["first", "last", None] = "first",
         **kws,
     ) -> "xCentralMoments":
@@ -991,8 +1081,9 @@ class xCentralMoments(CentralMoments):
         """
 
         self._raise_if_scalar()
+        axis, dim = _select_axis_dim(self.dims, axis, dim, default_axis=0)
         axis = self._wrap_axis(axis)
-        dim = self.dims[axis]
+        # dim = self.dims[axis]
 
         check_kws = dict(
             mom_dims=None, dims=None, attrs=None, coords=None, indexes=None
@@ -1024,12 +1115,6 @@ class xCentralMoments(CentralMoments):
             block_size=block_size, axis=axis, **kws
         )
 
-    # def resample(self, indices, axis=0, first=True, **kws):
-    #     self._raise_if_scalar()
-    #     axis = self._wrap_axis(axis)
-    #     dim = self.
-    #     if not isinstance(indices, xr.DataArray):
-
     @no_type_check
     def _wrap_axis(self, axis: int | str, default: int = 0, ndim: None = None) -> int:
         # if isinstance(axis, str):
@@ -1037,8 +1122,10 @@ class xCentralMoments(CentralMoments):
         # return super(xCentralMoments, self)._wrap_axis(
         #     axis=axis, default=default, ndim=ndim
         # )
+
         if isinstance(axis, str):
-            return self._xdata.get_axis_num(axis)
+            raise ValueError("shouldnt get string axis here")
+            # return self._xdata.get_axis_num(axis)
         else:
             return super(xCentralMoments, self)._wrap_axis(
                 axis=axis, default=default, ndim=ndim
@@ -1138,7 +1225,8 @@ class xCentralMoments(CentralMoments):
         datas: np.ndarray | xr.DataArray,
         mom: T_MOM | None = None,
         mom_ndim: int | None = None,
-        axis: int | str | None = 0,
+        axis: int | str | None = None,
+        dim: Hashable | None = None,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         verify: bool = True,
@@ -1160,9 +1248,13 @@ class xCentralMoments(CentralMoments):
             Note that this does not include the dimension reduced over.
         """
 
-        kws, axis, values = _check_xr_input(
+        if axis is None and dim is None:
+            raise ValueError("must specify axis or dim")
+
+        kws, axis, dim, values = _check_xr_input(
             datas,
             axis=axis,
+            dim=dim,
             _kws_in=kws,
             mom_dims=mom_dims,
             dims=dims,
@@ -1248,7 +1340,8 @@ class xCentralMoments(CentralMoments):
         raws: np.ndarray | xr.DataArray,
         mom: T_MOM | None = None,
         mom_ndim: int | None = None,
-        axis: int | str | None = 0,
+        axis: int | str | None = None,
+        dim: Hashable | None = None,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         convert_kws: Mapping | None = None,
@@ -1265,9 +1358,12 @@ class xCentralMoments(CentralMoments):
         See `CentralMoments.from_raw`
         """
 
-        kws, axis, values = _check_xr_input(
+        assert not (axis is None and dim is None)
+
+        kws, axis, dim, values = _check_xr_input(
             raws,
             axis=axis,
+            dim=dim,
             _kws_in=kws,
             mom_dims=mom_dims,
             dims=dims,
@@ -1297,7 +1393,8 @@ class xCentralMoments(CentralMoments):
         | xr.DataArray
         | Tuple[xr.DataArray, xr.DataArray],
         w: float | np.ndarray | xr.Datarray | None = None,
-        axis: str | int = 0,
+        axis: str | int | None = None,
+        dim: Hashable | None = None,
         mom: T_MOM | None = 2,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
@@ -1315,11 +1412,15 @@ class xCentralMoments(CentralMoments):
         See CentralMomentsfrom_vals
         """
 
+        # specify dim or axis
+        assert not (axis is None and dim is None)
+
         mom_ndim = cls._mom_ndim_from_mom(mom)
         x0 = x if mom_ndim == 1 else x[0]
-        kws, axis, values = _check_xr_input(
+        kws, axis, dim, values = _check_xr_input(
             x0,
             axis=axis,
+            dim=dim,
             _kws_in=kws,
             mom_dims=mom_dims,
             dims=dims,
@@ -1333,6 +1434,7 @@ class xCentralMoments(CentralMoments):
             x,
             w=w,
             axis=axis,
+            dim=dim,
             mom=mom,
             val_shape=val_shape,
             dtype=dtype,
@@ -1352,7 +1454,8 @@ class xCentralMoments(CentralMoments):
         indices=None,
         nrep=None,
         w=None,
-        axis=0,
+        axis=None,
+        dim=None,
         mom=2,
         rep_dim="rep",
         dtype=None,
@@ -1365,6 +1468,7 @@ class xCentralMoments(CentralMoments):
         indexes=None,
         name=None,
         mom_dims=None,
+        full_output=False,
         **kws,
     ):
         """Create from resampling values.
@@ -1372,15 +1476,18 @@ class xCentralMoments(CentralMoments):
         See CentralMomentsfrom_values
         """
 
+        assert not (axis is None and dim is None)
+
         mom_ndim = cls._mom_ndim_from_mom(mom)
         if mom_ndim == 1:
             y = None
         else:
             x, y = x
 
-        kws, axis, values = _check_xr_input(
+        kws, axis, dim, values = _check_xr_input(
             x,
             axis=axis,
+            dim=dim,
             _kws_in=kws,
             mom_dims=mom_dims,
             dims=dims,
@@ -1411,6 +1518,7 @@ class xCentralMoments(CentralMoments):
             broadcast=broadcast,
             parallel=parallel,
             resample_kws=resample_kws,
+            full_output=full_output,
             **kws,
         )
 
@@ -1460,7 +1568,8 @@ class xCentralMoments(CentralMoments):
         a,
         v=0.0,
         w=None,
-        axis=0,
+        axis=None,
+        dim=None,
         mom=2,
         val_shape=None,
         dtype=None,
@@ -1477,9 +1586,12 @@ class xCentralMoments(CentralMoments):
         See CentralMoments.from_stats
         """
 
-        kws, axis, values = _check_xr_input(
+        assert not (axis is None and dim is None)
+
+        kws, axis, dim, values = _check_xr_input(
             a,
             axis=axis,
+            dim=dim,
             mom_dims=mom_dims,
             dims=dims,
             attrs=attrs,
@@ -1489,8 +1601,16 @@ class xCentralMoments(CentralMoments):
             _kws_in=kws,
         )
 
-        return super(xCentralMoments, cls).from_stat(
-            a=a, v=v, w=w, axis=axis, mom=mom, val_shape=val_shape, dtype=dtype, **kws
+        return super(xCentralMoments, cls).from_stats(
+            a=a,
+            v=v,
+            w=w,
+            axis=axis,
+            dim=dim,
+            mom=mom,
+            val_shape=val_shape,
+            dtype=dtype,
+            **kws,
         )
 
     @no_type_check
