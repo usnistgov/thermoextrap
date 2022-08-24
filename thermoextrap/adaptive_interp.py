@@ -528,8 +528,8 @@ def factory_state_idealgas(
     thermoextrap.xpan_beta.factory_extrapmodel
     """
 
-    from .. import beta as xpan_beta
-    from . import idealgas
+    from . import beta as xpan_beta
+    from .core import idealgas
 
     # NOTE: this is for reproducable results.
     if seed_from_beta:
@@ -566,7 +566,7 @@ def callback_plot_progress(
 
     import matplotlib.pyplot as plt
 
-    from . import idealgas
+    from .core import idealgas
 
     if verbose:
         print("depth:", info_dict["depth"])
