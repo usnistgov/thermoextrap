@@ -991,6 +991,8 @@ class CentralMoments(object):
             if `axis=0`, where `nrec` is the number of data objects to sum.
         axis : int, default=0
             axis to reduce along
+        dim : Hashable, optional
+            For use in xCentralMoments only.
 
         Returns
         -------
