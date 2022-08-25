@@ -60,22 +60,10 @@ def _shape_insert_axis(
     shape: Sequence[int], axis: int | None, new_size: int
 ) -> Tuple[int, ...]:
     """Get new shape, given shape, with size put in position axis."""
-    n = len(shape)
-
     if axis is None:
         raise ValueError("must specify integre axis")
 
-    axis = np.core.numeric.normalize_axis_index(axis, n + 1)  # type: ignore
-    # assert -(n+1) <= axis <= n
-    # if axis < 0:
-    #     axis = axis + n + 1
-
-    # if axis < 0:
-    #     axis += len(shape) + 1
-    # shape_list = list(shape)
-    # shape_list.insert(axis, new_size)
-    # return tuple(shape)
-
+    axis = np.core.numeric.normalize_axis_index(axis, len(shape) + 1)  # type: ignore
     shape = tuple(shape)
     return shape[:axis] + (new_size,) + shape[axis:]
 

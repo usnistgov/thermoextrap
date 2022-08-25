@@ -58,6 +58,7 @@ def _select_axis_dim(
     default_axis: int | None = None,
     default_dim: Hashable | None = None,
 ) -> Tuple[int, Hashable]:
+    """Produce axis/dim from input."""
 
     if axis is None and dim is None:
         if default_axis is None and default_dim is None:
@@ -339,14 +340,6 @@ def _optional_wrap_data(
     """Wrap data with xarray."""
 
     if isinstance(data, xr.DataArray):
-        # if mom_dims is None:
-        #     mom_dims = data.dims[-mom_ndim: ]
-        # elif isinstance(mom_dims, str):
-        #     mom_dims = (mom_dims,)
-        # else:
-        #     mom_dims = tuple(mom_dims)
-        # pass
-
         if mom_dims is not None:
             if isinstance(mom_dims, str):
                 mom_dims = (mom_dims,)
@@ -420,6 +413,9 @@ def _optional_wrap_data(
         data = data.copy(data=vals)
 
     return data
+
+
+# from .abstract_central import CentralMomentsABC
 
 
 class xCentralMoments(CentralMoments):
@@ -522,14 +518,14 @@ class xCentralMoments(CentralMoments):
         return xr.zeros_like(self._template_val)
 
     @gcached()
-    def central(self):
+    def _array_view(self):
         """Create CentralMoments view."""
         return self.to_centralmoments()
 
     @no_type_check
     def new_like(
         self: T_CENTRALMOMENTS,
-        data: xr.DataArray | None = None,
+        data: np.ndarray | xr.DataArray | None = None,
         copy: bool = False,
         copy_kws: Mapping | None = None,
         verify: bool = True,
@@ -558,15 +554,24 @@ class xCentralMoments(CentralMoments):
             data = xr.zeros_like(self._xdata)
             copy = verify = check_shape = False
 
-        elif not isinstance(data, xr.DataArray):
+        kws.setdefault("mom_ndim", self.mom_ndim)
+
+        if strict:
+            kws = {
+                "mom": self.mom,
+                "val_shape": self.val_shape,
+                "dtype": self.dtype,
+                **kws,
+            }
+
+        if isinstance(data, np.ndarray):
             kws.setdefault("template", self._xdata)
 
-        return super().new_like(
+        return type(self).from_data(
             data=data,
             copy=copy,
             copy_kws=copy_kws,
             verify=verify,
-            strict=strict,
             check_shape=check_shape,
             **kws,
         )
@@ -580,6 +585,7 @@ class xCentralMoments(CentralMoments):
         mom_ndim: int | None = None,
         shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
+        zeros_kws: Mapping | None = None,
         dims: Tuple[Hashable, ...] | None = None,
         coords: Mapping | None = None,
         attrs: Mapping | None = None,
@@ -611,19 +617,20 @@ class xCentralMoments(CentralMoments):
         the resulting total shape of data is shape + mom_shape
         """
 
-        return super(xCentralMoments, cls).zeros(
+        return CentralMoments.zeros(
             mom=mom,
             val_shape=val_shape,
             mom_ndim=mom_ndim,
             shape=shape,
             dtype=dtype,
+            zeros_kws=zeros_kws,
+        ).to_xcentralmoments(
             dims=dims,
             coords=coords,
             attrs=attrs,
             name=name,
             indexes=indexes,
             mom_dims=mom_dims,
-            **kws,
         )
 
     ###########################################################################
@@ -1116,7 +1123,9 @@ class xCentralMoments(CentralMoments):
         )
 
     @no_type_check
-    def _wrap_axis(self, axis: int | str, default: int = 0, ndim: None = None) -> int:
+    def _wrap_axis(
+        self, axis: int | str, default: int = 0, ndim: None = None, **kws
+    ) -> int:
         # if isinstance(axis, str):
         #     axis = self._xdata.get_axis_num(axis)
         # return super(xCentralMoments, self)._wrap_axis(

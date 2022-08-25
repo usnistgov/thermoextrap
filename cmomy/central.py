@@ -5,15 +5,12 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Hashable,
-    Literal,
     Mapping,
     Optional,
     Sequence,
     Tuple,
     Type,
-    Union,
     cast,
-    no_type_check,
 )
 
 import numpy as np
@@ -23,9 +20,7 @@ from numpy.typing import ArrayLike, DTypeLike
 
 from . import convert
 from ._typing import ASARRAY_ORDER, T_CENTRALMOMENTS, T_MOM
-from .cached_decorators import gcached
-from .pushers import factory_pushers
-from .resample import randsamp_freq, resample_data, resample_vals
+from .resample import randsamp_freq, resample_vals
 from .utils import _axis_expand_broadcast  # _cached_ones,; _my_broadcast,
 from .utils import _shape_insert_axis, _shape_reduce
 
@@ -245,10 +240,13 @@ def central_moments(
         return _central_comoments(**kws)  # type: ignore
 
 
+from .abstract_central import CentralMomentsABC
+
+
 ###############################################################################
 # Classes
 ###############################################################################
-class CentralMoments(object):
+class CentralMoments(CentralMomentsABC[np.ndarray]):
     """Base class for moments accumulation.
 
     Parameters
@@ -270,7 +268,6 @@ class CentralMoments(object):
         "_cache",
         "_data",
         "_data_flat",
-        "_push",
     )
 
     def __init__(self, data: np.ndarray, mom_ndim: int = 1) -> None:
@@ -284,24 +281,11 @@ class CentralMoments(object):
         if data.ndim < self.mom_ndim:
             raise ValueError("not enough dimensions in data")
 
-        # if not data.flags['C_CONTIGUOUS']:
-        #     raise ValueError('data must be c contiguous')
-
         self._data = data
-        # check moments make sense
-        # skip this as it comes from array shape
-        # if not all([x > 0 for x in self.mom]):
-        #     raise ValueError("All moments must positive")
-
         self._data_flat = self._data.reshape(self.shape_flat)
 
         if any(m <= 0 for m in self.mom):
             raise ValueError("moments must be positive")
-
-        # setup pushers
-        vec = len(self.val_shape) > 0
-        cov = self.mom_ndim == 2
-        self._push = factory_pushers(cov=cov, vec=vec)
 
     @property
     def values(self) -> np.ndarray:
@@ -322,110 +306,12 @@ class CentralMoments(object):
         """
         return self._data
 
-    @property
-    def shape(self) -> Tuple[int, ...]:
-        """self.data.shape."""
-        return self._data.shape
-
-    @property
-    def ndim(self) -> int:
-        """self.data.ndim."""
-        return self._data.ndim
-
-    @property
-    def dtype(self):
-        """self.data.dtype."""
-        return self._data.dtype
-
-    @property
-    def mom(self) -> Tuple[int] | Tuple[int, int]:
-        """Number of moments."""  # noqa D401
-        return tuple(x - 1 for x in self.mom_shape)  # type: ignore
-
-    @property
-    def mom_shape(self) -> Tuple[int] | Tuple[int, int]:
-        """Shape of moments part."""
-        return self._data.shape[-self.mom_ndim :]  # type: ignore
-
-    @property
-    def mom_ndim(self) -> Literal[1, 2]:
-        """Length of moments.
-
-        if `mom_ndim` == 1, then single variable
-        moments if `mom_ndim` == 2, then co-moments.
-        """
-        return self._mom_ndim  # type: ignore
-
-    @property
-    def val_shape(self) -> Tuple[int, ...]:
-        """Shape of values dimensions.
-
-        That is shape less moments dimensions.
-        """
-        return self._data.shape[: -self.mom_ndim]
-
-    @property
-    def val_ndim(self) -> int:
-        """Number of value dimensions."""  # noqa D401
-        return len(self.val_shape)
-
-    @property
-    def val_shape_flat(self) -> Tuple[int, ...]:
-        """Shape of values part flattened."""
-        if self.val_shape == ():
-            return ()
-        else:
-            return (np.prod(self.val_shape),)
-
-    @property
-    def shape_flat(self) -> Tuple[int, ...]:
-        """Shape of flattened data."""
-        return self.val_shape_flat + self.mom_shape
-
-    @property
-    def mom_shape_var(self) -> Tuple[int, ...]:
-        """Shape of moment part of variance."""
-        return tuple(x - 1 for x in self.mom)
-
-    # variance shape
-    @property
-    def shape_var(self) -> Tuple[int, ...]:
-        """Total variance shape."""
-        return self.val_shape + self.mom_shape_var
-
-    @property
-    def shape_flat_var(self) -> Tuple[int, ...]:
-        """Shape of flat variance."""
-        return self.val_shape_flat + self.mom_shape_var
-
-    # I think this is for pickling
-    # probably don't need it anymore
-    # def __setstate__(self, state):
-    #     self.__dict__ = state
-    #     # make sure datar points to data
-    #     self._data_flat = self._data.reshape(self.shape_flat)
-
-    # not sure I want to actually implements this
-    # could lead to all sorts of issues applying
-    # ufuncs to underlying data
-    # def __array_wrap__(self, obj, context=None):
-    #     return self, obj, context
-
-    def __repr__(self):
-        """Repr for class."""
-        s = "<CentralMoments(val_shape={}, mom={})>\n".format(self.val_shape, self.mom)
-        return s + repr(self.values)
-
-    def __array__(self, dtype: DTypeLike | None = None) -> np.ndarray:
-        """Used by np.array(self)."""  # noqa D401
-        return np.asarray(self._data, dtype=dtype)
-
     ###########################################################################
     # SECTION: top level creation/copy/new
     ###########################################################################
     def new_like(
         self: T_CENTRALMOMENTS,
-        data: Any | None = None,
+        data: np.ndarray | None = None,
         copy: bool = False,
         copy_kws: Mapping | None = None,
         verify: bool = True,
@@ -467,30 +353,13 @@ class CentralMoments(object):
                 **kws,
             )
 
-        return cast(
-            T_CENTRALMOMENTS,
-            type(self).from_data(
-                data=data,
-                copy=copy,
-                copy_kws=copy_kws,
-                verify=verify,
-                check_shape=check_shape,
-                **kws,
-            ),
-        )
-
-    def zeros_like(self: T_CENTRALMOMENTS) -> T_CENTRALMOMENTS:
-        """Create new object empty object like self."""
-        return self.new_like()
-
-    def copy(self: T_CENTRALMOMENTS, **copy_kws) -> T_CENTRALMOMENTS:
-        """Create a new object with copy of data."""
-        return self.new_like(
-            data=self.values,
-            verify=False,
-            check_shape=False,
-            copy=True,
+        return type(self).from_data(
+            data=data,
+            copy=copy,
             copy_kws=copy_kws,
+            verify=verify,
+            check_shape=check_shape,
+            **kws,
         )
 
     @classmethod
@@ -565,74 +434,6 @@ class CentralMoments(object):
     ###########################################################################
     # SECTION: Access to underlying statistics
     ###########################################################################
-    @gcached()
-    def _weight_index(self):
-        index = (0,) * len(self.mom)
-        if self.val_ndim > 0:
-            index = (...,) + index
-        return index
-
-    @gcached(prop=False)
-    def _single_index(self, val):
-        # index with things like data[..., 1,0] data[..., 0,1]
-        # index = (...,[1,0],[0,1])
-        dims = len(self.mom)
-        if dims == 1:
-            index = [val]
-        else:
-            # this is a bit more complicated
-            index = [[0] * dims for _ in range(dims)]
-            for i in range(dims):
-                index[i][i] = val
-
-        if self.val_ndim > 0:
-            index = [...] + index
-
-        return tuple(index)
-
-    def weight(self):
-        """Weight data."""
-        return self.values[self._weight_index]
-
-    def mean(self):
-        """Mean (first moment)."""
-        return self.values[self._single_index(1)]
-
-    def var(self):
-        """Variance (second central moment)."""
-        return self.values[self._single_index(2)]
-
-    def std(self):
-        """Standard deviation."""  # noqa D401
-        return np.sqrt(self.var())
-
-    def cmom(self):  # -> np.ndarray:
-        """Central moments.
-
-        cmom[..., i0, i1] = < (x0 - <x0>)**i0 * (x1 - <x1>)**i1>
-        Note that this is scrict, so `cmom[..., i, j] = 0` if `i+j = 0`
-        and `cmom[...,0, 0] = 1`.
-
-        """
-        out = self.data.copy()
-        # zeroth central moment
-        out[self._weight_index] = 1
-        # first central moment
-        out[self._single_index(1)] = 0
-        return out
-
-    # convert to/from raw moments
-    def to_raw(self):  # -> np.ndarray:
-        """Convert central moments to raw moments.
-
-        raw[...,i, j] = weight,           i = j = 0
-                      = <x0**i * x1**j>,  otherwise
-        """
-        if self.mom_ndim == 1:
-            return convert.to_raw_moments(x=self.data)
-        elif self.mom_ndim == 2:
-            return convert.to_raw_comoments(x=self.data)
-
     def to_xarray(
         self,
         dims: Hashable | Sequence[Hashable] | None = None,
@@ -738,26 +539,9 @@ class CentralMoments(object):
         )
         return xCentralMoments(data=data, mom_ndim=self.mom_ndim)
 
-    def rmom(self):  # -> np.ndarray:
-        """Raw moments.
-
-        rmom[..., i, j] = <x0 ** i * x1 ** j>
-        """
-        out = self.to_raw()
-        out[self._weight_index] = 1
-        return out
-
     ###########################################################################
     # SECTION: pushing routines
     ###########################################################################
-    def _asarray(self, val: np.ndarray | float) -> np.ndarray:
-        return np.asarray(val, dtype=self.dtype)
-
-    # @property
-    # def _unit_weight(self):
-    #     """internally cached unit weight"""
-    #     return _cached_ones(self.shape, dtype=self.dtype)
-
     #  -> np.ndarray | float | Tuple[float|np.ndarray, None|float|np.ndarray] :
     def _verify_value(
         self,
@@ -769,6 +553,7 @@ class CentralMoments(object):
         expand: bool = False,
         shape_flat: Tuple[int, ...] | None = None,
         other: np.ndarray | None = None,
+        **kwargs,
     ):  # type: ignore
         """Verify input values.
 
@@ -783,7 +568,7 @@ class CentralMoments(object):
         to reorder,
         """
 
-        x = self._asarray(x)
+        x = np.asarray(x, dtype=self.dtype)
 
         if isinstance(target, str):
             if target == "val":
@@ -854,109 +639,6 @@ class CentralMoments(object):
         else:
             return x, target_output
 
-    def _check_weight(self, w: np.ndarray | float | None, target: np.ndarray):  # type: ignore
-        if w is None:
-            w = 1.0
-        return self._verify_value(
-            w,
-            target=target,
-            broadcast=True,
-            expand=True,
-            shape_flat=self.val_shape_flat,
-        )
-
-    def _check_weights(
-        self,
-        w: float | np.ndarray | None,
-        target: np.ndarray,
-        axis: int = None,
-        dim: Hashable | None = None,
-    ):
-        # type: ignore
-        if w is None:
-            w = 1.0
-        return self._verify_value(
-            w,
-            target=target,
-            axis=axis,
-            dim=dim,
-            broadcast=True,
-            expand=True,
-            shape_flat=self.val_shape_flat,
-        )
-
-    def _check_val(self, x: np.ndarray | float, target: str, broadcast: bool = False):  # type: ignore
-        return self._verify_value(
-            x,
-            target=target,
-            broadcast=broadcast,
-            expand=False,
-            shape_flat=self.val_shape_flat,
-        )
-
-    def _check_vals(
-        self,
-        x: np.ndarray,
-        target: np.ndarray | str,
-        axis: int = 0,
-        dim: Hashable | None = None,
-        broadcast: bool = False,
-    ):  # type: ignore
-        return self._verify_value(
-            x,
-            target=target,
-            axis=axis,
-            dim=dim,
-            broadcast=broadcast,
-            expand=broadcast,
-            shape_flat=self.val_shape_flat,
-        )
-
-    def _check_var(self, v: np.ndarray | float, broadcast: bool = False):  # type: ignore
-        return self._verify_value(
-            v,
-            target="var",  # self.shape_var,
-            broadcast=broadcast,
-            expand=False,
-            shape_flat=self.shape_flat_var,
-        )[0]
-
-    def _check_vars(
-        self,
-        v: np.ndarray | float,
-        target: np.ndarray,
-        axis: int = 0,
-        dim: Hashable | None = None,
-        broadcast: bool = False,
-    ):  # type: ignore
-        return self._verify_value(
-            v,
-            target="vars",
-            axis=axis,
-            dim=dim,
-            broadcast=broadcast,
-            expand=broadcast,
-            shape_flat=self.shape_flat_var,
-            other=target,
-        )[0]
-
-    def _check_data(self, data: np.ndarray):  # type: ignore
-        return self._verify_value(data, target="data", shape_flat=self.shape_flat)[0]
-
-    def _check_datas(self, datas: np.ndarray, axis: int = 0, dim: Hashable | None = None):  # type: ignore
-        return self._verify_value(
-            datas, target="datas", axis=axis, dim=dim, shape_flat=self.shape_flat
-        )[0]
-
-    def fill(self: T_CENTRALMOMENTS, value: Any = 0) -> T_CENTRALMOMENTS:
-        """Fill data with value."""
-        self._data.fill(value)
-        return self
-
-    def zero(self: T_CENTRALMOMENTS) -> T_CENTRALMOMENTS:
-        """Zero out underlying data."""
-        return self.fill(value=0)
-
     def push_data(self: T_CENTRALMOMENTS, data: np.ndarray) -> T_CENTRALMOMENTS:
         """Push data object to moments.
 
@@ -980,7 +662,6 @@ class CentralMoments(object):
         self: T_CENTRALMOMENTS,
         datas: np.ndarray,
         axis: int = 0,
-        dim: Hashable | None = None,
     ) -> T_CENTRALMOMENTS:
         """Push and reduce multiple average central moments.
 
@@ -998,7 +679,7 @@ class CentralMoments(object):
         -------
         self
         """
-        datas = self._check_datas(datas, axis=axis, dim=dim)
+        datas = self._check_datas(datas, axis=axis)
         self._push.datas(self._data_flat, datas)
         return self
 
@@ -1044,7 +725,6 @@ class CentralMoments(object):
         x: np.ndarray | Tuple[np.ndarray, np.ndarray],
         w: np.ndarray | None = None,
         axis: int = 0,
-        dim: Hashable | None = None,
         broadcast: bool = False,
     ) -> T_CENTRALMOMENTS:
         """Push multiple samples to central moments.
@@ -1069,9 +749,9 @@ class CentralMoments(object):
             assert len(x) == self.mom_ndim
             x, *ys = x  # type: ignore
 
-        xr, target = self._check_vals(x, axis=axis, dim=dim, target="vals")  # type: ignore
+        xr, target = self._check_vals(x, axis=axis, target="vals")  # type: ignore
         yr = tuple(  # type: ignore
-            self._check_vals(y, target=target, axis=axis, dim=dim, broadcast=broadcast)  # type: ignore
+            self._check_vals(y, target=target, axis=axis, broadcast=broadcast)  # type: ignore
             for y in ys  # type: ignore
         )  # type: ignore
         wr = self._check_weights(w, target=target, axis=axis)
@@ -1079,167 +759,8 @@ class CentralMoments(object):
         return self
 
     ###########################################################################
-    # SECTION: Operators
-    ###########################################################################
-    def _check_other(self: T_CENTRALMOMENTS, b: T_CENTRALMOMENTS) -> None:
-        """Check other object."""
-        assert type(self) == type(b)
-        assert self.mom_ndim == b.mom_ndim
-        assert self.shape == b.shape
-
-    def __iadd__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:  # noqa D105
-        self._check_other(b)
-        # self.push_data(b.data)
-        # return self
-        return self.push_data(b.data)
-
-    def __add__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:
-        """Add objects to new object."""
-        self._check_other(b)
-        # new = self.copy()
-        # new.push_data(b.data)
-        # return new
-        return self.copy().push_data(b.data)
-
-    def __isub__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:
-        """Inplace substraction."""
-        # NOTE: consider implementint push_data_scale routine to make this cleaner
-        self._check_other(b)
-        assert np.all(self.weight() >= b.weight())
-        data = b.data.copy()
-        data[self._weight_index] *= -1
-        # self.push_data(data)
-        # return self
-        return self.push_data(data)
-
-    def __sub__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:
-        """Subtract objects."""
-        self._check_other(b)
-        assert np.all(self.weight() >= b.weight())
-        new = b.copy()
-        new._data[self._weight_index] *= -1
-        # new.push_data(self.data)
-        # return new
-        return new.push_data(self.data)
-
-    def __mul__(self: T_CENTRALMOMENTS, scale: float | int) -> T_CENTRALMOMENTS:
-        """New object with weights scaled by scale."""  # noqa D401
-        scale = float(scale)
-        new = self.copy()
-        new._data[self._weight_index] *= scale
-        return new
-
-    def __imul__(self: T_CENTRALMOMENTS, scale: float | int) -> T_CENTRALMOMENTS:
-        """Inplace multiply."""
-        scale = float(scale)
-        self._data[self._weight_index] *= scale
-        return self
-
-    ###########################################################################
     # SECTION: Constructors
     ###########################################################################
-    @classmethod
-    @no_type_check
-    def _check_mom(
-        cls, moments: T_MOM, mom_ndim: int, shape: Tuple[int, ...] | None = None
-    ) -> Union[Tuple[int], Tuple[int, int]]:  # type: ignore
-        """Check moments for correct shape.
-
-        If moments is None, infer from
-        shape[-mom_ndim:] if integer, convert to tuple.
-        """
-
-        if moments is None:
-            if shape is not None:
-                if mom_ndim is None:
-                    raise ValueError(
-                        "must speficy either moments or shape and mom_ndim"
-                    )
-                moments = tuple(x - 1 for x in shape[-mom_ndim:])
-            else:
-                raise ValueError("must specify moments")
-
-        if isinstance(moments, int):
-            if mom_ndim is None:
-                mom_ndim = 1
-            moments = (moments,) * mom_ndim
-
-        else:
-            moments = tuple(moments)
-            if mom_ndim is None:
-                mom_ndim = len(moments)
-
-        assert len(moments) == mom_ndim
-        return moments
-
-    @staticmethod
-    def _datas_axis_to_first(
-        datas: np.ndarray, axis: int, mom_ndim: int
-    ) -> Tuple[np.ndarray, int]:
-        """Move axis to first first position."""
-        # NOTE: removinvg this. should be handles elsewhere
-        # datas = np.asarray(datas)
-        # ndim = datas.ndim - mom_ndim
-        # if axis < 0:
-        #     axis += ndim
-        # assert 0 <= axis < ndim
-        axis = normalize_axis_index(axis, datas.ndim - mom_ndim)
-        if axis != 0:
-            datas = np.moveaxis(datas, axis, 0)
-        return datas, axis
-
-    def _wrap_axis(
-        self,
-        axis: int | None,
-        default: int = 0,
-        ndim: int | None = None,
-    ) -> int:
-        """Wrap axis to positive value and check."""
-        if axis is None:
-            axis = default
-        if ndim is None:
-            ndim = self.val_ndim
-        axis = cast(int, normalize_axis_index(axis, ndim))
-        # if axis < 0:
-        #     axis += ndim
-        # assert 0 <= axis < ndim
-        return axis
-
-    @classmethod
-    def _mom_ndim_from_mom(cls, mom: Union[Tuple[int], Tuple[int, int], int]) -> int:
-        if isinstance(mom, int):
-            return 1
-        elif isinstance(mom, tuple):
-            return len(mom)
-        else:
-            raise ValueError("mom must be int or tuple")
-
-    @classmethod
-    def _choose_mom_ndim(
-        cls,
-        mom: T_MOM | None,
-        mom_ndim: int | None,
-    ) -> int:
-        if mom is not None:
-            mom_ndim = cls._mom_ndim_from_mom(mom)
-
-        if mom_ndim is None:
-            raise ValueError("must specify mom_ndim or mom")
-
-        return mom_ndim
-
     @classmethod
     def from_data(
         cls: Type[T_CENTRALMOMENTS],
@@ -1400,7 +921,7 @@ class CentralMoments(object):
             dtype = x0.dtype
 
         return cls.zeros(val_shape=val_shape, mom=mom, dtype=dtype, **kws).push_vals(
-            x=x, axis=axis, dim=dim, w=w, broadcast=broadcast
+            x=x, axis=axis, w=w, broadcast=broadcast
         )
 
     @classmethod
@@ -1625,158 +1146,6 @@ class CentralMoments(object):
     ###########################################################################
     # SECTION: Manipulation
     ###########################################################################
-    @property
-    def _is_vector(self) -> bool:
-        return self.val_ndim > 0
-
-    def _raise_if_scalar(self, message: str | None = None) -> None:
-        if not self._is_vector:
-            if message is None:
-                message = "not implemented for scalar"
-            raise ValueError(message)
-
-    # Universal reducers
-    def resample_and_reduce(
-        self: T_CENTRALMOMENTS,
-        freq: np.ndarray | None = None,
-        indices: np.ndarray | None = None,
-        nrep: None = None,
-        axis: int | None = None,
-        parallel: bool = True,
-        resample_kws: Mapping | None = None,
-        full_output: bool = False,
-        **kws,
-    ) -> T_CENTRALMOMENTS | Tuple[T_CENTRALMOMENTS, np.ndarray]:
-        """Bootstrap resample and reduce.
-
-        Parameter
-        ----------
-        freq : array-like, shape=(nrep, nrec), optional
-            frequence table.  freq[i, j] is the weight of the jth record to the ith
-            replicate indices : array-like, shape=(nrep, nrec), optional
-            resampling array.  idx[i, j] is the record index of the original array to
-            place in new sample[i, j]. if specified, create freq array from idx
-        nrep : int, optional
-            if specified, create idx array with this number of replicates
-        axis : int, Default=0
-            axis to resample and reduce along
-        parallel : bool, default=True
-            flags to `numba.njit`
-        resample_kws : dict
-            extra arguments to `cmomy.resample.resample_and_reduce`
-        kws : dict
-            extra key-word arguments to from_data method
-        """
-        self._raise_if_scalar()
-        axis = self._wrap_axis(axis)
-        if resample_kws is None:
-            resample_kws = {}
-
-        freq = randsamp_freq(
-            nrep=nrep, indices=indices, freq=freq, size=self.val_shape[axis], check=True
-        )
-        data = resample_data(
-            self.data, freq, mom=self.mom, axis=axis, parallel=parallel, **resample_kws
-        )
-        out = type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
-
-        if full_output:
-            return out, freq
-        else:
-            return out
-
-    def resample(
-        self: T_CENTRALMOMENTS,
-        indices: np.ndarray,
-        axis: int = 0,
-        first: bool = True,
-        **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create a new object sampled from index.
-
-        Parameters
-        ----------
-        indicies : array-like
-            shape should be (nrep, nrec)
-        axis : int, default=0
-            axis to resample
-        first : bool, default=True
-            if True, and axis != 0, the move the axis to first position.
-            This makes results similar to resample and reduce
-            If `first` False, then resampled array can have odd shape
-
-        Returns
-        -------
-        output : accumulator object
-        """
-        self._raise_if_scalar()
-        axis = self._wrap_axis(axis)
-
-        data = self.data
-        if first and axis != 0:
-            data = np.moveaxis(data, axis, 0)
-            axis = 0
-
-        out = np.take(data, indices, axis=axis)
-
-        return type(self).from_data(
-            data=out,
-            mom_ndim=self.mom_ndim,
-            mom=self.mom,
-            copy=False,
-            verify=True,
-            **kws,
-        )
-
-    def reduce(self: T_CENTRALMOMENTS, axis: int = 0, **kws) -> T_CENTRALMOMENTS:
-        """Create new object reducealong axis."""
-        self._raise_if_scalar()
-        axis = self._wrap_axis(axis)
-        return type(self).from_datas(
-            self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
-        )
-
-    def block(
-        self: T_CENTRALMOMENTS,
-        block_size: int | None = None,
-        axis: int | None = None,
-        **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Block average reduction.
-
-        Parameters
-        ----------
-        block_size : int
-            number of consecutive records to combine
-        axis : int, default=0
-            axis to reduce along
-        kws : dict
-            extral key word arguments to `from_datas` method
-        """
-
-        self._raise_if_scalar()
-
-        axis = self._wrap_axis(axis)
-        data = self.data
-
-        # move axis to first
-        if axis != 0:
-            data = np.moveaxis(data, axis, 0)
-
-        n = data.shape[0]
-
-        if block_size is None:
-            block_size = n
-            nblock = 1
-
-        else:
-            nblock = n // block_size
-
-        datas = data[: (nblock * block_size), ...].reshape(
-            (nblock, block_size) + data.shape[1:]
-        )
-        return type(self).from_datas(datas=datas, mom_ndim=self.mom_ndim, axis=1, **kws)
-
     def reshape(
         self: T_CENTRALMOMENTS,
         shape: Tuple[int, ...],
