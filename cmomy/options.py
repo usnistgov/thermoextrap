@@ -52,11 +52,8 @@ class set_options(object):
 
     - `NMAX` : max moment size
     You can use ``set_options`` either as a context manager:
-    >>> with xr.set_options(use_tqdm=True, tqdm_min_len_calc=50):
-    ...     c.xge.betaOmega()
-    ...
-    Or to set global options:
-    >>> xr.set_options(tqdm_min_len_calc=50)
+    - CACHE : bool, default=True
+    - FASTMATH : bool, default=True
     """
 
     def __init__(self, **kwargs):

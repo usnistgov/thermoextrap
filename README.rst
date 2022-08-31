@@ -19,7 +19,13 @@ Central (co)moment calculation/manipulation
 
 
 * Free software: NIST license
-* Documentation: https://cmomy.readthedocs.io.
+
+Overview
+--------
+``cmomy`` is an open source package to calculate central moments and co-moments in a numerical stable and direct way.
+Behind the scenes, ``cmomy`` makes use of Numba_ to rapidly calculate moments.  A good introduction to the type of formulas used can
+be found `here <https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance>`_.
+
 
 
 Features
@@ -28,6 +34,22 @@ Features
 * Fast calculation of central moments and central co-moments with weights
 * Support for scalor or vector inputs
 * numpy and xarray api's
+
+
+
+Installation
+------------
+Use one of the following
+
+.. code:: bash
+
+          pip install cmomy
+
+or
+
+.. code:: bash
+
+          conda install -c wpk-nist cmomy
 
 
 Note on caching
@@ -42,13 +64,12 @@ sessions) will be already compiled.
 
 Testing
 -------
-
 Tests are packaged with the distribution intentionally. To test code
 run:
 
 .. code:: bash
 
-   pytest -x -v --pyargs cmomy
+   pytest --pyargs cmomy
 
 By running the tests once, you create a cache of the numba code for most
 cases. The first time you run the tests, it will take a while (about 1.5
@@ -60,6 +81,7 @@ Credits
 
 This package was created with Cookiecutter_ and the `wpk-nist-gov/cookiecutter-pypackage`_ Project template forked from `audreyr/cookiecutter-pypackage`_.
 
+.. _Numba: https://numba.pydata.org/
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`wpk-nist-gov/cookiecutter-pypackage`: https://github.com/wpk-nist-gov/cookiecutter-pypackage
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
