@@ -2,19 +2,23 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Hashable, Literal, Tuple, TypeVar, Union
 
 import numpy as np
-from numpy.typing import ArrayLike
+import xarray as xr
 
 if TYPE_CHECKING:
-    from .central import CentralMoments
+    from .abstract_central import CentralMomentsABC
 
 
-T_MOM = Union[int, Tuple[int], Tuple[int, int]]
-T_XVAL_LIKE = Union[ArrayLike, Tuple[ArrayLike, ArrayLike]]
-T_XVAL_STRICT = Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]
+Moments = Union[int, Tuple[int], Tuple[int, int]]
+XvalStrict = Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]
+ArrayOrder = Literal["C", "F", "A", "K", None]
 
-ASARRAY_ORDER = Union[Literal["C", "F", "A", "K"], None]
 
-T_CENTRALMOMENTS = TypeVar("T_CENTRALMOMENTS", bound="CentralMoments")
+T_CentralMoments = TypeVar("T_CentralMoments", bound="CentralMomentsABC")
+T_Array = TypeVar("T_Array", np.ndarray, xr.DataArray)
+
+
+MomDims = Union[Hashable, Tuple[Hashable, Hashable]]
+Dims = Union[Hashable, Tuple[Hashable, ...]]

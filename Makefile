@@ -133,8 +133,14 @@ user-all: user-venv user-autoenv-zsh ## runs user scripts
 test: ## run tests quickly with the default Python
 	pytest -x -v
 
+test-gen_examples:
+	pytest -x -v --accept
+
 test-all: ## run tests on every Python version with tox
 	tox -- -x -v
+
+
+
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source cmomy -m pytest

@@ -25,6 +25,7 @@ repos:
     rev: v0.3.5
     hooks:
       - id: blackdoc
+        args: [--check --diff]
   # this should be run before flake8 to
   # this should be run externally
   # messes up too many things

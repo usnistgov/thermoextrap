@@ -5,11 +5,10 @@ from functools import lru_cache
 from typing import Sequence, Tuple
 
 import numpy as np
-import xarray as xr
 from numba import njit
 from numpy.typing import ArrayLike, DTypeLike
 
-from ._typing import ASARRAY_ORDER
+from ._typing import ArrayOrder
 
 # from .cached_decorators import gcached  # , cached_clear
 from .options import OPTIONS
@@ -49,13 +48,6 @@ def factory_binomial(order: int, dtype: DTypeLike = float):
     return out
 
 
-# def _my_broadcast(x, shape, dtype=None, order=None):
-#     x = np.asarray(x, dtype=dtype, order=order)
-#     if x.shape != shape:
-#         x = np.broadcast(x, shape)
-#     return x
-
-
 def _shape_insert_axis(
     shape: Sequence[int], axis: int | None, new_size: int
 ) -> Tuple[int, ...]:
@@ -84,7 +76,7 @@ def _axis_expand_broadcast(
     broadcast: bool = True,
     roll: bool = True,
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER = None,
+    order: ArrayOrder = None,
 ) -> np.ndarray:
     """Broadcast x to shape.
 
@@ -117,48 +109,9 @@ def _axis_expand_broadcast(
     return x
 
 
+# Mostly deprecated.  Keeping around for now.
+
+
 @lru_cache(maxsize=5)
 def _cached_ones(shape, dtype=None):
     return np.ones(shape, dtype=dtype)
-
-
-def _xr_wrap_like(da, x):
-    """Wrap x with xarray like da."""
-    x = np.asarray(x)
-    assert x.shape == da.shape
-
-    return xr.DataArray(
-        x, dims=da.dims, coords=da.coords, name=da.name, indexes=da.indexes
-    )
-
-
-def _xr_order_like(template, *others):
-    """Given dimensions, order in same manner."""
-
-    if not isinstance(template, xr.DataArray):
-        out = others
-
-    else:
-        dims = template.dims
-
-        key_map = {dim: i for i, dim in enumerate(dims)}
-
-        def key(x):
-            return key_map[x]
-
-        out = []
-        for other in others:
-            if isinstance(other, xr.DataArray):
-                # reorder
-                order = sorted(other.dims, key=key)
-
-                x = other.transpose(*order)
-            else:
-                x = other
-
-            out.append(x)
-
-    if len(out) == 1:
-        out = out[0]
-
-    return out

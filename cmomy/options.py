@@ -2,7 +2,17 @@
 
 from __future__ import annotations
 
+import os
 from typing import Callable, Dict
+
+# Useful if doing any command line editing of doc string stuff
+
+try:
+    # Default to setting docs
+    DOC_SUB = os.getenv("CMOMY_DOC_SUB", "True").lower() not in ("0", "f", "false")
+except KeyError:
+    DOC_SUB = True
+
 
 NMAX = "nmax"
 FASTMATH = "fastmath"

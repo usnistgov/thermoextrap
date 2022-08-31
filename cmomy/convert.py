@@ -7,7 +7,7 @@ import numpy as np
 from numpy import ndarray
 from numpy.typing import ArrayLike, DTypeLike
 
-from ._typing import ASARRAY_ORDER
+from ._typing import ArrayOrder
 from .options import OPTIONS
 from .utils import factory_binomial, myjit
 
@@ -153,7 +153,7 @@ def _convert_moments(
     target_axis: int | Sequence[int],
     func: Callable[..., Any],
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER | None = None,
+    order: ArrayOrder | None = None,
     out: np.ndarray | None = None,
 ) -> ndarray:
     if isinstance(axis, int):
@@ -203,7 +203,7 @@ def to_raw_moments(
     x: ndarray,
     axis: int = -1,
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER | None = None,
+    order: ArrayOrder | None = None,
     out: np.ndarray | None = None,
 ) -> ndarray:
     """Convert central moments to raw moments."""
@@ -225,7 +225,7 @@ def to_raw_comoments(
     x: ndarray,
     axis: Tuple[int, int] = (-2, -1),
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER | None = None,
+    order: ArrayOrder | None = None,
     out: np.ndarray | None = None,
 ) -> ndarray:
     """Convert central moments to raw moments."""
@@ -248,7 +248,7 @@ def to_central_moments(
     x: ndarray,
     axis: int = -1,
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER | None = None,
+    order: ArrayOrder | None = None,
     out: np.ndarray | None = None,
 ) -> ndarray:
     """Convert central moments to raw moments."""
@@ -271,7 +271,7 @@ def to_central_comoments(
     x: ndarray,
     axis: Tuple[int, int] = (-2, -1),
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER | None = None,
+    order: ArrayOrder | None = None,
     out: np.ndarray | None = None,
 ) -> ndarray:
     """Convert raw comoments to central comoments."""

@@ -8,12 +8,18 @@ import xarray as xr
 from numpy.typing import ArrayLike, DTypeLike
 
 from ._resample import factory_resample_data, factory_resample_vals
-from ._typing import ASARRAY_ORDER, T_MOM, T_XVAL_STRICT
+from ._typing import ArrayOrder, Moments, XvalStrict
 from .utils import _axis_expand_broadcast, myjit
 
 ###############################################################################
 # resampling
 ###############################################################################
+
+
+@myjit
+def numba_random_seed(seed):
+    """Set the random seed for numba functions"""
+    np.random.seed(seed)
 
 
 @myjit
@@ -34,6 +40,28 @@ def _randsamp_freq_indices(indices, freq):
         for d in range(ndat):
             idx = indices[r, d]
             freq[r, idx] += 1
+
+
+def freq_to_indices(freq):
+    """Convert a frequency array to indices array."""
+
+    indices_all = []
+
+    for f in freq:
+
+        indices = np.concatenate([np.repeat(i, count) for i, count in enumerate(f)])
+
+        indices_all.append(indices)
+
+    return np.array(indices_all)
+
+
+def indices_to_freq(indices):
+    """Convert indices to frequency array."""
+    freq = np.zeros_like(indices)
+    _randsamp_freq_indices(indices, freq)
+
+    return freq
 
 
 def randsamp_freq(
@@ -112,10 +140,10 @@ def randsamp_freq(
 def resample_data(
     data: ArrayLike,
     freq: ArrayLike,
-    mom: T_MOM,
+    mom: Moments,
     axis: int = 0,
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER = None,
+    order: ArrayOrder = None,
     parallel: bool = True,
     out: np.ndarray | None = None,
 ) -> np.ndarray:
@@ -200,15 +228,15 @@ def resample_data(
 
 
 def resample_vals(
-    x: T_XVAL_STRICT,
+    x: XvalStrict,
     freq: np.ndarray,
-    mom: T_MOM,
+    mom: Moments,
     axis: int = 0,
     w: np.ndarray | None = None,
     mom_ndim: int | None = None,
     broadcast: bool = False,
     dtype: DTypeLike | None = None,
-    order: ASARRAY_ORDER = None,
+    order: ArrayOrder = None,
     parallel: bool = True,
     out: np.ndarray | None = None,
 ) -> np.ndarray:

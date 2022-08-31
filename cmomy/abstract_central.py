@@ -1,18 +1,17 @@
-# type: ignore
-# flake8: noqa
+"""Base class for central moments calculations."""
+
+
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import (
     Any,
     Generic,
-    Hashable,
+    List,
     Literal,
     Mapping,
-    Sequence,
     Tuple,
     Type,
-    TypeVar,
     Union,
     cast,
     no_type_check,
@@ -20,52 +19,94 @@ from typing import (
 
 import numpy as np
 import xarray as xr
+from custom_inherit import DocInheritMeta
 from numpy.core.numeric import normalize_axis_index  # type: ignore
 from numpy.typing import ArrayLike, DTypeLike
 
 from . import convert
-from ._typing import ASARRAY_ORDER, T_MOM
+from ._docstrings import docfiller_shared
+from ._typing import Moments, T_Array, T_CentralMoments
 from .cached_decorators import gcached
+from .options import DOC_SUB
 from .pushers import factory_pushers
-from .resample import randsamp_freq, resample_data, resample_vals
-from .utils import _axis_expand_broadcast  # _cached_ones,; _my_broadcast,
-from .utils import _shape_insert_axis, _shape_reduce
-
-T_CENTRALMOMENTS = TypeVar("T_CENTRALMOMENTS", bound="CentralMomentsABC")
-T_npxr_strict = Union[np.ndarray, xr.DataArray]
-T_npxr_like = Union[ArrayLike, xr.DataArray]
-
-
-T_array = TypeVar("T_array_output", np.ndarray, xr.DataArray)
+from .resample import randsamp_freq, resample_data
 
 # TODO: Total rework is called for to handle typing correctly.
 # instead of xCentral subclassing Central, these should be separate things
 # for the cases where things are in the wrong format, can create a Central object,
 # then convert to an xCentral object
 
+# data[..., i, j] = \begin{cases}
+# \text{weight} & i = j = 0 \\
+# \langle x \rangle & i = 1, j = 0 \\
+# \langle (x - \langle x \rangle^i) (y - \langle y \rangle^j) \rangle & i + j > 0
+# \end{cases}
 
-class CentralMomentsABC(ABC, Generic[T_array]):
+
+def _get_metaclass():
+    if DOC_SUB:
+        return DocInheritMeta(style="numpy_with_merge")
+    else:
+        return ABCMeta
+
+
+class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
+    r"""Wrapper to calculate central moments.
+
+    Base data has the form
+
+    .. math::
+
+        data[..., i, j] = \begin{cases}
+            \text{weight} & i = j = 0 \\
+            \langle x \rangle & i = 1, j = 0 \\
+            \langle (x - \langle x \rangle^i) (y - \langle y \rangle^j) \rangle & i + j > 0
+        \end{cases}
+
+    Parameters
+    ----------
+    data : xr.DataArray / np.ndarray
+        Moment collection array.
+    mom_ndim : {1, 2}
+        Number of dimensions for moment part of `data`.
+
+        * 1 : central moments of single variable
+        * 2 : central comoments of two variables
+    """
+
+    __slots__ = (
+        "_mom_ndim",
+        "_cache",
+        "_data",
+        "_data_flat",
+    )
+
     @abstractmethod
-    def __init__(self, data: T_array, mom_ndims: int = 1) -> None:
-        pass
+    def __init__(self, data: T_Array, mom_ndim: Literal[1, 2]) -> None:
+
+        self._data = cast(np.ndarray, data)
+        self._data_flat = self._data
+
+        self._mom_ndim = mom_ndim
+        self._cache: Mapping[Any, Any] = {}
 
     @property
     def data(self) -> np.ndarray:
-        """Accessor to numpy underlying data.
+        """Accessor to numpy array underlying data.
 
         By convention data has the following meaning for the moments indexes
 
         * `data[...,i=0,j=0]`, weights
-        * `data[...,i=1,j=0]]`, if only one moment indice is one and all
-        others zero, then this is the average value of the variable with unit index.
-
+        * `data[...,i=1,j=0]]`, if only one moment indice is one and all others zero, then this is the average value of the variable with unit index.
         * all other cases, the central moments `<(x0-<x0>)**i0 * (x1 - <x1>)**i1 * ...>`
+
         """
-        return self._data
+        return cast(np.ndarray, self._data)
 
     @property
     @abstractmethod
-    def values(self) -> T_array:
+    def values(self) -> T_Array:
+        """Access underlying central moments array."""
         pass
 
     @property
@@ -79,9 +120,10 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         return self.data.ndim
 
     @property
-    def dtype(self):
+    def dtype(self) -> np.dtype:
         """self.data.dtype."""
-        return self.data.dtype
+        # Not sure why I have to cast
+        return cast(np.dtype, self.data.dtype)
 
     @property
     def mom_ndim(self) -> Literal[1, 2]:
@@ -90,12 +132,14 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         if `mom_ndim` == 1, then single variable
         moments if `mom_ndim` == 2, then co-moments.
         """
-        return self._mom_ndim  # type: ignore
+        return self._mom_ndim
 
     @property
     def mom_shape(self) -> Tuple[int] | Tuple[int, int]:
         """Shape of moments part."""
-        return self.data.shape[-self.mom_ndim :]  # type: ignore
+        return cast(
+            Union[Tuple[int], Tuple[int, int]], self.data.shape[-self.mom_ndim :]
+        )
 
     @property
     def mom(self) -> Tuple[int] | Tuple[int, int]:
@@ -143,19 +187,6 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         """Shape of flat variance."""
         return self.val_shape_flat + self.mom_shape_var
 
-    # I think this is for pickling
-    # probably don't need it anymore
-    # def __setstate__(self, state):
-    #     self.__dict__ = state
-    #     # make sure datar points to data
-    #     self._data_flat = self._data.reshape(self.shape_flat)
-
-    # not sure I want to actually implements this
-    # could lead to all sorts of issues applying
-    # ufuncs to underlying data
-    # def __array_wrap__(self, obj, context=None):
-    #     return self, obj, context
-
     @gcached()
     def _push(self):
         vec = len(self.val_shape) > 0
@@ -176,41 +207,76 @@ class CentralMomentsABC(ABC, Generic[T_array]):
     # SECTION: top level creation/copy/new
     ###########################################################################
     @abstractmethod
+    @docfiller_shared
     def new_like(
-        self: T_CENTRALMOMENTS,
+        self: T_CentralMoments,
         *,
-        data: T_npxr_like | None = None,
+        data: ArrayLike | xr.DataArray | None = None,
         copy: bool = False,
         copy_kws: Mapping | None = None,
         verify: bool = True,
-        check_shape: bool = True,
+        check_shape: bool = False,
         strict: bool = False,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create new object like self, with new data.
+    ) -> T_CentralMoments:
+        """
+        Create new object like self, with new data.
 
         Parameters
         ----------
         data : array-like, optional
             data for new object
-        verify : bool, default=False
-            if True, pass data through np.asarray
-        check : bool, default=True
-            if True, then check that data has same total shape as self
-        copy : bool, default=False
-            if True, perform copy of data
-        copy_kws : dict, optional
-            key-word arguments to `self.data.copy`
-        **kws : extra arguments
-            arguments to classmethod `from_data`
-        """
+        {copy}
+        {copy_kws}
+        {verify}
+        {check_shape}
+        strict : bool, default=False
+            If True, verify that `data` has correct shape
+        **kws
+            arguments to classmethod :meth:`from_data`
 
-    def zeros_like(self: T_CENTRALMOMENTS) -> T_CENTRALMOMENTS:
-        """Create new object empty object like self."""
+
+        See Also
+        --------
+        from_data
+
+        """
+        pass
+
+    def zeros_like(self: T_CentralMoments) -> T_CentralMoments:
+        """Create new empty object like self.
+
+        Returns
+        -------
+        output : same as object
+            Object with same attributes as caller, but with zerod out data.
+
+        See Also
+        --------
+        new_like
+        from_data
+        """
         return self.new_like()
 
-    def copy(self: T_CENTRALMOMENTS, **copy_kws) -> T_CENTRALMOMENTS:
-        """Create a new object with copy of data."""
+    def copy(self: T_CentralMoments, **copy_kws) -> T_CentralMoments:
+        """Create a new object with copy of data.
+
+        Parameters
+        ----------
+        **copy_kws
+            passed to parameter ``copy_kws`` in method :meth:`new_like`
+
+        Returns
+        -------
+        output : same as object
+            Object with same attributes as caller, but with new underlying data.
+
+
+        See Also
+        --------
+        new_like
+        zeros_like
+        """
         return self.new_like(
             data=self.values,
             verify=False,
@@ -221,45 +287,43 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
     @classmethod
     @abstractmethod
+    @docfiller_shared
     def zeros(
-        cls: Type[T_CENTRALMOMENTS],
-        mom: T_MOM | None = None,
+        cls: Type[T_CentralMoments],
+        mom: Moments | None = None,
         val_shape: Tuple[int, ...] | None = None,
-        mom_ndim: int | None = None,
         shape: Tuple[int, ...] | None = None,
+        mom_ndim: int | None = None,
         dtype: DTypeLike | None = None,
         zeros_kws: Mapping | None = None,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create a new base object.
+    ) -> T_CentralMoments:
+        """
+        Create a new base object.
 
         Parameters
         ----------
-        mom : int or tuple
-            moments.
-            if integer, or length one tuple, then moments of single variable.
-            if tuple of length 2, then comoments of two variables.
-        val_shape : tuple, optional
-            shape of values, excluding moments.  For example, if considering the average
-            of observations `x`, then `val_shape = x.shape`
-            if not passed, then assume val_shape = ()
-        shape : tuple, optional
-            if passed, create object with this total shape
-        mom_ndim : int {1, 2}, optional
-            number of variables.
-            if pass `shape`, then must pass mom_ndim
-        dtype : nunpy dtype, default=float
+        {mom}
+        {mom_ndim}
+        {val_shape}
+        {shape}
+        {dtype}
+        {zeros_kws}
+        **kws
+            extra arguments to :meth:`from_data`
 
-        **kws : dict
-            extra arguments to cls.from_data
-
-        Returns
-        -------
-        object : instance of class `cls`
 
         Notes
         -----
-        the resulting total shape of data is shape + (mom + 1)
+        The resulting total shape of data is shape + (mom + 1).
+        Must specify either `mom` or `mom_ndim`
+
+
+        See Also
+        --------
+        from_data : General constructor
+        numpy.zeros
+
         """
         pass
 
@@ -267,11 +331,12 @@ class CentralMomentsABC(ABC, Generic[T_array]):
     # SECTION: Access to underlying statistics
     ###########################################################################
     @gcached()
-    def _weight_index(self) -> Tuple[int, ...]:
+    def _weight_index(self):
         index = (0,) * len(self.mom)
         if self.val_ndim > 0:
-            index = (...,) + index
-        return index
+            return (...,) + index
+        else:
+            return index
 
     @gcached(prop=False)
     def _single_index(self, val) -> Tuple[List[int], ...]:
@@ -291,74 +356,130 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
         return tuple(index)
 
-    def weight(self) -> float | T_array:
+    def weight(self) -> float | T_Array:
         """Weight data."""
-        return self.values[self._weight_index]
+        return cast(Union[float, T_Array], self.values[self._weight_index])
 
-    def mean(self) -> float | T_array:
+    def mean(self) -> float | T_Array:
         """Mean (first moment)."""
-        return self.values[self._single_index(1)]
+        return cast(Union[float, T_Array], self.values[self._single_index(1)])
 
-    def var(self) -> float | T_array:
+    def var(self) -> float | T_Array:
         """Variance (second central moment)."""
-        return self.values[self._single_index(2)]
+        return cast(Union[float, T_Array], self.values[self._single_index(2)])
 
-    def std(self) -> float | T_array:
+    def std(self) -> float | T_Array:
         """Standard deviation."""  # noqa D401
-        return np.sqrt(self.var())
+        return cast(Union[float, T_Array], np.sqrt(self.var()))
 
-    def cmom(self) -> T_array:
-        """Central moments.
+    def _wrap_like(self, x: np.ndarray, *args, **kwargs) -> T_Array:
+        return cast(T_Array, x)
 
-        cmom[..., i0, i1] = < (x0 - <x0>)**i0 * (x1 - <x1>)**i1>
-        Note that this is scrict, so `cmom[..., i, j] = 0` if `i+j = 0`
-        and `cmom[...,0, 0] = 1`.
+    def cmom(self) -> T_Array:
+        r"""Central moments.
 
+        Strict central moments of the form
+
+        .. math::
+
+            \text{cmom[..., n, m]} =
+            \langle (x - \langle x \rangle^n) (y - \langle y \rangle^m) \rangle
+
+        Returns
+        -------
+        output : ndarray or DataArray
         """
         out = self.data.copy()
         # zeroth central moment
         out[self._weight_index] = 1
         # first central moment
         out[self._single_index(1)] = 0
-        return out
+        return self._wrap_like(out)
 
-    def to_raw(self) -> T_array:
-        """Convert central moments to raw moments.
+    def to_raw(self, weights=None) -> T_Array:
+        r"""
+        Raw moments accumulation array.
 
-        raw[...,i, j] = weight,           i = j = 0
-                      = <x0**i * x1**j>,  otherwise
+        .. math::
+
+            \text{raw[..., n, m]} = \begin{cases}
+            \text{weight} & n = m = 0 \\
+            \langle x^n y ^m \rangle & \text{otherwise}
+            \end{cases}
+
+        Returns
+        -------
+        raw : ndarray or DataArray
+
+        See Also
+        --------
+        from_raw
         """
         if self.mom_ndim == 1:
-            return convert.to_raw_moments(x=self.data)
+            out = convert.to_raw_moments(x=self.data)
         elif self.mom_ndim == 2:
-            return convert.to_raw_comoments(x=self.data)
+            out = convert.to_raw_comoments(x=self.data)
 
-    def rmom(self) -> T_array:
-        """Raw moments.
+        if weights is not None:
+            out[self._weight_index] = weights
 
-        rmom[..., i, j] = <x0 ** i * x1 ** j>
+        return self._wrap_like(out)
+
+    def rmom(self) -> T_Array:
+        r"""Raw moments.
+
+        .. math::
+            \text{rmom[..., n, m]} = \langle x^n y^m \rangle
+
+        Returns
+        -------
+        raw_moments : ndarray or DataArray
+
+        See Also
+        --------
+        to_raw
+        cmom
         """
-        out = self.to_raw()
-        out[self._weight_index] = 1
-        return out
+        return self.to_raw(weights=1.0)
 
     ###########################################################################
     # SECTION: pushing routines
     ###########################################################################
-    def fill(self: T_CENTRALMOMENTS, value: Any = 0) -> T_CENTRALMOMENTS:
-        """Fill data with value."""
+    def fill(self: T_CentralMoments, value: Any = 0) -> T_CentralMoments:
+        """Fill data with value.
+
+        Parameters
+        ----------
+        value : scalar
+            Value to insert into `self.data`
+
+        Returns
+        -------
+        self : same as object
+            Same object as caller with data filled with `values`
+        """
         self._data.fill(value)
         return self
 
-    def zero(self: T_CENTRALMOMENTS) -> T_CENTRALMOMENTS:
-        """Zero out underlying data."""
+    def zero(self: T_CentralMoments) -> T_CentralMoments:
+        """Zero out underlying data.
+
+        Returns
+        -------
+        self : same as object
+            Same object with data filled with zeros.
+
+        See Also
+        --------
+        fill
+        """
         return self.fill(value=0.0)
 
     @abstractmethod
     def _verify_value(
         self,
         x: Any,
-        target: any,
+        target: Any,
         axis: int | None = None,
         broadcast: bool = False,
         expand: bool = False,
@@ -459,70 +580,76 @@ class CentralMomentsABC(ABC, Generic[T_array]):
             **kwargs,
         )[0]
 
-    def push_data(self: T_CENTRALMOMENTS, data: Any) -> T_CENTRALMOMENTS:
-        """Push data object to moments.
+    @docfiller_shared
+    def push_data(self: T_CentralMoments, data: Any) -> T_CentralMoments:
+        """
+        Push data object to moments.
 
         Parameters
         ----------
-        data : array-like, `shape=self.shape`
-            array storing moment information
+        data : array-like
+            Accumulation array of same form as ``self.data``
+
         Returns
         -------
-        self
-
-        See Also
-        --------
-        cmomy.CentralMoments.data
+        {pushed}
         """
         data = self._check_data(data)
         self._push.data(self._data_flat, data)
         return self
 
+    @docfiller_shared
     def push_datas(
-        self: T_CENTRALMOMENTS,
+        self: T_CentralMoments,
         datas,
         axis: int,
         **kwargs,
-    ) -> T_CENTRALMOMENTS:
-        """Push and reduce multiple average central moments.
+    ) -> T_CentralMoments:
+        """
+        Push and reduce multiple average central moments.
 
         Parameters
         ----------
         datas : array-like
-            this should have shape like `(nrec,) + self.shape`
+            Collection of accumulation arrays to push onto ``self``.
+            This should have shape like `(nrec,) + self.shape`
             if `axis=0`, where `nrec` is the number of data objects to sum.
-        axis : int
-            axis to reduce along
+        {axis}
 
         Returns
         -------
-        self
+        {pushed}
         """
 
         datas = self._check_datas(datas=datas, axis=axis, **kwargs)
         self._push.datas(self._data_flat, datas)
         return self
 
+    @docfiller_shared
     def push_val(
-        self: T_CENTRALMOMENTS, x, w=None, broadcast: bool = False, **kwargs
-    ) -> T_CENTRALMOMENTS:
-        """Push single sample to central moments.
+        self: T_CentralMoments, x, w=None, broadcast: bool = False, **kwargs
+    ) -> T_CentralMoments:
+        """
+        Push single sample to central moments.
 
         Parameters
         ----------
-        x : array-like or tuple of arrays
-            if `self.mom_ndim == 1`, then this is the value to consider
-            if `self.mom_ndim == 2`, then `x = (x0, x1)`
-            `x.shape == self.val_shape`
-
+        x : array-like or tuple of array-like
+            Pass single array `x=x0`if accumulating moments.
+            Pass tuple of arrays `(x0, x1)` if accumulating comoments.
+            `x0.shape == self.val_shape`
         w : int, float, array-like, optional
-            optional weight of each sample
-        broadcast : bool, default = False
-            If true, do smart broadcasting for `x[1:]`
+            Weight of each sample.  If scalar, broadcast `w.shape` to `x0.shape`.
+        broadcast : bool, optional
+            If True, and `x1` present, attempt to broadcast `x1.shape` to `x0.shape`
 
         Returns
         -------
-        self
+        {pushed}
+
+        Notes
+        -----
+        Array `x0` should have same shape as `self.val_shape`.
         """
 
         if self.mom_ndim == 1:
@@ -537,29 +664,32 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         self._push.val(self._data_flat, *((wr, xr) + yr))
         return self
 
+    @docfiller_shared
     def push_vals(
-        self: T_CENTRALMOMENTS,
+        self: T_CentralMoments,
         x,
         w=None,
         axis: int | None = None,
         broadcast: bool = False,
         **kwargs,
-    ) -> T_CENTRALMOMENTS:
-        """Push multiple samples to central moments.
+    ) -> T_CentralMoments:
+        """
+        Push multiple samples to central moments.
 
         Parameters
         ----------
-        x : array-like or tuple of arrays
-            if `self.mom_ndim` == 1, then this is the value to consider
-            if `self.mom_ndim` == 2, then x = (x0, x1)
-            `x.shape[:axis] + x.shape[axis+1:] == self.val_shape`
-
+        x : array-like or tuple of array-like
+            Pass single array `x=x0`if accumulating moments.
+            Pass tuple of arrays `(x0, x1)` if accumulating comoments.
+            `x0.shape` less axis should be same as `self.val_shape`.
         w : int, float, array-like, optional
-            optional weight of each sample
-        axis : int, default=0
-            axis to reduce along
-        broadcast : bool, default = False
-            If true, do smart broadcasting for `x[1:]`
+            Weight of each sample.  If scalar, broadcast to `x0.shape`
+        {broadcast}
+        {axis}
+
+        Returns
+        -------
+        {pushed}
         """
         if self.mom_ndim == 1:
             ys = ()
@@ -579,25 +709,25 @@ class CentralMomentsABC(ABC, Generic[T_array]):
     ###########################################################################
     # SECTION: Operators
     ###########################################################################
-    def _check_other(self: T_CENTRALMOMENTS, b: T_CENTRALMOMENTS) -> None:
+    def _check_other(self: T_CentralMoments, b: T_CentralMoments) -> None:
         """Check other object."""
         assert type(self) == type(b)
         assert self.mom_ndim == b.mom_ndim
         assert self.shape == b.shape
 
-    def __iadd__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:  # noqa D105
+    def __iadd__(  # type: ignore
+        self: T_CentralMoments,
+        b: T_CentralMoments,
+    ) -> T_CentralMoments:  # noqa D105
         self._check_other(b)
         # self.push_data(b.data)
         # return self
         return self.push_data(b.data)
 
     def __add__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:
+        self: T_CentralMoments,
+        b: T_CentralMoments,
+    ) -> T_CentralMoments:
         """Add objects to new object."""
         self._check_other(b)
         # new = self.copy()
@@ -605,10 +735,10 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         # return new
         return self.copy().push_data(b.data)
 
-    def __isub__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:
+    def __isub__(  # type: ignore
+        self: T_CentralMoments,
+        b: T_CentralMoments,
+    ) -> T_CentralMoments:
         """Inplace substraction."""
         # NOTE: consider implementint push_data_scale routine to make this cleaner
         self._check_other(b)
@@ -620,9 +750,9 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         return self.push_data(data)
 
     def __sub__(
-        self: T_CENTRALMOMENTS,
-        b: T_CENTRALMOMENTS,
-    ) -> T_CENTRALMOMENTS:
+        self: T_CentralMoments,
+        b: T_CentralMoments,
+    ) -> T_CentralMoments:
         """Subtract objects."""
         self._check_other(b)
         assert np.all(self.weight() >= b.weight())
@@ -632,14 +762,14 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         # return new
         return new.push_data(self.data)
 
-    def __mul__(self: T_CENTRALMOMENTS, scale: float | int) -> T_CENTRALMOMENTS:
+    def __mul__(self: T_CentralMoments, scale: float | int) -> T_CentralMoments:
         """New object with weights scaled by scale."""  # noqa D401
         scale = float(scale)
         new = self.copy()
         new._data[self._weight_index] *= scale
         return new
 
-    def __imul__(self: T_CENTRALMOMENTS, scale: float | int) -> T_CENTRALMOMENTS:
+    def __imul__(self: T_CentralMoments, scale: float | int) -> T_CentralMoments:
         """Inplace multiply."""
         scale = float(scale)
         self._data[self._weight_index] *= scale
@@ -651,8 +781,8 @@ class CentralMomentsABC(ABC, Generic[T_array]):
     @classmethod
     @no_type_check
     def _check_mom(
-        cls, moments: T_MOM, mom_ndim: int, shape: Tuple[int, ...] | None = None
-    ) -> Union[Tuple[int], Tuple[int, int]]:  # type: ignore
+        cls, moments: Moments, mom_ndim: int, shape: Tuple[int, ...] | None = None
+    ) -> Tuple[int] | Tuple[int, int]:  # type: ignore
         """Check moments for correct shape.
 
         If moments is None, infer from
@@ -714,7 +844,7 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         return axis
 
     @classmethod
-    def _mom_ndim_from_mom(cls, mom: Union[Tuple[int], Tuple[int, int], int]) -> int:
+    def _mom_ndim_from_mom(cls, mom: Moments) -> int:
         if isinstance(mom, int):
             return 1
         elif isinstance(mom, tuple):
@@ -725,7 +855,7 @@ class CentralMomentsABC(ABC, Generic[T_array]):
     @classmethod
     def _choose_mom_ndim(
         cls,
-        mom: T_MOM | None,
+        mom: Moments | None,
         mom_ndim: int | None,
     ) -> int:
         if mom is not None:
@@ -738,70 +868,74 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
     @classmethod
     @abstractmethod
+    @docfiller_shared
     def from_data(
-        cls: Type[T_CENTRALMOMENTS],
+        cls: Type[T_CentralMoments],
         data: Any,
         mom_ndim: int | None = None,
-        mom: T_MOM | None = None,
+        mom: Moments | None = None,
         val_shape: Tuple[int, ...] | None = None,
         copy: bool = True,
         copy_kws: Mapping | None = None,
         verify: bool = True,
         check_shape: bool = True,
         dtype: DTypeLike | None = None,
-    ) -> T_CENTRALMOMENTS:
-        """Create new object from `data` array with additional checks.
+    ) -> T_CentralMoments:
+        """
+        Create new object from `data` array with additional checks.
 
         Parameters
         ----------
-        data : np.np.ndarray
-            shape should be val_shape + mom.
-        mom_ndim : int, optional
-            Number of moment dimensions.
-            `mom_dim=1` for moments, `mom_dim=2` for comoments.
-        mom : int or tuple, optional
-            Moments. Defaults to data.shape[-mom_ndim:].
-            Must specify either `mom_ndim` or `mom`.
-            Verify data has correct shape.
-        val_shape : tuple, optional
-            shape of non-moment dimensions.  Used to check `data`
-        copy : bool, default=True.
-            If True, copy `data`.  If False, try to not copy.
-        copy_kws : dict, optional
-            parameters to np.np.ndarray.copy
-        verify : bool, default=True
-            If True, force data to have 'c' order
-        check_shape : bool, default=True
-            If True, check that `data` has correct shape (based on `mom` and `val_shape`)
-        dtype : np.dtype, optional
+        data : array-like
+            central moments accumulation array.
+        {mom_ndim}
+        {mom}
+        {val_shape}
+        {copy}
+        {copy_kws}
+        {verify}
+        {check_shape}
+        {dtype}
 
         Returns
         -------
-        out : CentralMoments instance
+        out : caller class instance
+
         """
 
     @classmethod
     @abstractmethod
+    @docfiller_shared
     def from_datas(
-        cls: Type[T_CENTRALMOMENTS],
+        cls: Type[T_CentralMoments],
         datas: Any,
         mom_ndim: int | None = None,
         axis: int | None = 0,
-        mom: T_MOM | None = None,
+        mom: Moments | None = None,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         verify: bool = True,
         check_shape: bool = True,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create object from multiple data arrays.
+    ) -> T_CentralMoments:
+        """
+        Create object from multiple data arrays.
 
         Parameters
         ----------
-        datas : np.np.ndarray
+        datas : ndarray
             Array of multiple Moment arrays.
             datas[..., i, ...] is the ith data array, where i is
             in position `axis`.
+        {axis}
+        {mom}
+        {mom_ndim}
+        {val_shape}
+        {dtype}
+        {verify}
+        {check_shape}
+        **kws
+            Extra arguments
 
         See Also
         --------
@@ -810,171 +944,194 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
     @classmethod
     @abstractmethod
+    @docfiller_shared
     def from_vals(
-        cls: Type[T_CENTRALMOMENTS],
+        cls: Type[T_CentralMoments],
         x,
         w=None,
         axis: int | None = 0,
-        mom: T_MOM = 2,
+        mom: Moments = 2,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         broadcast: bool = False,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create from observations/values.
+    ) -> T_CentralMoments:
+        """
+        Create from observations/values.
 
         Parameters
         ----------
         x : array-like or tuple of array-like
-            For moments, pass single array-like objects.
-            For comoments, pass tuple of array-like objects.
-        w : array-like, optional
-            Optional weights.
-        axis : int, default=0
-            axis to reduce along.
-        mom : int or tuple of ints
-            For moments, pass an int.  For comoments, pass a tuple of ints.
-        val_shape : tuple, optional
-            shape array of values part of resulting object
-        broadcast : bool, default=False
-            If True, and doing comoments, broadcast x[1] to x[0]
-        kws : dict
-            optional arguments passed to cls.zeros
+            For moments, pass single array-like objects `x=x0`.
+            For comoments, pass tuple of array-like objects `x=(x0, x1)`.
+        w : scalar or array-like, optional
+            Optional weights.  If scalar or array, attempt to
+            broadcast to `x0.shape`
+        {axis}
+        {mom}
+        {val_shape}
+        {broadcast}
+        **kws
+            Optional arguments passed to :meth:`zeros`
 
-        Returns
-        -------
-        out : CentralMoments object
+        See Also
+        --------
+        push_vals
         """
 
     @classmethod
+    @abstractmethod
+    @docfiller_shared
     def from_resample_vals(
-        cls: Type[T_CENTRALMOMENTS],
+        cls: Type[T_CentralMoments],
         x,
         freq: np.ndarray | None = None,
         indices: np.ndarray | None = None,
         nrep: int | None = None,
         w: np.ndarray | None = None,
         axis: int = 0,
-        mom: T_MOM = 2,
+        mom: Moments = 2,
         dtype: DTypeLike | None = None,
         broadcast: bool = False,
         parallel: bool = True,
         resample_kws: Mapping | None = None,
+        full_output: bool = False,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create from resample observations/values.
+    ) -> T_CentralMoments:
+        """
+        Create from resample observations/values.
 
         This effectively resamples `x`.
 
         Parameters
         ----------
-        x : array or tuple of arrays
-            See CentralMoments.from_vals
-        freq : array, optional
-            Array of shape (nrep, size), where nrep is the number of
-            replicates, and size is `x.shape(axis)`.
-            `freq` is the weight that each sample contributes to the resampled values.
-            See resample.randsamp_freq
-        indices : array, optional
-            Array of shape (nrep, size).  If passed, create `freq` from indices.
-            See randsamp_freq.
-        nrep : int, optional
-            Number of replicates.  Create `freq` with this many replicates.
-            See randsamp_freq
-        w : array, optional.
-            Optional weights associated with `x`.
-        axis : int, default=0.
-            Dimension to reduce/sample along.
-        dtype : np.dtype, optional
-            dtype of created output
-        broadcast : bool, default=False
-            If True, and calculating comoments, broadcast x[1] to x[0].shape
+        x : array-like or tuple of array-like
+            For moments, pass single array-like objects `x=x0`.
+            For comoments, pass tuple of array-like objects `x=(x0, x1)`.
+        w : scalar or array-like, optional
+            Optional weights.  If scalar or array, attempt to
+            broadcast to `x0.shape`
+        {freq}
+        {indices}
+        {nrep}
+        {axis}
+        {mom}
+        {dtype}
+        {broadcast}
         parallel : bool, default=True
             If True, perform resampling in parallel.
-        resample_kws : dict
-            Extra arguments to resample.resample_vals
-        kws : dict
+        {resample_kws}
+        {full_output}
+        **kws
             Extra arguments to CentralMoments.from_data
 
         Returns
         -------
-        out : CentralMoments instance
+        out : instance of calling class
+        freq : ndarray, optional
+            If `full_output` is True, also return `freq` array
+
+
+        See Also
+        --------
+        ~resample.resample_vals
+        ~resample.randsamp_freq
+        ~resample.freq_to_indices
+        ~resample.indices_to_freq
         """
 
     @classmethod
     @abstractmethod
+    @docfiller_shared
     def from_raw(
-        cls: Type[T_CENTRALMOMENTS],
+        cls: Type[T_CentralMoments],
         raw,
         mom_ndim: int | None = None,
-        mom: T_MOM | None = None,
+        mom: Moments | None = None,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         convert_kws: Mapping | None = None,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create object from raw.
+    ) -> T_CentralMoments:
+        """
+        Create object from raw.
 
         raw[..., i, j] = <x**i y**j>.
-        raw[..., 0, 0] = {weight}
+        raw[..., 0, 0] = `weight`
 
 
         Parameters
         ----------
-        raw : np.np.ndarray
+        raw : ndarray
             Raw moment array.
-        mom_ndim : int, optional
-            Number of moment dimensions.
-        mom : int or tuple, optional
-            number of moments.
-            Must specify `mom_ndim` or `mom`.
-        val_shape : tuple, optional
-            shape of non-moment dimensions.
-        dtype : np.dtype
-            dtype of output
-        convert_kws : dict
-            arguments to central to raw converter
-        kws : dict
-            Extra arguments to cls.from_data
-
-        Returns
-        -------
-        out : instance of cls
+        {mom_ndim}
+        {mom}
+        {val_shape}
+        {dtype}
+        {convert_kws}
+        **kws
+            Extra arguments to :meth:`from_data`
 
         See Also
         --------
-        convert.to_central_moments
-        convert.to_central_comoments
+        to_raw
+        rmom
+        ~convert.to_central_moments
+        ~convert.to_central_comoments
+
+        Notes
+        -----
+        Weights are taken from ``raw[...,0, 0]``.
+        Using raw moments can result in numerical issues, especially for higher moments.  Use with care.
+
         """
+        pass
 
     @classmethod
     @abstractmethod
+    @docfiller_shared
     def from_raws(
-        cls: Type[T_CENTRALMOMENTS],
+        cls: Type[T_CentralMoments],
         raws,
         mom_ndim: int | None = None,
-        mom: T_MOM | None = None,
+        mom: Moments | None = None,
         axis: int = 0,
         val_shape: Tuple[int, ...] | None = None,
         dtype: DTypeLike | None = None,
         convert_kws: Mapping | None = None,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create object from multipel `raw` moment arrays.
+    ) -> T_CentralMoments:
+        """
+        Create object from multipel `raw` moment arrays.
 
         Parameters
         ----------
-        raws : array
+        raws : ndarray
             raws[...,i,...] is the ith sample of a `raw` array,
             Note that raw[...,i,j] = <x0**i, x1**j>
-        where `i` is in position `axis`
-        axis : int, default=0
+            where `i` is in position `axis`
+        {axis}
+        {mom_ndim}
+        {mom}
+        {val_shape}
+        {dtype}
+        {convert_kws}
+        **kws
+            Extra arguments to :meth:`from_datas`
 
         See Also
         --------
-        CentralMoments.from_raw : called by from_raws
-        CentralMoments.from_datas : similar constructor for central moments
+        from_raw
+        from_datas
+        ~convert.to_central_moments
+        ~convert.to_central_comoments
+
+        Notes
+        -----
+        Weights are taken from ``raw[...,0, 0]``.
+        Using raw moments can result in numerical issues, especially for higher moments.  Use with care.
         """
+        pass
 
     ###########################################################################
     # SECTION: Manipulation
@@ -990,8 +1147,9 @@ class CentralMomentsABC(ABC, Generic[T_array]):
             raise ValueError(message)
 
     # Universal reducers
+    @docfiller_shared
     def resample_and_reduce(
-        self: T_CENTRALMOMENTS,
+        self: T_CentralMoments,
         freq: np.ndarray | None = None,
         indices: np.ndarray | None = None,
         nrep: None = None,
@@ -1000,26 +1158,36 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         resample_kws: Mapping | None = None,
         full_output: bool = False,
         **kws,
-    ) -> T_CENTRALMOMENTS | Tuple[T_CENTRALMOMENTS, np.ndarray]:
-        """Bootstrap resample and reduce.
+    ) -> T_CentralMoments | Tuple[T_CentralMoments, np.ndarray]:
+        """
+        Bootstrap resample and reduce.
 
-        Parameter
+        Parameters
         ----------
-        freq : array-like, shape=(nrep, nrec), optional
-            frequence table.  freq[i, j] is the weight of the jth record to the ith
-            replicate indices : array-like, shape=(nrep, nrec), optional
-            resampling array.  idx[i, j] is the record index of the original array to
-            place in new sample[i, j]. if specified, create freq array from idx
-        nrep : int, optional
-            if specified, create idx array with this number of replicates
-        axis : int, Default=0
-            axis to resample and reduce along
+        {freq}
+        {indices}
+        {nrep}
+        {axis}
         parallel : bool, default=True
             flags to `numba.njit`
-        resample_kws : dict
-            extra arguments to `cmomy.resample.resample_and_reduce`
-        kws : dict
-            extra key-word arguments to from_data method
+        {resample_kws}
+        {full_output}
+        **kws
+            Extra key-word arguments to :meth:`from_data`
+
+        Returns
+        -------
+        output : instance of calling class
+            Note that new object will have val_shape = (nrep,) + val_shape[:axis] + val_shape[axis+1:]
+
+        See Also
+        --------
+        :meth:`resample`
+        :meth:`reduce`
+        ~resample.randsamp_freq
+        ~resample.freq_to_indices
+        ~resample.indices_to_freq
+        ~resample.resample_data
         """
         self._raise_if_scalar()
         axis = self._wrap_axis(axis, **kws)
@@ -1039,21 +1207,21 @@ class CentralMomentsABC(ABC, Generic[T_array]):
         else:
             return out
 
+    @docfiller_shared
     def resample(
-        self: T_CENTRALMOMENTS,
+        self: T_CentralMoments,
         indices: np.ndarray,
         axis: int = 0,
         first: bool = True,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Create a new object sampled from index.
+    ) -> T_CentralMoments:
+        """
+        Create a new object sampled from index.
 
         Parameters
         ----------
-        indicies : array-like
-            shape should be (nrep, nrec)
-        axis : int, default=0
-            axis to resample
+        {indices}
+        {axis}
         first : bool, default=True
             if True, and axis != 0, the move the axis to first position.
             This makes results similar to resample and reduce
@@ -1061,7 +1229,15 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
         Returns
         -------
-        output : accumulator object
+        output : instance of calling class
+            The new object will have shape
+            `(nrep, ndat, ...) + self.shape[:axis] + self.shape[axis+1:]`
+
+
+        See Also
+        --------
+        from_data
+
         """
         self._raise_if_scalar()
         axis = self._wrap_axis(axis, **kws)
@@ -1082,32 +1258,59 @@ class CentralMomentsABC(ABC, Generic[T_array]):
             **kws,
         )
 
+    @docfiller_shared
     def reduce(
-        self: T_CENTRALMOMENTS, axis: int | None = None, **kws
-    ) -> T_CENTRALMOMENTS:
-        """Create new object reducealong axis."""
+        self: T_CentralMoments, axis: int | None = None, **kws
+    ) -> T_CentralMoments:
+        """
+        Create new object reducealong axis.
+
+        Parameters
+        ----------
+        {axis}
+        **kws
+            Extra parameters to :meth:`from_data`
+
+        """
         self._raise_if_scalar()
         axis = self._wrap_axis(axis, **kws)
         return type(self).from_datas(
             self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
         )
 
+    @docfiller_shared
     def block(
-        self: T_CENTRALMOMENTS,
+        self: T_CentralMoments,
         block_size: int | None = None,
         axis: int | None = None,
         **kws,
-    ) -> T_CENTRALMOMENTS:
-        """Block average reduction.
+    ) -> T_CentralMoments:
+        """
+        Block average reduction.
 
         Parameters
         ----------
         block_size : int
             number of consecutive records to combine
-        axis : int, default=0
-            axis to reduce along
-        kws : dict
-            extral key word arguments to `from_datas` method
+        {axis}
+        **kws
+            Extral key word arguments to :meth:`from_datas` method
+
+        Returns
+        -------
+        output : new instance of calling class
+            Shape of output will be
+            `(nblock,) + self.shape[:axis] + self.shape[axis+1:]`.
+
+        Notes
+        -----
+        The block averaged `axis` will be moved to the front of the output data.
+
+        See Also
+        --------
+        reshape
+        moveaxis
+        reduce
         """
 
         self._raise_if_scalar()
@@ -1144,12 +1347,12 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
     # special, 1d only methods
     # def push_stat(
-    #     self: T_CENTRALMOMENTS,
+    #     self: T_CentralMoments,
     #     a: np.ndarray | float,
     #     v: np.ndarray | float = 0.0,
     #     w: np.ndarray | float | None = None,
     #     broadcast: bool = True,
-    # ) -> T_CENTRALMOMENTS:
+    # ) -> T_CentralMoments:
     #     """Push statisics onto self."""
     #     self._raise_if_not_1d(self.mom_ndim)
 
@@ -1160,13 +1363,13 @@ class CentralMomentsABC(ABC, Generic[T_array]):
     #     return self
 
     # def push_stats(
-    #     self: T_CENTRALMOMENTS,
+    #     self: T_CentralMoments,
     #     a: np.ndarray,
     #     v: np.ndarray | float = 0.0,
     #     w: np.ndarray | float | None = None,
     #     axis: int = 0,
     #     broadcast: bool = True,
-    # ) -> T_CENTRALMOMENTS:
+    # ) -> T_CentralMoments:
     #     """Push multiple statistics onto self."""
     #     self._raise_if_not_1d(self.mom_ndim)
 
@@ -1178,16 +1381,16 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
     # @classmethod
     # def from_stat(
-    #     cls: Type[T_CENTRALMOMENTS],
+    #     cls: Type[T_CentralMoments],
     #     a: ArrayLike | float,
     #     v: np.ndarray | float = 0.0,
     #     w: np.ndarray | float | None = None,
-    #     mom: T_MOM = 2,
+    #     mom: Moments = 2,
     #     val_shape: Tuple[int, ...] | None = None,
     #     dtype: DTypeLike | None = None,
-    #     order: ASARRAY_ORDER | None = None,
+    #     order: ArrayOrder | None = None,
     #     **kws,
-    # ) -> T_CENTRALMOMENTS:
+    # ) -> T_CentralMoments:
     #     """Create object from single weight, average, variance/covariance."""
     #     mom_ndim = cls._mom_ndim_from_mom(mom)
     #     cls._raise_if_not_1d(mom_ndim)
@@ -1205,17 +1408,17 @@ class CentralMomentsABC(ABC, Generic[T_array]):
 
     # @classmethod
     # def from_stats(
-    #     cls: Type[T_CENTRALMOMENTS],
+    #     cls: Type[T_CentralMoments],
     #     a: np.ndarray,
     #     v: np.ndarray,
     #     w: np.ndarray | float | None = None,
     #     axis: int = 0,
-    #     mom: T_MOM = 2,
+    #     mom: Moments = 2,
     #     val_shape: Tuple[int, ...] = None,
     #     dtype: DTypeLike | None = None,
-    #     order: ASARRAY_ORDER | None = None,
+    #     order: ArrayOrder | None = None,
     #     **kws,
-    # ) -> T_CENTRALMOMENTS:
+    # ) -> T_CentralMoments:
     #     """Create object from several statistics.
 
     #     Weights, averages, variances/covarainces along

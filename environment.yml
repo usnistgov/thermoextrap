@@ -7,3 +7,4 @@ dependencies:
   - numba
   - xarray
   - typing-extensions
+  - custom-inherit

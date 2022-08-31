@@ -10,6 +10,7 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-xdist
+  - pytest-accept
   - tox-conda
   # specials
   - pre-commit
@@ -47,3 +48,4 @@ dependencies:
       - mypy-extensions
       - pytest-monkeytype
       - flake8-mypy
+      - pytest-accept
