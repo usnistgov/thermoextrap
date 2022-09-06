@@ -55,7 +55,7 @@ _shared_docs = {
     "mom_ndim":
     """
     mom_ndim : {1, 2}
-        Value indicates if moments (`mom_ndim = 1`) or comoments (`mom_ndim=2`).
+        Value indicates if moments (``mom_ndim = 1``) or comoments (``mom_ndim=2``).
     """,
     "val_shape":
     """
@@ -70,7 +70,7 @@ _shared_docs = {
     "dtype":
     """
     dtype : dtype, optional
-        Optional `dtype` for output data.
+        Optional ``dtype`` for output data.
     """,
     "zeros_kws":
     """
@@ -85,21 +85,21 @@ _shared_docs = {
     "broadcast":
     """
     broadcast : bool, optional
-        If True, and `x=(x0, x1)`, then perform 'smart' broadcasting.
-        In this case, if `x1.ndim = 1` and `len(x1) == x0.shape[axis]`, then
-        broadcast `x1` to `x0.shape`.
+        If True, and ``x=(x0, x1)``, then perform 'smart' broadcasting.
+        In this case, if ``x1.ndim = 1`` and ``len(x1) == x0.shape[axis]``, then
+        broadcast `x1` to ``x0.shape``.
     """,
     "freq":
     """
     freq : array of int, optional
-        Array of shape `(nrep, size)` where `nrep` is the number of replicates and
-        `size = self.shape[axis]`.  `freq` is the weight that each sample contributes
+        Array of shape ``(nrep, size)`` where `nrep` is the number of replicates and
+        ``size = self.shape[axis]``.  `freq` is the weight that each sample contributes
         to resamples values.  See :func:`~cmomy.resample.randsamp_freq`
     """,
     "indices":
     """
     indices : array of int, optional
-        Array of shape (nrep, size).  If passed, create `freq` from indices.
+        Array of shape ``(nrep, size)``.  If passed, create `freq` from indices.
         See :func:`~cmomy.resample.randsamp_freq`.
     """,
     "nrep":
@@ -141,7 +141,7 @@ _shared_docs = {
     """,
     "mom_dims":
     """
-    mom_dims : hashable or Tuple of hashable
+    mom_dims : hashable or tuple of hashable
         Name of moment dimensions.  Defaults to ``(mom_0, ...)``
     """,
     "attrs":

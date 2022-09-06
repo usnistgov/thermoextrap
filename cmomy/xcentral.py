@@ -32,11 +32,8 @@ from .cached_decorators import gcached
 from .central import CentralMoments
 from .utils import _shape_reduce
 
-###############################################################################
-# central mom/comom routine
-###############################################################################
 
-
+# * Utilities
 def _select_axis_dim(
     dims: Tuple[Hashable, ...],
     axis: int | str | None = None,
@@ -97,6 +94,7 @@ def _move_mom_dims_to_end(x, mom_dims, mom_ndim=None):
     return x
 
 
+# * xcentral moments/comoments
 @no_type_check
 def _xcentral_moments(
     vals: xr.DataArray,
@@ -268,6 +266,7 @@ def xcentral_moments(
     return cast(xr.DataArray, out)
 
 
+# * xCentralMoments
 class xCentralMoments(CentralMomentsABC[xr.DataArray]):
     """Wrap cmomy.CentralMoments with xarray.
 
@@ -284,7 +283,11 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
 
     __slots__ = "_xdata"
 
-    def __init__(self, data: xr.DataArray, mom_ndim: int = 1) -> None:
+    # Override __new__ for signature
+    def __new__(cls, data: xr.DataArray, mom_ndim: Literal[1, 2] = 1):  # noqa: D102
+        return super().__new__(cls, data=data, mom_ndim=mom_ndim)
+
+    def __init__(self, data: xr.DataArray, mom_ndim: Literal[1, 2] = 1) -> None:
 
         if not isinstance(data, xr.DataArray):
             raise ValueError(
@@ -311,12 +314,12 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         if any(m <= 0 for m in self.mom):
             raise ValueError("moments must be positive")
 
+    # ** xarray attriburtes
     @property
     def values(self):
         """Underlying data."""
         return self._xdata
 
-    # xarray attriburtes
     @property
     def attrs(self):
         """Attributes of values."""
@@ -347,21 +350,6 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         """Sizes of values."""
         return self._xdata.sizes
 
-    ###########################################################################
-    # SECTION: top level creation/copy/new
-    ###########################################################################
-    @gcached()
-    def _template_val(self) -> xr.DataArray:
-        """Template for values part of data."""
-        return self._xdata[self._weight_index]
-
-    # def _wrap_like_template(self, x):
-    #     return _wrap_like(self._template_val, x)
-
-    def _wrap_like(self, x) -> xr.DataArray:
-        # return _xr_wrap_like(self._xdata, x)
-        return self._xdata.copy(data=x)
-
     @property
     def val_dims(self) -> Tuple[Hashable, ...]:
         """Names of value dimensions."""
@@ -372,18 +360,14 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         """Names of moment dimensions."""
         return self.dims[-self.mom_ndim :]
 
-    @property
-    def _one_like_val(self):  # -> xr.DataArray:
-        return xr.ones_like(self._template_val)
-
-    @property
-    def _zeros_like_val(self):  # -> xr.DataArray:
-        return xr.zeros_like(self._template_val)
-
+    # ** top level creation/copy/new
     @gcached()
-    def _array_view(self):
-        """Create CentralMoments view."""
-        return self.to_centralmoments()
+    def _template_val(self) -> xr.DataArray:
+        """Template for values part of data."""
+        return self._xdata[self._weight_index]
+
+    def _wrap_like(self, x) -> xr.DataArray:
+        return self._xdata.copy(data=x)
 
     @no_type_check
     def new_like(
@@ -429,9 +413,39 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
             **kws,
         )
 
-    ###########################################################################
-    # xarray specific methods
-    ###########################################################################
+    # ** Access to underlying statistics
+    def _single_index_selector(
+        self, val, dim_combined="variable", coords_combined=None, select=True
+    ):
+        idxs = self._single_index(val)[-self.mom_ndim :]
+        if coords_combined is None:
+            coords_combined = self.mom_dims
+
+        selector = {
+            dim: (idx if self._mom_ndim == 1 else xr.DataArray(idx, dims=dim_combined))
+            for dim, idx in zip(self.mom_dims, idxs)
+        }
+        if select:
+            out = self.values.isel(**selector)
+            if self._mom_ndim > 1:
+                out = out.assign_coords(**{dim_combined: list(coords_combined)})
+            return out
+        else:
+            return selector
+
+    def mean(self, dim_combined="variable", coords_combined=None):
+        """Return mean/first moment(s) of data."""
+        return self._single_index_selector(
+            val=1, dim_combined=dim_combined, coords_combined=coords_combined
+        )
+
+    def var(self, dim_combined="variable", coords_combined=None):
+        """Return variance (second central moment) of data."""
+        return self._single_index_selector(
+            val=2, dim_combined=dim_combined, coords_combined=coords_combined
+        )
+
+    # ** xarray specific methods
     def _wrap_xarray_method(self, _method, *args, **kwargs):
         xdata = getattr(self._xdata, _method)(*args, **kwargs)
         return self.new_like(data=xdata, strict=False)
@@ -450,40 +464,14 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
             "rename", new_name_or_name_dict=new_name_or_name_dict, **names
         )
 
-    def _wrap_xarray_method_from_data(
-        self,
-        _method: str,
-        _data_copy: bool = False,
-        _data_order: bool = False,
-        _data_kws: Mapping | None = None,
-        _data_verify: bool = False,
-        *args,
-        **kwargs,
-    ) -> "xCentralMoments":
-
-        xdata = getattr(self._xdata, _method)(*args, **kwargs)
-        if _data_order:
-            xdata = xdata.transpose(..., *self.mom_dims)
-        if _data_kws is None:
-            _data_kws = {}
-        else:
-            _data_kws = dict(_data_kws)
-        _data_kws.setdefault("copy", _data_copy)
-        _data_kws.setdefault("copy", _data_copy)
-
-        out = type(self).from_data(
-            data=xdata, mom_ndim=self.mom_ndim, verify=_data_verify, **_data_kws
-        )
-
-        return cast("xCentralMoments", out)
-
     def stack(
         self,
         dimensions: Mapping[Any, Sequence[Hashable]] | None = None,
-        _data_copy: bool = False,
-        _data_kws: Mapping | None = None,
-        _data_order: bool = True,
-        _data_verify: bool = False,
+        _order: bool = True,
+        _verify: bool = False,
+        _copy: bool = False,
+        _check_mom: bool = True,
+        _kws: Mapping | None = None,
         **dimensions_kwargs,
     ) -> "xCentralMoments":
         """Stack dimensions.
@@ -495,6 +483,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
 
         See Also
         --------
+        pipe
         xarray.DataArray.stack
 
         Examples
@@ -547,13 +536,14 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
 
 
         """
-        return self._wrap_xarray_method_from_data(
+        return self.pipe(
             "stack",
             dimensions=dimensions,
-            _data_copy=_data_copy,
-            _data_kws=_data_kws,
-            _data_order=_data_order,
-            _data_verify=_data_verify,
+            _order=_order,
+            _copy=_copy,
+            _verify=_verify,
+            _check_mom=_check_mom,
+            _kws=_kws,
             **dimensions_kwargs,
         )
 
@@ -562,10 +552,11 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         dim: Hashable | Sequence[Hashable] | None = None,
         fill_value: Any = np.nan,
         sparse: bool = False,
-        _data_copy=False,
-        _data_kws=None,
-        _data_order=True,
-        _data_verify=False,
+        _order=True,
+        _copy=False,
+        _verify=False,
+        _check_mom=True,
+        _kws=None,
     ) -> "xCentralMoments":
         """Unstack dimensions.
 
@@ -580,12 +571,13 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         xarray.DataArray.unstack
 
         """
-        return self._wrap_xarray_method_from_data(
+        return self.pipe(
             "unstack",
-            _data_copy=_data_copy,
-            _data_kws=_data_kws,
-            _data_order=_data_order,
-            _data_verify=_data_verify,
+            _order=_order,
+            _copy=_copy,
+            _verify=_verify,
+            _kws=_kws,
+            _check_mom=_check_mom,
             dim=dim,
             fill_value=fill_value,
             sparse=sparse,
@@ -597,10 +589,11 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         method: str | None = None,
         tolerance: Any = None,
         drop: bool = False,
-        _data_kws=None,
-        _data_copy=False,
-        _data_order=False,
-        _data_verify=False,
+        _order=False,
+        _copy=False,
+        _verify=False,
+        _check_mom=True,
+        _kws=None,
         **indexers_kws,
     ) -> "xCentralMoments":
         """Select subset of data.
@@ -668,11 +661,13 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         Dimensions without coordinates: mom_0
 
         """
-        return self._wrap_xarray_method_from_data(
+        return self.pipe(
             "sel",
-            _data_copy=_data_copy,
-            _data_kws=_data_kws,
-            _data_order=_data_order,
+            _order=_order,
+            _copy=_copy,
+            _verify=_verify,
+            _check_mom=_check_mom,
+            _kws=_kws,
             indexers=indexers,
             method=method,
             tolerance=tolerance,
@@ -684,10 +679,11 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         self,
         indexers: Mapping[Any, Any] | None = None,
         drop: bool = False,
-        _data_kws: None = None,
-        _data_copy: bool = False,
-        _data_order: bool = False,
-        _data_verify: bool = False,
+        _order: bool = False,
+        _copy: bool = False,
+        _verify: bool = False,
+        _check_mom=True,
+        _kws: None = None,
         **indexers_kws,
     ) -> "xCentralMoments":
         """Select subset of data by position.
@@ -702,19 +698,153 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         sel
         xarray.DataArray.isel
         """
-        return self._wrap_xarray_method_from_data(
+        return self.pipe(
             "isel",
-            _data_copy=_data_copy,
-            _data_kws=_data_kws,
-            _data_order=_data_order,
+            _order=_order,
+            _copy=_copy,
+            _verify=_verify,
+            _check_mom=_check_mom,
+            _kws=_kws,
             indexers=indexers,
             drop=drop,
             **indexers_kws,
         )
 
-    ###########################################################################
-    # Push/verify
-    ###########################################################################
+    @no_type_check
+    def transpose(
+        self,
+        *dims,
+        transpose_coords=None,
+        missing_dims="raise",
+        _order=True,
+        _copy=False,
+        _verify=False,
+        _check_mom=True,
+        _kws=None,
+        **kws,
+    ) -> "xCentralMoments":
+        """
+        Transpose dimensions of data.
+
+        Notes
+        -----
+        if ``_order = True`` (the default), then make sure mom_dims are last
+        regardless of input.
+
+        See Also
+        --------
+        pipe
+        DataArray.transpose
+        xarray.DataArray.transpose
+        """
+        # make sure dims are last
+
+        if _order:
+            dims = list(dims)  # type: ignore
+            for k in self.mom_dims:
+                if k in dims:
+                    dims.pop(dims.index(k))
+            dims = tuple(dims) + self.mom_dims  # type: ignore
+
+        return self.pipe(
+            "transpose",
+            *dims,
+            transpose_coords=transpose_coords,
+            missing_dims=missing_dims,
+            _order=False,
+            _copy=_copy,
+            _verify=_verify,
+            _check_mom=_check_mom,
+            _kws=_kws,
+        )
+
+    # ** To/from CentralMoments
+    def to_centralmoments(self):
+        """Create a CentralMoments object from xCentralMoments."""
+        return CentralMoments(data=self.data, mom_ndim=self.mom_ndim)
+
+    @gcached()
+    def centralmoments_view(self):
+        """Create CentralMoments view.
+
+        This object has the same underlying data as `self`, but no
+        DataArray attributes.  Useful for some function calls.
+
+        See Also
+        --------
+        CentralMoments.to_xcentralmoments
+        """
+        return self.to_centralmoments()
+
+    @classmethod
+    @docfiller_shared
+    def from_centralmoments(
+        cls,
+        obj: "CentralMoments",
+        dims: Hashable | Sequence[Hashable] | None = None,
+        attrs: Mapping | None = None,
+        coords: Mapping | None = None,
+        name: Hashable | None = None,
+        indexes: Any = None,
+        mom_dims: Hashable | Tuple[Hashable, Hashable] | None = None,
+        template: xr.DataArray | None = None,
+        copy: bool = False,
+    ) -> "xCentralMoments":
+        """
+        Create and xCentralMoments object from CentralMoments.
+
+        Parameters
+        ----------
+        {xr_params}
+        {copy}
+
+        Returns
+        -------
+        output : xCentralMoments
+
+        See Also
+        --------
+        CentralMoments.to_xcentralmoments
+
+        """
+
+        data = obj.to_xarray(
+            dims=dims,
+            attrs=attrs,
+            coords=coords,
+            name=name,
+            indexes=indexes,
+            mom_dims=mom_dims,
+        )
+        return cls(data=data, mom_ndim=obj.mom_ndim)
+
+    @staticmethod
+    def _wrap_centralmoments_method(
+        _method_name,
+        *args,
+        dims=None,
+        mom_dims=None,
+        attrs=None,
+        coords=None,
+        indexes=None,
+        name=None,
+        template=None,
+        **kwargs,
+    ):
+
+        method = getattr(CentralMoments, _method_name)
+
+        return method(*args, **kwargs).to_xcentralmoments(
+            dims=dims,
+            mom_dims=mom_dims,
+            attrs=attrs,
+            coords=coords,
+            indexes=indexes,
+            name=name,
+            template=template,
+        )
+
+    # ** Push/verify
     @no_type_check
     def _xverify_value(
         self,
@@ -851,7 +981,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
                 axis, int
             ), f"Error with axis value {axis}"
 
-            return self._array_view._verify_value(
+            return self.centralmoments_view._verify_value(
                 x,
                 target=target,
                 axis=axis,
@@ -860,62 +990,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
                 shape_flat=shape_flat,
             )
 
-    def _single_index_selector(
-        self, val, dim_combined="variable", coords_combined=None, select=True
-    ):
-        idxs = self._single_index(val)[-self.mom_ndim :]
-        if coords_combined is None:
-            coords_combined = self.mom_dims
-
-        selector = {
-            dim: (idx if self._mom_ndim == 1 else xr.DataArray(idx, dims=dim_combined))
-            for dim, idx in zip(self.mom_dims, idxs)
-        }
-        if select:
-            out = self.values.isel(**selector)
-            if self._mom_ndim > 1:
-                out = out.assign_coords(**{dim_combined: list(coords_combined)})
-            return out
-        else:
-            return selector
-
-    def mean(self, dim_combined="variable", coords_combined=None):
-        """Return mean/first moment(s) of data."""
-        return self._single_index_selector(
-            val=1, dim_combined=dim_combined, coords_combined=coords_combined
-        )
-
-    def var(self, dim_combined="variable", coords_combined=None):
-        """Return variance (second central moment) of data."""
-        return self._single_index_selector(
-            val=2, dim_combined=dim_combined, coords_combined=coords_combined
-        )
-
-    @staticmethod
-    def _wrap_centralmoments_method(
-        _method_name,
-        dims=None,
-        mom_dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
-        template=None,
-        **kwargs,
-    ):
-
-        method = getattr(CentralMoments, _method_name)
-
-        return method(**kwargs).to_xcentralmoments(
-            dims=dims,
-            mom_dims=mom_dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
-            template=template,
-        )
-
+    # ** Manipulation
     @docfiller_shared
     def resample_and_reduce(
         self,
@@ -1011,7 +1086,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         # this will be replaced by rep_dimension
         template = self.values.isel({dim: 0})
 
-        out, freq = self._array_view.resample_and_reduce(
+        out, freq = self.centralmoments_view.resample_and_reduce(
             freq=freq,
             indices=indices,
             nrep=nrep,
@@ -1035,6 +1110,17 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
 
         else:
             return new
+
+    @no_type_check
+    def _wrap_axis(
+        self, axis: int | str, default: int = 0, ndim: None = None, **kws
+    ) -> int:
+        if isinstance(axis, str):
+            raise ValueError("shouldnt get string axis here")
+        else:
+            return super(xCentralMoments, self)._wrap_axis(
+                axis=axis, default=default, ndim=ndim
+            )
 
     @no_type_check
     @docfiller_shared
@@ -1091,13 +1177,14 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         {dim}
         coords_policy : {{'first','last',None}}
             Policy for handling coordinates along `axis`.
-            If not coordinates do nothing.  Otherwise use:
+            If no coordinates do nothing, otherwise use:
 
-            * 'first': select first value of coordinate for each block
-            * 'last': select last value of coordate for each block
-            * None: drop any coordates
+            * 'first': select first value of coordinate for each block.
+            * 'last': select last value of coordinate for each block.
+            * None: drop any coordinates.
+
         **kws
-            Extra arguments to :meth:CentralMoments.block
+            Extra arguments to :meth:`CentralMoments.block`
 
         Returns
         -------
@@ -1138,6 +1225,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         Dimensions without coordinates: dim_0, mom_0
 
         This is equivalent to
+
         >>> xCentralMoments.from_vals(x.reshape(2, 50), mom=2, axis=1)
         <xCentralMoments(val_shape=(2,), mom=(2,))>
         <xarray.DataArray (dim_0: 2, mom_0: 3)>
@@ -1169,74 +1257,11 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         if coords_policy is None:
             template = template.drop(dim)
 
-        return self._array_view.block(
+        return self.centralmoments_view.block(
             block_size=block_size, axis=axis, **kws
         ).to_xcentralmoments(template=template)
 
-    @no_type_check
-    def _wrap_axis(
-        self, axis: int | str, default: int = 0, ndim: None = None, **kws
-    ) -> int:
-        # if isinstance(axis, str):
-        #     axis = self._xdata.get_axis_num(axis)
-        # return super(xCentralMoments, self)._wrap_axis(
-        #     axis=axis, default=default, ndim=ndim
-        # )
-
-        if isinstance(axis, str):
-            raise ValueError("shouldnt get string axis here")
-            # return self._xdata.get_axis_num(axis)
-        else:
-            return super(xCentralMoments, self)._wrap_axis(
-                axis=axis, default=default, ndim=ndim
-            )
-
-    def to_centralmoments(self):
-        """Create a CentralMoments object from xCentralMoments."""
-        return CentralMoments(data=self.data, mom_ndim=self.mom_ndim)
-
-    @classmethod
-    @docfiller_shared
-    def from_centralmoments(
-        cls,
-        obj: "CentralMoments",
-        dims: Hashable | Sequence[Hashable] | None = None,
-        attrs: Mapping | None = None,
-        coords: Mapping | None = None,
-        name: Hashable | None = None,
-        indexes: Any = None,
-        mom_dims: Hashable | Tuple[Hashable, Hashable] | None = None,
-        template: xr.DataArray | None = None,
-        copy: bool = False,
-    ) -> "xCentralMoments":
-        """
-        Create and xCentralMoments object from CentralMoments.
-
-        Parameters
-        ----------
-        {xr_params}
-        {copy}
-
-        Returns
-        -------
-        output : xCentralMoments
-
-        See Also
-        --------
-        CentralMoments.to_xcentralmoments
-
-        """
-
-        data = obj.to_xarray(
-            dims=dims,
-            attrs=attrs,
-            coords=coords,
-            name=name,
-            indexes=indexes,
-            mom_dims=mom_dims,
-        )
-        return cls(data=data, mom_ndim=obj.mom_ndim)
-
+    # ** Constructors
     @no_type_check
     @classmethod
     @docfiller_shared
@@ -1959,33 +1984,11 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
     #         **kws,
     #     )
 
-    @no_type_check
-    def transpose(
-        self, *dims, transpose_coords=None, copy=False, **kws
-    ) -> "xCentralMoments":
-        """
-        Transpose dimensions of data.
-
-        See Also
-        --------
-        xarray.DataArray.transpose
-        """
-        # make sure dims are last
-        dims = list(dims)  # type: ignore
-        for k in self.mom_dims:
-            if k in dims:
-                dims.pop(dims.index(k))
-        dims = tuple(dims) + self.mom_dims  # type: ignore
-
-        values = (
-            self.values.transpose(*dims, transpose_coords=transpose_coords)
-            # make sure mom are last
-            # .transpose(...,*self.mom_dims)
-        )
-        return type(self).from_data(values, mom_ndim=self.mom_ndim, copy=copy, **kws)
-
 
 # Mostly deprecated.  Keeping around for now.
+
+
+# * Deprecated utilities
 def _xr_wrap_like(da, x):
     """Wrap x with xarray like da."""
     x = np.asarray(x)

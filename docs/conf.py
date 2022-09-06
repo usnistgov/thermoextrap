@@ -57,7 +57,13 @@ nbsphinx_prolog = """
 You can view this notebook `on Github <https://github.com/wpk-nist-gov/cmomy/blob/master/doc/{{ docname }}>`_.
 """
 
+
+# The kernelname to use.
+nbsphinx_kernel_name = "python3"
+
+# autosummary_generate = True
 autosummary_generate = True
+
 autoclass_content = "both"  # include both class docstring and __init__
 autodoc_default_flags = [
     # Make sure that any autodoc declarations show the right members
@@ -80,7 +86,7 @@ napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
 napoleon_use_param = False
-napoleon_use_rtype = True
+napoleon_use_rtype = False
 napoleon_preprocess_types = True
 napoleon_type_aliases = {
     # general terms
@@ -92,7 +98,6 @@ napoleon_type_aliases = {
     "path-like": ":term:`path-like <path-like object>`",
     "mapping": ":term:`mapping`",
     "hashable": ":term:`hashable`",
-    "file-like": ":term:`file-like <file-like object>`",
     # special terms
     # "same type as caller": "*same type as caller*",  # does not work, yet
     # "same type as values": "*same type as values*",  # does not work, yet
@@ -106,7 +111,6 @@ napoleon_type_aliases = {
     "array-like": ":term:`array-like <array_like>`",
     "scalar": ":term:`scalar`",
     "array": ":term:`array`",
-    "hashable": ":term:`hashable <name>`",
     # matplotlib terms
     "color-like": ":py:func:`color-like <matplotlib.colors.is_color_like>`",
     "matplotlib colormap name": ":doc:`matplotlib colormap name <matplotlib:gallery/color/colormap_reference>`",
@@ -175,7 +179,7 @@ release = cmomy.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

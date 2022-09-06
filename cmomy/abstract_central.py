@@ -6,6 +6,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import (
     Any,
+    Callable,
     Generic,
     List,
     Literal,
@@ -31,16 +32,8 @@ from .options import DOC_SUB
 from .pushers import factory_pushers
 from .resample import randsamp_freq, resample_data
 
+# * Main
 # TODO: Total rework is called for to handle typing correctly.
-# instead of xCentral subclassing Central, these should be separate things
-# for the cases where things are in the wrong format, can create a Central object,
-# then convert to an xCentral object
-
-# data[..., i, j] = \begin{cases}
-# \text{weight} & i = j = 0 \\
-# \langle x \rangle & i = 1, j = 0 \\
-# \langle (x - \langle x \rangle^i) (y - \langle y \rangle^j) \rangle & i + j > 0
-# \end{cases}
 
 
 def _get_metaclass():
@@ -69,9 +62,9 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         Moment collection array.
     mom_ndim : {1, 2}
         Number of dimensions for moment part of `data`.
-
         * 1 : central moments of single variable
         * 2 : central comoments of two variables
+
     """
 
     __slots__ = (
@@ -81,8 +74,13 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         "_data_flat",
     )
 
-    @abstractmethod
-    def __init__(self, data: T_Array, mom_ndim: Literal[1, 2]) -> None:
+    # Override __new__ to make signature correct
+    # Better to do this in subclasses.
+    # otherwise, signature for data will be 'T_Array``
+    # def __new__(cls, data: T_Array, mom_ndim: Literal[1, 2] = 1):
+    #     return super().__new__(cls, data=data, mom_ndim=mom_ndim)
+
+    def __init__(self, data: T_Array, mom_ndim: Literal[1, 2] = 1) -> None:
 
         self._data = cast(np.ndarray, data)
         self._data_flat = self._data
@@ -204,7 +202,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         return np.asarray(self.data, dtype=dtype)
 
     ###########################################################################
-    # SECTION: top level creation/copy/new
+    # ** top level creation/copy/new
     ###########################################################################
     @abstractmethod
     @docfiller_shared
@@ -285,51 +283,10 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
             copy_kws=copy_kws,
         )
 
-    @classmethod
-    @abstractmethod
-    @docfiller_shared
-    def zeros(
-        cls: Type[T_CentralMoments],
-        mom: Moments | None = None,
-        val_shape: Tuple[int, ...] | None = None,
-        shape: Tuple[int, ...] | None = None,
-        mom_ndim: int | None = None,
-        dtype: DTypeLike | None = None,
-        zeros_kws: Mapping | None = None,
-        **kws,
-    ) -> T_CentralMoments:
-        """
-        Create a new base object.
-
-        Parameters
-        ----------
-        {mom}
-        {mom_ndim}
-        {val_shape}
-        {shape}
-        {dtype}
-        {zeros_kws}
-        **kws
-            extra arguments to :meth:`from_data`
-
-
-        Notes
-        -----
-        The resulting total shape of data is shape + (mom + 1).
-        Must specify either `mom` or `mom_ndim`
-
-
-        See Also
-        --------
-        from_data : General constructor
-        numpy.zeros
-
-        """
-        pass
-
     ###########################################################################
-    # SECTION: Access to underlying statistics
+    # ** Access to underlying statistics
     ###########################################################################
+
     @gcached()
     def _weight_index(self):
         index = (0,) * len(self.mom)
@@ -443,7 +400,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         return self.to_raw(weights=1.0)
 
     ###########################################################################
-    # SECTION: pushing routines
+    # ** pushing routines
     ###########################################################################
     def fill(self: T_CentralMoments, value: Any = 0) -> T_CentralMoments:
         """Fill data with value.
@@ -707,7 +664,286 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         return self
 
     ###########################################################################
-    # SECTION: Operators
+    # ** Manipulation
+    ###########################################################################
+    def pipe(
+        self,
+        func_or_method: Callable | str,
+        *args,
+        _order: bool = True,
+        _copy: bool = False,
+        _verify: bool = False,
+        _check_mom: bool = True,
+        _kws: Mapping | None = None,
+        **kwargs,
+    ) -> T_CentralMoments:
+        """
+        Apply `func_or_method` to underlying data and wrap results in `xCentralMoments` object.
+
+        This is usefull for calling any not implemnted methods on ndarray or DataArray data.
+
+        Parameters
+        ----------
+        func_or_method : str or callable
+            If callable, then apply ``values = func_or_method(self.values, *args, **kwargs)``.
+            If string is passed, then ``values = getattr(self.values, func_or_method)(*args, **kwargs)``.
+        _order : bool, default = True
+            If True, reorder the data such that ``mom_dims`` are last.
+        _copy : bool, default = False
+            If True, copy the resulting data.  Otherwise, try to use a view.
+            This is passed as ``copy=_copy`` to :meth:`from_data`.
+        _verify: bool, default=False
+            If True, ensure underlying data is contiguous.  Passed as ``verify=_verify`` to :meth:`from_data`
+        _check_mom: bool, default = True
+            If True, check the resulting object has the same moment shape as the current object.
+        _kws : Mapping, optional
+            Extra arguments to :meth:`from_data`.
+        *args
+            Extra positional arguments to `func_or_method`
+        **kwargs
+            Extra keyword arguments to `func_or_method`
+
+        Returns
+        -------
+        output : xCentralMoments
+            New :class:`xCentralMoments` object after `func_or_method` is applies to `self.values`
+
+
+        Notes
+        -----
+        Use leading underscore for `_order`, `_copy` to avoid name possible name clashes.
+
+
+        See Also
+        --------
+        from_data
+        """
+
+        if isinstance(func_or_method, str):
+            values = getattr(self.values, func_or_method)(*args, **kwargs)
+        else:
+            values = func_or_method(self.values, *args, **kwargs)
+
+        if _order:
+            values = values.transpose(..., *self.mom_dims)
+
+        if _kws is None:
+            _kws = {}
+        else:
+            _kws = dict(_kws)
+        _kws.setdefault("copy", _copy)
+        _kws.setdefault("verify", _verify)
+        _kws.setdefault("mom_ndim", self.mom_ndim)
+        if _check_mom:
+            _kws["mom"] = self.mom
+            _kws["check_shape"] = True
+
+        out = type(self).from_data(data=values, **_kws)
+
+        return cast(T_CentralMoments, out)
+
+    @property
+    def _is_vector(self) -> bool:
+        return self.val_ndim > 0
+
+    def _raise_if_scalar(self, message: str | None = None) -> None:
+        if not self._is_vector:
+            if message is None:
+                message = "not implemented for scalar"
+            raise ValueError(message)
+
+    # Universal reducers
+    @docfiller_shared
+    def resample_and_reduce(
+        self: T_CentralMoments,
+        freq: np.ndarray | None = None,
+        indices: np.ndarray | None = None,
+        nrep: None = None,
+        axis: int | None = None,
+        parallel: bool = True,
+        resample_kws: Mapping | None = None,
+        full_output: bool = False,
+        **kws,
+    ) -> T_CentralMoments | Tuple[T_CentralMoments, np.ndarray]:
+        """
+        Bootstrap resample and reduce.
+
+        Parameters
+        ----------
+        {freq}
+        {indices}
+        {nrep}
+        {axis}
+        parallel : bool, default=True
+            flags to `numba.njit`
+        {resample_kws}
+        {full_output}
+        **kws
+            Extra key-word arguments to :meth:`from_data`
+
+        Returns
+        -------
+        output : instance of calling class
+            Note that new object will have val_shape = (nrep,) + val_shape[:axis] + val_shape[axis+1:]
+
+        See Also
+        --------
+        :meth:`resample`
+        :meth:`reduce`
+        ~resample.randsamp_freq
+        ~resample.freq_to_indices
+        ~resample.indices_to_freq
+        ~resample.resample_data
+        """
+        self._raise_if_scalar()
+        axis = self._wrap_axis(axis, **kws)
+        if resample_kws is None:
+            resample_kws = {}
+
+        freq = randsamp_freq(
+            nrep=nrep, indices=indices, freq=freq, size=self.val_shape[axis], check=True
+        )
+        data = resample_data(
+            self.data, freq, mom=self.mom, axis=axis, parallel=parallel, **resample_kws
+        )
+        out = type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
+
+        if full_output:
+            return out, freq
+        else:
+            return out
+
+    @docfiller_shared
+    def resample(
+        self: T_CentralMoments,
+        indices: np.ndarray,
+        axis: int = 0,
+        first: bool = True,
+        **kws,
+    ) -> T_CentralMoments:
+        """
+        Create a new object sampled from index.
+
+        Parameters
+        ----------
+        {indices}
+        {axis}
+        first : bool, default=True
+            if True, and axis != 0, the move the axis to first position.
+            This makes results similar to resample and reduce
+            If `first` False, then resampled array can have odd shape
+
+        Returns
+        -------
+        output : instance of calling class
+            The new object will have shape
+            `(nrep, ndat, ...) + self.shape[:axis] + self.shape[axis+1:]`
+
+
+        See Also
+        --------
+        from_data
+
+        """
+        self._raise_if_scalar()
+        axis = self._wrap_axis(axis, **kws)
+
+        data = self.data
+        if first and axis != 0:
+            data = np.moveaxis(data, axis, 0)
+            axis = 0
+
+        out = np.take(data, indices, axis=axis)
+
+        return type(self).from_data(
+            data=out,
+            mom_ndim=self.mom_ndim,
+            mom=self.mom,
+            copy=False,
+            verify=True,
+            **kws,
+        )
+
+    @docfiller_shared
+    def reduce(
+        self: T_CentralMoments, axis: int | None = None, **kws
+    ) -> T_CentralMoments:
+        """
+        Create new object reducealong axis.
+
+        Parameters
+        ----------
+        {axis}
+        **kws
+            Extra parameters to :meth:`from_data`
+
+        """
+        self._raise_if_scalar()
+        axis = self._wrap_axis(axis, **kws)
+        return type(self).from_datas(
+            self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
+        )
+
+    @docfiller_shared
+    def block(
+        self: T_CentralMoments,
+        block_size: int | None = None,
+        axis: int | None = None,
+        **kws,
+    ) -> T_CentralMoments:
+        """
+        Block average reduction.
+
+        Parameters
+        ----------
+        block_size : int
+            number of consecutive records to combine
+        {axis}
+        **kws
+            Extral key word arguments to :meth:`from_datas` method
+
+        Returns
+        -------
+        output : new instance of calling class
+            Shape of output will be
+            `(nblock,) + self.shape[:axis] + self.shape[axis+1:]`.
+
+        Notes
+        -----
+        The block averaged `axis` will be moved to the front of the output data.
+
+        See Also
+        --------
+        reshape
+        moveaxis
+        reduce
+        """
+
+        self._raise_if_scalar()
+
+        axis = self._wrap_axis(axis, **kws)
+        data = self.data
+
+        # move axis to first
+        if axis != 0:
+            data = np.moveaxis(data, axis, 0)
+
+        n = data.shape[0]
+
+        if block_size is None:
+            block_size = n
+            nblock = 1
+
+        else:
+            nblock = n // block_size
+
+        datas = data[: (nblock * block_size), ...].reshape(
+            (nblock, block_size) + data.shape[1:]
+        )
+        return type(self).from_datas(datas=datas, mom_ndim=self.mom_ndim, axis=1, **kws)
+
+    ###########################################################################
+    # ** Operators
     ###########################################################################
     def _check_other(self: T_CentralMoments, b: T_CentralMoments) -> None:
         """Check other object."""
@@ -776,8 +1012,9 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         return self
 
     ###########################################################################
-    # SECTION: Constructors
+    # ** Constructors
     ###########################################################################
+    # *** Utils
     @classmethod
     @no_type_check
     def _check_mom(
@@ -837,11 +1074,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         if ndim is None:
             ndim = self.val_ndim
 
-        axis = cast(int, normalize_axis_index(axis, ndim))
-        # if axis < 0:
-        #     axis += ndim
-        # assert 0 <= axis < ndim
-        return axis
+        return cast(int, normalize_axis_index(axis, ndim))
 
     @classmethod
     def _mom_ndim_from_mom(cls, mom: Moments) -> int:
@@ -865,6 +1098,49 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
             raise ValueError("must specify mom_ndim or mom")
 
         return mom_ndim
+
+    # *** Core
+    @classmethod
+    @abstractmethod
+    @docfiller_shared
+    def zeros(
+        cls: Type[T_CentralMoments],
+        mom: Moments | None = None,
+        val_shape: Tuple[int, ...] | None = None,
+        shape: Tuple[int, ...] | None = None,
+        mom_ndim: int | None = None,
+        dtype: DTypeLike | None = None,
+        zeros_kws: Mapping | None = None,
+        **kws,
+    ) -> T_CentralMoments:
+        """
+        Create a new base object.
+
+        Parameters
+        ----------
+        {mom}
+        {mom_ndim}
+        {val_shape}
+        {shape}
+        {dtype}
+        {zeros_kws}
+        **kws
+            extra arguments to :meth:`from_data`
+
+
+        Notes
+        -----
+        The resulting total shape of data is shape + (mom + 1).
+        Must specify either `mom` or `mom_ndim`
+
+
+        See Also
+        --------
+        from_data : General constructor
+        numpy.zeros
+
+        """
+        pass
 
     @classmethod
     @abstractmethod
@@ -1132,209 +1408,6 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         Using raw moments can result in numerical issues, especially for higher moments.  Use with care.
         """
         pass
-
-    ###########################################################################
-    # SECTION: Manipulation
-    ###########################################################################
-    @property
-    def _is_vector(self) -> bool:
-        return self.val_ndim > 0
-
-    def _raise_if_scalar(self, message: str | None = None) -> None:
-        if not self._is_vector:
-            if message is None:
-                message = "not implemented for scalar"
-            raise ValueError(message)
-
-    # Universal reducers
-    @docfiller_shared
-    def resample_and_reduce(
-        self: T_CentralMoments,
-        freq: np.ndarray | None = None,
-        indices: np.ndarray | None = None,
-        nrep: None = None,
-        axis: int | None = None,
-        parallel: bool = True,
-        resample_kws: Mapping | None = None,
-        full_output: bool = False,
-        **kws,
-    ) -> T_CentralMoments | Tuple[T_CentralMoments, np.ndarray]:
-        """
-        Bootstrap resample and reduce.
-
-        Parameters
-        ----------
-        {freq}
-        {indices}
-        {nrep}
-        {axis}
-        parallel : bool, default=True
-            flags to `numba.njit`
-        {resample_kws}
-        {full_output}
-        **kws
-            Extra key-word arguments to :meth:`from_data`
-
-        Returns
-        -------
-        output : instance of calling class
-            Note that new object will have val_shape = (nrep,) + val_shape[:axis] + val_shape[axis+1:]
-
-        See Also
-        --------
-        :meth:`resample`
-        :meth:`reduce`
-        ~resample.randsamp_freq
-        ~resample.freq_to_indices
-        ~resample.indices_to_freq
-        ~resample.resample_data
-        """
-        self._raise_if_scalar()
-        axis = self._wrap_axis(axis, **kws)
-        if resample_kws is None:
-            resample_kws = {}
-
-        freq = randsamp_freq(
-            nrep=nrep, indices=indices, freq=freq, size=self.val_shape[axis], check=True
-        )
-        data = resample_data(
-            self.data, freq, mom=self.mom, axis=axis, parallel=parallel, **resample_kws
-        )
-        out = type(self).from_data(data, mom_ndim=self.mom_ndim, copy=False, **kws)
-
-        if full_output:
-            return out, freq
-        else:
-            return out
-
-    @docfiller_shared
-    def resample(
-        self: T_CentralMoments,
-        indices: np.ndarray,
-        axis: int = 0,
-        first: bool = True,
-        **kws,
-    ) -> T_CentralMoments:
-        """
-        Create a new object sampled from index.
-
-        Parameters
-        ----------
-        {indices}
-        {axis}
-        first : bool, default=True
-            if True, and axis != 0, the move the axis to first position.
-            This makes results similar to resample and reduce
-            If `first` False, then resampled array can have odd shape
-
-        Returns
-        -------
-        output : instance of calling class
-            The new object will have shape
-            `(nrep, ndat, ...) + self.shape[:axis] + self.shape[axis+1:]`
-
-
-        See Also
-        --------
-        from_data
-
-        """
-        self._raise_if_scalar()
-        axis = self._wrap_axis(axis, **kws)
-
-        data = self.data
-        if first and axis != 0:
-            data = np.moveaxis(data, axis, 0)
-            axis = 0
-
-        out = np.take(data, indices, axis=axis)
-
-        return type(self).from_data(
-            data=out,
-            mom_ndim=self.mom_ndim,
-            mom=self.mom,
-            copy=False,
-            verify=True,
-            **kws,
-        )
-
-    @docfiller_shared
-    def reduce(
-        self: T_CentralMoments, axis: int | None = None, **kws
-    ) -> T_CentralMoments:
-        """
-        Create new object reducealong axis.
-
-        Parameters
-        ----------
-        {axis}
-        **kws
-            Extra parameters to :meth:`from_data`
-
-        """
-        self._raise_if_scalar()
-        axis = self._wrap_axis(axis, **kws)
-        return type(self).from_datas(
-            self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
-        )
-
-    @docfiller_shared
-    def block(
-        self: T_CentralMoments,
-        block_size: int | None = None,
-        axis: int | None = None,
-        **kws,
-    ) -> T_CentralMoments:
-        """
-        Block average reduction.
-
-        Parameters
-        ----------
-        block_size : int
-            number of consecutive records to combine
-        {axis}
-        **kws
-            Extral key word arguments to :meth:`from_datas` method
-
-        Returns
-        -------
-        output : new instance of calling class
-            Shape of output will be
-            `(nblock,) + self.shape[:axis] + self.shape[axis+1:]`.
-
-        Notes
-        -----
-        The block averaged `axis` will be moved to the front of the output data.
-
-        See Also
-        --------
-        reshape
-        moveaxis
-        reduce
-        """
-
-        self._raise_if_scalar()
-
-        axis = self._wrap_axis(axis, **kws)
-        data = self.data
-
-        # move axis to first
-        if axis != 0:
-            data = np.moveaxis(data, axis, 0)
-
-        n = data.shape[0]
-
-        if block_size is None:
-            block_size = n
-            nblock = 1
-
-        else:
-            nblock = n // block_size
-
-        datas = data[: (nblock * block_size), ...].reshape(
-            (nblock, block_size) + data.shape[1:]
-        )
-        return type(self).from_datas(datas=datas, mom_ndim=self.mom_ndim, axis=1, **kws)
 
     # --------------------------------------------------
     # mom_ndim == 1 specific

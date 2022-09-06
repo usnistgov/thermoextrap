@@ -5,6 +5,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Hashable,
+    Literal,
     Mapping,
     Optional,
     Sequence,
@@ -286,7 +287,10 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
         Moments collection array.
     """
 
-    def __init__(self, data: np.ndarray, mom_ndim: int = 1) -> None:
+    def __new__(cls, data: np.ndarray, mom_ndim: Literal[1, 2] = 1):  # noqa: D102
+        return super().__new__(cls, data=data, mom_ndim=mom_ndim)
+
+    def __init__(self, data: np.ndarray, mom_ndim: Literal[1, 2] = 1) -> None:
         if mom_ndim not in (1, 2):
             raise ValueError(
                 "mom_ndim must be either 1 (for central moments)"
@@ -375,52 +379,8 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
             **kws,
         )
 
-    @classmethod
-    def zeros(
-        cls: Type[T_CentralMoments],
-        mom: Moments | None = None,
-        val_shape: Tuple[int, ...] | None = None,
-        mom_ndim: int | None = None,
-        shape: Tuple[int, ...] | None = None,
-        dtype: DTypeLike | None = None,
-        zeros_kws: Mapping | None = None,
-        **kws,
-    ) -> T_CentralMoments:
-        """
-        Returns
-        -------
-        output : CentralMoments
-        """
-
-        if shape is None:
-            assert mom is not None
-            if isinstance(mom, int):
-                mom = (mom,)
-            if mom_ndim is None:
-                mom_ndim = len(mom)
-            assert len(mom) == mom_ndim
-
-            if val_shape is None:
-                val_shape = ()
-            elif isinstance(val_shape, int):
-                val_shape = (val_shape,)
-            shape = val_shape + tuple(x + 1 for x in mom)
-
-        else:
-            assert mom_ndim is not None
-
-        if dtype is None:
-            dtype = float
-
-        if zeros_kws is None:
-            zeros_kws = {}
-        data = np.zeros(shape=shape, dtype=dtype, **zeros_kws)
-
-        kws = dict(kws, verify=False, copy=False, check_shape=False)
-        return cls.from_data(data=data, mom_ndim=mom_ndim, **kws)
-
     ###########################################################################
-    # SECTION: Access to underlying statistics
+    # SECTION: To/from xarray
     ###########################################################################
     @docfiller_shared
     def to_xarray(
@@ -875,8 +835,203 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
         return self
 
     ###########################################################################
+    # SECTION: Manipulation
+    ###########################################################################
+    @docfiller_shared
+    def reshape(
+        self: T_CentralMoments,
+        shape: Tuple[int, ...],
+        copy: bool = True,
+        copy_kws: Mapping | None = None,
+        **kws,
+    ) -> T_CentralMoments:
+        """
+        Create a new object with reshaped data.
+
+        Parameters
+        ----------
+        shape : tuple
+            shape of values part of data.
+        {copy}
+        {copy_kws}
+        **kws
+            Parameters to :meth:`from_data`
+
+        Returns
+        -------
+        output : CentralMoments
+            output object with reshaped data
+
+        See Also
+        --------
+        numpy.reshape
+        from_data
+
+        Examples
+        --------
+        >>> x = np.random.seed(0)
+        >>> da = CentralMoments.from_vals(np.random.rand(10, 2, 3), mom=2)
+        >>> da
+        <CentralMoments(val_shape=(2, 3), mom=(2,))>
+        array([[[10.        ,  0.45494641,  0.04395725],
+                [10.        ,  0.60189056,  0.08491604],
+                [10.        ,  0.6049404 ,  0.09107171]],
+        <BLANKLINE>
+               [[10.        ,  0.53720667,  0.05909394],
+                [10.        ,  0.42622908,  0.08434857],
+                [10.        ,  0.47326641,  0.05907737]]])
+
+               [[10.        ,  0.53720667,  0.05909394],
+                [10.        ,  0.42622908,  0.08434857],
+                [10.        ,  0.47326641,  0.05907737]]])
+
+        >>> da.reshape(shape=(-1,))
+        <CentralMoments(val_shape=(6,), mom=(2,))>
+        array([[10.        ,  0.45494641,  0.04395725],
+               [10.        ,  0.60189056,  0.08491604],
+               [10.        ,  0.6049404 ,  0.09107171],
+               [10.        ,  0.53720667,  0.05909394],
+               [10.        ,  0.42622908,  0.08434857],
+               [10.        ,  0.47326641,  0.05907737]])
+
+
+
+        """
+        self._raise_if_scalar()
+        new_shape = shape + self.mom_shape
+        data = self._data.reshape(new_shape)
+
+        return type(self).from_data(
+            data=data,
+            mom_ndim=self.mom_ndim,
+            mom=self.mom,
+            val_shape=None,
+            copy=copy,
+            copy_kws=copy_kws,
+            verify=True,
+            check_shape=True,
+            dtype=self.dtype,
+            **kws,
+        )
+
+    @docfiller_shared
+    def moveaxis(
+        self: T_CentralMoments,
+        source: int | Tuple[int, ...],
+        destination: int | Tuple[int, ...],
+        copy: bool = True,
+        copy_kws: Mapping | None = None,
+        **kws,
+    ) -> T_CentralMoments:
+        """
+        Move axis from source to destination.
+
+        Parameters
+        ----------
+        source : int or sequence of int
+            Original positions of the axes to move. These must be unique.
+        destination : int or sequence of int
+            Destination positions for each of the original axes. These must also be
+            unique.
+        {copy}
+        {copy_kws}
+
+        Returns
+        -------
+        result : CentralMoments
+            CentralMoments object with with moved axes. This array is a view of the input array.
+
+
+        Examples
+        --------
+        >>> np.random.seed(0)
+        >>> da = CentralMoments.from_vals(np.random.rand(10, 1, 2, 3), axis=0)
+        >>> da.moveaxis((2, 1), (0, 2))
+        <CentralMoments(val_shape=(3, 1, 2), mom=(2,))>
+        array([[[[10.        ,  0.45494641,  0.04395725],
+                 [10.        ,  0.53720667,  0.05909394]]],
+        <BLANKLINE>
+        <BLANKLINE>
+               [[[10.        ,  0.60189056,  0.08491604],
+                 [10.        ,  0.42622908,  0.08434857]]],
+        <BLANKLINE>
+        <BLANKLINE>
+               [[[10.        ,  0.6049404 ,  0.09107171],
+                 [10.        ,  0.47326641,  0.05907737]]]])
+
+        """
+        self._raise_if_scalar()
+
+        def _internal_check_val(v) -> Tuple[int, ...]:
+            if isinstance(v, int):
+                v = (v,)
+            else:
+                v = tuple(v)
+            return tuple(self._wrap_axis(x) for x in v)
+
+        source = _internal_check_val(source)
+        destination = _internal_check_val(destination)
+        data = np.moveaxis(self.data, source, destination)
+
+        # use from data for extra checks
+        # return self.new_like(data=data, copy=copy, *args, **kwargs)
+        return type(self).from_data(
+            data,
+            mom=self.mom,
+            mom_ndim=self.mom_ndim,
+            val_shape=data.shape[: -self.mom_ndim],
+            copy=copy,
+            copy_kws=copy_kws,
+            **kws,
+        )
+
+    ###########################################################################
     # SECTION: Constructors
     ###########################################################################
+    @classmethod
+    def zeros(
+        cls: Type[T_CentralMoments],
+        mom: Moments | None = None,
+        val_shape: Tuple[int, ...] | None = None,
+        mom_ndim: int | None = None,
+        shape: Tuple[int, ...] | None = None,
+        dtype: DTypeLike | None = None,
+        zeros_kws: Mapping | None = None,
+        **kws,
+    ) -> T_CentralMoments:
+        """
+        Returns
+        -------
+        output : CentralMoments
+        """
+
+        if shape is None:
+            assert mom is not None
+            if isinstance(mom, int):
+                mom = (mom,)
+            if mom_ndim is None:
+                mom_ndim = len(mom)
+            assert len(mom) == mom_ndim
+
+            if val_shape is None:
+                val_shape = ()
+            elif isinstance(val_shape, int):
+                val_shape = (val_shape,)
+            shape = val_shape + tuple(x + 1 for x in mom)
+
+        else:
+            assert mom_ndim is not None
+
+        if dtype is None:
+            dtype = float
+
+        if zeros_kws is None:
+            zeros_kws = {}
+        data = np.zeros(shape=shape, dtype=dtype, **zeros_kws)
+
+        kws = dict(kws, verify=False, copy=False, check_shape=False)
+        return cls.from_data(data=data, mom_ndim=mom_ndim, **kws)
+
     @classmethod
     def from_data(
         cls: Type[T_CentralMoments],
@@ -1264,158 +1419,6 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
             mom=mom,
             val_shape=val_shape,
             dtype=dtype,
-            **kws,
-        )
-
-    ###########################################################################
-    # SECTION: Manipulation
-    ###########################################################################
-
-    @docfiller_shared
-    def reshape(
-        self: T_CentralMoments,
-        shape: Tuple[int, ...],
-        copy: bool = True,
-        copy_kws: Mapping | None = None,
-        **kws,
-    ) -> T_CentralMoments:
-        """
-        Create a new object with reshaped data.
-
-        Parameters
-        ----------
-        shape : tuple
-            shape of values part of data.
-        {copy}
-        {copy_kws}
-        **kws
-            Parameters to :meth:`from_data`
-
-        Returns
-        -------
-        output : CentralMoments
-            output object with reshaped data
-
-        See Also
-        --------
-        numpy.reshape
-        from_data
-
-        Examples
-        --------
-        >>> x = np.random.seed(0)
-        >>> da = CentralMoments.from_vals(np.random.rand(10, 2, 3), mom=2)
-        >>> da
-        <CentralMoments(val_shape=(2, 3), mom=(2,))>
-        array([[[10.        ,  0.45494641,  0.04395725],
-                [10.        ,  0.60189056,  0.08491604],
-                [10.        ,  0.6049404 ,  0.09107171]],
-        <BLANKLINE>
-               [[10.        ,  0.53720667,  0.05909394],
-                [10.        ,  0.42622908,  0.08434857],
-                [10.        ,  0.47326641,  0.05907737]]])
-
-               [[10.        ,  0.53720667,  0.05909394],
-                [10.        ,  0.42622908,  0.08434857],
-                [10.        ,  0.47326641,  0.05907737]]])
-
-        >>> da.reshape(shape=(-1,))
-        <CentralMoments(val_shape=(6,), mom=(2,))>
-        array([[10.        ,  0.45494641,  0.04395725],
-               [10.        ,  0.60189056,  0.08491604],
-               [10.        ,  0.6049404 ,  0.09107171],
-               [10.        ,  0.53720667,  0.05909394],
-               [10.        ,  0.42622908,  0.08434857],
-               [10.        ,  0.47326641,  0.05907737]])
-
-
-
-        """
-        self._raise_if_scalar()
-        new_shape = shape + self.mom_shape
-        data = self._data.reshape(new_shape)
-
-        return type(self).from_data(
-            data=data,
-            mom_ndim=self.mom_ndim,
-            mom=self.mom,
-            val_shape=None,
-            copy=copy,
-            copy_kws=copy_kws,
-            verify=True,
-            check_shape=True,
-            dtype=self.dtype,
-            **kws,
-        )
-
-    @docfiller_shared
-    def moveaxis(
-        self: T_CentralMoments,
-        source: int | Tuple[int, ...],
-        destination: int | Tuple[int, ...],
-        copy: bool = True,
-        copy_kws: Mapping | None = None,
-        **kws,
-    ) -> T_CentralMoments:
-        """
-        Move axis from source to destination.
-
-        Parameters
-        ----------
-        source : int or sequence of int
-            Original positions of the axes to move. These must be unique.
-        destination : int or sequence of int
-            Destination positions for each of the original axes. These must also be
-            unique.
-        {copy}
-        {copy_kws}
-
-        Returns
-        -------
-        result : CentralMoments
-            CentralMoments object with with moved axes. This array is a view of the input array.
-
-
-        Examples
-        --------
-        >>> np.random.seed(0)
-        >>> da = CentralMoments.from_vals(np.random.rand(10, 1, 2, 3), axis=0)
-        >>> da.moveaxis((2, 1), (0, 2))
-        <CentralMoments(val_shape=(3, 1, 2), mom=(2,))>
-        array([[[[10.        ,  0.45494641,  0.04395725],
-                 [10.        ,  0.53720667,  0.05909394]]],
-        <BLANKLINE>
-        <BLANKLINE>
-               [[[10.        ,  0.60189056,  0.08491604],
-                 [10.        ,  0.42622908,  0.08434857]]],
-        <BLANKLINE>
-        <BLANKLINE>
-               [[[10.        ,  0.6049404 ,  0.09107171],
-                 [10.        ,  0.47326641,  0.05907737]]]])
-
-        """
-        self._raise_if_scalar()
-
-        def _internal_check_val(v) -> Tuple[int, ...]:
-            if isinstance(v, int):
-                v = (v,)
-            else:
-                v = tuple(v)
-            return tuple(self._wrap_axis(x) for x in v)
-
-        source = _internal_check_val(source)
-        destination = _internal_check_val(destination)
-        data = np.moveaxis(self.data, source, destination)
-
-        # use from data for extra checks
-        # return self.new_like(data=data, copy=copy, *args, **kwargs)
-        return type(self).from_data(
-            data,
-            mom=self.mom,
-            mom_ndim=self.mom_ndim,
-            val_shape=data.shape[: -self.mom_ndim],
-            copy=copy,
-            copy_kws=copy_kws,
             **kws,
         )
 
