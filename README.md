@@ -1,12 +1,12 @@
 # cmomy
 
-[![image](https://img.shields.io/pypi/v/cmomy.svg)](https://pypi.python.org/pypi/cmomy)
+A Python package to calculate and manipulate Central (co)moments. The main features of ``cmomy`` are as follows:
 
-[![image](https://img.shields.io/travis/wpk-nist-gov/cmomy.svg)](https://travis-ci.com/wpk-nist-gov/cmomy)
-
-Central (co)moment calculation/manipulation
-
--   Free software: NIST license
+* [Numba](https://numba.pydata.org/) accelerated computation of central moments and co-moments
+* Routines to combine, and resample central moments.
+* Both [numpy](https://numpy.org/) array-like and [xarray](https://docs.xarray.dev/en/stable/) DataArray interfaces to
+  Data.
+* Routines to convert between central and raw moments.
 
 ## Overview
 
@@ -17,12 +17,11 @@ calculate moments. A good introduction to the type of formulas used can
 be found
 [here](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance).
 
-## Features
 
--   Fast calculation of central moments and central co-moments with
-    weights
--   Support for scalor or vector inputs
--   numpy and xarray api\'s
+## Status
+
+This package is actively used by the author.  Please feel free to create a pull request for wanted features and suggestions!
+
 
 ## Installation
 
@@ -60,6 +59,26 @@ By running the tests once, you create a cache of the numba code for most
 cases. The first time you run the tests, it will take a while (about 1.5
 min on my machine). However, subsequent runs will be much faster (about
 3 seconds on my machine).
+
+There are a variety of tests.  More testing is always needed!
+
+
+## Examples
+
+See the [motivation](docs/motivation.ipynb) and [usage](docs/usage_notebook.ipynb) for examples of ``cmomy`` in action.
+
+## License
+
+This is free software.  See [LICENSE](LICENSE**.
+
+## Related work
+
+This package is used extensively in the newest version of ``thermoextrap``.  See [here](https://github.com/usnistgov/thermo-extrap).
+
+
+## Contact
+
+The author can be reached at wpk@nist.gov.
 
 ## Credits
 
