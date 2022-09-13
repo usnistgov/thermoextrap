@@ -38,6 +38,20 @@ Central moments from xarray.DataArray
    xcentral_moments
 
 
+Resampling routings
+===================
+
+.. autosummary::
+   :toctree: generated/
+
+   resample.resample_vals
+   resample.resample_data
+   resample.randsamp_freq
+   resample.freq_to_indices
+   resample.bootstrap_confidence_interval
+   resample.xbootstrap_confidence_interval
+
+
 Convert to/from faw moments
 ===========================
 

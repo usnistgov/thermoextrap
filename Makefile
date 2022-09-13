@@ -77,21 +77,36 @@ init: .git pre-commit-init ## run git-init pre-commit
 # virtual env
 ################################################################################
 .PHONY: conda-env conda-dev conda-all mamba-env mamba-dev mamba-all activate
-conda-env: ## conda create base env
-	conda env create -f environment.yml
 
-conda-dev: ## conda update development dependencies
-	conda env update -n cmomy-env -f environment-dev.yml
 
-conda-all: conda-env conda-dev ## conda create development env
+# environment-dev.yml: environment.yml environment-tools.yml
+# 	conda-merge environment.yml environment-tools.yml > environment-dev.yml
+
+create-dev-yml:
+	conda-merge environment.yml environment-tools.yml > environment-dev.yml
+
+
+# conda-env: ## conda create base env
+# 	conda env create -f environment.yml
+
+# conda-dev: ## conda update development dependencies
+# 	conda env update -n cmomy-env -f environment-dev.yml
+
+# conda-all: conda-env conda-dev ## conda create development env
 
 mamba-env: ## mamba create base env
 	mamba env create -f environment.yml
 
 mamba-dev: ## mamba update development dependencies
-	mamba env update -n cmomy-env -f environment-dev.yml
+	mamba env create -f environment-dev.yml
 
-mamba-all: mamba-env mamba-dev ## mamba create development env
+mamba-env-update:
+	mamba env update -f environment.yml
+
+mamba-dev-update:
+	mamba env update -f environment-dev.yml
+
+# mamba-all: mamba-env mamba-dev ## mamba create development env
 
 activate: ## activate base env
 	conda activate cmomy-env
@@ -118,8 +133,14 @@ user-all: user-venv user-autoenv-zsh ## runs user scripts
 test: ## run tests quickly with the default Python
 	pytest -x -v
 
+test-gen_examples:
+	pytest -x -v --accept
+
 test-all: ## run tests on every Python version with tox
 	tox -- -x -v
+
+
+
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source cmomy -m pytest
@@ -129,7 +150,7 @@ coverage: ## check code coverage quickly with the default Python
 
 
 version: ## check version of package
-	python setup.py --version
+	python -m setuptools_scm
 
 
 ################################################################################

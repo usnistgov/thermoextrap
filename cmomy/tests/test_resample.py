@@ -2,9 +2,28 @@ import numpy as np
 import pytest
 
 import cmomy.central as central
+import cmomy.resample as resample
 from cmomy.resample import (  # , xbootstrap_confidence_interval
     bootstrap_confidence_interval,
 )
+
+
+@pytest.mark.parametrize("nrep, ndat", [(100, 50)])
+def test_freq_indices(nrep, ndat):
+
+    indices = np.random.choice(10, (20, 10), replace=True)
+
+    freq0 = resample.indices_to_freq(indices)
+
+    freq1 = resample.randsamp_freq(indices=indices, size=ndat)
+
+    np.testing.assert_allclose(freq0, freq1)
+
+    # round trip should be identical as well
+    indices1 = resample.freq_to_indices(freq0)
+    freq2 = resample.indices_to_freq(indices1)
+
+    np.testing.assert_allclose(freq0, freq1)
 
 
 @pytest.mark.parametrize("parallel", [True, False])
@@ -27,7 +46,6 @@ def test_resample_vals(other, parallel):
 
 @pytest.mark.parametrize("parallel", [True, False])
 def test_stats_resample_vals(other, parallel):
-
     if other.style == "total":
         t = other.cls.from_resample_vals(
             x=other.x,
@@ -55,7 +73,6 @@ def test_stats_resample_vals(other, parallel):
 
 @pytest.mark.parametrize("parallel", [True, False])
 def test_resample_data(other, parallel):
-
     nrep = 10
 
     if len(other.val_shape) > 0:
@@ -79,7 +96,6 @@ def test_resample_data(other, parallel):
 
 @pytest.mark.parametrize("parallel", [True, False])
 def test_resample_against_vals(other, parallel):
-
     nrep = 10
 
     if len(other.val_shape) > 0:
@@ -97,7 +113,6 @@ def test_resample_against_vals(other, parallel):
 
 
 def test_bootstrap_stats(other):
-
     x = other.xdata
     axis = other.axis
     alpha = 0.05

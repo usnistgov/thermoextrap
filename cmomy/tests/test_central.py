@@ -11,7 +11,6 @@ def test_fix_test(other):
 
 # test central_moments with out parameter
 def test_central_moments_out(other):
-
     out = np.zeros_like(other.data_test)
 
     _ = central.central_moments(
@@ -29,7 +28,6 @@ def test_central_moments_out(other):
 
 # exceptions
 def test_mom_ndim():
-
     with pytest.raises(ValueError):
         central.CentralMoments(np.zeros((4, 4)), mom_ndim=0)
 
@@ -201,7 +199,6 @@ def test_reduce(other):
 
 
 def test_reshape(other):
-
     ndim = len(other.val_shape)
     if ndim > 0:
 

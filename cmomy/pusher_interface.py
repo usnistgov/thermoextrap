@@ -1,3 +1,7 @@
+"""Interface to numba push fuctions."""
+
+from __future__ import annotations
+
 import numpy as np
 
 # from .pushers import factory_pushers
@@ -19,8 +23,7 @@ def verify_value(
     shape_flat=None,
     first=True,
 ):
-    """
-    given an array `x` verify that it conforms to a target shape
+    """Given an array `x` verify that it conforms to a target shape.
 
     Parameters
     ----------
@@ -44,7 +47,6 @@ def verify_value(
         Pass this to perform a check on sizes.
     broadcast: bool, default=False
         if True, then broadcast to target shape
-
     """
 
     if verify:

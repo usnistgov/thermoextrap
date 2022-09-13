@@ -1,14 +1,15 @@
-"""
-low level routines to do pushing
-"""
-from __future__ import absolute_import
+"""low level routines to do pushing."""
+from __future__ import annotations
 
 from collections import namedtuple
 
 from .options import OPTIONS
 from .utils import factory_binomial, myjit
 
-# from functools import lru_cache
+# from typing import Any, Callable
+
+
+# from functool import lru_cache
 
 
 # Maximum binomial factor
@@ -22,7 +23,6 @@ _bfac = factory_binomial(OPTIONS["nmax"])
 
 @myjit
 def _push_val(data, w, x):
-
     if w == 0.0:
         return
 
@@ -82,13 +82,12 @@ def _push_vals_scale(data, W, X, scale):
 
 @myjit
 def _push_stat(data, w, a, v):
-    """
-    w : weight
-    a : average
-    v[i] : <dx**(i+2)>
+    # w : weight
+    # a : average
+    # v[i] : <dx**(i+2)>
 
-    scale : parameter to rescale the weight
-    """
+    # scale : parameter to rescale the weight
+
     if w == 0:
         return
 
@@ -258,7 +257,6 @@ def _push_datas_scale_vec(data, Data_in, scale):
 
 @myjit
 def _push_val_cov(data, w, x0, x1):
-
     if w == 0.0:
         return
 
@@ -350,7 +348,6 @@ def _push_vals_scale_cov(data, W, X1, X2, scale):
 
 @myjit
 def _push_data_scale_cov(data, data_in, scale):
-
     w = data_in[0, 0] * scale
     if w == 0.0:
         return
@@ -557,7 +554,8 @@ pusher_cov_vector = Pusher(
 )
 
 
-def factory_pushers(cov=False, vec=False):
+def factory_pushers(cov: bool = False, vec: bool = False) -> "Pusher":
+    """Factory method to get pusher functions."""  # noqa D401
     if cov:
         if vec:
             return pusher_cov_vector
@@ -571,6 +569,7 @@ def factory_pushers(cov=False, vec=False):
 
 
 def factory_pusher_datas_scale(cov=False, vec=False):
+    """Factory method to get pushe with scale functions."""  # noqa D401
     if cov:
         if vec:
             return _push_datas_scale_cov_vec
@@ -585,6 +584,7 @@ def factory_pusher_datas_scale(cov=False, vec=False):
 
 
 def factory_pusher_vals_scale(cov=False, vec=False):
+    """Factory method to get val pusher functions."""  # noqa D401
     if cov:
         if vec:
             return _push_vals_scale_cov_vec

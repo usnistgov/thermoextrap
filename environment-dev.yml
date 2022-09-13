@@ -1,36 +1,35 @@
+channels:
+- conda-forge
 dependencies:
-  # development
-  - isort
-  - black
-  - blackdoc
-  - flake8
-  # testing
-  - pytest
-  - pytest-cov
-  - pytest-xdist
-  - tox-conda
-  # specials
-  - pre-commit
-  # repl
-  - ipython
-  - ipykernel
-  # build
-  - build
-  - setuptools
-  - setuptools-scm
-  - setuptools-scm-git-archive
-  - twine
-  # conda specific
-  - conda-build
-  - anaconda-client
-  - greyskull
-  # doc stuff
-  - sphinx
-  - sphinx_rtd_theme
-  - recommonmark # if want markdown
-  - nbsphinx # if want notebooks
-  # lsp stuff
-  - autoflake
-  - pyls-mypy
-  - pyls-black
-  - pyls-isort
+- anaconda-client
+- autoflake
+- black
+- blackdoc
+- build
+- conda-build
+- flake8
+- greyskull
+- ipykernel
+- ipython
+- isort
+- nbsphinx
+- numba
+- numpy
+- pre-commit
+- pyls-black
+- pyls-isort
+- pyls-mypy
+- pytest
+- pytest-cov
+- pytest-xdist
+- python=3.8
+- recommonmark
+- setuptools
+- setuptools-scm
+- setuptools-scm-git-archive
+- sphinx
+- sphinx_rtd_theme
+- tox-conda
+- twine
+- xarray
+name: cmomy-env

@@ -8,7 +8,6 @@ from cmomy.cached_decorators import gcached
 
 
 def _get_cmom(w, x, moments, axis=0, last=True):
-
     if w is None:
         w = np.array(1.0)
 
@@ -35,7 +34,7 @@ def _get_cmom(w, x, moments, axis=0, last=True):
     data = [weight, xmean]
 
     for n in range(2, moments + 1):
-        y = (w * dx ** n).sum(axis) * wsum_inv
+        y = (w * dx**n).sum(axis) * wsum_inv
         data.append(y)
 
     data = np.array(data)
@@ -45,7 +44,6 @@ def _get_cmom(w, x, moments, axis=0, last=True):
 
 
 def _get_comom(w, x, y, moments, axis=0, broadcast=True):
-
     if w is None:
         w = np.array(1.0)
 
@@ -91,17 +89,16 @@ def _get_comom(w, x, y, moments, axis=0, broadcast=True):
                 val = wsum
 
             elif i + j == 1:
-                val = (w * x ** i * y ** j).sum(axis) * wsum_inv
+                val = (w * x**i * y**j).sum(axis) * wsum_inv
             else:
-                val = (w * dx ** i * dy ** j).sum(axis) * wsum_inv
+                val = (w * dx**i * dy**j).sum(axis) * wsum_inv
 
             out[..., i, j] = val
-
     return out
 
 
 class Data(object):
-    """wrapper around stuff for generic testing"""
+    """wrapper around stuff for generic testing."""
 
     # _count = 0
 
@@ -273,7 +270,7 @@ class Data(object):
             if not self.cov:
                 raw = np.array(
                     [
-                        np.average(self.x ** i, weights=self.w, axis=self.axis)
+                        np.average(self.x**i, weights=self.w, axis=self.axis)
                         for i in range(self.mom + 1)
                     ]
                 )
