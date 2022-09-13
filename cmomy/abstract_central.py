@@ -32,7 +32,7 @@ from .options import DOC_SUB
 from .pushers import factory_pushers
 from .resample import randsamp_freq, resample_data
 
-# * Main
+# * TODO Main
 # TODO: Total rework is called for to handle typing correctly.
 
 
@@ -752,7 +752,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
                 message = "not implemented for scalar"
             raise ValueError(message)
 
-    # Universal reducers
+    # * Universal reducers
     @docfiller_shared
     def resample_and_reduce(
         self: T_CentralMoments,

@@ -2,19 +2,6 @@
 cmomy
 =====
 
-
-.. image:: https://img.shields.io/pypi/v/cmomy.svg
-        :target: https://pypi.python.org/pypi/cmomy
-
-.. image:: https://img.shields.io/travis/wpk-nist-gov/cmomy.svg
-        :target: https://travis-ci.com/wpk-nist-gov/cmomy
-
-..
-   .. image:: https://readthedocs.org/projects/cmomy/badge/?version=latest
-           :target: https://cmomy.readthedocs.io/en/latest/?badge=latest
-           :alt: Documentation Status
-
-
 Central (co)moment calculation/manipulation
 
 
@@ -45,12 +32,15 @@ Use one of the following
 
           pip install cmomy
 
-or
-
 .. code:: bash
 
           conda install -c wpk-nist cmomy
 
+
+Basic Usage
+-----------
+
+For a quick introduction to the usage of ``cmomy``, please see the `basic usage <https://github.com/wpk-nist-gov/cmomy/blob/master/docs/notebooks/docs/usage_notebook.ipynb>`__
 
 Note on caching
 ---------------
