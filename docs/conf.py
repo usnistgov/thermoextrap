@@ -57,7 +57,13 @@ nbsphinx_prolog = """
 You can view this notebook `on Github <https://github.com/wpk-nist-gov/cmomy/blob/master/doc/{{ docname }}>`_.
 """
 
+
+# The kernelname to use.
+nbsphinx_kernel_name = "python3"
+
+# autosummary_generate = True
 autosummary_generate = True
+
 autoclass_content = "both"  # include both class docstring and __init__
 autodoc_default_flags = [
     # Make sure that any autodoc declarations show the right members
@@ -80,7 +86,7 @@ napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
 napoleon_use_param = False
-napoleon_use_rtype = True
+napoleon_use_rtype = False
 napoleon_preprocess_types = True
 napoleon_type_aliases = {
     # general terms
@@ -89,8 +95,9 @@ napoleon_type_aliases = {
     "callable": ":py:func:`callable`",
     "dict_like": ":term:`dict-like <mapping>`",
     "dict-like": ":term:`dict-like <mapping>`",
+    "path-like": ":term:`path-like <path-like object>`",
     "mapping": ":term:`mapping`",
-    "file-like": ":term:`file-like <file-like object>`",
+    "hashable": ":term:`hashable`",
     # special terms
     # "same type as caller": "*same type as caller*",  # does not work, yet
     # "same type as values": "*same type as values*",  # does not work, yet
@@ -104,20 +111,25 @@ napoleon_type_aliases = {
     "array-like": ":term:`array-like <array_like>`",
     "scalar": ":term:`scalar`",
     "array": ":term:`array`",
-    "hashable": ":term:`hashable <name>`",
     # matplotlib terms
     "color-like": ":py:func:`color-like <matplotlib.colors.is_color_like>`",
-    "matplotlib colormap name": ":doc:matplotlib colormap name <Colormap reference>",
+    "matplotlib colormap name": ":doc:`matplotlib colormap name <matplotlib:gallery/color/colormap_reference>`",
     "matplotlib axes object": ":py:class:`matplotlib axes object <matplotlib.axes.Axes>`",
     "colormap": ":py:class:`colormap <matplotlib.colors.Colormap>`",
-    # objects without namespace
+    # objects without namespace: xarray
     "DataArray": "~xarray.DataArray",
     "Dataset": "~xarray.Dataset",
     "Variable": "~xarray.Variable",
+    "DatasetGroupBy": "~xarray.core.groupby.DatasetGroupBy",
+    "DataArrayGroupBy": "~xarray.core.groupby.DataArrayGroupBy",
+    "CentralMoments": "~cmomy.CentralMoments",
+    "xCentralMoments": "~cmomy.xCentralMoments",
+    # objects without namespace: numpy
     "ndarray": "~numpy.ndarray",
     "MaskedArray": "~numpy.ma.MaskedArray",
     "dtype": "~numpy.dtype",
     "ComplexWarning": "~numpy.ComplexWarning",
+    # objects without namespace: pandas
     "Index": "~pandas.Index",
     "MultiIndex": "~pandas.MultiIndex",
     "CategoricalIndex": "~pandas.CategoricalIndex",
@@ -167,7 +179,7 @@ release = cmomy.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -279,14 +291,15 @@ texinfo_documents = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
-    "iris": ("https://scitools.org.uk/iris/docs/latest", None),
     "numpy": ("https://numpy.org/doc/stable", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     "numba": ("https://numba.pydata.org/numba-doc/latest", None),
-    "matplotlib": ("https://matplotlib.org", None),
+    # "matplotlib": ("https://matplotlib.org", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
     "dask": ("https://docs.dask.org/en/latest", None),
     "cftime": ("https://unidata.github.io/cftime", None),
     "sparse": ("https://sparse.pydata.org/en/latest/", None),
+    "xarray": ("https://docs.xarray.dev/en/stable/", None),
 }
 
 # think jinja stuff

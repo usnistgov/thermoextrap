@@ -7,8 +7,8 @@ Welcome to cmomy's documentation!
 
    readme
    installation
-   usage
-   demo
+   motivation
+   usage_notebook
    api_autosummary
    contributing
    authors

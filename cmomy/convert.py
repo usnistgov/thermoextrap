@@ -1,8 +1,13 @@
 """routines to convert central (co)moments to raw (co)moments."""
-from __future__ import absolute_import
+from __future__ import annotations
+
+from typing import Any, Callable, Sequence, Tuple
 
 import numpy as np
+from numpy import ndarray
+from numpy.typing import ArrayLike, DTypeLike
 
+from ._typing import ArrayOrder
 from .options import OPTIONS
 from .utils import factory_binomial, myjit
 
@@ -142,7 +147,15 @@ def _raw_to_central_comoments(raw, central):
                     central[v, n, m] = tmp
 
 
-def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=None):
+def _convert_moments(
+    data: ArrayLike,
+    axis: int | Sequence[int],
+    target_axis: int | Sequence[int],
+    func: Callable[..., Any],
+    dtype: DTypeLike | None = None,
+    order: ArrayOrder | None = None,
+    out: np.ndarray | None = None,
+) -> ndarray:
     if isinstance(axis, int):
         axis = (axis,)
     if isinstance(target_axis, int):
@@ -168,7 +181,7 @@ def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=
         out_r = out
 
     # make sure out_r is in correct order
-    out_r = np.asarray(out_r, order="c")
+    out_r = np.asarray(out_r, order="C")
 
     shape = data_r.shape
     mom_shape = shape[-len(axis) :]
@@ -186,7 +199,13 @@ def _convert_moments(data, axis, target_axis, func, dtype=None, order=None, out=
     return out_r.reshape(shape)
 
 
-def to_raw_moments(x, axis=-1, dtype=None, order=None, out=None):
+def to_raw_moments(
+    x: ndarray,
+    axis: int = -1,
+    dtype: DTypeLike | None = None,
+    order: ArrayOrder | None = None,
+    out: np.ndarray | None = None,
+) -> ndarray:
     """Convert central moments to raw moments."""
     if axis is None:
         axis = -1
@@ -202,7 +221,13 @@ def to_raw_moments(x, axis=-1, dtype=None, order=None, out=None):
     )
 
 
-def to_raw_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
+def to_raw_comoments(
+    x: ndarray,
+    axis: Tuple[int, int] = (-2, -1),
+    dtype: DTypeLike | None = None,
+    order: ArrayOrder | None = None,
+    out: np.ndarray | None = None,
+) -> ndarray:
     """Convert central moments to raw moments."""
 
     if axis is None:
@@ -219,7 +244,13 @@ def to_raw_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
     )
 
 
-def to_central_moments(x, axis=-1, dtype=None, order=None, out=None):
+def to_central_moments(
+    x: ndarray,
+    axis: int = -1,
+    dtype: DTypeLike | None = None,
+    order: ArrayOrder | None = None,
+    out: np.ndarray | None = None,
+) -> ndarray:
     """Convert central moments to raw moments."""
 
     if axis is None:
@@ -236,7 +267,13 @@ def to_central_moments(x, axis=-1, dtype=None, order=None, out=None):
     )
 
 
-def to_central_comoments(x, axis=(-2, -1), dtype=None, order=None, out=None):
+def to_central_comoments(
+    x: ndarray,
+    axis: Tuple[int, int] = (-2, -1),
+    dtype: DTypeLike | None = None,
+    order: ArrayOrder | None = None,
+    out: np.ndarray | None = None,
+) -> ndarray:
     """Convert raw comoments to central comoments."""
 
     if axis is None:

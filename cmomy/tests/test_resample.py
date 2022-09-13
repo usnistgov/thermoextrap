@@ -2,9 +2,28 @@ import numpy as np
 import pytest
 
 import cmomy.central as central
+import cmomy.resample as resample
 from cmomy.resample import (  # , xbootstrap_confidence_interval
     bootstrap_confidence_interval,
 )
+
+
+@pytest.mark.parametrize("nrep, ndat", [(100, 50)])
+def test_freq_indices(nrep, ndat):
+
+    indices = np.random.choice(10, (20, 10), replace=True)
+
+    freq0 = resample.indices_to_freq(indices)
+
+    freq1 = resample.randsamp_freq(indices=indices, size=ndat)
+
+    np.testing.assert_allclose(freq0, freq1)
+
+    # round trip should be identical as well
+    indices1 = resample.freq_to_indices(freq0)
+    freq2 = resample.indices_to_freq(indices1)
+
+    np.testing.assert_allclose(freq0, freq1)
 
 
 @pytest.mark.parametrize("parallel", [True, False])
