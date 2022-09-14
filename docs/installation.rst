@@ -11,6 +11,7 @@ Stable release
 To install cmomy, run one of the following command:
 
 .. code-block:: console
+
    # from pip
    $ pip install cmomy
 

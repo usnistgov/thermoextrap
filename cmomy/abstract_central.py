@@ -559,7 +559,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
     def push_datas(
         self: T_CentralMoments,
         datas,
-        axis: int,
+        axis: int | None = None,
         **kwargs,
     ) -> T_CentralMoments:
         """

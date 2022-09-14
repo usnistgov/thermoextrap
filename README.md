@@ -65,7 +65,9 @@ There are a variety of tests.  More testing is always needed!
 
 ## Examples
 
-See the [motivation](docs/motivation.ipynb) and [usage](docs/usage_notebook.ipynb) for examples of ``cmomy`` in action.
+See the [motivation](docs/notebooks/motivation.ipynb) and [usage](docs/notebook/usage_notebook.ipynb) for examples of ``cmomy`` in action.
+
+For a deeper dive, look at the [documentation](https://pages.nist.gov/cmomy/)
 
 ## License
 

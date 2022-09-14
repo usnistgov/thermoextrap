@@ -40,7 +40,7 @@ Use one of the following
 Basic Usage
 -----------
 
-For a quick introduction to the usage of ``cmomy``, please see the `basic usage <https://github.com/wpk-nist-gov/cmomy/blob/master/docs/notebooks/docs/usage_notebook.ipynb>`__
+For a quick introduction to the usage of ``cmomy``, please see the `basic usage <https://github.com/usnistgov/cmomy/blob/master/docs/notebooks/docs/notebooks/usage_notebook.ipynb>`__
 
 Note on caching
 ---------------
