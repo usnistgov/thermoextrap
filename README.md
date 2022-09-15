@@ -73,7 +73,7 @@ For a deeper dive, look at the [documentation](https://pages.nist.gov/cmomy/)
 
 ## License
 
-This is free software.  See [LICENSE](LICENSE**.
+This is free software.  See [LICENSE](LICENSE).
 
 ## Related work
 
