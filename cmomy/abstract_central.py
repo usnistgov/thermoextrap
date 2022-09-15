@@ -77,8 +77,8 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
     # Override __new__ to make signature correct
     # Better to do this in subclasses.
     # otherwise, signature for data will be 'T_Array``
-    # def __new__(cls, data: T_Array, mom_ndim: Literal[1, 2] = 1):
-    #     return super().__new__(cls, data=data, mom_ndim=mom_ndim)
+    def __new__(cls, data: T_Array, mom_ndim: Literal[1, 2] = 1):  # noqa: D102
+        return super().__new__(cls)  # , data=data, mom_ndim=mom_ndim)
 
     def __init__(self, data: T_Array, mom_ndim: Literal[1, 2] = 1) -> None:
 
