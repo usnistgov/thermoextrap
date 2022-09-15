@@ -54,7 +54,7 @@ nbsphinx_prolog = """
 {% set docname = env.doc2path(env.docname, base=None) %}
 
 
-You can view this notebook `on Github <https://github.com/wpk-nist-gov/cmomy/blob/master/doc/{{ docname }}>`_.
+You can view this notebook `on Github <https://github.com/usnistgov/cmomy/blob/master/doc/{{ docname }}>`_.
 """
 
 
@@ -75,7 +75,7 @@ autodoc_default_flags = [
 # # for scanpydoc's jinja filter
 # project_dir = pathlib.Path(__file__).parent.parent
 html_context = {
-    "github_user": "wpk-nist-gov",
+    "github_user": "usnistgov",
     "github_repo": "cmomy",
     "github_version": "master",
 }
@@ -162,7 +162,6 @@ master_doc = "index"
 
 # General information about the project.
 project = "cmomy"
-copyright = "2020, William P. Krekelberg"
 author = "William P. Krekelberg"
 
 # The version info for the project you're documenting, acts as replacement
@@ -191,7 +190,6 @@ pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
-
 
 # -- Options for HTML output -------------------------------------------
 

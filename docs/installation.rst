@@ -28,7 +28,7 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/usnistgov/cmomy
+    $ git clone {repo}
 
 Once you have a copy of the source, you can install it with:
 
@@ -44,5 +44,4 @@ Once you have a copy of the source, you can install it with:
 
 
 
-.. _Github repo: https://github.com/wpk-nist-gov/cmomy
-.. _tarball: https://github.com/wpk-nist-gov/cmomy/tarball/master
+.. _Github repo: https://github.com/usnistgov/cmomy

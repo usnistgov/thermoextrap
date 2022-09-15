@@ -23,6 +23,13 @@ Features
 * numpy and xarray api's
 
 
+Links
+-----
+
+* `Github <https://github.com/usnistgov/cmomy>`__
+* `Documentation <https://pages.nist.gov/cmomy/index.html>`__
+
+
 
 Installation
 ------------
@@ -41,6 +48,7 @@ Basic Usage
 -----------
 
 For a quick introduction to the usage of ``cmomy``, please see the `basic usage <https://github.com/usnistgov/cmomy/blob/master/docs/notebooks/docs/notebooks/usage_notebook.ipynb>`__
+
 
 Note on caching
 ---------------
