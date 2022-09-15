@@ -64,7 +64,7 @@ def _select_axis_dim(
     elif axis is not None:
         if isinstance(axis, str):
             warn(
-                "Using string value for axis is deprecated.  Please use `dim` option instead."
+                f"Using string value for axis is deprecated.  Please use `dim` option instead.  Passed {axis} of type {type(axis)}"
             )
             dim = axis
             axis = dims.index(dim)
@@ -123,7 +123,7 @@ def _xcentral_moments(
     else:
         w = xr.DataArray(w).broadcast_like(x)
 
-    axis, dim = _select_axis_dim(x.dims, axis, dim, default_axis=0)
+    axis, dim = _select_axis_dim(dims=x.dims, axis=axis, dim=dim, default_axis=0)
 
     wsum = w.sum(dim=dim)
     wsum_inv = 1.0 / wsum
@@ -181,7 +181,7 @@ def _xcentral_comoments(
         assert y.shape == x.shape
         assert x.dims == y.dims
 
-    axis, dim = _select_axis_dim(x.dims, axis, dim, default_axis=0)
+    axis, dim = _select_axis_dim(dims=x.dims, axis=axis, dim=dim, default_axis=0)
 
     if mom_dims is None:
         mom_dims = ("mom_0", "mom_1")
@@ -869,7 +869,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
                 axis = None
 
             if dim is not None or axis is not None:
-                axis, dim = _select_axis_dim(x.dims, axis, dim)
+                axis, dim = _select_axis_dim(dims=x.dims, axis=axis, dim=dim)
 
             if target == "val":
                 target = self.val_dims
@@ -1077,7 +1077,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         """
         self._raise_if_scalar()
 
-        axis, dim = _select_axis_dim(self.dims, axis, dim)
+        axis, dim = _select_axis_dim(dims=self.dims, axis=axis, dim=dim)
 
         if dim in self.mom_dims:
             raise ValueError(f"can only resample from value dimensions {self.val_dims}")
@@ -1155,7 +1155,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         """
 
         self._raise_if_scalar()
-        axis, dim = _select_axis_dim(self.dims, axis, dim)
+        axis, dim = _select_axis_dim(dims=self.dims, axis=axis, dim=dim)
         axis = self._wrap_axis(axis)
         return type(self).from_datas(
             self.values, mom_ndim=self.mom_ndim, axis=axis, **kws
@@ -1236,7 +1236,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
         """
 
         self._raise_if_scalar()
-        axis, dim = _select_axis_dim(self.dims, axis, dim, default_axis=0)
+        axis, dim = _select_axis_dim(dims=self.dims, axis=axis, dim=dim, default_axis=0)
 
         if block_size is None:
             block_size = self.sizes[dim]
@@ -1472,7 +1472,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
 
         if isinstance(datas, xr.DataArray):
             mom_ndim = cls._choose_mom_ndim(mom, mom_ndim)
-            axis, dim = _select_axis_dim(datas.dims, axis, dim)
+            axis, dim = _select_axis_dim(dims=datas.dims, axis=axis, dim=dim)
 
             datas = _move_mom_dims_to_end(datas, mom_dims, mom_ndim).transpose(dim, ...)
 
@@ -1493,7 +1493,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
                     mom_ndim=mom_ndim,
                 )
                 .zero()
-                .push_datas(datas, axis=dim)
+                .push_datas(datas, dim=dim)
             )
 
         else:
@@ -1728,7 +1728,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
 
         if isinstance(x0, xr.DataArray):
             mom_ndim = cls._mom_ndim_from_mom(mom)
-            axis, dim = _select_axis_dim(x0.dims, axis, dim)
+            axis, dim = _select_axis_dim(dims=x0.dims, axis=axis, dim=dim)
 
             if val_shape is None:
                 val_shape = _shape_reduce(x0.shape, axis)
@@ -1840,7 +1840,7 @@ class xCentralMoments(CentralMomentsABC[xr.DataArray]):
             x0 = x
 
         if isinstance(x0, xr.DataArray):
-            axis, dim = _select_axis_dim(x0.dims, axis, dim)
+            axis, dim = _select_axis_dim(dims=x0.dims, axis=axis, dim=dim)
             # TODO: create object, and verify y, and w against x
 
             # override final xarray stuff:
@@ -2065,7 +2065,7 @@ def _check_xr_input(
         if axis is None and dim is None:
             pass
         else:
-            axis, dim = _select_axis_dim(x.dims, axis, dim)
+            axis, dim = _select_axis_dim(dims=x.dims, axis=axis, dim=dim)
         values = x.values
     else:
         if axis is None:

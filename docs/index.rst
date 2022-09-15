@@ -7,9 +7,10 @@ Welcome to cmomy's documentation!
 
    readme
    installation
-   motivation
-   usage_notebook
+   notebooks/motivation
+   notebooks/usage_notebook
    api_autosummary
+   license
    contributing
    authors
    history
