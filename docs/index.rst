@@ -10,6 +10,7 @@ Welcome to cmomy's documentation!
    notebooks/motivation
    notebooks/usage_notebook
    api_autosummary
+   license
    contributing
    authors
    history
