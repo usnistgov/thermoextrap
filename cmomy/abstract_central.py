@@ -95,7 +95,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         By convention data has the following meaning for the moments indexes
 
         * `data[...,i=0,j=0]`, weights
-        * `data[...,i=1,j=0]]`, if only one moment indice is one and all others zero, then this is the average value of the variable with unit index.
+        * `data[...,i=1,j=0]]`, if only one moment index is one and all others zero, then this is the average value of the variable with unit index.
         * all other cases, the central moments `<(x0-<x0>)**i0 * (x1 - <x1>)**i1 * ...>`
 
         """
@@ -247,7 +247,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         Returns
         -------
         output : same as object
-            Object with same attributes as caller, but with zerod out data.
+            Object with same attributes as caller, but with data set to zero.
 
         See Also
         --------
@@ -680,7 +680,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         """
         Apply `func_or_method` to underlying data and wrap results in `xCentralMoments` object.
 
-        This is usefull for calling any not implemnted methods on ndarray or DataArray data.
+        This is useful for calling any not implemented methods on ndarray or DataArray data.
 
         Parameters
         ----------
@@ -869,7 +869,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         self: T_CentralMoments, axis: int | None = None, **kws
     ) -> T_CentralMoments:
         """
-        Create new object reducealong axis.
+        Create new object reduce along axis.
 
         Parameters
         ----------
@@ -900,7 +900,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
             number of consecutive records to combine
         {axis}
         **kws
-            Extral key word arguments to :meth:`from_datas` method
+            Extra key word arguments to :meth:`from_datas` method
 
         Returns
         -------
@@ -975,7 +975,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         self: T_CentralMoments,
         b: T_CentralMoments,
     ) -> T_CentralMoments:
-        """Inplace substraction."""
+        """Inplace subtraction."""
         # NOTE: consider implementint push_data_scale routine to make this cleaner
         self._check_other(b)
         assert np.all(self.weight() >= b.weight())
@@ -1378,7 +1378,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
         **kws,
     ) -> T_CentralMoments:
         """
-        Create object from multipel `raw` moment arrays.
+        Create object from multiple `raw` moment arrays.
 
         Parameters
         ----------
@@ -1426,7 +1426,7 @@ class CentralMomentsABC(Generic[T_Array], metaclass=_get_metaclass()):
     #     w: np.ndarray | float | None = None,
     #     broadcast: bool = True,
     # ) -> T_CentralMoments:
-    #     """Push statisics onto self."""
+    #     """Push statistics onto self."""
     #     self._raise_if_not_1d(self.mom_ndim)
 
     #     ar, target = self._check_val(a, target="val")

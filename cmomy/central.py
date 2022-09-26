@@ -250,7 +250,7 @@ def central_moments(
     array([5.47343366, 0.65419879, 0.0389794 ])
 
 
-    Generate co-momoments
+    Generate co-moments
 
     >>> y = np.random.rand(10)
     >>> central_moments(x=(x, y), w=w, mom=(2, 2))
@@ -671,7 +671,7 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
         array([20.        ,  0.58155482,  0.07612921])
 
 
-        Which is equivalaent to
+        Which is equivalent to
         >>> CentralMoments.from_vals(xs.reshape(-1), mom=2)
         <CentralMoments(val_shape=(), mom=(2,))>
         array([20.        ,  0.58155482,  0.07612921])
@@ -704,7 +704,7 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
         array([20.        ,  0.58155482,  0.07612921])
 
 
-        Which is equivalaent to
+        Which is equivalent to
         >>> CentralMoments.from_vals(xs.reshape(-1), mom=2)
         <CentralMoments(val_shape=(), mom=(2,))>
         array([20.        ,  0.58155482,  0.07612921])
@@ -1439,7 +1439,7 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
         w: np.ndarray | float | None = None,
         broadcast: bool = True,
     ) -> T_CentralMoments:
-        """Push statisics onto self."""
+        """Push statistics onto self."""
         self._raise_if_not_1d(self.mom_ndim)
 
         ar, target = self._check_val(a, target="val")
@@ -1508,7 +1508,7 @@ class CentralMoments(CentralMomentsABC[np.ndarray]):
     ) -> T_CentralMoments:
         """Create object from several statistics.
 
-        Weights, averages, variances/covarainces along
+        Weights, averages, variances/covariances along
         axis.
         """
 

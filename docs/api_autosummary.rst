@@ -38,7 +38,7 @@ Central moments from xarray.DataArray
    xcentral_moments
 
 
-Resampling routings
+Resampling routines
 ===================
 
 .. autosummary::
@@ -52,7 +52,7 @@ Resampling routings
    resample.xbootstrap_confidence_interval
 
 
-Convert to/from faw moments
+Convert to/from raw moments
 ===========================
 
 .. autosummary::

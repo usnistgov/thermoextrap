@@ -45,8 +45,12 @@ extensions = [
     "nbsphinx",
     # "sphinx_autosummary_accessors",
     # "scanpydoc.rtd_github_links",
+    # view source code on created page
     # "sphinx.ext.viewcode",
+    # view source code on github
     "sphinx.ext.linkcode",
+    # spelling
+    "sphinxcontrib.spelling",
 ]
 
 # defined stuff, from xarray
@@ -310,6 +314,10 @@ def linkcode_resolve(domain, info):
     fn = os.path.relpath(fn, start=os.path.dirname(cmomy.__file__))
 
     return f"https://github.com/usnistgov/cmomy/blob/master/cmomy/{fn}{linespec}"
+
+
+# spelling
+spelling_word_list_filename = "spelling_wordlist.txt"
 
 
 # -- Options for HTMLHelp output ---------------------------------------

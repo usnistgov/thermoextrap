@@ -80,14 +80,14 @@ def randsamp_freq(
         data dimension size
     freq : array-like, shape=(nrep, size), optional
         if passed, use this frequency array.
-        overides size
+        overrides size
     indices : array-like, shape=(nrep, size), optional
         if passed and `freq` is `None`, construct frequency
         array from this indices array
 
     nrep : int, optional
         if `freq` and `indices` are `None`, construct
-        sample with this number of repititions
+        sample with this number of repetitions
     indices : array-like, optional
         if passed, build frequency table based on this sampling.
         shape = (nrep, ndat)
@@ -102,7 +102,7 @@ def randsamp_freq(
     -------
     output : frequency table
         if not transpose: output.shape == (nrep, size)
-        if tranpose, output.shae = (size, nrep)
+        if transpose, output.shape = (size, nrep)
     """
 
     def _array_check(x: ArrayLike, name="") -> np.ndarray:
@@ -157,11 +157,11 @@ def resample_data(
         frequency array with shape (nrep, data.shape[axis])
     mom : int or array-like
         if int or length 1, then data contains central mom.
-        if length is 2, then data contains central comom
+        if length is 2, then data contains central comoments
     axis : int, default=0
         axis to reduce along
     parallel : bool
-        options for jitting pusher
+        option to run jitted pusher in parallel.
     dtype, order : options to np.asarray
     out : optional output
 
