@@ -19,7 +19,7 @@ Features
 --------
 
 * Fast calculation of central moments and central co-moments with weights
-* Support for scalor or vector inputs
+* Support for scalar or vector inputs
 * numpy and xarray api's
 
 
@@ -55,7 +55,7 @@ Note on caching
 
 This code makes extensive use of the numba python package. This uses a
 jit compiler to speed up vital code sections. This means that the first
-time a funciton called, it has to compile the underlying code. However,
+time a function called, it has to compile the underlying code. However,
 caching has been implemented. Therefore, the very first time you run a
 function, it may be slow. But all subsequent uses (including other
 sessions) will be already compiled.

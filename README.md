@@ -43,7 +43,7 @@ conda install -c wpk-nist cmomy
 
 This code makes extensive use of the numba python package. This uses a
 jit compiler to speed up vital code sections. This means that the first
-time a funciton called, it has to compile the underlying code. However,
+time a function called, it has to compile the underlying code. However,
 caching has been implemented. Therefore, the very first time you run a
 function, it may be slow. But all subsequent uses (including other
 sessions) will be already compiled.
