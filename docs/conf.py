@@ -45,7 +45,8 @@ extensions = [
     "nbsphinx",
     # "sphinx_autosummary_accessors",
     # "scanpydoc.rtd_github_links",
-    "sphinx.ext.viewcode",
+    # "sphinx.ext.viewcode",
+    "sphinx.ext.linkcode",
 ]
 
 # defined stuff, from xarray
@@ -78,6 +79,7 @@ html_context = {
     "github_user": "usnistgov",
     "github_repo": "cmomy",
     "github_version": "master",
+    "doc_path": "doc",
 }
 
 autodoc_typehints = "none"
@@ -229,6 +231,87 @@ today_fmt = "%Y-%m-%d"
 html_last_updated_fmt = today_fmt
 
 
+# code_url = f"https://github.com/usnistgov/cmomy/blob/develop/cmomy/"
+# def linkcode_resolve(domain, info):
+#     # Non-linkable objects from the starter kit in the tutorial.
+#     assert domain == "py", "expected only Python objects"
+
+#     import importlib, inspect
+
+#     mod = importlib.import_module(info["module"])
+#     if "." in info["fullname"]:
+#         objname, attrname = info["fullname"].split(".")
+#         obj = getattr(mod, objname)
+#         try:
+#             # object is a method of a class
+#             obj = getattr(obj, attrname)
+#         except AttributeError:
+#             # object is an attribute of a class
+#             return None
+#     else:
+#         obj = getattr(mod, info["fullname"])
+
+#     try:
+#         file = inspect.getsourcefile(obj)
+#         lines = inspect.getsourcelines(obj)
+#     except TypeError:
+#         # e.g. object is a typing.Union
+#         return None
+#     file = os.path.relpath(file, os.path.abspath(".."))
+#     # if not file.startswith("src/websockets"):
+#     #     # e.g. object is a typing.NewType
+#     #     return None
+#     start, end = lines[1], lines[1] + len(lines[0]) - 1
+
+#     return f"{code_url}/{file}#L{start}-L{end}"
+
+
+# based on numpy doc/source/conf.py
+def linkcode_resolve(domain, info):
+    """
+    Determine the URL corresponding to Python object
+    """
+    import inspect
+
+    if domain != "py":
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    submod = sys.modules.get(modname)
+    if submod is None:
+        return None
+
+    obj = submod
+    for part in fullname.split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return None
+
+    try:
+        fn = inspect.getsourcefile(inspect.unwrap(obj))
+    except TypeError:
+        fn = None
+    if not fn:
+        return None
+
+    try:
+        source, lineno = inspect.getsourcelines(obj)
+    except OSError:
+        lineno = None
+
+    if lineno:
+        linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
+    else:
+        linespec = ""
+
+    fn = os.path.relpath(fn, start=os.path.dirname(cmomy.__file__))
+
+    return f"https://github.com/usnistgov/cmomy/blob/master/cmomy/{fn}{linespec}"
+
+
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
@@ -307,3 +390,50 @@ intersphinx_mapping = {
 
 # def setup(app):
 #     DEFAULT_FILTERS["escape_underscores"] = escape_underscores
+
+
+# based on numpy doc/source/conf.py
+# def linkcode_resolve(domain, info):
+#     """
+#     Determine the URL corresponding to Python object
+#     """
+#     import inspect
+
+
+#     if domain != "py":
+#         return None
+
+#     modname = info["module"]
+#     fullname = info["fullname"]
+
+#     submod = sys.modules.get(modname)
+#     if submod is None:
+#         return None
+
+#     obj = submod
+#     for part in fullname.split("."):
+#         try:
+#             obj = getattr(obj, part)
+#         except AttributeError:
+#             return None
+
+#     try:
+#         fn = inspect.getsourcefile(inspect.unwrap(obj))
+#     except TypeError:
+#         fn = None
+#     if not fn:
+#         return None
+
+#     try:
+#         source, lineno = inspect.getsourcelines(obj)
+#     except OSError:
+#         lineno = None
+
+#     if lineno:
+#         linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
+#     else:
+#         linespec = ""
+
+#     fn = os.path.relpath(fn, start=os.path.dirname(cmomy.__file__))
+
+#     return f"https://github.com/usnistgov/cmomy/blob/develop/cmomy/{fn}{linespec}"
