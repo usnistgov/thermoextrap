@@ -10,7 +10,6 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-xdist
-  - pytest-accept
   - tox-conda
   # specials
   - pre-commit
@@ -18,23 +17,22 @@ dependencies:
   - ipython
   - ipykernel
   # build
-  - build
-  - setuptools
   - setuptools-scm
-  - setuptools_scm_git_archive
-  - build
-  - twine
+  # - setuptools
+  # - setuptools_scm_git_archive
+  # - build
+  # - twine
   # conda specific
-  - conda-build
-  - anaconda-client
-  - greyskull
+  # - conda-build
+  # - anaconda-client
+  # - greyskull
   # doc stuff
   - sphinx
   - sphinx_rtd_theme
-  - recommonmark # if want markdown
+  # - recommonmark # if want markdown
   - nbsphinx # if want notebooks
   # spell checking?
-  # - sphinxcontrib-spelling
+  - sphinxcontrib-spelling
   # lsp stuff
   - autoflake
   - pyls-mypy
@@ -52,4 +50,4 @@ dependencies:
       - flake8-mypy
       - pytest-accept
       # spelling
-      # - pyenchant
+      - pyenchant
