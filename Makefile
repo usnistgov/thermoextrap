@@ -82,7 +82,7 @@ init: .git pre-commit-init ## run git-init pre-commit
 # environment-dev.yml: environment.yml environment-tools.yml
 # 	conda-merge environment.yml environment-tools.yml > environment-dev.yml
 
-create-dev-yml:
+environment-dev.yml: environment.yml environment-tools.yml
 	conda-merge environment.yml environment-tools.yml > environment-dev.yml
 
 
@@ -106,7 +106,6 @@ mamba-env-update:
 mamba-dev-update:
 	mamba env update -f environment-dev.yml
 
-# mamba-all: mamba-env mamba-dev ## mamba create development env
 
 activate: ## activate base env
 	conda activate cmomy-env
@@ -140,8 +139,6 @@ test-all: ## run tests on every Python version with tox
 	tox -- -x -v
 
 
-
-
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source cmomy -m pytest
 	coverage report -m
@@ -149,19 +146,40 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 
-version: ## check version of package
+
+.PHONY: version-scm version-import version
+version-scm: ## check version of package
 	python -m setuptools_scm
+
+version-import: ## check version from python import
+	python -c 'import analphipy; print(analphipy.__version__)'
+
+version: version-scm version-import
 
 
 ################################################################################
 # Docs
 ################################################################################
-.PHONY: docs serverdocs
+
+.PHONY: create-docs-nist-pages
+# create docs-nist-pages directory with empty branch
+create-docs-nist-pages:
+	mkdir -p docs-nist-pages ; \
+	cd docs-nist-pages ; \
+	echo git clone git@github.com:{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug }} html ;\
+	echo "To push, use the following" ; \
+	echo "cd docs-nist-pages/html" ; \
+	echo "" ; \
+	echo git checkout --orphan nist-pages ; \
+	echo git reset --hard ; \
+	echo git commit --allow-empty -m "Initializing gh-pages branch" ; \
+	echo git push origin nist-pages ; \
+	echo git checkout master ; \
+
+
+.PHONY: docs serverdocs doc-spelling docs-nist-pages
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/cmomy.rst
-	rm -f docs/modules.rst
-	rm -fr docs/api
-	rm -rf docs/generated
+	rm -fr docs/generated
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
@@ -169,31 +187,47 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-
-doc-spelling:
+docs-spelling:
 	sphinx-build -b spelling docs docs/_build
+
+docs-nist-pages:
+	tox -e docs
 
 
 ################################################################################
 # distribution
 ################################################################################
-dist: ## builds source and wheel package (run clean?)
-	python -m build
-	ls -l dist
+.PHONY: pypi-build pypi-release pypi-test-release pypi-dist
+pypi-build:
+	tox -e pypi-build
 
-.PHONY: release release-test conda-dist
-release: dist ## package and upload a release
-	twine upload dist/*
+pypi-release:
+	twine upload .tox/pypi-build/tmp/dist
 
-release-test: dist ## package and upload to test
-	twine upload --repository testpypi dist/*
+pypi-test-release:
+	twine upload --repository testpypi .tox/pypi-build/tmp/dist
 
-conda-dist: ## build conda dist (run dist and clean?)
-	mkdir conda_dist; \
-	cd cond_dist; \
-	grayskull pypi cmomy ; \
-	conda-build .; \
-	echo 'upload now'
+
+pypi-dist:
+	pypi-build
+	pypi-release
+
+
+.PHONY: conda-grayksull conda-build conda-release conda-dist
+
+conda-grayskull:
+	tox -e grayskull
+
+conda-build:
+	tox -e conda-build
+
+conda-release:
+	echo 'prefix upload with .tox/conda-dist/'
+
+conda-dist:
+	conda-grayskull
+	conda-build
+	conda-release
 
 
 ################################################################################
