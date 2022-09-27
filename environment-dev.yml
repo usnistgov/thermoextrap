@@ -1,35 +1,41 @@
 channels:
 - conda-forge
 dependencies:
-- anaconda-client
+- MonkeyType
 - autoflake
 - black
 - blackdoc
-- build
-- conda-build
+- custom-inherit
 - flake8
-- greyskull
+- flake8-docstrings
 - ipykernel
 - ipython
 - isort
+- mypy
 - nbsphinx
 - numba
 - numpy
+- pip
 - pre-commit
 - pyls-black
 - pyls-isort
 - pyls-mypy
 - pytest
 - pytest-cov
+- pytest-mypy
 - pytest-xdist
 - python=3.8
-- recommonmark
-- setuptools
 - setuptools-scm
-- setuptools-scm-git-archive
 - sphinx
 - sphinx_rtd_theme
+- sphinxcontrib-spelling
 - tox-conda
-- twine
+- typing-extensions
 - xarray
+- pip:
+  - flake8-mypy
+  - mypy-extensions
+  - pyenchant
+  - pytest-accept
+  - pytest-monkeytype
 name: cmomy-env
