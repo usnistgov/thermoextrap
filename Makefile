@@ -152,7 +152,7 @@ version-scm: ## check version of package
 	python -m setuptools_scm
 
 version-import: ## check version from python import
-	python -c 'import analphipy; print(analphipy.__version__)'
+	python -c 'import cmomy; print(cmomy.__version__)'
 
 version: version-scm version-import
 
@@ -197,21 +197,21 @@ docs-nist-pages:
 ################################################################################
 # distribution
 ################################################################################
+
 .PHONY: pypi-build pypi-release pypi-test-release pypi-dist
 pypi-build:
 	tox -e pypi-build
 
 pypi-release:
-	twine upload .tox/pypi-build/tmp/dist
+	tox -e pypi-release
+
 
 pypi-test-release:
-	twine upload --repository testpypi .tox/pypi-build/tmp/dist
-
+	tox -e pypi-test-release
 
 pypi-dist:
 	pypi-build
 	pypi-release
-
 
 .PHONY: conda-grayksull conda-build conda-release conda-dist
 
