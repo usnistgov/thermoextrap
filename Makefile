@@ -160,18 +160,35 @@ docs-nist-pages:
 	tox -e docs-nist-pages
 
 
+.PHONY: create-docs-nist-pages
+# create docs-nist-pages directory with empty branch
+create-docs-nist-pages:
+	mkdir -p docs-nist-pages ; \
+	cd docs-nist-pages ; \
+	echo git clone git@github.com:usnistgov/thermodynamic-extrapolation.git html ;\
+	echo "To push, use the following" ; \
+	echo "cd docs-nist-pages/html" ; \
+	echo "" ; \
+	echo git checkout --orphan nist-pages ; \
+	echo git reset --hard ; \
+	echo git commit --allow-empty -m "Initializing gh-pages branch" ; \
+	echo git push origin nist-pages ; \
+	echo git checkout master ; \
+
+
+
 ###############################################################################
 # distribution
 ###############################################################################
-.PHONY: pypi-build pypi-release pypi-test-release pypi-dist
+.PHONY: pypi-build pypi-release pypi-testrelease pypi-dist
 pypi-build:
 	tox -e pypi-build
 
 pypi-release:
 	tox -e pypi-release
 
-pypi-test-release:
-	tox -e pypi-test-release
+pypi-testrelease:
+	tox -e pypi-testrelease
 
 pypi-dist:
 	pypi-build
