@@ -9,14 +9,6 @@ from typing import Literal
 
 import sympy as sp
 
-# from .cached_decorators import gcached
-from .core.data import (  # noqa: F401
-    DataCentralMoments,
-    DataCentralMomentsVals,
-    DataValues,
-    DataValuesCentral,
-    resample_indicies,
-)
 from .core.models import (
     Derivatives,
     ExtrapModel,
@@ -26,6 +18,10 @@ from .core.models import (
     get_default_indexed,
     get_default_symbol,
 )
+
+# from .cached_decorators import gcached
+# from .core.data import factory_data_values
+
 
 # from cmomy.options import set_options
 
@@ -504,73 +500,6 @@ class SymDerivBeta(SymDerivBase):
 ###############################################################################
 # Factory functions
 ###############################################################################
-def factory_data(
-    uv,
-    xv,
-    order,
-    central=False,
-    skipna=False,
-    xalpha=False,
-    rec_dim="rec",
-    umom_dim="umom",
-    val_dims="val",
-    rep_dim="rep",
-    deriv_dim=None,
-    chunk=None,
-    compute=None,
-    **kws
-):
-    """
-    Factory function to produce a Data object
-
-    Parameters
-    ----------
-    uv : array-like
-        energy values
-    xv : array-like
-        observable values
-    order : int
-        highest umom_dim to calculate
-    skipna : bool, default=False
-        if True, skip `np.nan` values in creating averages.
-        Can make some "big" calculations slow
-    rec_dim, umom_dim, val_dim, rep_dim, deriv_dim : str
-        names of record (i.e. time), umom_dim, value, replicate,
-        and derivative (with respect to alpha)
-    chunk : int or dict, optional
-        If specified, perform chunking on resulting uv, xv arrays.
-        If integer, chunk with {rec: chunk}
-        otherwise, should be a mapping of form {dim_0: chunk_0, dim_1: chunk_1, ...}
-    compute : bool, optional
-        if compute is True, do compute averages greedily.
-        if compute is False, and have done chunking, then defer calculation of averages (i.e., will be dask future objects).
-        Default is to do greedy calculation
-    kws : dict, optional
-        extra arguments
-    """
-
-    if central:
-        cls = DataValuesCentral
-    else:
-        cls = DataValues
-
-    if xalpha and deriv_dim is None:
-        raise ValueError("if xalpha, must pass string name of derivative")
-
-    return cls.from_vals(
-        uv=uv,
-        xv=xv,
-        order=order,
-        skipna=skipna,
-        rec_dim=rec_dim,
-        umom_dim=umom_dim,
-        val_dims=val_dims,
-        rep_dim=rep_dim,
-        deriv_dim=deriv_dim,
-        chunk=chunk,
-        compute=compute,
-        **kws
-    )
 
 
 @lru_cache(5)
@@ -656,7 +585,7 @@ def factory_extrapmodel(
     alpha_name, str, default='beta'
         name of expansion parameter
     kws : dict
-        extra arguments to `factory_data`
+        extra arguments to `factory_data_values`
 
     Returns
     -------
@@ -718,15 +647,7 @@ def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     -------
     perturbmodel : PerturbModel object
     """
-    data = factory_data(uv=uv, xv=xv, order=0, central=False, **kws)
+    from .core.data import factory_data_values
+
+    data = factory_data_values(uv=uv, xv=xv, order=0, central=False, **kws)
     return PerturbModel(alpha0=beta, data=data, alpha_name=alpha_name)
-
-
-# def factory_lnPi_extrapmodel(
-#         beta,
-#         data_u,
-#         name='u_ave',
-#         central=None,
-#         order=None,
-
-# ):

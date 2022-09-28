@@ -1,5 +1,4 @@
-""" to handle data objects
-"""
+"""Routines and classes to process input data to expected average format."""
 
 
 from __future__ import absolute_import
@@ -66,35 +65,46 @@ def resample_indicies(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
 
 
 class DatasetSelector(object):
-    """
-    wrap dataset so can index like ds[i, j]
+    """Wrap xarray object so can index like ds[i, j].
 
-    Needed for calling sympy.lambdify functions
+    Parameters
+    ----------
+    data : xarray object
+    dims : Hashable or sequence of hashables.
     """
 
-    def __init__(self, data, dims=None, mom_dim="moment", deriv_dim=None):
+    def __init__(self, data, dims=None):  # , mom_dim="moment", deriv_dim=None):
 
         # Default dims
-        if dims is None:
-            if deriv_dim is not None:
-                dims = [mom_dim, deriv_dim]
-            else:
-                dims = [mom_dim]
-
         # if dims is None:
-        #     if deriv_dim in data.dims:
+        #     if deriv_dim is not None:
         #         dims = [mom_dim, deriv_dim]
         #     else:
         #         dims = [mom_dim]
 
         if isinstance(dims, str):
-            dims = [dims]
+            dims = (dims,)
+        else:
+            dims = tuple(dims)
 
         for d in dims:
             if d not in data.dims:
                 raise ValueError("{} not in dims {}".format(d, data.dims))
+
         self.data = data
         self.dims = dims
+
+    @classmethod
+    def from_defaults(cls, data, dims=None, mom_dim="moment", deriv_dim=None):
+        """Create DataSelector object with default values for dims."""
+
+        if dims is None:
+            if deriv_dim is not None:
+                dims = (mom_dim, deriv_dim)
+            else:
+                dims = (mom_dim,)
+
+        return cls(data=data, dims=dims)
 
     def __getitem__(self, idx):
         if not isinstance(idx, tuple):
@@ -816,11 +826,15 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def u_selector(self):
-        return DatasetSelector(self.u, deriv_dim=None, mom_dim=self.umom_dim)
+        return DatasetSelector.from_defaults(
+            self.u, deriv_dim=None, mom_dim=self.umom_dim
+        )
 
     @gcached()
     def xu_selector(self):
-        return DatasetSelector(self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim)
+        return DatasetSelector.from_defaults(
+            self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
+        )
 
     @property
     def derivs_args(self):
@@ -889,11 +903,13 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def du_selector(self):
-        return DatasetSelector(self.du, deriv_dim=None, mom_dim=self.umom_dim)
+        return DatasetSelector.from_defaults(
+            self.du, deriv_dim=None, mom_dim=self.umom_dim
+        )
 
     @gcached()
     def dxdu_selector(self):
-        return DatasetSelector(
+        return DatasetSelector.from_defaults(
             self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
@@ -902,7 +918,7 @@ class DataValuesCentral(DataValuesBase):
         if self.deriv_dim is None:
             return self.xave
         else:
-            return DatasetSelector(self.xave, dims=[self.deriv_dim])
+            return DatasetSelector.from_defaults(self.xave, dims=[self.deriv_dim])
 
     @property
     def derivs_args(self):
@@ -910,8 +926,82 @@ class DataValuesCentral(DataValuesBase):
             out = (self.xave_selector, self.du_selector, self.dxdu_selector)
         else:
             out = (self.xave_selector, self.du_selector)
-
         return self.meta.derivs_args(self, out)
+
+
+def factory_data_values(
+    order,
+    uv,
+    xv,
+    central=False,
+    skipna=False,
+    xalpha=False,
+    rec_dim="rec",
+    umom_dim="umom",
+    val_dims="val",
+    rep_dim="rep",
+    deriv_dim=None,
+    chunk=None,
+    compute=None,
+    x_is_u=False,
+    **kws,
+):
+    """
+    Factory function to produce a DataValues object
+
+    Parameters
+    ----------
+    order : int
+        Highest moment <x * u ** order>.
+        For the case `x_is_u`, highest order is <u ** (order+1)>
+    uv : array-like
+        energy values
+    xv : array-like or None
+        observable values.
+        If None, set `xv = uv`.
+    skipna : bool, default=False
+        if True, skip `np.nan` values in creating averages.
+        Can make some "big" calculations slow
+    rec_dim, umom_dim, val_dim, rep_dim, deriv_dim : str
+        names of record (i.e. time), umom_dim, value, replicate,
+        and derivative (with respect to alpha)
+    chunk : int or dict, optional
+        If specified, perform chunking on resulting uv, xv arrays.
+        If integer, chunk with {rec: chunk}
+        otherwise, should be a mapping of form {dim_0: chunk_0, dim_1: chunk_1, ...}
+    compute : bool, optional
+        if compute is True, do compute averages greedily.
+        if compute is False, and have done chunking, then defer calculation of averages (i.e., will be dask future objects).
+        Default is to do greedy calculation
+    kws : dict, optional
+        extra arguments
+    x_is_u : bool, default=False
+        If True, produce moments only of `uv` up to `order + 1`
+    """
+
+    if central:
+        cls = DataValuesCentral
+    else:
+        cls = DataValues
+
+    if xalpha and deriv_dim is None:
+        raise ValueError("if xalpha, must pass string name of derivative")
+
+    return cls.from_vals(
+        uv=uv,
+        xv=xv,
+        order=order,
+        skipna=skipna,
+        rec_dim=rec_dim,
+        umom_dim=umom_dim,
+        val_dims=val_dims,
+        rep_dim=rep_dim,
+        deriv_dim=deriv_dim,
+        chunk=chunk,
+        compute=compute,
+        x_is_u=x_is_u,
+        **kws,
+    )
 
 
 ################################################################################
@@ -1045,11 +1135,15 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def u_selector(self):
-        return DatasetSelector(self.u, deriv_dim=None, mom_dim=self.umom_dim)
+        return DatasetSelector.from_defaults(
+            self.u, deriv_dim=None, mom_dim=self.umom_dim
+        )
 
     @gcached()
     def xu_selector(self):
-        return DatasetSelector(self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim)
+        return DatasetSelector.from_defaults(
+            self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
+        )
 
     @gcached()
     def xave_selector(self):
@@ -1060,11 +1154,13 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def du_selector(self):
-        return DatasetSelector(self.du, deriv_dim=None, mom_dim=self.umom_dim)
+        return DatasetSelector.from_defaults(
+            self.du, deriv_dim=None, mom_dim=self.umom_dim
+        )
 
     @gcached()
     def dxdu_selector(self):
-        return DatasetSelector(
+        return DatasetSelector.from_defaults(
             self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 

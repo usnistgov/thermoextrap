@@ -78,7 +78,7 @@ def test_extrapmodel_ig():
     xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, central=True
     )
 
@@ -172,7 +172,7 @@ def test_extrapmodel_weighted_slow(fixture):
     xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
     xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xtrap.beta.factory_data(
+        data=xtrap.factory_data_values(
             uv=fixture.ub, xv=fixture.xb, order=fixture.order, central=False
         ),
     )
@@ -193,7 +193,7 @@ def test_extrapmodel_weighted(fixture):
     xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
     xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xtrap.beta.factory_data(
+        data=xtrap.factory_data_values(
             uv=fixture.ub, xv=fixture.xb, order=fixture.order, central=False
         ),
     )
@@ -206,7 +206,7 @@ def test_extrapmodel_weighted(fixture):
     xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.cdata)
     xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xtrap.beta.factory_data(
+        data=xtrap.factory_data_values(
             uv=fixture.ub,
             xv=fixture.xb,
             order=fixture.order,
@@ -222,7 +222,7 @@ def test_extrapmodel_weighted(fixture):
     xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.xdata)
     xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xtrap.beta.DataCentralMoments.from_vals(
+        data=xtrap.DataCentralMoments.from_vals(
             uv=fixture.ub,
             xv=fixture.xb,
             order=fixture.order,
@@ -244,7 +244,7 @@ def test_extrapmodel_weighted_multi(fixture):
     xems_r = [
         xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xtrap.beta.factory_data(
+            data=xtrap.factory_data_values(
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
@@ -257,7 +257,7 @@ def test_extrapmodel_weighted_multi(fixture):
     xems_c = [
         xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xtrap.beta.factory_data(
+            data=xtrap.factory_data_values(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
@@ -267,7 +267,7 @@ def test_extrapmodel_weighted_multi(fixture):
     xems_x = [
         xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xtrap.beta.DataCentralMomentsVals.from_vals(
+            data=xtrap.DataCentralMomentsVals.from_vals(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
@@ -320,7 +320,7 @@ def test_interpmodel_slow(fixture):
     xems = [
         xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xtrap.beta.factory_data(
+            data=xtrap.factory_data_values(
                 uv=u, xv=x, order=fixture.order, central=False
             ),
         )
@@ -340,7 +340,7 @@ def test_interpmodel(fixture):
     xems_r = [
         xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xtrap.beta.factory_data(
+            data=xtrap.factory_data_values(
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
@@ -353,7 +353,7 @@ def test_interpmodel(fixture):
     xems_c = [
         xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xtrap.beta.factory_data(
+            data=xtrap.factory_data_values(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
@@ -363,7 +363,7 @@ def test_interpmodel(fixture):
     xems_x = [
         xtrap.beta.factory_extrapmodel(
             beta=xem.alpha0,
-            data=xtrap.beta.DataCentralMomentsVals.from_vals(
+            data=xtrap.DataCentralMomentsVals.from_vals(
                 order=fixture.order, uv=xem.data.uv, xv=xem.data.xv, central=True
             ),
         )
@@ -397,7 +397,7 @@ def test_interpmodelpiecewise(fixture):
     xems_r = [
         xtrap.beta.factory_extrapmodel(
             beta=beta,
-            data=xtrap.beta.factory_data(
+            data=xtrap.factory_data_values(
                 xv=np.random.rand(*fixture.x.shape),
                 uv=np.random.rand(*fixture.u.shape),
                 central=False,
@@ -429,10 +429,10 @@ def test_interpmodel_polynomial():
         udat1 = (i + 1) * xr.DataArray([-2.0, 2.0], dims=["rec"])
         udat2 = (i + 1) * xr.DataArray([2.0, -2.0], dims=["rec"])
         print(udat1, udat2)
-        dat1 = xtrap.beta.DataCentralMomentsVals.from_vals(
+        dat1 = xtrap.DataCentralMomentsVals.from_vals(
             order=1, xv=xdat1, uv=udat1, central=True
         )
-        dat2 = xtrap.beta.DataCentralMomentsVals.from_vals(
+        dat2 = xtrap.DataCentralMomentsVals.from_vals(
             order=1, xv=xdat2, uv=udat2, central=True
         )
 
@@ -459,7 +459,7 @@ def test_mbar(fixture):
     xem0 = xtrap.beta.factory_extrapmodel(beta=beta0[0], data=fixture.rdata)
     xem1 = xtrap.beta.factory_extrapmodel(
         beta=beta0[1],
-        data=xtrap.beta.factory_data(
+        data=xtrap.factory_data_values(
             uv=fixture.ub, xv=fixture.xb, order=fixture.order, central=False
         ),
     )
@@ -566,7 +566,7 @@ def test_extrapmodel_minuslog_ig():
     xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, central=True
     )
 
@@ -668,7 +668,7 @@ def test_extrapmodel_alphadep_slow(fixture):
     # by passign a derivative name, we are
     xem = xtrap.beta.factory_extrapmodel(
         beta0,
-        xtrap.beta.factory_data(
+        xtrap.factory_data_values(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -691,14 +691,14 @@ def test_extrapmodel_alphadep(fixture):
     # by passign a derivative name, we are
     xem0 = xtrap.beta.factory_extrapmodel(
         beta0,
-        xtrap.beta.factory_data(
+        xtrap.factory_data_values(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
 
     xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
-        data=xtrap.beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -708,7 +708,7 @@ def test_extrapmodel_alphadep(fixture):
     # for central, only test up to third order
     xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
-        data=xtrap.beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=True, deriv_dim="deriv"
         ),
     )
@@ -732,7 +732,7 @@ def test_extrapmodel_alphadep_ig():
         .fillna(0.0)
     )
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, deriv_dim="deriv", central=True
     )
 
@@ -845,7 +845,7 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
     xem = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func="minus_log",
-        data=xtrap.beta.factory_data(
+        data=xtrap.factory_data_values(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -859,7 +859,7 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
     xem = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func=None,
-        data=xtrap.beta.factory_data(
+        data=xtrap.factory_data_values(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -885,7 +885,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     xem0 = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func="minus_log",
-        data=xtrap.beta.factory_data(
+        data=xtrap.factory_data_values(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -893,7 +893,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func=None,
-        data=xtrap.beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=False, deriv_dim="deriv"
         ),
     )
@@ -904,7 +904,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     xem1 = xtrap.beta.factory_extrapmodel(
         beta0,
         post_func=None,
-        data=xtrap.beta.DataCentralMomentsVals.from_vals(
+        data=xtrap.DataCentralMomentsVals.from_vals(
             uv=u, xv=x, order=order, central=True, deriv_dim="deriv"
         ),
     )
@@ -930,7 +930,7 @@ def test_extrapmodel_alphadep_minuslog_ig():
         .fillna(0.0)
     )
     udata = xr.DataArray(udata, dims=["rec"])
-    dat = xtrap.beta.DataCentralMomentsVals.from_vals(
+    dat = xtrap.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, deriv_dim="deriv", central=True
     )
 

@@ -72,5 +72,4 @@ def test_extrapmodel_vol(fixture):
     )
 
     np.testing.assert_allclose(em.predict(volumes), xem_ig.predict(volumes))
-
     xr.testing.assert_allclose(xem_ig.predict(volumes), xem.predict(volumes))
