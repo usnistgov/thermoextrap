@@ -190,83 +190,83 @@ class lnPiDataCallback(DataCallbackABC):
         return tuple(derivs_args) + (self.lnPi0_ave, self.mudotN)
 
 
-def factory_data(
-    uv,
-    order,
-    lnPi,
-    mu,
-    dims_n,
-    dims_comp,
-    ncoords=None,
-    central=False,
-    skipna=False,
-    rec_dim="rec",
-    umom_dim="umom",
-    xmom_dim="xmom",
-    val_dims="val",
-    rep_dim="rep",
-    deriv_dim=None,
-    chunk=None,
-    compute=None,
-    xv=None,
-    x_is_u=True,
-    **kws,
-):
-    """
-    Factory function to produce a Data object
+# def factory_data_values(
+#     uv,
+#     order,
+#     lnPi,
+#     mu,
+#     dims_n,
+#     dims_comp,
+#     ncoords=None,
+#     central=False,
+#     skipna=False,
+#     rec_dim="rec",
+#     umom_dim="umom",
+#     xmom_dim="xmom",
+#     val_dims="val",
+#     rep_dim="rep",
+#     deriv_dim=None,
+#     chunk=None,
+#     compute=None,
+#     xv=None,
+#     x_is_u=True,
+#     **kws,
+# ):
+#     """
+#     Factory function to produce a Data object
 
-    Parameters
-    ----------
-    uv : array-like
-        energy values.  These are not averaged
-    order : int
-        highest umom_dim to calculate
-    skipna : bool, default=False
-        if True, skip `np.nan` values in creating averages.
-        Can make some "big" calculations slow
-    rec_dim, umom_dim, val_dim, rep_dim, deriv_dim : str
-        names of record (i.e. time), umom_dim, value, replicate,
-        and derivative (with respect to alpha)
-    chunk : int or dict, optional
-        If specified, perform chunking on resulting uv, xv arrays.
-        If integer, chunk with {rec: chunk}
-        otherwise, should be a mapping of form {dim_0: chunk_0, dim_1: chunk_1, ...}
-    compute : bool, optional
-        if compute is True, do compute averages greedily.
-        if compute is False, and have done chunking, then defer calculation of averages (i.e., will be dask future objects).
-        Default is to do greedy calculation
+#     Parameters
+#     ----------
+#     uv : array-like
+#         energy values.  These are not averaged
+#     order : int
+#         highest umom_dim to calculate
+#     skipna : bool, default=False
+#         if True, skip `np.nan` values in creating averages.
+#         Can make some "big" calculations slow
+#     rec_dim, umom_dim, val_dim, rep_dim, deriv_dim : str
+#         names of record (i.e. time), umom_dim, value, replicate,
+#         and derivative (with respect to alpha)
+#     chunk : int or dict, optional
+#         If specified, perform chunking on resulting uv, xv arrays.
+#         If integer, chunk with {rec: chunk}
+#         otherwise, should be a mapping of form {dim_0: chunk_0, dim_1: chunk_1, ...}
+#     compute : bool, optional
+#         if compute is True, do compute averages greedily.
+#         if compute is False, and have done chunking, then defer calculation of averages (i.e., will be dask future objects).
+#         Default is to do greedy calculation
 
-    constructor : 'val'
-    kws : dict, optional
+#     constructor : 'val'
+#     kws : dict, optional
 
-        extra arguments
-    """
+#         extra arguments
+#     """
 
-    if central:
-        cls = DataValuesCentral
-    else:
-        cls = DataValues
+#     if central:
+#         cls = DataValuesCentral
+#     else:
+#         cls = DataValues
 
-    meta = lnPiDataCallback(
-        lnPi0=lnPi, mu=mu, dims_n=dims_n, dims_comp=dims_comp, ncoords=ncoords
-    )
+#     meta = lnPiDataCallback(
+#         lnPi0=lnPi, mu=mu, dims_n=dims_n, dims_comp=dims_comp, ncoords=ncoords
+#     )
 
-    return cls.from_vals(
-        uv=uv,
-        xv=xv,
-        order=order,
-        skipna=skipna,
-        rec_dim=rec_dim,
-        umom_dim=umom_dim,
-        val_dims=val_dims,
-        rep_dim=rep_dim,
-        deriv_dim=deriv_dim,
-        chunk=chunk,
-        compute=compute,
-        x_is_u=x_is_u,
-        meta=meta,
-        **kws,
-    )
+#     return cls.from_vals(
+#         uv=uv,
+#         xv=xv,
+#         order=order,
+#         skipna=skipna,
+#         rec_dim=rec_dim,
+#         umom_dim=umom_dim,
+#         val_dims=val_dims,
+#         rep_dim=rep_dim,
+#         deriv_dim=deriv_dim,
+#         chunk=chunk,
+#         compute=compute,
+#         x_is_u=x_is_u,
+#         meta=meta,
+#         **kws,
+#     )
 
 
 # much more likely to have pre-aves here, but save that for the user
@@ -301,7 +301,7 @@ def factory_extrapmodel_lnPi(
     alpha_name, str, default='beta'
         name of expansion parameter
     kws : dict
-        extra arguments to `factory_data`
+        extra arguments to `factory_data_values`
     post_func : callable, optional
         optional function to apply to derivative functions (e.g., post_func = lambda x: -sympy.log(x))
 
@@ -317,6 +317,7 @@ def factory_extrapmodel_lnPi(
 
     assert central == data.central
     assert order <= data.order + 1
+    assert data.x_is_u
 
     if derivatives is None:
         if derivatives_kws is None:

@@ -9,12 +9,11 @@ import numpy as np
 # import xarray as xr
 from scipy import stats
 
-from .beta import factory_data
-
 # TODO: Change this to point to the "new" ideagas.py
 # TODO: rework this code to be cleaner
 # from ..legacy.ig import IGmodel
 from .core import idealgas
+from .core.data import factory_data_values
 from .core.models import ExtrapModel, InterpModel
 
 try:
@@ -66,7 +65,7 @@ class RecursiveInterp:
         # datModel = IGmodel(nParticles=1000)
         # xdata, udata = datModel.genData(B, nConfigs=10000)
         # Need to also change data object kwargs based on data when change getData
-        data = factory_data(uv=udata, xv=xdata, order=self.maxOrder)
+        data = factory_data_values(uv=udata, xv=xdata, order=self.maxOrder)
         return data
 
     def recursiveTrain(

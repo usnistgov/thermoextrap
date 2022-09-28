@@ -31,13 +31,13 @@ class FixtureData:
     # bunch of things to test
     @gcached()
     def rdata(self):
-        return xtrap.beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=False
         )
 
     @gcached()
     def cdata(self):
-        return xtrap.beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=True
         )
 
@@ -79,13 +79,13 @@ class FixtureData:
     # bunch of things to test
     @gcached()
     def rdata(self):
-        return xtrap.beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=False
         )
 
     @gcached()
     def cdata(self):
-        return xtrap.beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=True
         )
 
@@ -287,13 +287,13 @@ def pytest_collection_modifyitems(config, items):
 # @pytest.fixture
 # def fix_rdata(test_ux):
 #     u, x, order = test_ux
-#     data = xtrap.beta.factory_data(uv=u, xv=x, order=order, central=False)
+#     data = xtrap.factory_data_values(uv=u, xv=x, order=order, central=False)
 #     return Fixture_New(data)
 
 # @pytest.fixture
 # def fix_cdata(test_ux):
 #     u, x, order = test_ux
-#     data = xtrap.beta.factory_data(uv=u, xv=x, order=order, central=True)
+#     data = xtrap.factory_data_values(uv=u, xv=x, order=order, central=True)
 #     return Fixture_New(data)
 
 # @pytest.fixture

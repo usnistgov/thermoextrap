@@ -9,6 +9,7 @@ from .core.data import (
     DataCentralMomentsVals,
     DataValues,
     DataValuesCentral,
+    factory_data_values,
     resample_indicies,
 )
 
@@ -55,6 +56,7 @@ __all__ = [
     "DataCentralMomentsVals",
     "DataValues",
     "DataValuesCentral",
+    "factory_data_values",
     "resample_indicies",
     "xrwrap_xv",
     "xrwrap_uv",

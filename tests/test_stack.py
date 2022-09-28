@@ -18,7 +18,7 @@ def states():
     for beta in [0.1, 10.0]:
         x = xr.DataArray(np.random.rand(*shape), dims=dims, coords=coords)
         u = xr.DataArray(np.random.rand(shape[0]), dims=dims[0])
-        data = xtrap.beta.DataCentralMomentsVals.from_vals(x, u, order=3, central=True)
+        data = xtrap.DataCentralMomentsVals.from_vals(x, u, order=3, central=True)
         xems.append(xtrap.beta.factory_extrapmodel(beta, data))
     s = xtrap.StateCollection(xems)
 

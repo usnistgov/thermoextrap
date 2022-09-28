@@ -58,7 +58,7 @@ def central(request):
 # test all other data constructors
 @pytest.fixture
 def data_x(data, order, central):
-    return xtrap.beta.factory_data(xv=data.u, uv=data.u, order=order, central=central)
+    return xtrap.factory_data_values(xv=data.u, uv=data.u, order=order, central=central)
 
 
 @pytest.fixture(params=[True, False])
@@ -74,7 +74,7 @@ def data_other(request, data, xv_fixture, order, central):
     style = request.param
 
     if style == "factory":
-        factory = xtrap.beta.factory_data
+        factory = xtrap.factory_data_values
     elif style == "cmom":
         factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
@@ -127,7 +127,7 @@ def data_x_is_u(request, data, order, central):
     style = request.param
 
     if style == "factory":
-        factory = xtrap.beta.factory_data
+        factory = xtrap.factory_data_values
     elif style == "cmom":
         factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
@@ -158,7 +158,7 @@ def test_em_x_is_u(em_x_out, em_x_is_u_out):
 
 @pytest.fixture
 def data_u(data, order, central):
-    return xtrap.beta.factory_data(
+    return xtrap.factory_data_values(
         xv=None, uv=data.u, order=order, central=central, x_is_u=True
     )
 
@@ -181,7 +181,7 @@ def test_data_u(em_u_out, em_x_is_u_out):
 
 @pytest.fixture
 def data_x2(data, order, central):
-    return xtrap.beta.factory_data(
+    return xtrap.factory_data_values(
         xv=data.u**2, uv=data.u, order=order, central=central
     )
 
@@ -229,10 +229,10 @@ def test_x2_u2(em_x2_out, em_u2_out, central):
 
 def test_du2_3(beta, order, data, betas_extrap):
 
-    data_u = xtrap.beta.factory_data(
+    data_u = xtrap.factory_data_values(
         uv=data.u, xv=None, x_is_u=True, order=order, central=True
     )
-    data_u_r = xtrap.beta.factory_data(
+    data_u_r = xtrap.factory_data_values(
         uv=data.u, xv=None, x_is_u=True, order=order, central=False
     )
 

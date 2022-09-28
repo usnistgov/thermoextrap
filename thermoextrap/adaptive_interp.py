@@ -530,13 +530,14 @@ def factory_state_idealgas(
 
     from . import beta as xpan_beta
     from .core import idealgas
+    from .core.data import DataCentralMomentsVals
 
     # NOTE: this is for reproducable results.
     if seed_from_beta:
         np.random.seed(int(beta * 1000))
 
     xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
-    data = xpan_beta.DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
+    data = DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
 
     # use indices for reproducability
     nrec = len(xdata)

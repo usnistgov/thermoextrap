@@ -155,7 +155,7 @@ def factory_extrapmodel(
     alpha_name, str, default='volume'
         name of expansion parameter
     kws : dict
-        extra arguments to `factory_data`
+        extra arguments to `factory_data_values`
 
     Returns
     -------

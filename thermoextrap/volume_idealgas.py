@@ -6,10 +6,11 @@ from __future__ import absolute_import
 
 from functools import lru_cache
 
-from .beta import factory_data
-
 # from .models import DataTemplateValues, DatasetSelector
 from .core.models import Derivatives, ExtrapModel
+
+# from .beta import factory_datavalues
+
 
 # from .data import DataCentralMoments, DataCentralMomentsVals
 
@@ -103,7 +104,7 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
     alpha_name, str, default='volume'
         name of expansion parameter
     kws : dict
-        extra arguments to `factory_data`
+        extra arguments to `factory_datavalues`
 
     Returns
     -------
@@ -113,7 +114,11 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
     if order != 1:
         raise ValueError("only first order supported")
 
-    data = factory_data(uv=uv, xv=xv, order=order, central=False, xalpha=False, **kws)
+    from .core.data import factory_data_values
+
+    data = factory_data_values(
+        uv=uv, xv=xv, order=order, central=False, xalpha=False, **kws
+    )
     derivatives = factory_derivatives(refV=volume)
     return ExtrapModel(
         alpha0=volume,
@@ -147,6 +152,8 @@ def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
 
     if order != 1:
         raise ValueError("only first order supported")
+
+    assert data.order >= order
 
     assert not data.central
     assert data.deriv is None
