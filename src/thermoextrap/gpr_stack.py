@@ -2,7 +2,6 @@
 Routines GPR interpolation models
 """
 
-from __future__ import absolute_import
 
 import gpflow
 import numpy as np
@@ -275,7 +274,7 @@ class HeteroscedasticGaussian(gpflow.likelihoods.Likelihood):
         raise NotImplementedError
 
 
-class combined_loss(object):
+class combined_loss:
     """Convenience function for training all output dimension in parallel with sum of losses."""
 
     def __init__(self, loss_list):

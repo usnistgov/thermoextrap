@@ -2,7 +2,6 @@
 This includes the recursive training algorithm and consistency checks.
 """
 
-from __future__ import absolute_import
 
 import numpy as np
 
@@ -92,7 +91,7 @@ class RecursiveInterp:
             raise RecursionError("Maximum recursion depth reached.")
 
         if verbose:
-            print("\nInterpolating from points %f and %f" % (B1, B2))
+            print("\nInterpolating from points {:f} and {:f}".format(B1, B2))
             print("Recursion depth on this branch: %i" % recurseDepth)
 
         # Generate data somehow if not provided
@@ -239,7 +238,7 @@ class RecursiveInterp:
             B2 = self.edgeB[i + 1]
 
             if verbose:
-                print("\nInterpolating from points %f and %f" % (B1, B2))
+                print("\nInterpolating from points {:f} and {:f}".format(B1, B2))
 
             # Check if already have ExtrapModel with data for B1
             if self.states[i] is None:

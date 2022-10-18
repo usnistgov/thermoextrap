@@ -94,7 +94,7 @@ mamba-dev-update: environment-dev.yaml
 	mamba env update -f environment-dev.yaml
 
 activate: ## activate base env
-	conda activate {{ cookiecutter.project_slug }}-env
+	conda activate thermoextrap-env
 
 ################################################################################
 # my convenience functions
@@ -159,6 +159,9 @@ docs-spelling:
 ################################################################################
 tox_posargs?=-v
 TOX=CONDA_EXE=mamba tox $(tox_posargs)
+
+hello:
+	echo $(TOX)
 
 ## testing
 .PHONY: test-all

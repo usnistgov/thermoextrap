@@ -5,7 +5,6 @@ This only handles volume expansion to first order.
 Also, Only DataValues like objects are supported.
 """
 
-from __future__ import absolute_import
 
 from functools import lru_cache
 
@@ -27,7 +26,7 @@ from .core.xrutils import xrwrap_xv
 # some constant multiplied by an average of x (same with ideal gas, too).
 
 
-class VolumeDerivFuncs(object):
+class VolumeDerivFuncs:
     """Calculates specific derivative values at refV with data x and W.
     Only go to first order for volume extrapolation.
     Here W represents the virial instead of the potential energy.
