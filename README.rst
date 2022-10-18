@@ -1,6 +1,6 @@
-===========================
+=================================================
 Thermodynamic Extrapolation/Interpolation Library
-===========================
+=================================================
 
 
 .. image:: https://img.shields.io/pypi/v/thermoextrap.svg

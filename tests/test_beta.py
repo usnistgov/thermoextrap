@@ -488,6 +488,7 @@ class LogAvgExtrapModel(thermoextrap.legacy.ExtrapModel):
             return
 
         avgUfunc, avgXUfunc = thermoextrap.legacy.buildAvgFuncs(x, U, self.maxOrder)
+
         derivVals = np.zeros((self.maxOrder + 1, x.shape[1]))
         for o in range(self.maxOrder + 1):
             if o == 0:
@@ -642,6 +643,7 @@ class ExtrapModelDependent(thermoextrap.legacy.ExtrapModel):
         avgUfunc, avgXUfunc = buildAvgFuncsDependent(
             x, U, self.maxOrder
         )  # Change this line to use dependent function
+
         derivVals = np.zeros(
             (self.maxOrder + 1, x.shape[2])
         )  # And change this line because x data is of different shape
@@ -795,6 +797,7 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
         avgUfunc, avgXUfunc = buildAvgFuncsDependent(
             x, U, self.maxOrder
         )  # Change this line to use dependent function
+
         derivVals = np.zeros(
             (self.maxOrder + 1, x.shape[2])
         )  # And change this line because x data is of different shape

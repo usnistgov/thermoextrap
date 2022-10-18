@@ -141,6 +141,14 @@ class FixtureData:
 
         return em
 
+    # @staticmethod
+    # def fix_ufunc_xufunc(ufunc, xufunc):
+
+    #     ufunc_out = lambda x: float(ufunc(x))
+    #     xufunc_out = lambda x: xufunc.avgdict[x]
+
+    #     return ufunc_out, xufunc_out
+
     @gcached()
     def u_xu_funcs(self):
         ufunc, xufunc = thermoextrap.legacy.buildAvgFuncs(self.x, self.u, self.order)
@@ -150,6 +158,7 @@ class FixtureData:
     def derivs_list(self):
         fs = [thermoextrap.legacy.symDerivAvgX(i) for i in range(self.order + 1)]
         ufunc, xufunc = self.u_xu_funcs
+
         return [fs[i](ufunc, xufunc) for i in range(self.order + 1)]
 
     def xr_test_raw(self, b, a=None):

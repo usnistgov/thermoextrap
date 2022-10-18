@@ -4,7 +4,6 @@ channels:
   - wpk-nist
 dependencies:
   - python=3.8
-  - setuptools
   - sympy
   - matplotlib
   - numpy
@@ -12,6 +11,8 @@ dependencies:
   - xarray
 #  - openmm
   - cmomy
+  - custom-inherit
+  - attrs
   - pymbar<4.0
   - pip
   - pip:

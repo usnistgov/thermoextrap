@@ -1,13 +1,18 @@
 """Routines and classes to process input data to expected average format."""
 
 
-from __future__ import absolute_import
+from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
+import attrs
 import numpy as np
 import xarray as xr
+from cmomy.xcentral import Hashable, Sequence
+from custom_inherit import DocInheritMeta
 
+from ._attrs_utils import convert_dims_to_tuple
+from ._docstrings import factory_docfiller_shared
 from .cached_decorators import gcached
 from .xrutils import xrwrap_uv, xrwrap_xv
 
@@ -19,6 +24,8 @@ except ImportError:
     _HAS_CMOMY = False
 
 
+docfiller_shared = factory_docfiller_shared()
+
 # NOTE: General scheme:
 # uv, xv -> samples (values) for u, x
 # u, xu -> averages of u and x*u
@@ -27,30 +34,26 @@ except ImportError:
 # xu[i, j] = <d^i x/d beta^i * u**j
 
 
-def resample_indicies(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
+@docfiller_shared
+def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
     """
-    get indexing DataArray
+    Get indexing DataArray
 
     Parameters
     ----------
     size : int
         size of axis to bootstrap along
-    nrep : int
-        number of replicates
-    rec_dim : str, default='rec'
-        name of record dimension.
-        That is, the dimension to sample along
-    rep_dim : str, default='rep'
-        name of replicate dimension.
-        That is, the new resampledd dimension.
+    {nrep}
+    {rec_dim}
+    {rep_dim}
     replace : bool, default=True
-        if True, sample with replacement.
+        If True, sample with replacement.
     transpose : bool, default=False
-        see `out`
+        Output format.
 
     Returns
     -------
-    indices : xarray.DataArray
+    indices : DataArray
         if transpose, shape=(size, nrep)
         else, shape=(nrep, size)
     """
@@ -64,39 +67,60 @@ def resample_indicies(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
     return indices
 
 
+@attrs.frozen
 class DatasetSelector(object):
     """Wrap xarray object so can index like ds[i, j].
 
     Parameters
     ----------
-    data : xarray object
+    data : DataArray or Dataset
+        Object to index into.
     dims : Hashable or sequence of hashables.
+        Name of dimensions to be indexed.
+
+    Examples
+    --------
+    >>> x = xr.DataArray([[1, 2, 3], [4, 5, 6]], dims=["x", "y"])
+    >>> s = DatasetSelector(data=x, dims=["y", "x"])
+    >>> s[0, 1]
+    4
     """
 
-    def __init__(self, data, dims=None):  # , mom_dim="moment", deriv_dim=None):
+    data: xr.DataArray | xr.Dataset = attrs.field()
+    dims: Hashable | Sequence[Hashable] = attrs.field(converter=convert_dims_to_tuple)
 
-        # Default dims
-        # if dims is None:
-        #     if deriv_dim is not None:
-        #         dims = [mom_dim, deriv_dim]
-        #     else:
-        #         dims = [mom_dim]
+    @data.validator
+    def _validate_data(self, attribute, data):
+        assert isinstance(data, (xr.DataArray, xr.Dataset))
 
-        if isinstance(dims, str):
-            dims = (dims,)
-        else:
-            dims = tuple(dims)
-
+    @dims.validator
+    def _validate_dims(self, attribute, dims):
         for d in dims:
-            if d not in data.dims:
-                raise ValueError("{} not in dims {}".format(d, data.dims))
-
-        self.data = data
-        self.dims = dims
+            if d not in self.data.dims:
+                raise ValueError(f"{d} not in data.dimensions {self.data.dims}")
 
     @classmethod
     def from_defaults(cls, data, dims=None, mom_dim="moment", deriv_dim=None):
-        """Create DataSelector object with default values for dims."""
+        """
+        Create DataSelector object with default values for dims.
+
+        Parameters
+        ----------
+        data : DataArray or Dataset
+            object to index into.
+        dims : hashable or sequence of hashable.
+            Name of dimensions to be indexed.
+            If dims is None, default to either
+            ``dims=(mom_dim,)`` if ``deriv_dim is None``.
+            Otherwise ``dims=(mom_dim, deriv_dim)``.
+        mom_dim : hashable, default='moment'
+        deriv_dim, hashable, optional
+            If passed and `dims` is None, set ``dims=(mom_dim, deriv_dim)``
+
+        Returns
+        -------
+        out : DatasetSelector
+        """
 
         if dims is None:
             if deriv_dim is not None:
@@ -118,26 +142,38 @@ class DatasetSelector(object):
         return repr(self.data)
 
 
-class NewLikeAssignMixin(ABC):
-    @property
+class NewLikeAssignMixin(
+    metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True)
+):
+    @classmethod
     @abstractmethod
-    def param_names(self):
+    def param_names(cls):
         """
-        returns sequence of string names to be copied over
+        Sequence of string names to be copied over
         """
         raise NotImplementedError
 
     def new_like(self, **kws):
         """
-        create new object with optional parameters
+        Create new object with optional parameters
+
+
+        Parameters
+        ----------
+        **kws :
+            parameters to set in new object.  Defaults to parameters in `self`.
+
+        See Also
+        --------
+        param_names
         """
-        kws_default = {k: getattr(self, k) for k in self.param_names}
+        kws_default = {k: getattr(self, k) for k in self.param_names()}
         kws = dict(kws_default, **kws)
         return type(self)(**kws)
 
     def assign_params(self, **kws):
         """
-        create new object with optional parameters
+        Create new object with optional parameters
 
         Same as self.new_like
         """
@@ -145,7 +181,7 @@ class NewLikeAssignMixin(ABC):
 
     def set_params(self, **kws):
         """
-        set parameters of self, and retun self (for chaining)
+        Set parameters of self, and retun self (for chaining)
         """
 
         for name in kws.keys():
@@ -179,7 +215,7 @@ class DataCallbackABC(NewLikeAssignMixin):
 
     @abstractmethod
     def derivs_args(self, data, derivs_args):
-        """adjust derivs args from data class
+        """Adjust derivs args from data class
 
         should return a tuple
         """
@@ -188,7 +224,7 @@ class DataCallbackABC(NewLikeAssignMixin):
     # define these to raise error instead
     # of forcing usage.
     def resample(self, data, meta_kws, **kws):
-        """adjust create new object
+        """Adjust create new object
 
         Should return new instance of class or self no change
         """
@@ -219,8 +255,8 @@ class DataCallback(DataCallbackABC):
         """Perform any consistency checks between self and data"""
         pass
 
-    @property
-    def param_names(self):
+    @classmethod
+    def param_names(cls):
         """returns sequence of string names to be copied over"""
         return ()
 
@@ -397,8 +433,8 @@ class DataValuesBase(AbstractData):
         self.deriv_dim = deriv_dim
         self.meta = meta
 
-    @property
-    def param_names(self):
+    @classmethod
+    def param_names(cls):
         return [
             "uv",
             "xv",
@@ -549,7 +585,7 @@ class DataValuesBase(AbstractData):
 
         if indices is None:
             assert nrep is not None
-            indices = resample_indicies(
+            indices = resample_indices(
                 len(self), nrep, rec_dim=self.rec_dim, rep_dim=rep_dim
             )
         elif not isinstance(indices, xr.DataArray):
@@ -1054,8 +1090,8 @@ class DataCentralMomentsBase(AbstractData):
         self.central = central
         self.meta = meta
 
-    @property
-    def param_names(self):
+    @classmethod
+    def param_names(cls):
         return (
             "dxduave",
             "xmom_dim",
@@ -1909,8 +1945,8 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             x_is_u=x_is_u,
         )
 
-    @property
-    def param_names(self):
+    @classmethod
+    def param_names(cls):
         return (
             "uv",
             "xv",
