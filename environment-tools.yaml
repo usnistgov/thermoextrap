@@ -8,6 +8,7 @@ dependencies:
   # testing
   - pytest
   - pytest-cov
+  - pytest-xdist
   - tox
   # hooks
   - pre-commit

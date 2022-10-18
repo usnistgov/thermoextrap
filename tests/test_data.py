@@ -8,6 +8,20 @@ import thermoextrap as xtrap
 def test_rdata(fixture):
     """testing new interface against old interface"""
     ufunc, xufunc = fixture.u_xu_funcs
+
+    # ufunc = lambda x: float(_ufunc(x))
+    # xufunc = lambda x: _xufunc.avgdict[x]
+
+    # a = fixture.rdata.xu
+    # b = [xufunc(i) for i in range(fixture.order + 1)]
+
+    # print('hello a', a)
+    # print('hello b', b)
+    # print('hello a1', type(a[0]))
+    # print('hello b1', type(b[0]))
+
+    # raise AssertionError
+
     np.testing.assert_allclose(
         fixture.rdata.u, [ufunc(i) for i in range(fixture.order + 1)]
     )

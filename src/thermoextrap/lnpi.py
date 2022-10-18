@@ -12,10 +12,8 @@ from .beta import ExtrapModel, SymDerivBeta
 from .beta import factory_derivatives as factory_derivatives_beta
 from .beta import u_func, u_func_central
 from .core.cached_decorators import gcached
-from .core.data import (  # DataCentralMoments,; DataCentralMomentsVals,
+from .core.data import (  # DataCentralMoments,; DataCentralMomentsVals,; DataValues,; DataValuesCentral,
     DataCallbackABC,
-    DataValues,
-    DataValuesCentral,
 )
 from .core.models import Derivatives, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol

@@ -1,5 +1,5 @@
 Welcome to thermodynamic-extrapolation's documentation!
-======================================
+=======================================================
 
 .. toctree::
    :maxdepth: 1
@@ -8,8 +8,8 @@ Welcome to thermodynamic-extrapolation's documentation!
    readme
    installation
    usage
-   demo
    api
+   examples
    contributing
    authors
    history

@@ -31,25 +31,32 @@ def buildAvgFuncs(xvals, uvals, order):
         dictu[o] = np.average(uvals**o)
         dictxu[o] = np.average(xvals * (uvalsT**o), axis=0)
 
-    class ufunc(sym.Function):
-        """Modified sympy Function class to output powers of potential energies."""
+    def ufunc(order):
+        return dictu[order]
 
-        avgdict = copy.deepcopy(dictu)
+    def xufunc(order):
+        return dictxu[order]
 
-        @classmethod
-        def eval(cls, x):
-            return cls.avgdict[x]
+    return ufunc, xufunc
 
-    class xufunc(sym.Function):
-        """Modified sympy Function class to output powers of potential energies."""
+    # class ufunc(sym.Function):
+    #     """Modified sympy Function class to output powers of potential energies."""
 
-        avgdict = copy.deepcopy(dictxu)
+    #     avgdict = copy.deepcopy(dictu)
 
-        @classmethod
-        def eval(cls, x):
-            return cls.avgdict[x]
+    #     @classmethod
+    #     def eval(cls, x):
+    #         return cls.avgdict[x]
 
-    return (ufunc, xufunc)
+    # class xufunc(sym.Function):
+    #     """Modified sympy Function class to output powers of potential energies."""
+    #     avgdict = copy.deepcopy(dictxu)
+
+    #     @classmethod
+    #     def eval(cls, x):
+    #         return cls.avgdict[x]
+
+    # return (ufunc, xufunc)
 
 
 def symDerivAvgX(order):
@@ -144,23 +151,29 @@ def buildAvgFuncsDependent(xvals, uvals, order):
         for j in range(order + 1):
             dictxu[(j, o)] = np.average(xvals[:, j, :] * (uvalsT**o), axis=0)
 
-    class ufunc(sym.Function):
-        """Modified sympy Function class to output powers of potential energies."""
+    # class ufunc(sym.Function):
+    #     """Modified sympy Function class to output powers of potential energies."""
 
-        avgdict = copy.deepcopy(dictu)
+    #     avgdict = copy.deepcopy(dictu)
 
-        @classmethod
-        def eval(cls, x):
-            return cls.avgdict[x]
+    #     @classmethod
+    #     def eval(cls, x):
+    #         return cls.avgdict[x]
 
-    class xufunc(sym.Function):
-        """Modified sympy Function class to output product of observable and potential energies."""
+    # class xufunc(sym.Function):
+    #     """Modified sympy Function class to output product of observable and potential energies."""
 
-        avgdict = copy.deepcopy(dictxu)
+    #     avgdict = copy.deepcopy(dictxu)
 
-        @classmethod
-        def eval(cls, x, y):
-            return cls.avgdict[(x, y)]
+    #     @classmethod
+    #     def eval(cls, x, y):
+    #         return cls.avgdict[(x, y)]
+
+    def ufunc(order):
+        return dictu[order]
+
+    def xufunc(x, y):
+        return dictxu[x, y]
 
     return (ufunc, xufunc)
 

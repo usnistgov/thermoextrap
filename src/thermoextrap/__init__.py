@@ -10,7 +10,7 @@ from .core.data import (
     DataValues,
     DataValuesCentral,
     factory_data_values,
-    resample_indicies,
+    resample_indices,
 )
 
 # expose some data/models
@@ -57,7 +57,7 @@ __all__ = [
     "DataValues",
     "DataValuesCentral",
     "factory_data_values",
-    "resample_indicies",
+    "resample_indices",
     "xrwrap_xv",
     "xrwrap_uv",
     "xrwrap_alpha",

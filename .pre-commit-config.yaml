@@ -31,8 +31,8 @@ repos:
       - id: flake8
         # should do on all files, but in a hurry
         # files: ^thermoextrap/xtrapy|^tests/
-        files: ^thermoextrap/xtrapy
-        exclude: ^thermoextrap/xtrapy/xpan_GPR.py
+        # files: ^src/thermoextrap/xtrapy
+        exclude: ^src/thermoextrap/legacy|^tests/|^src/thermoextrap/gpr.py
 
   # Note yet implemented
   # - repo: https://github.com/pre-commit/mirrors-mypy
