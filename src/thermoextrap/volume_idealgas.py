@@ -2,7 +2,6 @@
 Routines for volume expansion(s) of ideal gas
 """
 
-from __future__ import absolute_import
 
 from functools import lru_cache
 
@@ -26,7 +25,7 @@ from .core.models import Derivatives, ExtrapModel
 # This is because the last, custom term may need more information than W and x*W moments
 # Though ALL of the observables in the paper end up with a unique term that is just
 # some constant multiplied by an average of x (same with ideal gas, too).
-class VolumeDerivFuncsIG(object):
+class VolumeDerivFuncsIG:
     """Calculates specific derivative values at refV with data x and W.
     Only go to first order for volume extrapolation.
     Here W represents the virial instead of the potential energy.

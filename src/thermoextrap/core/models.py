@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from functools import lru_cache
 
 import numpy as np
@@ -49,7 +47,7 @@ class SympyDerivFuncBase(sp.Function):
         raise NotImplementedError("must specify in subclass")
 
 
-class SymDerivBase(object):
+class SymDerivBase:
     """
     Base class for working with recursive derivatives in expansions
     """
@@ -105,7 +103,7 @@ class SymDerivBase(object):
         return out
 
 
-class SymSubs(object):
+class SymSubs:
     def __init__(
         self,
         funcs,
@@ -155,7 +153,7 @@ class SymSubs(object):
         return func
 
 
-class Lambdify(object):
+class Lambdify:
     """
     create python function from list of sympy expression
     """
@@ -199,7 +197,7 @@ class Lambdify(object):
 
 
 # -log<X>
-class SymMinusLog(object):
+class SymMinusLog:
     """
     class to take compute derivatives of Y = -log(<X>)
 
@@ -444,7 +442,7 @@ def taylor_series_norm(order, order_dim="order"):
 #         return cls(funcs=funcs, exprs=exprs)
 
 
-class ExtrapModel(object):
+class ExtrapModel:
     """
     apply taylor series extrapolation
     """
@@ -562,7 +560,7 @@ class ExtrapModel(object):
         )
 
 
-class StateCollection(object):
+class StateCollection:
     def __init__(self, states, **kws):
         """
         Parameters
@@ -1000,7 +998,7 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
         return out
 
 
-class PerturbModel(object):
+class PerturbModel:
     def __init__(self, alpha0, data, alpha_name="alpha"):
 
         self.alpha0 = alpha0
@@ -1049,7 +1047,7 @@ class MBARModel(StateCollection):
     def __init__(self, states):
         if not _HAS_PYMBAR:
             raise ImportError("need pymbar to use this")
-        super(MBARModel, self).__init__(states)
+        super().__init__(states)
 
     @gcached(prop=False)
     def _default_params(self, state_dim="state", alpha_name="alpha"):

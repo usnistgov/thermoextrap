@@ -5,7 +5,6 @@ As a result, the potential energy of a system of N particles with positions x_1,
 This is a useful test system with analytical solutions coded alongside the ability to randomly generate data.
 """
 
-from __future__ import absolute_import
 
 from functools import lru_cache
 

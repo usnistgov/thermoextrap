@@ -2,7 +2,6 @@
 This includes the recursive training algorithm and consistency checks.
 """
 
-from __future__ import absolute_import
 
 from itertools import chain, islice
 
@@ -415,7 +414,7 @@ def train_recursive(
         )
 
     else:
-        alphas_states = set([s.alpha0 for s in states])
+        alphas_states = {s.alpha0 for s in states}
         for alpha, state in zip([alpha0, alpha1], [state0, state1]):
             if alpha not in alphas_states:
                 states.append(state)

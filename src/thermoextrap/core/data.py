@@ -23,8 +23,20 @@ try:
 except ImportError:
     _HAS_CMOMY = False
 
+_shared_docs_local = {
+    "data_select": """
+    data : xr.DataArray or xr.Dataset
+        Underlying dataset to consider.
+    """,
+    "dims_select": """
+    dims : hashable or sequence of hashable
+        Dimension(s) to select along.
+    """,
+}
 
-docfiller_shared = factory_docfiller_shared()
+docfiller_shared = factory_docfiller_shared(
+    **_shared_docs_local,
+)
 
 # NOTE: General scheme:
 # uv, xv -> samples (values) for u, x
@@ -68,13 +80,16 @@ def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
 
 
 @attrs.frozen
-class DatasetSelector(object):
+@docfiller_shared
+class DatasetSelector:
     """Wrap xarray object so can index like ds[i, j].
 
     Parameters
     ----------
+    {data_select}
     data : DataArray or Dataset
         Object to index into.
+    {dims_select}
     dims : Hashable or sequence of hashables.
         Name of dimensions to be indexed.
 
@@ -86,7 +101,9 @@ class DatasetSelector(object):
     4
     """
 
+    #: Data to index
     data: xr.DataArray | xr.Dataset = attrs.field()
+    #: Dims to index along
     dims: Hashable | Sequence[Hashable] = attrs.field(converter=convert_dims_to_tuple)
 
     @data.validator
@@ -100,12 +117,15 @@ class DatasetSelector(object):
                 raise ValueError(f"{d} not in data.dimensions {self.data.dims}")
 
     @classmethod
+    @docfiller_shared
     def from_defaults(cls, data, dims=None, mom_dim="moment", deriv_dim=None):
         """
         Create DataSelector object with default values for dims.
 
         Parameters
         ----------
+        {data_select}
+        {dims_select}
         data : DataArray or Dataset
             object to index into.
         dims : hashable or sequence of hashable.
@@ -1782,14 +1802,14 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
 
         if dxdu is None or x_is_u:
-            dxdu, du = [
+            dxdu, du = (
                 (
                     du.sel(**{umom_dim: s}).assign_coords(
                         **{umom_dim: lambda x: range(x.sizes[umom_dim])}
                     )
                 )
                 for s in [slice(1, None), slice(None, -1)]
-            ]
+            )
 
         if (xave is None or x_is_u) and uave is not None:
             xave = uave
@@ -1934,7 +1954,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
                 **self.from_vals_kws,
             )
 
-        super(DataCentralMomentsVals, self).__init__(
+        super().__init__(
             dxduave=dxduave,
             xmom_dim=xmom_dim,
             umom_dim=umom_dim,
