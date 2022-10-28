@@ -8,12 +8,23 @@ Also, Only DataValues like objects are supported.
 
 from functools import lru_cache
 
+import attrs
+import xarray as xr
+from attrs import field
+from attrs import validators as attv
+
+from .core._attrs_utils import _cache_field
+from .core._docstrings import factory_docfiller_shared
 from .core.cached_decorators import gcached
 from .core.data import DataCallbackABC, DataValues
 from .core.models import Derivatives, ExtrapModel
 from .core.xrutils import xrwrap_xv
 
-# Lazily imported everything above - will trim down later
+docfiller_shared = factory_docfiller_shared(
+    names=("default", "beta", "volume"),
+)
+
+
 # Need funcs to pass to Coefs class
 # Just needs to be indexable based on order, so...
 # d^n X / d V^n = funcs[n](*args)
@@ -32,9 +43,6 @@ class VolumeDerivFuncs:
     Here W represents the virial instead of the potential energy.
     """
 
-    # def __init__(self):
-    #     pass
-
     def __getitem__(self, order):
         # Check to make sure not going past first order
         if order > 1:
@@ -51,7 +59,6 @@ class VolumeDerivFuncs:
     def create_deriv_func(order):
         # Works only because of local scope
         # Even if order is defined somewhere outside of this class, won't affect returned func
-
         def func(W, xW, dxdq, volume, ndim=1):
             """
             dxdq is <sum_{i=1}^N dy/dx_i x_i>
@@ -89,29 +96,42 @@ def factory_derivatives():
     return Derivatives(deriv_funcs)
 
 
+@attrs.define
+@docfiller_shared
 class VolumeDataCallback(DataCallbackABC):
     """
-    object to handle callbacks of metadata
+    Object to handle callbacks of metadata
+
+    Parameters
+    ----------
+    volume : float
+        Reference value of system volume.
+    {dxdqv}
+    {ndim}
+
+    See Also
+    --------
+    thermoextrap.DataCallbackABC
     """
 
-    def __init__(self, volume, dxdqv, ndim=3):
-        self.volume = volume
-        self.dxdqv = dxdqv
-        self.ndim = ndim
+    volume: float = field(validator=attv.instance_of(float))
+    dxdqv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    ndim: int = field(default=3, validator=attv.instance_of(int))
+
+    _cache: dict = _cache_field()
 
     def check(self, data):
         pass
-
-    @property
-    def param_names(self):
-        return ["volume", "dxdqv", "ndim"]
 
     @gcached(prop=False)
     def dxdq(self, rec_dim, skipna):
         return self.dxdqv.mean(rec_dim, skipna=skipna)
 
     def resample(self, data, meta_kws, indices, **kws):
-        return self.new_like(dxdqv=self.dxdqv[indices])
+        if not isinstance(data, DataValues):
+            raise NotImplementedError("resampling only possible with DataValues style.")
+        else:
+            return self.new_like(dxdqv=self.dxdqv[indices])
 
     def derivs_args(self, data, derivs_args):
         return tuple(derivs_args) + (
@@ -121,6 +141,7 @@ class VolumeDataCallback(DataCallbackABC):
         )
 
 
+@docfiller_shared
 def factory_extrapmodel(
     volume,
     uv,
@@ -135,10 +156,11 @@ def factory_extrapmodel(
     **kws
 ):
     """
-    factory function to create Extrapolation model for volume expansion
+    Factory function to create Extrapolation model for volume expansion
 
     Parameters
     ----------
+    {volume}
     volume : float
         reference value of volume
     uv, xv : array-like
@@ -147,18 +169,21 @@ def factory_extrapmodel(
     dxdqv : array-like
         values of `sum dx/dq_i q_i` where `q_i` is the ith coordinate
         This array is wrapped with `cmomy.data.xrwrap_xv`
-    ndim : int, default=3
-        number of dimensions
+    {ndim}
     order : int, default=1
         maximum order.  Only `order=1` is currently supported
     alpha_name, str, default='volume'
         name of expansion parameter
-    kws : dict
-        extra arguments to `factory_data_values`
+    {rec_dim}
+    {val_dims}
+    {rep_dim}
+    **kws :
+        Extra arguments to :func:`factory_data_values`
 
     Returns
     -------
     extrapmodel : ExtrapModel object
+
     """
 
     if order != 1:
@@ -175,11 +200,6 @@ def factory_extrapmodel(
         xv=xv,
         order=order,
         meta=meta,
-        # meta=dict(
-        #     dxdqv=dxdqv,
-        #     volume=volume,
-        #     ndim=ndim,
-        # ),
         rec_dim=rec_dim,
         rep_dim=rep_dim,
         val_dims=val_dims,

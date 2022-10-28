@@ -5,26 +5,12 @@ Routines for volume expansion(s) of ideal gas
 
 from functools import lru_cache
 
-# from .models import DataTemplateValues, DatasetSelector
+from .core._docstrings import factory_docfiller_shared
 from .core.models import Derivatives, ExtrapModel
 
-# from .beta import factory_datavalues
+docfiller_shared = factory_docfiller_shared(names=("default", "beta", "volume"))
 
 
-# from .data import DataCentralMoments, DataCentralMomentsVals
-
-
-# Lazily imported everything above - will trim down later
-# Need funcs to pass to Coefs class
-# Just needs to be indexable based on order, so...
-# d^n X / d V^n = funcs[n](*args)
-# Could create list of simple functions for each derivative order
-# But here I'm trying something similar to what's in xtrapy already
-# For any general observable, might need to modify Data class to also pass full x values
-# (or other data, perhaps)
-# This is because the last, custom term may need more information than W and x*W moments
-# Though ALL of the observables in the paper end up with a unique term that is just
-# some constant multiplied by an average of x (same with ideal gas, too).
 class VolumeDerivFuncsIG:
     """Calculates specific derivative values at refV with data x and W.
     Only go to first order for volume extrapolation.

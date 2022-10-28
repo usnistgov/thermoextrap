@@ -1,11 +1,23 @@
-from functools import lru_cache
+from __future__ import annotations
 
+from functools import lru_cache
+from typing import Callable, Mapping, Sequence
+
+import attrs
 import numpy as np
 import pandas as pd
 import sympy as sp
 import xarray as xr
+from attrs import converters as attc
+from attrs import field
+from attrs import validators as attv
+from custom_inherit import DocInheritMeta
 from scipy.special import factorial as sp_factorial
 
+from thermoextrap.core.data import AbstractData, kw_only_field
+
+from ._attrs_utils import MyAttrsMixin, _cache_field
+from ._docstrings import factory_docfiller_shared
 from .cached_decorators import gcached
 from .sputils import get_default_indexed, get_default_symbol
 from .xrutils import xrwrap_alpha
@@ -18,22 +30,14 @@ except ImportError:
     _HAS_PYMBAR = False
 
 
-# __all__ = []
-# from cmomy.xcentral import xCentralMoments
+docfiller_shared = factory_docfiller_shared(
+    names="default",
+)
+
 
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
-
-
-# @lru_cache(100)
-# def get_default_function(*args):
-#     out = [sp.Function(key) for key in args]
-#     if len(out) == 1:
-#         out = out[0]
-#     return out
-
-
 class SympyDerivFuncBase(sp.Function):
     @classmethod
     def deriv_args(cls):
@@ -47,28 +51,21 @@ class SympyDerivFuncBase(sp.Function):
         raise NotImplementedError("must specify in subclass")
 
 
-class SymDerivBase:
+@docfiller_shared
+class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
     """
     Base class for working with recursive derivatives in expansions
+
+    Parameters
+    ----------
+    func : sympy function
+        Function to differentiate
+    args : Sequence of arguments to func
+    {expand}
+    {post_func}
     """
 
     def __init__(self, func, args=None, expand=True, post_func=None):
-        """
-        Parameters
-        ----------
-        func : sympy function
-            Function to differentiate
-        args : Sequence of arguments to func
-        expand : bool
-        post_func : str or callable
-        function to perform on funciton.
-            For example, `post_fuc = -sympy.log` is equivalent to passing `minus_log=True`
-            If a string, then apply the following standard functions
-
-            * minus_log : post_func = -sympy.log
-            * pow_{i} : post_func = lambda f: pow(f, i).  E.g., `pow_2` => pow(f, 2)
-        """
-
         if args is None:
             args = func.deriv_args()
 
@@ -103,29 +100,38 @@ class SymDerivBase:
         return out
 
 
+@attrs.define
 class SymSubs:
-    def __init__(
-        self,
-        funcs,
-        subs=None,
-        subs_final=None,
-        subs_all=None,
-        recursive=True,
-        simplify=False,
-        expand=True,
-    ):
-        """
-        perform substitution on stuff
-        """
+    """
+    Class to handle substitution on :class:`SymDerivBase`
 
-        self.funcs = funcs
-        self.subs = subs
-        self.subs_final = subs_final
-        self.subs_all = subs_all
+    Parameters
+    ----------
+    funcs : sequence of sympy.Functions
+        Symbolic functions to consider.
+    subs : Sequence, optional
+        Substitutions.
+    subs_final : Sequence, optional
+        Final substitutions.
+    subs_all : mapping, optional
+        Total substitution.
+    recursive : bool, default=True
+        If True, recursively apply substitutions.
+    simplify : bool, default=False
+        If True, simplify result.
+    expand : bool, default=True
+        If True, try to exapand result.
+    """
 
-        self.recursive = recursive
-        self.simplify = simplify
-        self.expand = expand
+    funcs: Sequence[sp.Function] = field()
+    subs: Sequence | None = field(default=None)
+    subs_final: Sequence | None = field(default=None)
+    subs_all: Mapping | None = field(default=None)
+    recursive: bool = field(default=True)
+    simplify: bool = field(default=False)
+    expand: bool = field(default=True)
+
+    _cache: dict = _cache_field()
 
     @gcached(prop=False)
     def __getitem__(self, order):
@@ -153,54 +159,54 @@ class SymSubs:
         return func
 
 
+@attrs.define
 class Lambdify:
     """
-    create python function from list of sympy expression
+    Create python function from list of sympy expression
+    Parameters
+    ----------
+    exprs : sequence
+        array of sympy expressions to lambdify
+    args : sequence
+        array of sympy symbols which will be in args of the resulting function
+    lambdify_kws : dict
+        extra arguments to sympy.lambdify
     """
 
-    def __init__(self, exprs, args=None, **opts):
-        """
-        Parameters
-        ----------
-        exprs : array-like
-            array of sympy expressions to lambdify
-        args : array-like
-            array of sympy symbols which will be in args of the resulting function
-        opts : dict
-            extra arguments to sympy.lambdify
-        """
+    exprs: Sequence[sp.Function] = field()
+    args: Sequence | None = field(default=None)
+    lambdify_kws: Mapping | None = kw_only_field(
+        default=None, converter=attc.default_if_none(factory=dict)
+    )
 
-        self.exprs = exprs
-        self.args = args
-        self.opts = opts
+    _cache: dict = _cache_field()
 
     @gcached(prop=False)
     def __getitem__(self, order):
-        return sp.lambdify(self.args, self.exprs[order], **self.opts)
+        return sp.lambdify(self.args, self.exprs[order], **self.lambdify_kws)
 
     @classmethod
-    def from_u_xu(cls, exprs, **opts):
+    def from_u_xu(cls, exprs, **lambdify_kws):
         """factory for u/xu args"""
         u, xu = get_default_indexed("u", "xu")
         # args = (u, xu)
-        return cls(exprs=exprs, args=(u, xu), **opts)
+        return cls(exprs=exprs, args=(u, xu), lambdify_kws=lambdify_kws)
 
     @classmethod
-    def from_du_dxdu(cls, exprs, xalpha=False, **opts):
+    def from_du_dxdu(cls, exprs, xalpha=False, **lambdify_kws):
         """factory for du/dxdu args"""
         if xalpha:
             x1 = get_default_indexed("x1")
         else:
             x1 = get_default_symbol("x1")
         du, dxdu = get_default_indexed("du", "dxdu")
-        return cls(exprs=exprs, args=(x1, du, dxdu), **opts)
+        return cls(exprs=exprs, args=(x1, du, dxdu), lambdify_kws=lambdify_kws)
 
 
 # -log<X>
 class SymMinusLog:
     """
-    class to take compute derivatives of Y = -log(<X>)
-
+    Class to compute derivatives of Y = -log(<X>)
     """
 
     X, dX = get_default_indexed("X", "dX")
@@ -227,7 +233,8 @@ def factory_minus_log():
     return Lambdify(s, (s.X,))
 
 
-class Derivatives:
+@attrs.define
+class Derivatives(MyAttrsMixin):
     """
     Class to wrap functions calculating derivatives to specified order
 
@@ -241,28 +248,16 @@ class Derivatives:
         Mostly for debuggin purposes.
     """
 
-    def __init__(self, funcs, exprs=None, args=None):
-        self.funcs = funcs
-        self.exprs = exprs
-        self.args = args
+    #: Sequence of callable functions
+    funcs: Sequence[Callable] = field()
+    #: Sequence of sympy expressions, optional
+    exprs: Sequence[sp.Function] | None = kw_only_field(default=None)
+    #: Arguments
+    args: Sequence | None = kw_only_field(default=None)
 
     def _apply_minus_log(self, X, order):
         func = factory_minus_log()
         return [func[i](X) for i in range(order + 1)]
-
-    def __call__(
-        self,
-        data=None,
-        order=None,
-        args=None,
-        minus_log=False,
-        order_dim="order",
-        concat_kws=None,
-        norm=False,
-    ):
-        """
-        alias to self.derivs
-        """
 
     def derivs(
         self,
@@ -334,7 +329,11 @@ class Derivatives:
         self, data=None, args=None, order=None, minus_log=False, order_dim="order"
     ):
         """
-        same as `self.derivs(..., norm=True)`
+        Alias to `self.derivs(..., norm=True)`
+
+        See Also
+        --------
+        derivs
         """
 
         return self.derivs(
@@ -348,6 +347,20 @@ class Derivatives:
 
     @classmethod
     def from_sympy(cls, exprs, args):
+        """
+        Create object from list of sympy expressions.
+
+        Parameters
+        ----------
+        exprs : sequence
+            sequence of sympy expressions.
+        args : sequence
+            Arguments
+
+        Returns
+        -------
+        output : instance of cls
+        """
         funcs = Lambdify(exprs, args=args)
         return cls(funcs=funcs, exprs=exprs, args=args)
 
@@ -363,109 +376,31 @@ def taylor_series_norm(order, order_dim="order"):
     return out
 
 
-# @lru_cache(10):
-# def _get_p_value(order, order_dim='order'):
-#     p = np.arange(order + 1)
-#     if order_dim is not None:
-#         p = xr.DataArray(p, dims=order_dim)
-
-
-# def apply_xr_taylor_series(alpha0, alphas, order, derivs, normed=False, order_dim="order"):
-#     """
-#     apply taylor series
-
-#     sum (alpha - alpha0) ** i * derivs[i] / i!
-
-#     Parameters
-#     ----------
-#     alpha0 : float
-#         reference alpha value
-#     alphas : xarray.DataArray
-#         values to predict along
-#     order : int
-#         order of taylor series
-#     derivs : xarray.DataArray
-#         derivatives to be used in taylor series
-#         `derivs.isel(**{order_dim : i})` is the ith derivative
-#     normed : bool, default=True
-#         Whether `derivs` have been normalized by i!
-#     order_dim : str, default='order
-#         dimension indicating derivative order
-#     """
-
-#     dalpha = alpha - alpha0
-
-#     p = _get_p_value(order, order_dim)
-#     if not normed:
-#         derivs = derivs * taylor_series_norm(order, order_dim)
-
-
-# class Coefs(object):
-#     """class to handle coefficients in taylor expansion"""
-
-#     def __init__(self, funcs, exprs=None):
-#         """
-#         Parameters
-#         ----------
-#         funcs : array-like
-#             array of functions.
-#             funcs[n] is the nth derivative of function
-#         exprs : array-like, optional
-#             optional placeholder for sympy expressions corresponding to the
-#             lambdified functions in `funcs`
-#         """
-#         self.funcs = funcs
-#         self.exprs = exprs
-
-#     def _apply_minus_log(self, X, order):
-#         func = factory_minus_log()
-#         return [func[i](X) for i in range(order + 1)]
-
-#     def coefs(self, *args, order, norm=True, minus_log=False):
-#         out = [self.funcs[i](*args) for i in range(order + 1)]
-#         if minus_log:
-#             out = self._apply_minus_log(X=out, order=order)
-
-#         if norm:
-#             out = [x / np.math.factorial(i) for i, x in enumerate(out)]
-#         return out
-
-#     def derivs(self, data, order=None, norm=True, minus_log=False, order_dim="order"):
-#         if order is None:
-#             order = data.order
-#         out = self.coefs(*data.derivs_args, order=order, norm=norm, minus_log=minus_log)
-#         return xr.concat(out, dim=order_dim)
-
-#     @classmethod
-#     def from_sympy(cls, exprs, args):
-#         funcs = Lambdify(exprs, args=args)
-#         return cls(funcs=funcs, exprs=exprs)
-
-
-class ExtrapModel:
+@attrs.define
+class ExtrapModel(MyAttrsMixin):
     """
-    apply taylor series extrapolation
+    Apply taylor series extrapolation
     """
 
-    def __init__(
-        self, alpha0, data, derivatives, order=None, minus_log=False, alpha_name="alpha"
-    ):
+    #: Alpha value data is evalulated at
+    alpha0: float = field(converter=float)
 
-        self.alpha0 = alpha0
-        self.data = data
-        self.derivatives = derivatives
+    #: Data object
+    data: AbstractData = field(validator=attv.instance_of(AbstractData))
 
-        if order is None:
-            order = data.order
-        self.order = order
+    #: Derivatives object
+    derivatives: Derivatives = field(validator=attv.instance_of(Derivatives))
 
-        if minus_log is None:
-            minus_log = False
-        self.minus_log = minus_log
+    #: Maximum order of expansion
+    order: int | None = field(default=attrs.Factory(lambda self: self.data.order))
+    #: Whether to apply `X <- -log(X)`.
+    minus_log: bool | None = kw_only_field(
+        default=False, converter=attc.default_if_none(False)
+    )
+    #: Name of `alpha`
+    alpha_name: str = kw_only_field(default="alpha", converter=str)
 
-        if alpha_name is None:
-            alpha_name = "alpha"
-        self.alpha_name = alpha_name
+    _cache: dict = _cache_field()
 
     @gcached(prop=False)
     def _derivs(self, order, order_dim, minus_log):
@@ -510,6 +445,32 @@ class ExtrapModel:
         """
         Calculate taylor series at values "alpha"
 
+        Parameters
+        ----------
+        alpha : float or sequence of DataArray
+            Value of `alpha` to evaluate expansion at.
+        order : int, optional
+            Optional order to perform expansion to.
+        order_dim : str, default="order"
+            Name of dimension for new order dimension, if created.
+        cumsum : bool, default=False
+            If True, perform a cumsum on output for all orders.  Otherwise,
+            to total sum.
+        no_sum : bool, default=False
+            If True, do not sum the results.  Useful if manually performing any
+            math with series.
+        minus_log : bool, default=False
+            If True, transorm expansion to ``Y = - log(X)``.
+        alpha_name : str, optional
+            Name to apply to created alpha dimension.
+        dalpha_coords : str, default="dalpha"
+            Name of coordinate ``dalpha = alpha - alpha0``.
+        alpha0_coords : bool, default=True
+            If True, add ``alpha0`` to the coordinates of the results.
+
+        Returns
+        -------
+        output : DataArray or Dataset
         """
         if order is None:
             order = self.order
@@ -550,7 +511,10 @@ class ExtrapModel:
         return out
 
     def resample(self, indices=None, nrep=None, **kws):
-        return self.__class__(
+        """
+        Create new object with resampled data.
+        """
+        return self.new_like(
             order=self.order,
             alpha0=self.alpha0,
             derivatives=self.derivatives,
@@ -560,20 +524,29 @@ class ExtrapModel:
         )
 
 
-class StateCollection:
-    def __init__(self, states, **kws):
-        """
-        Parameters
-        ----------
-        states : list
-            list of states to consider
-            Note that some subclasses require this list to be sorted
-        kws : dict
-            additional key word arguments to keep internally in self.kws
-        """
+# TODO: rename StateCollection to ModelSequence?
 
-        self.states = states
-        self.kws = kws
+
+@attrs.define
+class StateCollection(MyAttrsMixin):
+    """
+    Sequence of models.
+
+    Parameters
+    ----------
+    states : list
+        list of states to consider
+        Note that some subclasses require this list to be sorted
+    kws : Mapping, optional
+        additional key word arguments to keep internally in self.kws
+    """
+
+    states: Sequence = field()
+    kws: Mapping | None = kw_only_field(
+        default=None, converter=attc.default_if_none(factory=dict)
+    )
+
+    _cache: dict = _cache_field()
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -594,7 +567,7 @@ class StateCollection:
 
     def resample(self, indices=None, nrep=None, **kws):
         """
-        resample things
+        Resample underlying models
         """
         if indices is None:
             indices = [None] * len(self)
@@ -714,6 +687,7 @@ def xr_weights_minkowski(deltas, m=20, dim="state"):
     return 1.0 - deltas_m / deltas_m.sum(dim)
 
 
+@attrs.define
 class PiecewiseMixin:
     """
     Provide methods for Piecewise state collection
@@ -744,30 +718,20 @@ class PiecewiseMixin:
     def _states_alpha(self, alpha, method):
         return [self[i] for i in self._indices_alpha(alpha, method)]
 
-    # def _states_between_alpha(self, alpha):
-    #     idx = np.digitize(alpha, self.alpha0, right=False) - 1
-    #     if idx < 0:
-    #         idx = 0
-    #     elif idx == len(self) - 1:
-    #         idx = len(self) - 2
 
-    #     return self.states[idx : idx + 2]
-
-    # def _states_nearest_alpha(self, alpha):
-    #     dalpha = np.abs(np.array(self.alpha0) - alpha)
-    #     # two lowest
-    #     idx = np.argsort(dalpha)[:2]
-    #     return [self[i] for i in idx]
-    # def _states_alpha(self, alpha, method):
-    #     if method is None or method == "between":
-    #         return self._states_between_alpha(alpha)
-    #     elif method == "nearest":
-    #         return self._states_nearest_alpha(alpha)
-    #     else:
-    #         raise ValueError("unknown method {}".format(method))
-
-
+@attrs.define
 class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
+    """
+    Weighted extrapolation model
+
+    Parameters
+    ----------
+    states : sequence of ExtrapModel
+        Extrap models to consider.
+    """
+
+    states: Sequence[ExtrapModel] = field()
+
     def predict(
         self,
         alpha,
@@ -848,6 +812,7 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
         return out
 
 
+@attrs.define
 class InterpModel(StateCollection):
     @gcached(prop=False)
     def coefs(self, order=None, order_dim="porder", minus_log=None):
@@ -932,8 +897,12 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
     Apposed to the multiple model InterpModel, perform a piecewise interpolation
     """
 
+    # @gcached(prop=False)
+    # def single_interpmodel(self, state0, state1):
+    #     return InterpModel([state0, state1])
     @gcached(prop=False)
-    def single_interpmodel(self, state0, state1):
+    def single_interpmodel(self, *state_indices):
+        state0, state1 = (self[i] for i in state_indices)
         return InterpModel([state0, state1])
 
     def predict(
@@ -959,7 +928,8 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
             alpha_name = self.alpha_name
 
         if len(self) == 2:
-            model = self.single_interpmodel(self[0], self[1])
+            # model = self.single_interpmodel(self[0], self[1])
+            model = self.single_interpmodel(0, 1)
 
             out = model.predict(
                 alpha=alpha,
@@ -977,8 +947,11 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
 
             out = []
             for a in seq:
-                state0, state1 = self._states_alpha(a, method)
-                model = self.single_interpmodel(state0, state1)
+                # state0, state1 = self._states_alpha(a, method)
+                # model = self.single_interpmodel(state0, state1)
+                model = self.single_interpmodel(
+                    *self._indices_alpha(alpha=a, method=method)
+                )
 
                 out.append(
                     model.predict(
@@ -998,15 +971,14 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
         return out
 
 
-class PerturbModel:
-    def __init__(self, alpha0, data, alpha_name="alpha"):
+@attrs.define
+class PerturbModel(MyAttrsMixin):
 
-        self.alpha0 = alpha0
-        self.data = data
-
-        if alpha_name is None:
-            alpha_name = "alpha"
-        self.alpha_name = alpha_name
+    alpha0: float = field(converter=float)
+    data: AbstractData = field(validator=attv.instance_of(AbstractData))
+    alpha_name: str | None = field(
+        default="alpha", converter=attc.default_if_none("alpha")
+    )
 
     def predict(self, alpha, alpha_name=None):
 
@@ -1039,15 +1011,15 @@ class PerturbModel:
         )
 
 
+@attrs.define
 class MBARModel(StateCollection):
     """
     Sadly, this doesn't work as beautifully.
     """
 
-    def __init__(self, states):
+    def __attrs_pre_init__(self):
         if not _HAS_PYMBAR:
             raise ImportError("need pymbar to use this")
-        super().__init__(states)
 
     @gcached(prop=False)
     def _default_params(self, state_dim="state", alpha_name="alpha"):

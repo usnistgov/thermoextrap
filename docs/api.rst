@@ -53,31 +53,79 @@ Specific models
 Inverse temperature extrapolation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. currentmodule:: thermoextrap.beta
+
+
 .. autosummary::
    :toctree: generated/
-   :template: custom-module-single.rst
+   :template: custom-class.rst
    :recursive:
 
-   beta
+   SymDerivBeta
+
+.. autosummary::
+   :toctree: generated/
+
+   factory_derivatives
+   factory_extrapmodel
+   factory_perturbmodel
+
 
 
 Volume extrapolation
 ^^^^^^^^^^^^^^^^^^^^
 
+.. currentmodule:: thermoextrap.volume
+
 .. autosummary::
    :toctree: generated/
-   :template: custom-module-single.rst
+   :template: custom-class.rst
    :recursive:
 
-   volume
+   VolumeDerivFuncs
+   VolumeDataCallback
+
+.. autosummary::
+   :toctree: generated/
+
+   factory_derivatives
+   factory_extrapmodel
+
+Ideal gas volume extrapolation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. currentmodule:: thermoextrap.volume_idealgas
+
+.. autosummary::
+   :toctree: generated/
+   :template: custom-class.rst
+   :recursive:
+
+   VolumeDerivFuncsIG
+
+.. autosummary::
+   :toctree: generated/
+
+   factory_derivatives
+   factory_extrapmodel
+   factory_extrapmodel_data
 
 
 TMMC :math:`\ln \Pi(N)` extrapolation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. currentmodule:: thermoextrap.lnpi
+
+
 .. autosummary::
    :toctree: generated/
-   :template: custom-module-single.rst
+   :template: custom-class.rst
    :recursive:
 
-   lnpi
+   lnPiDataCallback
+
+.. autosummary::
+   :toctree: generated/
+
+   factory_derivatives
+   factory_extrapmodel_lnPi

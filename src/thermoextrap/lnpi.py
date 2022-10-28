@@ -2,21 +2,38 @@
 Routinese to temperature expand lnPi
 """
 
-from functools import lru_cache
+from __future__ import annotations
 
+import warnings
+from functools import lru_cache
+from typing import Hashable, Sequence
+
+import attrs
 import numpy as np
 import sympy as sp
 import xarray as xr
 
+# from attrs import converters as attc
+from attrs import field
+from attrs import validators as attv
+from cmomy import xCentralMoments
+
 from .beta import ExtrapModel, SymDerivBeta
 from .beta import factory_derivatives as factory_derivatives_beta
 from .beta import u_func, u_func_central
+from .core._attrs_utils import (  # MyAttrsMixin,; kw_only_field,
+    _cache_field,
+    convert_dims_to_tuple,
+)
+from .core._docstrings import factory_docfiller_shared
 from .core.cached_decorators import gcached
-from .core.data import (  # DataCentralMoments,; DataCentralMomentsVals,; DataValues,; DataValuesCentral,
+from .core.data import (  # DataCentralMome nts,; DataCentralMomentsVals,; DataValues,; DataValuesCentral,
     DataCallbackABC,
 )
 from .core.models import Derivatives, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol
+
+docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
 
 
 ################################################################################
@@ -63,7 +80,7 @@ class lnPi_func_central(sp.Function):
 
 class lnPi_func_raw(sp.Function):
     """
-    raw version
+    Raw moments version.
     """
 
     nargs = 1
@@ -89,6 +106,7 @@ class lnPi_func_raw(sp.Function):
 
 
 @lru_cache(5)
+@docfiller_shared
 def factory_derivatives(
     name="lnPi",
     n=None,
@@ -99,7 +117,27 @@ def factory_derivatives(
     post_func=None,
 ):
     """
-    expansion for ln(Pi/Pi_0) (ignore bad parts of stuff)
+    Expansion for ln(Pi/Pi_0) (ignore bad parts of stuff)
+
+    Parameters
+    ----------
+    name : str, default='lnPi'
+        If name is `'lnPi'`, then get derivatives of lnPi.
+        Otherwise, get derivative object for general `X`.
+    {n_order}
+    {d_order}
+    {xalpha}
+    {central}
+    {expand}
+    {post_func}
+
+    Returns
+    -------
+    ~thermoextrap.Derivatives
+
+    See Also
+    --------
+    thermoextrap.beta.factory_derivatives
     """
 
     if name == "lnPi":
@@ -132,40 +170,71 @@ def _is_xr(name, x):
     return x
 
 
+@attrs.define
 class lnPiDataCallback(DataCallbackABC):
     """
-    object to handle metadata callbacks
+    Class to handle metadata callbacks for lnPi data.
+
+    Parameters
+    ----------
+    lnPi0 : DataArray
+        Reference value of lnPi.
+    mu : xr.DataArray
+        Value of chemical potential.  Must have dimension ``dims_comp``.
+    dims_n : hashable or sequence of hashable
+        Dimension(s) for number of particle(s).  That is, the dimensions of lnPi0 corresponding to particle number.
+    dims_comp : hashable
+        Dimension corresponding to components.
+    ncoords : DataArray, optional.
+        Count of number of particles for given particle number (vector) and component.
+        Must have dimensions ``dims_comp`` and ``dims_n``.
+    allow_resample : bool, default=False
+        If True, allow simplified resampling of ``lnPi0`` data.
+
     """
 
+    # TODO: rename dims_comp to dim_comp.
+
+    #: lnPi data
+    lnPi0: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    #: Chemical potential
+    mu: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    #: Dimensions for particle number
+    dims_n: Hashable | Sequence[Hashable] = field(converter=convert_dims_to_tuple)
+    #: Dimensions for component
+    dims_comp: Hashable = field()
+    #: Particle number coordinates
+    ncoords: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    #: Flag to allow/disallow resampling of ``lnPi0``.
+    allow_resample: bool = field(default=False)
+
+    _cache: dict = _cache_field()
     # FIXME: using dims_n, dims_comp naming because this is what is used in lnPi module
 
-    def __init__(self, lnPi0, mu, dims_n, dims_comp, ncoords=None):
+    # def __init__(self, lnPi0, mu, dims_n, dims_comp, ncoords=None):
 
-        if isinstance(dims_n, str):
-            dims_n = [dims_n]
-        self.dims_n = dims_n
-        self.dims_comp = dims_comp
+    #     if isinstance(dims_n, str):
+    #         dims_n = [dims_n]
+    #     self.dims_n = dims_n
+    #     self.dims_comp = dims_comp
 
-        self.lnPi0 = lnPi0
+    #     self.lnPi0 = lnPi0
 
-        self.mu = _is_xr("mu", mu)
-        if ncoords is None:
-            ncoords = self.get_ncoords()
-        self.ncoords = _is_xr("ncoords", ncoords)
+    #     self.mu = _is_xr("mu", mu)
+    #     if ncoords is None:
+    #         ncoords = self.get_ncoords()
+    #     self.ncoords = _is_xr("ncoords", ncoords)
 
     def check(self, data):
         pass
 
-    @property
-    def param_names(self):
-        return ["lnPi0", "mu", "dims_n", "dims_comp", "ncoords"]
-
-    def get_ncoords(self):
+    @ncoords.default
+    def _set_default_ncoords(self):
         # create grid
         ncoords = np.meshgrid(
             *tuple(self.lnPi0[x].values for x in self.dims_n), indexing="ij"
         )
-        ncoords = xr.DataArray(np.array(ncoords), dims=[self.dims_comp] + self.dims_n)
+        ncoords = xr.DataArray(np.array(ncoords), dims=(self.dims_comp,) + self.dims_n)
         return ncoords
 
     @property
@@ -178,11 +247,42 @@ class lnPiDataCallback(DataCallbackABC):
 
     @gcached()
     def mudotN(self):
+        """Dot product of `self.mu` and `self.ncoords`, reduces along `self.dims_comp`"""
         return xr.dot(self.mu, self.ncoords, dims=self.dims_comp)
 
     def resample(self, data, meta_kws=None, **kws):
-        lnPi0 = self.lnPi0.resample(**kws)
-        return self.new_like(lnPi0=lnPi0)
+        """
+        Resample lnPi0 data.
+
+        """
+
+        if not self.allow_resample:
+            raise ValueError(
+                "Must set `self.allow_resample` to `True` to use resampling. "
+                "Resampling here is handled in an ad-hoc way, and should be "
+                "used with care."
+            )
+
+        warnings.warn(
+            "'Correct' resampling of lnPi should be handled externally. "
+            "This resamples the average lnPi values.  Instead, it is "
+            "recommended to resample based on collection matrices, and "
+            "construct lnPi values based on these.",
+            category=UserWarning,
+            stacklevel=2,
+        )
+
+        # wrap in xarray object:
+        dc = xCentralMoments.from_vals(
+            self.lnPi0.expand_dims(dim="_new", axis=0),
+            axis="_new",
+            mom_dims="_mom",
+            mom=1,
+        )
+        # resample and reduce
+        dc, _ = dc.resample_and_reduce(**kws)
+        # return new object
+        return self.new_like(lnPi0=dc.values.sel(_mom=1))
 
     def derivs_args(self, data, derivs_args):
         return tuple(derivs_args) + (self.lnPi0_ave, self.mudotN)
@@ -268,9 +368,11 @@ class lnPiDataCallback(DataCallbackABC):
 
 
 # much more likely to have pre-aves here, but save that for the user
+@docfiller_shared
 def factory_extrapmodel_lnPi(
     beta,
     data,
+    *,
     central=None,
     order=None,
     alpha_name="beta",
@@ -283,29 +385,29 @@ def factory_extrapmodel_lnPi(
 
     Parameters
     ----------
-    beta : float
-        reference value of inverse temperature
+    {beta}
     data : Data object
         Should include lnPiDataCallback object as well
         See data.AbstractData
     order : int, optional
         maximum order.
         If not specified, default to `data.order + 1`
-    central : bool, optional
-        Whether or not to use central moments
-        If not specified, infer from `data`
-    post_func : str or callable
-        apply function to x.  For example, post_func = 'minus_log' or post_func = lambda x: -sympy.log(x)
-    alpha_name, str, default='beta'
-        name of expansion parameter
-    kws : dict
-        extra arguments to `factory_data_values`
-    post_func : callable, optional
-        optional function to apply to derivative functions (e.g., post_func = lambda x: -sympy.log(x))
+    {central}
+    {post_func}
+    {alpha_name}
+    derivatives : :class:`thermoextrap.Derivatives`, optional
+        Derivates object.  If not passed, construct derivatives using :func:`thermoextrap.lnpi.factory_derivatives`.
+    derivates_kws : mapping, optional
+        Optional parameters to :func:`thermoextrap.lnpi.factory_derivatives`.
 
     Returns
     -------
-    extrapmodel : ExtrapModel object
+    extrapmodel : ExtrapModel
+
+    See Also
+    --------
+    thermoextrap.lnpi.factory_derivaties
+    ~thermoextrap.ExtrapModel
     """
 
     if central is None:
