@@ -1,49 +1,50 @@
-"""Routines and classes to process input data to expected average format."""
+"""
+Routines and classes to process input data to expected average format.
+
+The general scheme is to use the following:
+
+* uv, xv -> samples (values) for u, x
+* u, xu -> averages of u and x*u
+* u[i] = <u**i>
+* xu[i] = <x * u**i>
+* xu[i, j] = <d^i x/d beta^i * u**j
+"""
 
 
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import Hashable, Mapping, Sequence
 
 import attrs
 import numpy as np
 import xarray as xr
-from cmomy.xcentral import Hashable, Sequence
+from attrs import converters as attc
+from attrs import field
+from attrs import validators as attv
 from custom_inherit import DocInheritMeta
 
-from ._attrs_utils import convert_dims_to_tuple
+from ._attrs_utils import (
+    MyAttrsMixin,
+    _cache_field,
+    convert_dims_to_tuple,
+    kw_only_field,
+)
 from ._docstrings import factory_docfiller_shared
 from .cached_decorators import gcached
 from .xrutils import xrwrap_uv, xrwrap_xv
 
 try:
-    import cmomy.xcentral as xcentral
+    from cmomy import xCentralMoments
 
     _HAS_CMOMY = True
 except ImportError:
     _HAS_CMOMY = False
 
-_shared_docs_local = {
-    "data_select": """
-    data : xr.DataArray or xr.Dataset
-        Underlying dataset to consider.
-    """,
-    "dims_select": """
-    dims : hashable or sequence of hashable
-        Dimension(s) to select along.
-    """,
-}
 
 docfiller_shared = factory_docfiller_shared(
-    **_shared_docs_local,
+    names=("default",),
 )
-
-# NOTE: General scheme:
-# uv, xv -> samples (values) for u, x
-# u, xu -> averages of u and x*u
-# u[i] = <u**i>
-# xu[i] = <x * u**i>
-# xu[i, j] = <d^i x/d beta^i * u**j
 
 
 @docfiller_shared
@@ -80,16 +81,13 @@ def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
 
 
 @attrs.frozen
-@docfiller_shared
-class DatasetSelector:
+class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_merge")):
     """Wrap xarray object so can index like ds[i, j].
 
     Parameters
     ----------
-    {data_select}
     data : DataArray or Dataset
         Object to index into.
-    {dims_select}
     dims : Hashable or sequence of hashables.
         Name of dimensions to be indexed.
 
@@ -102,13 +100,11 @@ class DatasetSelector:
     """
 
     #: Data to index
-    data: xr.DataArray | xr.Dataset = attrs.field()
+    data: xr.DataArray | xr.Dataset = field(
+        validator=attv.instance_of((xr.DataArray, xr.Dataset))
+    )
     #: Dims to index along
-    dims: Hashable | Sequence[Hashable] = attrs.field(converter=convert_dims_to_tuple)
-
-    @data.validator
-    def _validate_data(self, attribute, data):
-        assert isinstance(data, (xr.DataArray, xr.Dataset))
+    dims: Hashable | Sequence[Hashable] = field(converter=convert_dims_to_tuple)
 
     @dims.validator
     def _validate_dims(self, attribute, dims):
@@ -117,15 +113,12 @@ class DatasetSelector:
                 raise ValueError(f"{d} not in data.dimensions {self.data.dims}")
 
     @classmethod
-    @docfiller_shared
     def from_defaults(cls, data, dims=None, mom_dim="moment", deriv_dim=None):
         """
         Create DataSelector object with default values for dims.
 
         Parameters
         ----------
-        {data_select}
-        {dims_select}
         data : DataArray or Dataset
             object to index into.
         dims : hashable or sequence of hashable.
@@ -162,57 +155,11 @@ class DatasetSelector:
         return repr(self.data)
 
 
-class NewLikeAssignMixin(
-    metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True)
+@attrs.define
+class DataCallbackABC(
+    MyAttrsMixin,
+    metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True),
 ):
-    @classmethod
-    @abstractmethod
-    def param_names(cls):
-        """
-        Sequence of string names to be copied over
-        """
-        raise NotImplementedError
-
-    def new_like(self, **kws):
-        """
-        Create new object with optional parameters
-
-
-        Parameters
-        ----------
-        **kws :
-            parameters to set in new object.  Defaults to parameters in `self`.
-
-        See Also
-        --------
-        param_names
-        """
-        kws_default = {k: getattr(self, k) for k in self.param_names()}
-        kws = dict(kws_default, **kws)
-        return type(self)(**kws)
-
-    def assign_params(self, **kws):
-        """
-        Create new object with optional parameters
-
-        Same as self.new_like
-        """
-        return self.new_like(**kws)
-
-    def set_params(self, **kws):
-        """
-        Set parameters of self, and retun self (for chaining)
-        """
-
-        for name in kws.keys():
-            assert hasattr(self, name)
-
-        for name, val in kws.items():
-            setattr(self, name, val)
-        return self
-
-
-class DataCallbackABC(NewLikeAssignMixin):
     """
     Base class for handling callbacks to adjust data.
 
@@ -223,10 +170,6 @@ class DataCallbackABC(NewLikeAssignMixin):
 
     DataCallback can be subclassed to fine tune things.
     """
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
 
     @abstractmethod
     def check(self, data):
@@ -260,25 +203,17 @@ class DataCallbackABC(NewLikeAssignMixin):
         return f"<{self.__class__.__name__}>"
 
 
+@attrs.define
 class DataCallback(DataCallbackABC):
     """
     Basic version of DataCallbackABC.
 
     Implemented to pass things through unchanged.  Will be used for default construction
-
     """
-
-    def __init__(self, *args, **kwargs):
-        pass
 
     def check(self, data):
         """Perform any consistency checks between self and data"""
         pass
-
-    @classmethod
-    def param_names(cls):
-        """returns sequence of string names to be copied over"""
-        return ()
 
     def derivs_args(self, data, derivs_args):
         """adjust derivs args from data class
@@ -301,20 +236,40 @@ class DataCallback(DataCallbackABC):
         return self
 
 
-class AbstractData(NewLikeAssignMixin):
-    @property
-    @abstractmethod
-    def order(self):
-        pass
+def _meta_converter(meta):
+    if meta is None:
+        meta = DataCallback()
+    return meta
+
+
+@attrs.define
+class AbstractData(
+    MyAttrsMixin,
+    metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True),
+):
+    #: Callback
+    meta: DataCallbackABC | None = field(
+        kw_only=True,
+        converter=_meta_converter,
+    )
+    _cache: dict = _cache_field()
+
+    @meta.validator
+    def _meta_validate(self, attribute, meta):
+        if not isinstance(meta, DataCallbackABC):
+            raise ValueError("meta must be None or subclass of DataCallbackABC")
+        meta.check(data=self)
 
     @property
     @abstractmethod
     def central(self):
+        """Whether central (True) or raw (False) moments are used."""
         pass
 
     @property
     @abstractmethod
     def derivs_args(self):
+        """Sequence of arguments to derivative calculation function."""
         pass
 
     @abstractmethod
@@ -333,23 +288,6 @@ class AbstractData(NewLikeAssignMixin):
         """
         return self.deriv_dim is not None
 
-    # metheds for working with meta
-    @property
-    def meta(self):
-        return self._meta
-
-    @meta.setter
-    def meta(self, m):
-        """
-        set value and check meta
-        """
-        if m is None:
-            m = DataCallback()
-        elif not isinstance(m, DataCallbackABC):
-            raise ValueError("meta must be None or subclass of DataCallbackABC")
-        m.check(data=self)
-        self._meta = m
-
     @property
     def x_isnot_u(self):
         return not self.x_is_u
@@ -357,120 +295,84 @@ class AbstractData(NewLikeAssignMixin):
     def pipe(self, func, *args, **kwargs):
         return func(self, *args, **kwargs)
 
-    # def __repr__(self):
-    #     return f'<{self.__class__.__name__}>'
+
+# NOTE : custom_inherit doesn't play super will with docfiller.
+# the first argument to a class with custom_inherit must be an explicit parameter
 
 
+@attrs.define
+@docfiller_shared
 class DataValuesBase(AbstractData):
-    def __init__(
-        self,
-        uv,
-        xv,
-        order,
-        rec_dim="rec",
-        umom_dim="umom",
-        deriv_dim=None,
-        skipna=False,
-        chunk=None,
-        compute=None,
-        build_aves_kws=None,
-        meta=None,
-        x_is_u=False,
-    ):
-        """
-        Parameters
-        ----------
-        uv : xarray.DataArray
-            raw values of u (energy)
-        xv : xarray.DataArray
-            raw values of x (observable)
-        order : int
-            maximum order of moments to calculate
-        rec_dim : str, default='rec'
-            Name of dimension to average along.
-        umom_dim : str, default='umom',
-            Name of moment dimension < u ** umom >
-        deriv_dim : str, default=None
-            if deriv_dim is a string, then this is the name of the derivative dimension
-            and xarray objects will have a derivative
-        skipna : bool, default=False
-            if True, skip nan values
-        chunk : bool, optional
-            chunking of xarray objects
-        compute : bool, optional
-            whether to perform compute step on xarray outputs
-        meta : dict, optional
-            extra meta data/parameters to be caried along with object and child objects.
-            if 'checker' in meta, then perform a callback of the form meta['checker](self, meta)
-            this can also be used to hotwire things like derivs_args.
-        x_is_u : bool, default=False
-            if True, treat `xv = uv` and do adjust u/du accordingly
-        Values passed through method `resample_meta`
-        """
+    """
+    Base class to work with data based on values (non-cmomy)
 
-        assert isinstance(uv, xr.DataArray)
-        self.x_is_u = x_is_u
+    Parameters
+    ----------
+    uv : xarray.DataArray
+        raw values of u (energy)
+    {xv}
+    {order}
+    {rec_dim}
+    {umom_dim}
+    {deriv_dim}
+    {skipna}
+    {chunk}
+    {compute}
+    {meta}
+    {x_is_u}
+    """
 
-        if xv is not None:
-            assert isinstance(xv, (xr.DataArray, xr.Dataset))
+    #: Energy values
+    uv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    #: Obervable values
+    xv: xr.DataArray | None = field(
+        validator=attv.optional(attv.instance_of((xr.DataArray, xr.Dataset)))
+    )
+    #: Expansion order
+    order: int = field()
+    #: Records dimension
+    rec_dim: Hashable | None = kw_only_field(default="rec")
+    #: Energy moments dimension
+    umom_dim: Hashable | None = kw_only_field(default="umom")
+    #: Derivative dimension
+    deriv_dim: Hashable | None = kw_only_field(default=None)
+    #: Whether to skip NAN values
+    skipna: bool = kw_only_field(default=False)
+    #: Whether to chunk the xarray objects
+    chunk: int | Mapping | None = kw_only_field(default=None)
+    #: Whether to compute the chunked data
+    compute: bool | None = kw_only_field(default=None)
+    #: Arguments to building the averages
+    build_aves_kws: Mapping | None = kw_only_field(
+        default=None, converter=attc.default_if_none(factory=dict)
+    )
+    #: Whether the observable `x` is the same as energy `u`
+    x_is_u: bool = kw_only_field(default=False)
 
-        if chunk is not None:
-            if isinstance(chunk, int):
-                chunk = {rec_dim: chunk}
+    def __attrs_post_init__(self):
+        assert isinstance(self.uv, xr.DataArray)
+        if self.xv is not None:
+            assert isinstance(self.xv, (xr.DataArray, xr.Dataset))
 
-            uv = uv.chunk(chunk)
-            if xv is not None or self.x_isnot_u:
-                xv = xv.chunk(chunk)
+        if self.chunk is not None:
+            if isinstance(self.chunk, int):
+                self.chunk = {self.rec_dim: self.chunk}
 
-        if compute is None:
-            # default compute
-            # if not chunk, default compute is False
-            # if chunk, default compute is True
-            if chunk is None:
-                compute = False
+            self.uv = self.uv.chunk(self.chunk)
+            if self.xv is not None or self.x_isnot_u:
+                self.xv = self.xv.chunk(self.chunk)
+
+        if self.compute is None:
+            if self.chunk is None:
+                self.compute = False
             else:
-                compute = True
+                self.compute = True
 
-        if build_aves_kws is None:
-            build_aves_kws = {}
-
-        self.build_aves_kws = build_aves_kws
-
-        self.uv = uv
-        if xv is None or self.x_is_u:
-            xv = uv
-        self.xv = xv
-
-        self._order = order
-
-        self.chunk = chunk
-        self.compute = compute
-        self.skipna = skipna
-
-        # dimension names
-        self.rec_dim = rec_dim
-        self.umom_dim = umom_dim
-        self.deriv_dim = deriv_dim
-        self.meta = meta
+        if self.xv is None or self.x_is_u:
+            self.xv = self.uv
 
     @classmethod
-    def param_names(cls):
-        return [
-            "uv",
-            "xv",
-            "order",
-            "rec_dim",
-            "umom_dim",
-            "deriv_dim",
-            "skipna",
-            "chunk",
-            "compute",
-            "build_aves_kws",
-            "meta",
-            "x_is_u",
-        ]
-
-    @classmethod
+    @docfiller_shared
     def from_vals(
         cls,
         xv,
@@ -493,31 +395,16 @@ class DataValuesBase(AbstractData):
 
         Parameters
         ----------
-        uv : array-like
-            raw values of u (energy)
-            if not DataArray, wrap with `xrwrap_uv`
-        xv : xarray.DataArray
-            raw values of x (observable)
-            if not DataArray, wrap with `xrwrap_xv`
-        order : int
-            maximum order of moments to calculate
-        rec_dim : str, default='rec'
-            Name of dimension to average along.
-        umom_dim : str, default='umom',
-            Name of moment dimension <u**umom_dim>
-        val_dims : str or list-like
-            names of extra dimensions
-        deriv_dim : str, default=None
-            if deriv_dim is a string, then this is the name of the derivative dimension
-            and xarray objects will have a derivative
-        skipna : bool, default=False
-            if True, skip nan values
-        chunk : bool, optional
-            chunking of xarray objects
-        compute : bool, optional
-            whether to perform compute step on xarray outputs
-        meta : DataCallback, optional
-            extra keyword arguments
+        {uv_xv_array}
+        {order}
+        {rec_dim}
+        {umom_dim}
+        {val_dims}
+        {deriv_dim}
+        {skipna}
+        {chunk}
+        {meta}
+        {x_is_u}
         """
 
         # make sure "val" is a list
@@ -553,16 +440,13 @@ class DataValuesBase(AbstractData):
         )
 
     @property
-    def order(self):
-        return self._order
-
-    @property
     def central(self):
         return self._CENTRAL
 
     def __len__(self):
         return len(self.uv[self.rec_dim])
 
+    @docfiller_shared
     def resample(
         self,
         indices=None,
@@ -577,19 +461,11 @@ class DataValuesBase(AbstractData):
 
         Parameters
         ----------
-        indices : array-like, shape=(nrep, nrec), optional
-            if present, use this to resample
-        nrep : int, optional
-            construct resampling with `nrep` samples
-        rep_dim : str, default='rep'
-            dimension name for repetition dimension
-        chunk : optional
-            chunk size
-        compute : optional
-            if compute is the string 'None', then pass compute=None to constructor.
-            Otherwise, inheret compute
-
-
+        {indices}
+        {nrep}
+        {rep_dim}
+        {chunk}
+        {compute}
         """
 
         if chunk is None:
@@ -648,6 +524,7 @@ class DataValuesBase(AbstractData):
 ###############################################################################
 # Data
 ###############################################################################
+@docfiller_shared
 def build_aves_xu(
     uv,
     xv,
@@ -662,17 +539,31 @@ def build_aves_xu(
     transpose=False,
 ):
     """
-    build averages from values uv, xv up to order `order`
+    Build averages from values uv, xv up to order `order`
 
     Parameters
     ----------
-    umom_dim : dimension with moment order
-    deriv_dim : dimension with derivative order
+    {uv}
+    {xv}
+    {order}
+    {rec_dim}
+    {umom_dim}
+    {deriv_dim}
+    {skipna}
+    u_name : str, optional
+        Name to add to energy output.
+    xu_name
+        Name to add to ``x * u`` output.
+    merge : bool, default=False
+        Merge output `u` and `xu`.
+    transpose : bool, default=False
+        If True, transpose results such that `umom_dim` is *first*.
 
-    skipna : bool, default=False
-        if True, then handle nan values correctly.  Note that skipna=True
-        can drastically slow down the calculations
-
+    Returns
+    -------
+    output :
+        If merge is False, return ``u`` and ``xu``, xarray objects for average energy and observable times energy.
+        If merge is True, then return an :class:`xr.Dataset` containing ``u`` and ``xu``.
     """
 
     assert isinstance(uv, xr.DataArray)
@@ -736,6 +627,7 @@ def build_aves_xu(
         return u, xu
 
 
+@docfiller_shared
 def build_aves_dxdu(
     uv,
     xv,
@@ -751,17 +643,31 @@ def build_aves_dxdu(
     transpose=False,
 ):
     """
-    build central moments from values uv, xv up to order `order`
+    Build central moments from values uv, xv up to order `order`
 
     Parameters
     ----------
-    umom_dim : dimension with moment order
-    deriv_dim : dimension with derivative order
+    {uv}
+    {xv}
+    {order}
+    {rec_dim}
+    {umom_dim}
+    {deriv_dim}
+    {skipna}
+    du_name : str, optional
+        Name for output ``du``
+    dxdu_name : str, optional
+        Name for output ``dxdu``.
+    xave_name : str, optional
+        Name for output ``xave``
+    merge : bool, default=False
+    transpose : bool, default=False
 
-    skipna : bool, default=False
-        if True, then handle nan values correctly.  Note that skipna=True
-        can drastically slow down the calculations
-
+    Returns
+    -------
+    xave, duave, dxduave :
+        xarray objects with averaged data.  If merge is True, merge output
+        into single :class:`xr.Dataset` object.
     """
 
     assert isinstance(uv, xr.DataArray)
@@ -839,6 +745,7 @@ def _xu_to_u(xu, dim="umom"):
     return out
 
 
+@attrs.define
 class DataValues(DataValuesBase):
     """
     Class to hold uv/xv data
@@ -864,6 +771,7 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def xu(self):
+        """Average of `x * u ** n`"""
         out = self._mean()[1]
         if self.compute:
             out = out.compute()
@@ -871,6 +779,7 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def u(self):
+        """Average of `u ** n`"""
         if self.x_isnot_u:
             out = self._mean()[0]
             if self.compute:
@@ -882,12 +791,14 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def u_selector(self):
+        """Indexer for `self.u`"""
         return DatasetSelector.from_defaults(
             self.u, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @gcached()
     def xu_selector(self):
+        """Indexer for `self.xu`"""
         return DatasetSelector.from_defaults(
             self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
@@ -901,18 +812,8 @@ class DataValues(DataValuesBase):
         return self.meta.derivs_args(data=self, derivs_args=out)
 
 
+@attrs.define
 class DataValuesCentral(DataValuesBase):
-    """
-    Hold uv/xv data and produce central momemnts
-
-    Attributes:
-    xave : DataArray or Dataset
-        <xv>
-    du : DataArray
-        <(u-<u>)**moment>
-    dxdu : DataArray
-        <(x-<x>) * (u-<u>)**moment>
-    """
 
     _CENTRAL = True
 
@@ -934,6 +835,7 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def xave(self):
+        """Averages of `x`"""
         out = self._mean()[0]
         if self.compute:
             out = out.compute()
@@ -941,6 +843,7 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def dxdu(self):
+        """Averages of `dx * du ** n`"""
         out = self._mean()[2]
         if self.compute:
             out = out.compute()
@@ -948,6 +851,7 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def du(self):
+        """Averages of `du ** n`"""
         if self.x_isnot_u:
             out = self._mean()[1]
             if self.compute:
@@ -985,18 +889,19 @@ class DataValuesCentral(DataValuesBase):
         return self.meta.derivs_args(self, out)
 
 
+@docfiller_shared
 def factory_data_values(
     order,
     uv,
     xv,
     central=False,
-    skipna=False,
     xalpha=False,
     rec_dim="rec",
     umom_dim="umom",
     val_dims="val",
     rep_dim="rep",
     deriv_dim=None,
+    skipna=False,
     chunk=None,
     compute=None,
     x_is_u=False,
@@ -1010,29 +915,30 @@ def factory_data_values(
     order : int
         Highest moment <x * u ** order>.
         For the case `x_is_u`, highest order is <u ** (order+1)>
-    uv : array-like
-        energy values
-    xv : array-like or None
-        observable values.
-        If None, set `xv = uv`.
-    skipna : bool, default=False
-        if True, skip `np.nan` values in creating averages.
-        Can make some "big" calculations slow
-    rec_dim, umom_dim, val_dim, rep_dim, deriv_dim : str
-        names of record (i.e. time), umom_dim, value, replicate,
-        and derivative (with respect to alpha)
-    chunk : int or dict, optional
-        If specified, perform chunking on resulting uv, xv arrays.
-        If integer, chunk with {rec: chunk}
-        otherwise, should be a mapping of form {dim_0: chunk_0, dim_1: chunk_1, ...}
-    compute : bool, optional
-        if compute is True, do compute averages greedily.
-        if compute is False, and have done chunking, then defer calculation of averages (i.e., will be dask future objects).
-        Default is to do greedy calculation
-    kws : dict, optional
-        extra arguments
-    x_is_u : bool, default=False
-        If True, produce moments only of `uv` up to `order + 1`
+    {uv_xv_array}
+    {central}
+    {xalpha}
+    {rec_dim}
+    {umom_dim}
+    {val_dims}
+    {rep_dim}
+    {deriv_dim}
+    {skipna}
+    {chunk}
+    {compute}
+    {x_is_u}
+    **kws :
+        Extra arguments passed to constructor
+
+    Returns
+    -------
+    output : Data object
+
+
+    See Also
+    --------
+    DataValuesCentral
+    DataValues
     """
 
     if central:
@@ -1063,102 +969,74 @@ def factory_data_values(
 ################################################################################
 # StatsCov objects
 ################################################################################
+@attrs.define
+@docfiller_shared
 class DataCentralMomentsBase(AbstractData):
-    def __init__(
-        self,
-        dxduave,
-        umom_dim="umom",
-        xmom_dim="xmom",
-        rec_dim="rec",
-        deriv_dim=None,
-        central=False,
-        meta=None,
-        x_is_u=False,
-    ):
-        """
-        Data object based on central co-moments array
+    """
+    Data object based on central co-moments array
 
-        Parameters
-        ----------
-        dxduave : cmomy.xcentral.xStatsAccum object
-            central object to work with
-        rec_dim : str, default='rec'
-            Name of dimension to average along.
-        umom_dim : str, default='umom',
-            Name of moment dimension on `u`, < u ** umom>
-        xmom_dim : str, default='xmom'
-            Name of moment dimension on `x` variable
-        deriv_dim : str, default=None
-            if deriv_dim is a string, then this is the name of the derivative dimension
-            and xarray objects will have a derivative
-        central : bool, default=False
-            if True, use central moments.
-            if False, use raw moments
-        meta : dict, optional
-            extra meta data/parameters to be passed to child objects.  To be used with care.
-        x_is_u : bool, default=False
-            If `True` treat x as the same as u, and expose special methods
-        """
+    Parameters
+    ----------
+    dxduave : xCentralMoments
+        Central moments object.
+    {rec_dim}
+    {umom_dim}
+    {xmom_dim}
+    {deriv_dim}
+    {central}
+    {meta}
+    {x_is_u}
+    """
 
-        self.x_is_u = x_is_u
-
-        self.dxduave = dxduave
-        self.umom_dim = umom_dim
-        self.xmom_dim = xmom_dim
-        self.rec_dim = rec_dim
-        self.deriv_dim = deriv_dim
-        self.central = central
-        self.meta = meta
-
-    @classmethod
-    def param_names(cls):
-        return (
-            "dxduave",
-            "xmom_dim",
-            "umom_dim",
-            "rec_dim",
-            "deriv_dim",
-            "central",
-            "meta",
-            "x_is_u",
-        )
-
-    @property
-    def central(self):
-        return self._central
-
-    @central.setter
-    def central(self, val):
-        self._central = val
+    #: :class:`cmomy.xCentralMoments` object
+    dxduave: xCentralMoments = field(validator=attv.instance_of(xCentralMoments))
+    #: Energy moment dimension
+    umom_dim: Hashable = kw_only_field(default="umom")
+    #: Overvable moment dimension
+    xmom_dim: Hashable = kw_only_field(default="xmom")
+    #: Records dimension
+    rec_dim: Hashable = kw_only_field(default="rec")
+    #: Derivative with respect to alpha dimension
+    deriv_dim: Hashable | None = kw_only_field(default=None)
+    #: Whether central or raw moments are used
+    central: bool = kw_only_field(default=False)
+    #: Whether observable `x` is same as energy `u`
+    x_is_u: bool = kw_only_field(default=None)
 
     @property
     def order(self):
+        """Order of expansion"""
         return self.dxduave.sizes[self.umom_dim] - 1
 
     @property
     def values(self):
+        """Data underlying :attr:`dxduave`"""
         return self.dxduave.values
 
     @gcached(prop=False)
     def rmom(self):
         """
-        raw co-moments
+        Raw co-moments
         """
         return self.dxduave.rmom()
 
     @gcached(prop=False)
     def cmom(self):
         """
-        central co-moments
+        Central co-moments
         """
         return self.dxduave.cmom()
 
     @gcached()
     def xu(self):
+        """
+        Averages of form ``x * u ** n``.
+        """
         return self.rmom().sel(**{self.xmom_dim: 1}, drop=True)
 
     @gcached()
     def u(self):
+        """Averages of form ``u ** n``."""
         if self.x_isnot_u:
             out = self.rmom().sel(**{self.xmom_dim: 0}, drop=True)
             if self.xalpha:
@@ -1170,16 +1048,19 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def xave(self):
+        """Averages of form observable ``x``."""
         return self.dxduave.values.sel(
             **{self.umom_dim: 0, self.xmom_dim: 1}, drop=True
         )
 
     @gcached()
     def dxdu(self):
+        """Averages of form ``dx * dx ** n``"""
         return self.cmom().sel(**{self.xmom_dim: 1}, drop=True)
 
     @gcached()
     def du(self):
+        """Averages of ``du ** n``"""
         if self.x_isnot_u:
             out = self.cmom().sel(**{self.xmom_dim: 0}, drop=True)
             if self.xalpha:
@@ -1191,18 +1072,21 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def u_selector(self):
+        """Indexer for ``u_selector[n] = u ** n``"""
         return DatasetSelector.from_defaults(
             self.u, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @gcached()
     def xu_selector(self):
+        """Indexer for ``xu_select[n] = x * u ** n``"""
         return DatasetSelector.from_defaults(
             self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
     @gcached()
     def xave_selector(self):
+        """Selector for ``xave``"""
         if self.deriv_dim is None:
             return self.xave
         else:
@@ -1210,18 +1094,25 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def du_selector(self):
+        """Selector for ``du_selector[n] = du ** n``"""
         return DatasetSelector.from_defaults(
             self.du, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @gcached()
     def dxdu_selector(self):
+        """Selector for ``dxdu_selector[n] = dx * du ** n``"""
         return DatasetSelector.from_defaults(
             self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
     @property
     def derivs_args(self):
+        """
+        Arguments to be passed to derivative function.
+
+        For example, ``derivs(*self.derivs_args)``.
+        """
         if self.x_isnot_u:
             if self.central:
                 out = (self.xave_selector, self.du_selector, self.dxdu_selector)
@@ -1237,13 +1128,14 @@ class DataCentralMomentsBase(AbstractData):
         return self.meta.derivs_args(data=self, derivs_args=out)
 
 
+@attrs.define(slots=True)
 class DataCentralMoments(DataCentralMomentsBase):
     def __len__(self):
         return self.values.sizes[self.rec_dim]
 
     def block(self, block_size, axis=None, meta_kws=None, **kwargs):
         """
-        block resample along axis
+        Block resample along axis
 
         Paramters
         ---------
@@ -1266,7 +1158,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
     def reduce(self, axis=None, meta_kws=None, **kwargs):
         """
-        reduce along axis
+        Reduce along axis
 
         Parameters
         ----------
@@ -1282,6 +1174,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             meta=self.meta.reduce(data=self, meta_kws=meta_kws, **kws),
         )
 
+    @docfiller_shared
     def resample(
         self,
         freq=None,
@@ -1294,25 +1187,21 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta_kws=None,
         **kwargs,
     ):
-
         """
-        resample data
+        Resample data
 
         Parameters
         ----------
-        freq : array-like, shape=(nrec, nrep)
-            frequency table for resampling.
-        indices : array-like, shape=(nrep, nrec)
-            if specified and `freq` is None, construct frequency table from this.
-        nrep : int
-            if `freq` and `indices` is None, construct frequency table from this.
-        axis : int or string, default=self.rec_dim
-            axis or dimension to resample along
-        rep_dim : str, default='rep'
-            Name of repetition dimension
+        {freq}
+        {indices}
+        {nrep}
+        {axis}
+        {rep_dim}
         parallel : bool, default=True
             If true, perform resampling in parallel
-        resample_kws : dict, optional
+        meta_kws : mapping, optional
+            Parameters to `self.meta.resample`
+        resample_kws : mapping, optional
             dictionary of values to pass to self.dxduave.resample_and_reduce
         """
 
@@ -1326,20 +1215,13 @@ class DataCentralMoments(DataCentralMomentsBase):
             axis=axis,
             rep_dim=rep_dim,
             parallel=True,
-            resample_kws=None,
+            resample_kws=resample_kws,
             **kwargs,
         )
 
-        dxdu_new = self.dxduave.resample_and_reduce(**kws)
+        kws["full_output"] = True
 
-        # <<<<<<< HEAD:thermoextrap/core/data.py
-        #         # make new with new data
-        #         new = self.new_like(dxduave=dxdu_new)
-
-        #         # set meta of new objects
-        #         return new.set_params(
-        #             meta=new.meta.resample(data=new, meta_kws=meta_kws, **kws)
-        #         )
+        dxdu_new, kws["freq"] = self.dxduave.resample_and_reduce(**kws)
 
         meta = self.meta.resample(data=self, meta_kws=meta_kws, **kws)
         return self.new_like(dxduave=dxdu_new, rec_dim=rep_dim, meta=meta)
@@ -1350,6 +1232,7 @@ class DataCentralMoments(DataCentralMomentsBase):
     # so if things are in wrong order, stuff still works out
 
     @classmethod
+    @docfiller_shared
     def from_raw(
         cls,
         raw,
@@ -1370,6 +1253,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
+        Convert raw moments to data object.
+
         Parameters
         ----------
         raw : array-like
@@ -1377,6 +1262,26 @@ class DataCentralMoments(DataCentralMomentsBase):
             raw[..., i, j] = weight,        i = j = 0
                            = <x**i * u**j>, otherwise
            The shape should be (..., 2, order+1)
+        {rec_dim}
+        {xmom_dim}
+        {umom_dim}
+        {deriv_dim}
+        {central}
+        {mom}
+        {val_shape}
+        {dtype}
+        {xr_params}
+        {meta}
+        {x_is_u}
+
+        Returns
+        -------
+        output : Data object
+
+        See Also
+        --------
+        cmomy.xCentralMoments.from_raw
+
         """
 
         if x_is_u:
@@ -1393,7 +1298,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             )
             raw = raw.transpose(..., xmom_dim, umom_dim)
 
-        dxduave = xcentral.xCentralMoments.from_raw(
+        dxduave = xCentralMoments.from_raw(
             raw=raw,
             mom=mom,
             mom_ndim=2,
@@ -1419,6 +1324,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
     @classmethod
+    @docfiller_shared
     def from_vals(
         cls,
         xv,
@@ -1443,15 +1349,41 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        create DataCentralMoments object from individual (unaveraged) samples
+        Create DataCentralMoments object from individual (unaveraged) samples
 
-        uv, xv are wrapped before execution
+        Parameters
+        ----------
+        {xv}
+        {uv}
+        {order}
+        {xmom_dim}
+        {umom_dim}
+        {rec_dim}
+        {deriv_dim}
+        {central}
+        {w}
+        {axis}
+        {broadcast}
+        {val_shape}
+        {dtype}
+        {xr_params}
+        {meta}
+        {x_is_u}
+
+
+        Returns
+        -------
+        output : Data object
+
+        See Also
+        --------
+        cmomy.xCentralMoments.from_vals
         """
 
         if xv is None or x_is_u:
             xv = uv
 
-        dxduave = xcentral.xCentralMoments.from_vals(
+        dxduave = xCentralMoments.from_vals(
             x=(xv, uv),
             w=w,
             axis=axis,
@@ -1479,6 +1411,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
     @classmethod
+    @docfiller_shared
     def from_data(
         cls,
         data,
@@ -1505,6 +1438,29 @@ class DataCentralMoments(DataCentralMomentsBase):
                         = < x >                           i = 1 and j = 0
                         = < u >                           i = 0 and j = 1
                         = <(x - <x>)**i * (u - <u>)**j >  otherwise
+
+        Parameters
+        ----------
+        data : array-like
+        {rec_dim}
+        {xmom_dim}
+        {umom_dim}
+        {deriv_dim}
+        {central}
+        {mom}
+        {val_shape}
+        {dtype}
+        {xr_params}
+        {meta}
+        {x_is_u}
+
+        Returns
+        -------
+        output : Data object
+
+        See Also
+        --------
+        cmomy.xCentralMoments.from_data
         """
 
         if x_is_u:
@@ -1523,7 +1479,7 @@ class DataCentralMoments(DataCentralMomentsBase):
                 dim=xmom_dim,
             )
 
-        dxduave = xcentral.xCentralMoments.from_data(
+        dxduave = xCentralMoments.from_data(
             data=data,
             mom_ndim=2,
             mom=mom,
@@ -1576,17 +1532,36 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta_kws=None,
         x_is_u=False,
     ):
-
         """
-        create DataCentralMoments object from unaveraged samples with resampling
+        Create DataCentralMoments object from unaveraged samples with resampling
 
         Parameters
         ----------
-        axis : string or int
-            axis or dimension to resample along
-        rep_dim : string, default='rep'
-            name of repetition dimension.  This will be the rec_dim dimension of the resulting object
+        {xv}
+        {uv}
+        {order}
+        {freq}
+        {indices}
+        {nrep}
+        {xmom_dim}
+        {umom_dim}
+        {rep_dim}
+        {deriv_dim}
+        {central}
+        w : array-like, optional
+            Weights for each observation.
+        {axis}
+        {broadcast}
+        {dtype}
+        {xr_params}
+        {resample_kws}
+        {meta}
+        {meta_kws}
+        {x_is_us}
 
+        See Also
+        --------
+        cmomy.xCentralMoments.from_resample_vals
         """
         if xv is None or x_is_u:
             xv = uv
@@ -1612,7 +1587,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             mom_dims=(xmom_dim, umom_dim),
         )
 
-        dxduave = xcentral.xCentralMoments.from_resample_vals(**kws)
+        dxduave = xCentralMoments.from_resample_vals(**kws)
 
         out = cls(
             dxduave=dxduave,
@@ -1630,6 +1605,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         return out
 
     @classmethod
+    @docfiller_shared
     def from_ave_raw(
         cls,
         u,
@@ -1674,6 +1650,20 @@ class DataCentralMoments(DataCentralMomentsBase):
         axis : int, default=-1
             if `umom_axis` or `xumom_axis` is None, set to axis
             Ignored if xu is an xarray.DataArray object
+        {rec_dim}
+        {xmom_dim}
+        {umom_dim}
+        {deriv_dim}
+        {central}
+        {mom}
+        {dtype}
+        {xr_params}
+        {meta}
+        {x_is_u}
+
+        See Also
+        --------
+        cmomy.xCentralMoments.from_raw
         """
 
         if xu is None or x_is_u:
@@ -1683,14 +1673,6 @@ class DataCentralMoments(DataCentralMomentsBase):
             if w is not None:
                 raw.loc[{umom_dim: 0}] = w
             raw = raw.transpose(..., umom_dim)
-            # xu, u = [
-            #     (
-            #         u.isel(**{umom_dim: s}).assign_coords(
-            #             **{umom_dim: lambda x: range(x.sizes[umom_dim])}
-            #         )
-            #     )
-            #     for s in [slice(1, None), slice(None, -1)]
-            # ]
 
         elif isinstance(xu, xr.DataArray):
             raw = xr.concat((u, xu), dim=xmom_dim)
@@ -1745,6 +1727,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
     @classmethod
+    @docfiller_shared
     def from_ave_central(
         cls,
         du,
@@ -1772,7 +1755,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        constructor from central moments, with reduction along axis
+        Constructor from central moments, with reduction along axis
 
         Parameters
         ----------
@@ -1798,6 +1781,21 @@ class DataCentralMoments(DataCentralMomentsBase):
         axis : int, default=-1
             if `umom_axis` or `xumom_axis` is None, set to axis
             Ignored if xu is an xarray.DataArray object
+        {rec_dim}
+        {xmom_dim}
+        {umom_dim}
+        {deriv_dim}
+        {central}
+        {mom}
+        {val_shape}
+        {dtype}
+        {xr_params}
+        {meta}
+        {x_is_u}
+
+        See Also
+        --------
+        cmomy.xCentralMoments.from_data
 
         """
 
@@ -1852,7 +1850,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             if uave is not None:
                 data[..., 0, 1] = uave
 
-        dxduave = xcentral.xCentralMoments.from_data(
+        dxduave = xCentralMoments.from_data(
             data=data,
             mom=mom,
             mom_ndim=2,
@@ -1878,111 +1876,57 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
 
+@attrs.define
+@docfiller_shared
 class DataCentralMomentsVals(DataCentralMomentsBase):
-    def __init__(
-        self,
-        uv,
-        xv,
-        order=None,
-        dxduave=None,
-        w=None,
-        rec_dim="rec",
-        umom_dim="umom",
-        xmom_dim="xmom",
-        deriv_dim=None,
-        central=False,
-        from_vals_kws=None,
-        meta=None,
-        x_is_u=False,
-    ):
-        """
-        Parameters
-        ----------
-        uv : xarray.DataArray
-            raw values of u (energy)
-        xv : xarray.DataArray
-            raw values of x (observable)
-        w : array-like, optional
-            optional weigth array.  Note that this array/xarray must be conformable to uv, xv
-        order : int
-            maximum order of moments to calculate
-        rec_dim : str, default='rec'
-            Name of dimension to average along.
-        umom_dim : str, default='umom'
-            Name of moment dimension <u**umom_dim>
-        xmom_dim : str, default='xmom'
-            Name of the x moment dimension <u**umom_dim * x**xmom_dim>
-        deriv_dim : str, default=None
-            if deriv_dim is a string, then this is the name of the derivative dimension
-            and xarray objects will have a derivative
-        central : bool, default=False
-            Whether this is for central or raw moments
-        from_vals_kws : dict, optional
-            extra arguments passed to xcentral.xCentralMoments.from_vals
-        meta : dict, optional
-            extra keyword arguments.  To be used in subclasses with care.
-        """
+    """
+    Parameters
+    ----------
+    uv : xarray.DataArray
+        raw values of u (energy)
+    {xv}
+    {order}
+    from_vals_kws : dict, optional
+        extra arguments passed to xCentralMoments.from_vals
+    {dxduave}
+    """
 
-        self.x_is_u = x_is_u
+    uv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    xv: xr.DataArray | None = field(
+        validator=attv.optional(attv.instance_of(xr.DataArray))
+    )
+    order: int | None = kw_only_field(
+        default=None, validator=attv.optional(attv.instance_of(int))
+    )
+    w: Sequence | None = kw_only_field(default=None)
+    from_vals_kws: Mapping | None = kw_only_field(default=None)
+    dxduave: xCentralMoments | None = kw_only_field(
+        default=None,
+        validator=attv.optional(attv.instance_of(xCentralMoments)),
+    )
 
-        assert isinstance(uv, xr.DataArray)
-        self.uv = uv
+    def __attrs_post_init__(self):
+        if self.xv is None or self.x_is_u:
+            self.xv = self.uv
+        if self.from_vals_kws is None:
+            self.from_vals_kws = {}
 
-        if xv is None or self.x_is_u:
-            xv = uv
-        else:
-            assert isinstance(xv, xr.DataArray)
-        self.xv = xv
-
-        self.w = w
-
-        if from_vals_kws is None:
-            from_vals_kws = {}
-        self.from_vals_kws = from_vals_kws
-
-        if dxduave is None:
-            if order is None:
+        if self.dxduave is None:
+            if self.order is None:
                 raise ValueError("must pass order if calculating dxduave")
 
-            dxduave = xcentral.xCentralMoments.from_vals(
+            self.dxduave = xCentralMoments.from_vals(
                 x=(self.xv, self.uv),
                 w=self.w,
-                axis=rec_dim,
-                mom=(1, order),
+                axis=self.rec_dim,
+                mom=(1, self.order),
                 broadcast=True,
-                mom_dims=(xmom_dim, umom_dim),
+                mom_dims=(self.xmom_dim, self.umom_dim),
                 **self.from_vals_kws,
             )
 
-        super().__init__(
-            dxduave=dxduave,
-            xmom_dim=xmom_dim,
-            umom_dim=umom_dim,
-            rec_dim=rec_dim,
-            deriv_dim=deriv_dim,
-            central=central,
-            meta=meta,
-            x_is_u=x_is_u,
-        )
-
     @classmethod
-    def param_names(cls):
-        return (
-            "uv",
-            "xv",
-            "w",
-            "dxduave",
-            "order",
-            "rec_dim",
-            "umom_dim",
-            "xmom_dim",
-            "deriv_dim",
-            "central",
-            "meta",
-            "x_is_u",
-        )
-
-    @classmethod
+    @docfiller_shared
     def from_vals(
         cls,
         xv,
@@ -2005,33 +1949,31 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
 
         Parameters
         ----------
-        uv : array-like
-            raw values of u (energy)
-            if not DataArray, wrap with `xrwrap_uv`
-        xv : xarray.DataArray
-            raw values of x (observable)
-            if not DataArray, wrap with `xrwrap_xv`
-        order : int
-            maximum order of moments to calculate
-        w : array-like, optional
-            optional weigth array.  Note that this array/xarray must be conformable to uv, xv
-        rec_dim : str, default='rec'
-            Name of dimension to average along.
-        umom_dim : str, default='umom',
-            Name of moment dimension <u**umom>
-        xmom_dim : str, default='xmom'
-            Name of moment dimension on x
-        val_dims : str or list-like
-            names of extra dimensions
-        deriv_dim : str, default=None
-            if deriv_dim is a string, then this is the name of the derivative dimension
-            and xarray objects will have a derivative
-        central : bool, default=False
-            Whether this is for central or raw moments
-        from_vals_kws : dict, optional
-            extra arguments passed to xcentral.xCentralMoments.from_vals
-        meta : dict
-            extra keyword arguments
+        {xv}
+        {uv}
+        {order}
+        {xmom_dim}
+        {umom_dim}
+        {rec_dim}
+        {deriv_dim}
+        {central}
+        {w}
+        {axis}
+        {broadcast}
+        {val_shape}
+        {dtype}
+        {xr_params}
+        {meta}
+        {x_is_u}
+
+
+        Returns
+        -------
+        output : Data object
+
+        See Also
+        --------
+        cmomy.xCentralMoments.from_vals
         """
 
         # make sure "val" is a list
@@ -2082,6 +2024,20 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     ):
         """
         Resample data
+
+        Parameters
+        ----------
+        {indices}
+        {nrep}
+        {freq}
+        {resample_kws}
+        {rep_dim}
+        {axis}
+        {meta_kws}
+
+        See Also
+        --------
+        cmomy.xCentralMoments.resample
         """
 
         if axis is None:
@@ -2097,7 +2053,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             rep_dim=rep_dim,
         )
 
-        dxduave = xcentral.xCentralMoments.from_resample_vals(
+        dxduave = xCentralMoments.from_resample_vals(
             x=(self.xv, self.uv),
             w=self.w,
             mom=(1, self.order),

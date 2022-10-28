@@ -8,18 +8,12 @@ This is a useful test system with analytical solutions coded alongside the abili
 
 from functools import lru_cache
 
-# import xarray as xr
 import numpy as np
 import sympy as sp
 
-# from .cached_decorators import gcached
-# from .models import get_default_indexed, get_default_symbol
-
+# global variables
 beta_sym, vol_sym = sp.symbols("beta_sym vol_sym")
 xave_sym = (1 / beta_sym) - vol_sym / (sp.exp(beta_sym * vol_sym) - 1)
-
-# def x_ave_sym(beta, vol):
-#     return (1 / beta) - vol / (sp.exp(beta * vol) - 1)
 
 
 def x_ave(beta, vol=1.0):
@@ -166,13 +160,6 @@ def x_beta_extrap_minuslog(order, beta0, beta, vol=1.0):
     tot = 0.0
     for o in range(order + 1):
         out[o] = dbeta_xave_minuslog(o)(beta0, vol)
-        # Above does derivative with sympy... slower, but more straight-forward than below
-        # if o == 0:
-        #     out[o] = -np.log(x_ave(beta0, vol))
-        # else:
-        #     for k in range(1,o+1):
-        #         this_diffs = np.array([dbeta_xave(kk)(beta0, vol) for kk in range(1, o-k+2)])
-        #         out[o] += (np.math.factorial(k-1) * (-1/x_ave(beta0, vol))**k) *  sp.bell(o, k, this_diffs)
         tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
 
     return tot, out
