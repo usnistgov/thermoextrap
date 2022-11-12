@@ -217,7 +217,7 @@ class DataWrapper:
         u_vals = all_data[0]
         x_vals = all_data[1]
         weights = all_data[2]
-        state_data = DataCentralMomentsVals(
+        state_data = DataCentralMomentsVals.from_vals(
             uv=u_vals, xv=x_vals, w=weights, order=max_order
         )
         state = xpan_beta.factory_extrapmodel(self.beta, state_data)

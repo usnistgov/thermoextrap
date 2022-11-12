@@ -143,7 +143,7 @@ class DataWrapDensities(active_utils.DataWrapper):
         u_vals = all_data[0]
         x_vals = all_data[1]
         weights = all_data[2]
-        state_data = thermoextrap.DataCentralMomentsVals(
+        state_data = thermoextrap.DataCentralMomentsVals.from_vals(
             uv=u_vals, xv=x_vals, w=weights, order=max_order
         )
         state = thermoextrap.beta.factory_extrapmodel(
