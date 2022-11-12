@@ -4,7 +4,6 @@ import os
 import sys
 
 import numpy as np
-import sims_poly
 import sims_poly_feasst
 from openmm import unit
 
