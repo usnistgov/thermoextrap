@@ -1,17 +1,17 @@
 # packages for development
 dependencies:
   # linting
-  - black
-  - blackdoc
-  - flake8
-  - isort
+  # - black
+  # - blackdoc
+  # - flake8
+  # - isort
   # testing
   - pytest
   - pytest-cov
   - pytest-xdist
-  - tox
+  # - tox
   # hooks
-  - pre-commit
+  # - pre-commit
  # repl
   - ipython
   - ipykernel
@@ -26,16 +26,16 @@ dependencies:
   # - anaconda-client
   # - greyskull
   # doc stuff
-  - sphinx
-  - sphinx_rtd_theme
-  - recommonmark # if want markdown
-  - nbsphinx # if want notebooks
-  - sphinxcontrib-spelling
+  # - sphinx
+  # - sphinx_rtd_theme
+  # - recommonmark # if want markdown
+  # - nbsphinx # if want notebooks
+  # - sphinxcontrib-spelling
   # lsp stuff
-  - autoflake
-  - pyls-mypy
-  - pyls-black
-  - pyls-isort
-  - pip
-  - pip:
-      - pyenchant
+  # - autoflake
+  # - pyls-mypy
+  # - pyls-black
+  # - pyls-isort
+  # - pip
+  # - pip:
+  #     - pyenchant

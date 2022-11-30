@@ -66,7 +66,12 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
 
 
 3. Install dependecies.  There are useful commands in the makefile, that depend on
-   `pre-commit` and `conda-merge`.  These can be installed with `pip`, `pipx`, or `conda/mamba`.
+   `pre-commit` and `conda-merge`.  These can be installed in the local environment with `pip`, or `conda/mamba`, or across environments with `pipx` or `condax`.  For example, we do the following::
+
+   $ for x in pre-commit tox ; do condax install $x; done
+
+   Any additional packages you need for development can be installed likewise.
+
 
 4. Initiate pre-commit with::
 
@@ -86,6 +91,12 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
      $ make environment-dev.yml
      $ conda/mamba env create -n {env-name} -f environment-dev.yml
      $ conda activate {env-name}
+
+   If there are additional tools you'd like to install in the development enviroment (opposed to globally installed via pipx or condax), install them here::
+
+     $ conda install -n {env-name} pre-commit tox ...
+
+   Note that if additional dependecies are required by the edited packages, these should be added to `environment.yaml` and `setup.cfg`
 
 
 6. Install editable package::
