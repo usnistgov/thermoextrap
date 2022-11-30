@@ -31,6 +31,7 @@ repos:
     rev: v0.3.5
     hooks:
       - id: blackdoc
+        # exclude: ^src/thermoextrap/core/external/docfiller.py
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.9.2
     hooks:
