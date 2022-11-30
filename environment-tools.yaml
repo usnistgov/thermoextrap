@@ -15,6 +15,7 @@ dependencies:
  # repl
   - ipython
   - ipykernel
+  - nbconvert
   # build
   # - setuptools
   - setuptools-scm

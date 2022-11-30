@@ -7,9 +7,10 @@ Welcome to thermodynamic-extrapolation's documentation!
 
    readme
    installation
-   usage
-   api
    examples
+   ..
+      usage
+   api
    contributing
    authors
    history
