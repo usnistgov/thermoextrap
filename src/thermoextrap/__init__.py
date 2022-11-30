@@ -25,10 +25,6 @@ from .core.models import (
 )
 from .core.xrutils import xrwrap_alpha, xrwrap_uv, xrwrap_xv
 
-# remove explicit imports of gpr stuff
-# causing some warnings during tests that are annoying
-# from . import gpr, gpr_stack
-
 # updated versioning scheme
 try:
     from importlib.metadata import version as _version
@@ -63,8 +59,6 @@ __all__ = [
     "xrwrap_alpha",
     "idealgas",
     "beta",
-    # "gpr",
-    # "gpr_stack",
     "lnpi",
     "volume",
     "volume_idealgas",
