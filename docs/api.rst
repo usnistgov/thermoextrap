@@ -133,3 +133,38 @@ TMMC :math:`\ln \Pi(N)` extrapolation
 
 
 Gaussian Process Regression
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. currentmodule:: thermoextrap.gpr_active
+
+
+.. autosummary::
+   :toctree: generated/
+   :template: custom-class.rst
+   :recursive:
+
+   ig_active.IG_DataWrapper
+   ig_active.SimulateIG
+
+   active_utils.DataWrapper
+   active_utils.input_GP_from_states
+   active_utils.create_base_GP_model
+   active_utils.train_GPR
+   active_utils.make_poly_expr
+   active_utils.UpdateALMbrute
+   active_utils.UpdateSpaceFill
+   active_utils.UpdateFuncBase
+   active_utils.MaxRelGlobalVar
+   active_utils.MaxAbsRelGlobalDeviation
+   active_utils.MaxRelVar
+   active_utils.StopCriteria
+   active_utils.create_GPR
+
+   gp_models.DerivativeKernel
+
+
+.. autosummary::
+   :toctree: generated/
+
+   active_utils.active_learning
+   active_utils.get_logweights

@@ -6,6 +6,7 @@ Tests for GP models with derivatives and active learning based on those models.
 
 import gpflow
 import numpy as np
+import pytest
 
 from thermoextrap.gpr_active import sine_active
 from thermoextrap.gpr_active.active_utils import make_rbf_expr, train_GPR
@@ -390,6 +391,7 @@ def test_GP_likelihood():
 # Would allow for most comparisons to a "base" model created in __init__
 # But would make testing more modular and specific
 # Manually parsing and running all methods in class is a pain for testing, though
+@pytest.mark.slow
 def test_GP():
 
     # First create data we can use

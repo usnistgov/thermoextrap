@@ -354,6 +354,9 @@ class SimWrapper:
         return sim_dat
 
 
+# FIXME: replace l with v
+
+
 def make_matern_expr(p):
     d = sp.symbols("d")
     k = sp.var("k")
@@ -365,40 +368,40 @@ def make_matern_expr(p):
     poly_part = poly_part * sp.factorial(p) / sp.factorial(2 * p)
     exp_part = sp.exp(-sp.sqrt(float(2 * p + 1)) * d)
     full_expr = sp.simplify(poly_part * exp_part)
-    v = sp.symbols("v", real=True)
+    l = sp.symbols("l", real=True)  # noqa: E741
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
-    distance = sp.sqrt((x1 / v - x2 / v) ** 2)
+    distance = sp.sqrt((x1 / l - x2 / l) ** 2)
     var = sp.symbols("var", real=True)
     kern_params = {
         "var": [1.0, {"transform": gpflow.utilities.positive()}],
-        "v": [1.0, {"transform": gpflow.utilities.positive()}],
+        "l": [1.0, {"transform": gpflow.utilities.positive()}],
     }
     return var * full_expr.subs(d, distance), kern_params
 
 
 def make_rbf_expr():
     var = sp.symbols("var", real=True)
-    v = sp.symbols("v", real=True)
+    l = sp.symbols("l", real=True)  # noqa: E741
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
-    rbf_kern_expr = var * sp.exp(-0.5 * (x1 / v - x2 / v) ** 2)
+    rbf_kern_expr = var * sp.exp(-0.5 * (x1 / l - x2 / l) ** 2)
     kern_params = {
         "var": [1.0, {"transform": gpflow.utilities.positive()}],
-        "v": [1.0, {"transform": gpflow.utilities.positive()}],
+        "l": [1.0, {"transform": gpflow.utilities.positive()}],
     }
     return rbf_kern_expr, kern_params
 
 
 def make_poly_expr(p):
     var = sp.symbols("var", real=True)
-    v = sp.symbols("v", real=True)
+    l = sp.symbols("l", real=True)  # noqa: E741
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
-    poly_kern_expr = (var * x1 * x2 + v) ** p
+    poly_kern_expr = (var * x1 * x2 + l) ** p
     kern_params = {
         "var": [1.0, {"transform": gpflow.utilities.positive()}],
-        "v": [1.0, {"transform": gpflow.utilities.positive()}],
+        "l": [1.0, {"transform": gpflow.utilities.positive()}],
     }
     return poly_kern_expr, kern_params
 
