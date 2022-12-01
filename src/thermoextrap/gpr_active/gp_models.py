@@ -4,14 +4,16 @@ import gpflow
 import numpy as np
 import sympy as sp
 import tensorflow as tf
+from gpflow import logdensities
 from scipy import optimize
 
 
+# TODO: Bunch of cleanup here
 # First define classes needed for a GPR model
 # A general derivative kernel based on a sympy expression
 class DerivativeKernel(gpflow.kernels.Kernel):
     """
-        Creates a kernel that can be differentiated based on a sympy expression for the kernel.
+    Creates a kernel that can be differentiated based on a sympy expression for the kernel.
     Given observations that are tagged with the order of the derivative, builds the appropriate
     kernel. Be warned that your kernel_expr will not be checked to make sure it is positive
     definite, stationary, etc.
@@ -24,25 +26,28 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
     Currently, everything is only intended to work with 1D observables.
 
-        Inputs:
-               kernel_expr - sympy expression for the kernel that can be differentiated - must
-                             have at least 2 symbols
-                             (symbol names should be 'x1' and 'x2', case insensitive, if have
-                              only 2)
-               obs_dims - number of dimensions for observable input
-                          (input should be twice this with obs_dims values then obs_dims
-                           derivative labels each row)
-               kernel_params - a dictionary of kernel parameters that can be optimized by
-                               tensorflow
-                               (key should be name, then references list with value then
-                                another dict with kwargs for gpflow.Parameter, i.e.,
-                                {'variance', [1.0, {'transform':gpflow.utilities.positive()}]}
-                                so if you don't want to set any kwargs, just pass empty
-                                dictionary
-                               NOTE THAT THE KEYS MUST MATCH THE SYMBOL NAMES IN kernel_expr
-                               OTHER THAN 'x1' and 'x2'
-                               Default is empty dict, so will mine names from kernel_expr and
-                               set all parameters to 1.0
+    Parameters
+    ----------
+    kernel_expr : sympy expression
+        Expression for the kernel that can be differentiated - must
+        have at least 2 symbols
+        (symbol names should be 'x1' and 'x2', case insensitive, if have
+        only 2)
+    obs_dims : int
+        Number of dimensions for observable input
+        (input should be twice this with obs_dims values then obs_dims
+        derivative labels each row)
+    kernel_params : mapping
+        A dictionary of kernel parameters that can be optimized by tensorflow
+        (key should be name, then references list with value then
+        another dict with kwargs for gpflow.Parameter, i.e.,
+        {'variance', [1.0, {'transform':gpflow.utilities.positive()}]}
+        so if you don't want to set any kwargs, just pass empty
+        dictionary
+        NOTE THAT THE KEYS MUST MATCH THE SYMBOL NAMES IN kernel_expr
+        OTHER THAN 'x1' and 'x2'
+        Default is empty dict, so will mine names from kernel_expr and
+        set all parameters to 1.0
     """
 
     def __init__(
@@ -1205,6 +1210,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
             )
             inds_list.append(this_inds)
 
-        k_list = tf.dynamic_stitch(inds_list, f_list)
+        # NOTE: never used, so commented out.  Something wrong here?
+        # k_list = tf.dynamic_stitch(inds_list, f_list)
         out = tf.reshape(f_list, (x_vals.shape[0], 1))  # Really, just for 1D functions
         return out

@@ -1,5 +1,6 @@
+=================
 Notebook Examples
------------------
+=================
 
 .. toctree::
    :maxdepth: 1
@@ -8,7 +9,7 @@ Notebook Examples
    notebooks/Customized_Derivatives
 
 Extrapolation in temperature
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -20,10 +21,24 @@ Extrapolation in temperature
    notebooks/Temperature_Interp
 
 Other systems
-^^^^^^^^^^^^^
+-------------
 
 .. toctree::
    :maxdepth: 1
 
    notebooks/Macrostate_Dist_Extrap
    notebooks/Test_System_Ideal_Gas
+
+
+Gaussian process regression
+---------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   notebooks/gpr/IdealGas
+   notebooks/gpr/analysis_LJ_GEMC
+   notebooks/gpr/analysis_LJ_NPT
+   notebooks/gpr/analysis_LJ_lnPi
+   notebooks/gpr/analysis_adsorption
+   notebooks/gpr/analysis_polymer

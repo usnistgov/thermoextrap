@@ -2,13 +2,13 @@ import glob
 import multiprocessing
 import os
 import time
-from typing import Optional
 
 import gpflow
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
-import tensorflow as tf
+
+# import tensorflow as tf
 import xarray as xr
 from pymbar import timeseries
 from scipy import integrate, linalg, special
@@ -22,9 +22,12 @@ from .gp_models import (
     LinearWithDerivs,
 )
 
+# from typing import Optional
+
 
 def get_logweights(bias):
-    """Given values of the biasing potential for each configuration, calculates the weights
+    """
+    Given values of the biasing potential for each configuration, calculates the weights
     for averaging over those configurations for the biased ensemble so that the
     average represents the unbiased ensemble.
     """
@@ -362,40 +365,40 @@ def make_matern_expr(p):
     poly_part = poly_part * sp.factorial(p) / sp.factorial(2 * p)
     exp_part = sp.exp(-sp.sqrt(float(2 * p + 1)) * d)
     full_expr = sp.simplify(poly_part * exp_part)
-    l = sp.symbols("l", real=True)
+    v = sp.symbols("v", real=True)
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
-    distance = sp.sqrt((x1 / l - x2 / l) ** 2)
+    distance = sp.sqrt((x1 / v - x2 / v) ** 2)
     var = sp.symbols("var", real=True)
     kern_params = {
         "var": [1.0, {"transform": gpflow.utilities.positive()}],
-        "l": [1.0, {"transform": gpflow.utilities.positive()}],
+        "v": [1.0, {"transform": gpflow.utilities.positive()}],
     }
     return var * full_expr.subs(d, distance), kern_params
 
 
 def make_rbf_expr():
     var = sp.symbols("var", real=True)
-    l = sp.symbols("l", real=True)
+    v = sp.symbols("v", real=True)
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
-    rbf_kern_expr = var * sp.exp(-0.5 * (x1 / l - x2 / l) ** 2)
+    rbf_kern_expr = var * sp.exp(-0.5 * (x1 / v - x2 / v) ** 2)
     kern_params = {
         "var": [1.0, {"transform": gpflow.utilities.positive()}],
-        "l": [1.0, {"transform": gpflow.utilities.positive()}],
+        "v": [1.0, {"transform": gpflow.utilities.positive()}],
     }
     return rbf_kern_expr, kern_params
 
 
 def make_poly_expr(p):
     var = sp.symbols("var", real=True)
-    l = sp.symbols("l", real=True)
+    v = sp.symbols("v", real=True)
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
-    poly_kern_expr = (var * x1 * x2 + l) ** p
+    poly_kern_expr = (var * x1 * x2 + v) ** p
     kern_params = {
         "var": [1.0, {"transform": gpflow.utilities.positive()}],
-        "l": [1.0, {"transform": gpflow.utilities.positive()}],
+        "v": [1.0, {"transform": gpflow.utilities.positive()}],
     }
     return poly_kern_expr, kern_params
 
@@ -721,6 +724,22 @@ class UpdateStopABC:
     """
     Class that forms basis for both update and stopping criteria classes, which both need to
     define transformation functions and create grids of alpha values.
+
+    Parameters
+    ----------
+    d_order_pred : int, default=0
+        Derivative order at which predictions should be made
+    transform_func : identityTransform function
+        For transforming GP model output
+        should take the x, y, and y_var (input, output, and variance
+        in y) of GP as input; output should be transformed mu (or
+        median, which is better), transformed uncertainty (could be
+        std or confidence interval width), and finally the confidence
+        interval itself, which is best for plotting.
+    log_scale : bool, default=False
+        Whether to use log scale for input (x) or not.
+    avoid_repeats : bool, default=False
+        Whether or not to randomize grid of new locations.
     """
 
     def __init__(
@@ -813,6 +832,18 @@ class UpdateFuncBase(UpdateStopABC):
     which means that for new classes inheriting from this do_update() must be implemented.
     The update function should typically take two arguments: the GP model and the list of
     alpha (or x) input values that the model is based on.
+
+    Parameters
+    ----------
+    show_plot : bool, default=False
+        Whether or not to show a plot after each update
+    save_plot : bool, default=False
+        Whether or not to save a plot after each update
+    save_dir : str or path-like, default='./'
+        Directory to save figures.
+    compare_func : callable, optional
+        Function to compare to for plotting, like ground truth if it is known.
+
     """
 
     def __init__(
@@ -823,13 +854,6 @@ class UpdateFuncBase(UpdateStopABC):
         compare_func=None,
         **kwargs
     ):
-        """
-        show_plot - (False) whether or not to show a plot after each update
-        save_plot - (False) whether or not to save a plot after each update
-        save_dir - ('./') directory to save figures
-        compare_func - (None) function to compare to for plotting, like ground truth
-                       if it is known
-        """
         super().__init__(**kwargs)
 
         # init just sets up how update function should behave
@@ -1218,7 +1242,8 @@ class UpdateALCbrute(UpdateFuncBase):
                     axis=1,
                 )
             )
-            this_std = transform_func(
+            # TODO: fix parameter definitions
+            this_std = transform_func(  # noqa: F821
                 alpha_grid, np.sqrt(np.squeeze(this_pred[1].numpy()))
             )
             new_int_std[i] = integrate.simpson(this_std, x=alpha_grid)
@@ -1697,38 +1722,56 @@ def active_learning(
     alpha_name="alpha",
     log_scale=False,
     max_order=4,
-    gp_base_kwargs={},
+    gp_base_kwargs=None,
     num_state_repeats=1,
     save_history=False,
     use_predictions=False,
 ):
     """Continues adding new points with active learning by running simulations until the
     specified tolerance is reached or the maximum number of iterations is achieved.
-        Inputs:
-               init_states - list of initial DataWrapper objects
-               sim_wrapper - SimWrapper object for running simulations
-               update_func - callable for selecting the next state point
-               stop_criteria - (None) callable taking GP to determine if should stop
-               max_iter - (10) maximum number of iterations to run (new points to add)
-               alpha_name - ('alpha') the changed parameter; MUST match input name for sim_inputs
-               log_scale - (False) whether or not to use a log scale for alpha
-               max_order - (4) maximum order to use for derivative observations
-               gp_base_kwargs - {} dictionary of keyword arguments for create_base_GP_model
-                                (allows for more advanced specification of GP model)
-               num_state_repeats - (1) number of simulations to run for each state
-                                   (can help to estimate uncertainty as long as independent)
-               save_history - (False) If stop_criteria is not None, saves it's history (all
-                              predictions at each step of active learning protocol)
-               use_predictions - (False) Whether or not sim_wrapper needs predictions from
-                                 the GP model or not; if True, passes keyword arguments of
-                                 model_pred and model_std (model predicted mu and std) to
-                                 sim_wrapper
-        Outputs:
-               data_list - list of DataWrapper objects describing how to load data
-                           (can be used to build states and create_GPR to generate GP model)
-               train_history - dictionary of information about results at each training
-                               iteration, like GP predictions, losses, parameters, etc.
+
+    Parameters
+    ----------
+    init_states : list of initial DataWrapper objects
+    sim_wrapper : SimWrapper object for running simulations
+    update_func : callable
+        For selecting the next state point.
+    stop_criteria : callable, optional
+        callable taking GP to determine if should stop
+    max_iter : int, default=10
+        maximum number of iterations to run (new points to add)
+    alpha_name : str, default='alpha'
+        the changed parameter; MUST match input name for sim_inputs
+    log_scale : bool, default=False
+        whether or not to use a log scale for alpha
+    max_order : int, default=4
+        Maximum order to use for derivative observations
+    gp_base_kwargs : dict, optional
+        dictionary of keyword arguments for create_base_GP_model
+        (allows for more advanced specification of GP model)
+    num_state_repeats : int, default=1
+        Number of simulations to run for each state
+        (can help to estimate uncertainty as long as independent)
+    save_history : bool, default=False
+        If stop_criteria is not None, saves it's history (all
+        predictions at each step of active learning protocol).
+    use_predictions : bool, default=False
+        Whether or not sim_wrapper needs predictions from
+        the GP model or not; if True, passes keyword arguments of
+        model_pred and model_std (model predicted mu and std) to
+        sim_wrapper
+
+    Returns
+    -------
+    data_list : list of DataWrapper objects
+        List of DataWrapper objects describing how to load data (can be used to build states and create_GPR to generate GP model)
+    train_history - dict
+        Dictionary of information about results at each training
+        iteration, like GP predictions, losses, parameters, etc.
     """
+
+    if gp_base_kwargs is None:
+        gp_base_kwargs = {}
 
     if log_scale ^ update_func.log_scale:  # Bitwise XOR
         print(
@@ -1799,7 +1842,7 @@ def active_learning(
             stop_bool, stop_metrics = stop_criteria(this_GP, alpha_list)
             # Add to training history
             for m in stop_metrics.keys():
-                if not "tol" in m:
+                if "tol" not in m:
                     train_history[m].append(stop_metrics[m])
             if stop_bool:
                 print("\nStopping criteria satisfied with stopping metrics of: ")

@@ -39,7 +39,7 @@ repos:
         # should do on all files, but in a hurry
         # files: ^thermoextrap/xtrapy|^tests/
         # files: ^src/thermoextrap/xtrapy
-        exclude: ^src/thermoextrap/legacy|^tests/|^src/thermoextrap/gpr.py
+        exclude: ^src/thermoextrap/legacy|^tests/|^src/thermoextrap/gpr.py|^docs/notebooks/gpr/
   # Note yet implemented
   # - repo: https://github.com/pre-commit/mirrors-mypy
   #   rev: v0.790  # Must match ci/requirements/*.yml
