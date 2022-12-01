@@ -4,9 +4,9 @@
 Tests for active learning based on those GP models with derivatives.
 """
 
-
 import gpflow
 import numpy as np
+import pytest
 import sympy as sp
 import xarray as xr
 from scipy import linalg
@@ -250,6 +250,7 @@ def test_base_GP_creation():
 
 # Simple test for checking training of GP model
 # Test is a bit slow, though
+@pytest.mark.slow
 def test_train_GP():
     # Will compare training results to a reference
     # Need data to work with
@@ -290,6 +291,7 @@ def test_train_GP():
 
 # Simple test for creating a GP model from list of states
 # Also a bit slow
+@pytest.mark.slow
 def test_create_GP_from_states():
     # Need data to work with
     states = []
@@ -318,6 +320,7 @@ def test_create_GP_from_states():
 
 
 # Testing update and stopping function classes
+@pytest.mark.slow
 def test_update_stop_ABC():
     # Need data to work with
     states = []
@@ -388,6 +391,7 @@ def test_update_stop_ABC():
 # For update classes, all have different update criteria
 # Rather than check all of these (hard for random...)
 # just check to make sure satisfy correct input/output structure
+@pytest.mark.slow
 def test_update_classes():
     # Need data to work with
     states = []
@@ -429,6 +433,7 @@ def test_update_classes():
     assert isinstance(out_adapt[0], float)
 
 
+@pytest.mark.slow
 def test_update_classes_multioutput():
     # Need data to work with
     states = []
@@ -470,6 +475,7 @@ def test_update_classes_multioutput():
 
 # Same for metric classes
 # just check mechanics for taking inputs and generic features of outputs
+@pytest.mark.slow
 def test_metrics():
     # Need to create inputs to work with
     # Expects "history" which is a list of array-likes
@@ -549,6 +555,7 @@ def test_metrics():
 
 
 # Test class for implementing stopping criteria
+@pytest.mark.slow
 def test_stop_criteria():
     # Need data to work with
     states = []
@@ -631,6 +638,7 @@ import io
 from contextlib import redirect_stdout
 
 
+@pytest.mark.slow
 def test_active_learning():
     # Starting beta values
     init_states = [1.0, 9.6]

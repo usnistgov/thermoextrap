@@ -63,6 +63,9 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
         super().__init__(active_dims=active_dims, **kwargs)
 
+        if kernel_params is None:
+            kernel_params = {}
+
         # Get the sympy expression for the kernel
         self.kernel_expr = kernel_expr
         # Now need to mine it a little bit to get the adjustable parameters and input variables
