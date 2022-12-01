@@ -7,9 +7,9 @@ Tests for GP models with derivatives and active learning based on those models.
 import gpflow
 import numpy as np
 
-from . import sine_active
-from .active_utils import make_rbf_expr, train_GPR
-from .gp_models import (
+from thermoextrap.gpr_active import sine_active
+from thermoextrap.gpr_active.active_utils import make_rbf_expr, train_GPR
+from thermoextrap.gpr_active.gp_models import (
     ConstantMeanWithDerivs,
     DerivativeKernel,
     HeteroscedasticGPR,

@@ -11,8 +11,8 @@ import sympy as sp
 import xarray as xr
 from scipy import linalg
 
-from .. import idealgas
-from . import active_utils, gp_models, ig_active
+from thermoextrap import idealgas
+from thermoextrap.gpr_active import active_utils, gp_models, ig_active
 
 # For now, not testing DataWrapper or SimWrapper objects
 # These will likely change in future iterations and be highly dependent on individual problems

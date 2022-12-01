@@ -140,18 +140,18 @@ version: version-scm version-import
 ################################################################################
 # Docs
 ################################################################################
-.PHONY: docs serverdocs doc-spelling
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -fr docs/generated
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+# .PHONY: docs serverdocs doc-spelling
+# docs: ## generate Sphinx HTML documentation, including API docs
+# 	rm -fr docs/generated
+# 	$(MAKE) -C docs clean
+# 	$(MAKE) -C docs html
+# 	$(BROWSER) docs/_build/html/index.html
 
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+# servedocs: docs ## compile the docs watching for changes
+# 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-docs-spelling:
-	sphinx-build -b spelling docs docs/_build
+# docs-spelling:
+# 	sphinx-build -b spelling docs docs/_build
 
 
 ################################################################################
@@ -160,23 +160,25 @@ docs-spelling:
 tox_posargs?=-v
 TOX=CONDA_EXE=mamba tox $(tox_posargs)
 
-hello:
-	echo $(TOX)
-
 ## testing
 .PHONY: test-all
 test-all: ## run tests on every Python version with tox
 	$(TOX) -- $(posargs)
 
-## docs
-.PHONY: docs-build docs-release docs-nist-pages
-posargs=
-docs-build:
-	$(TOX) -e docs-build -- $(posargs)
-docs-release:
-	$(TOX) -e docs-release -- $(posargs)
 
-docs-nist-pages:
+## docs
+.PHONY: docs-build docs-release docs-clean docs-spelling docs-nist-pages
+posargs=
+docs-build: ## build docs in isolation
+	$(TOX) -e docs-build -- $(posargs)
+docs-release: ## release docs.  use posargs=... to override stuff
+	$(TOX) -e docs-release -- $(posargs)
+docs-clean: ## clean docs
+	rm -rf docs/_build/*
+	rm -rf docs/generated/*
+docs-spelling:
+	$(TOX) -e docs-spelling -- $(posargs)
+docs-nist-pages: ## do both build and releas
 	$(TOX) -e docs-build,docs-release -- $(posargs)
 
 
@@ -210,12 +212,11 @@ test-dist-pypi-remote: ## test pypi install, can run as `make test-dist-pypi-rem
 test-dist-conda-remote: ## test conda install, can run as `make test-dist-conda-remote py=39` to run test-dist-conda-local-py39
 	$(TOX) -e $@-py$(py) -- $(poasargs)
 
-test-dist-pypi-local: ## test pypi install, can run as `make test-dist-pypi-local py=39 posargs=path-to-dist` to run test-dist-pypi-local-py39
+test-dist-pypi-local: ## test pypi install, can run as `make test-dist-pypi-local py=39` to run test-dist-pypi-local-py39
 	$(TOX) -e $@-py$(py) -- $(posargs)
 
-test-dist-conda-local: ## test conda install, can run as `make test-dist-conda-local py=39 posargs=path-to-conda-dist` to run test-dist-conda-local-py39 -- path-to-conda-dist
+test-dist-conda-local: ## test conda install, can run as `make test-dist-conda-local py=39` to run test-dist-conda-local-py39
 	$(TOX) -e $@-py$(py) -- $(poasargs)
-
 
 ################################################################################
 # installation

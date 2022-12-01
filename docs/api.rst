@@ -129,3 +129,7 @@ TMMC :math:`\ln \Pi(N)` extrapolation
 
    factory_derivatives
    factory_extrapmodel_lnPi
+
+
+
+Gaussian Process Regression
