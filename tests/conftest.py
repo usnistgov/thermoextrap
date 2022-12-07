@@ -97,6 +97,7 @@ class FixtureData:
             order=self.order,
             central=True,
             dims=["val"],
+            axis=0,
         )
 
     @gcached()
@@ -113,6 +114,7 @@ class FixtureData:
             order=self.order,
             central=False,
             dims=["val"],
+            axis=0,
         )
 
     @gcached()
