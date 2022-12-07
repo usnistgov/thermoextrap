@@ -1133,7 +1133,8 @@ class DataCentralMoments(DataCentralMomentsBase):
     def __len__(self):
         return self.values.sizes[self.rec_dim]
 
-    def block(self, block_size, axis=None, meta_kws=None, **kwargs):
+    @docfiller_shared
+    def block(self, block_size, dim=None, axis=None, meta_kws=None, **kwargs):
         """
         Block resample along axis
 
@@ -1141,33 +1142,36 @@ class DataCentralMoments(DataCentralMomentsBase):
         ---------
         block_size : int
             number of sample to block average together
+        {dim}
+        {axis}
         axis : int or str, default=self.rec_dim
             axis or dimension to block average along
         **kwargs : dict
             extra arguments to cmomy.xCentralMoments.block
         """
 
-        if axis is None:
-            axis = self.rec_dim
+        if dim is None and axis is None:
+            dim = self.rec_dim
 
-        kws = dict(block_size=block_size, axis=axis, **kwargs)
+        kws = dict(block_size=block_size, dim=dim, axis=axis, **kwargs)
         return self.new_like(
             dxduave=self.dxduave.block(**kws),
             meta=self.meta.block(data=self, meta_kws=meta_kws, **kws),
         )
 
-    def reduce(self, axis=None, meta_kws=None, **kwargs):
+    @docfiller_shared
+    def reduce(self, dim=None, axis=None, meta_kws=None, **kwargs):
         """
         Reduce along axis
 
         Parameters
         ----------
-        axis : int or str, default=self.rec_dim
-            axis to reduce (combine moments) along
+        {dim}
+        {axis}
         """
-        if axis is None:
-            axis = self.rec_dim
-        kws = dict(axis=axis, **kwargs)
+        if dim is None and axis is None:
+            dim = self.rec_dim
+        kws = dict(dim=dim, axis=axis, **kwargs)
 
         return self.new_like(
             dxduave=self.dxduave.reduce(**kws),
@@ -1180,6 +1184,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         freq=None,
         indices=None,
         nrep=None,
+        dim=None,
         axis=None,
         rep_dim="rep",
         parallel=True,
@@ -1195,6 +1200,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         {freq}
         {indices}
         {nrep}
+        {dim}
         {axis}
         {rep_dim}
         parallel : bool, default=True
@@ -1205,13 +1211,14 @@ class DataCentralMoments(DataCentralMomentsBase):
             dictionary of values to pass to self.dxduave.resample_and_reduce
         """
 
-        if axis is None:
-            axis = self.rec_dim
+        if dim is None and axis is None:
+            dim = self.rec_dim
 
         kws = dict(
             freq=freq,
             indices=indices,
             nrep=nrep,
+            dim=dim,
             axis=axis,
             rep_dim=rep_dim,
             parallel=True,
@@ -1336,7 +1343,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         deriv_dim=None,
         central=False,
         w=None,
-        axis=0,
+        axis=None,
+        dim=None,
         broadcast=True,
         val_shape=None,
         dtype=None,
@@ -1362,6 +1370,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         {deriv_dim}
         {central}
         {w}
+        {dim}
         {axis}
         {broadcast}
         {val_shape}
@@ -1380,6 +1389,9 @@ class DataCentralMoments(DataCentralMomentsBase):
         cmomy.xCentralMoments.from_vals
         """
 
+        if axis is None and dim is None:
+            axis = 0
+
         if xv is None or x_is_u:
             xv = uv
 
@@ -1387,6 +1399,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             x=(xv, uv),
             w=w,
             axis=axis,
+            dim=dim,
             mom=(1, order),
             broadcast=broadcast,
             val_shape=val_shape,
@@ -1518,7 +1531,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         deriv_dim=None,
         central=False,
         w=None,
-        axis=0,
+        axis=None,
+        dim=None,
         broadcast=True,
         dtype=None,
         dims=None,
@@ -1551,6 +1565,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         w : array-like, optional
             Weights for each observation.
         {axis}
+        {dim}
         {broadcast}
         {dtype}
         {xr_params}
@@ -1572,6 +1587,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             freq=freq,
             indices=indices,
             nrep=nrep,
+            dim=dim,
             axis=axis,
             mom=(1, order),
             parallel=parallel,
@@ -1918,7 +1934,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             self.dxduave = xCentralMoments.from_vals(
                 x=(self.xv, self.uv),
                 w=self.w,
-                axis=self.rec_dim,
+                dim=self.rec_dim,
                 mom=(1, self.order),
                 broadcast=True,
                 mom_dims=(self.xmom_dim, self.umom_dim),
@@ -1958,7 +1974,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         {deriv_dim}
         {central}
         {w}
-        {axis}
         {broadcast}
         {val_shape}
         {dtype}
@@ -2019,6 +2034,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         resample_kws=None,
         parallel=True,
         axis=None,
+        dim=None,
         rep_dim="rep",
         meta_kws=None,
     ):
@@ -2033,6 +2049,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         {resample_kws}
         {rep_dim}
         {axis}
+        {dim}
         {meta_kws}
 
         See Also
@@ -2040,8 +2057,8 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         cmomy.xCentralMoments.resample
         """
 
-        if axis is None:
-            axis = self.rec_dim
+        if dim is None and axis is None:
+            dim = self.rec_dim
 
         kws = dict(
             indices=indices,
@@ -2050,6 +2067,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             resample_kws=resample_kws,
             parallel=True,
             axis=axis,
+            dim=dim,
             rep_dim=rep_dim,
         )
 

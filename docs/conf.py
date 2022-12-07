@@ -45,6 +45,7 @@ extensions = [
     # "sphinx_autosummary_accessors",
     # "scanpydoc.rtd_github_links",
     "sphinx.ext.viewcode",
+    # "sphinx.ext.linkcode",
 ]
 
 # defined stuff, from xarray

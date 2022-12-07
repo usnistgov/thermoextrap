@@ -3,17 +3,6 @@ Thermodynamic Extrapolation/Interpolation Library
 =================================================
 
 
-.. image:: https://img.shields.io/pypi/v/thermoextrap.svg
-        :target: https://pypi.python.org/pypi/thermoextrap
-
-.. image:: https://img.shields.io/travis/wpk-nist-gov/thermoextrap.svg
-        :target: https://travis-ci.com/wpk-nist-gov/thermoextrap
-
-.. image:: https://readthedocs.org/projects/thermoextrap/badge/?version=latest
-        :target: https://thermoextrap.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
 This repository contains code used and described in:
 
 Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
@@ -28,7 +17,6 @@ Additionally, the code may be in continuous development at any time.
 Use at your own risk and always check to make sure the produced results make sense.
 If bugs are found, please report them.
 If specific features would be helpful just let us know and we will be happy to work with you to come up with a solution.
-
 
 * Free software: NIST license
 ..
