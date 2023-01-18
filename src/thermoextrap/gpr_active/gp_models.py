@@ -224,6 +224,8 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
 class HetGaussianNoiseGP(gpflow.likelihoods.ScalarLikelihood):
     """
+    EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!
+
     Intended to model the noise associated with a GPR model using another GP contained
     within the likelihood. In other words, the likelihood, which usually describes the
     distribution for the added noise, is based on a GP that predicts the noise based on
@@ -300,6 +302,8 @@ class FullyHeteroscedasticGPR(
     gpflow.models.GPModel, gpflow.models.InternalDataTrainingLossMixin
 ):
     """
+    EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!
+
     Implements a fully heteroscedastic GPR model in which the noise is modeled
     with another Gaussian Process. To accomplish this, the likelihood is set to
     contain a simple GPR model that predicts the logarithm of the noise based on
@@ -439,6 +443,8 @@ class FullyHeteroscedasticGPR(
 
 class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
     """
+    NOTE MAINTAINED, MAY BE OUT OF DATE AND NOT COMPATIBLE
+
     Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise
     variance. Note that the noise variance can be provided as a matrix or a 1D array.
     If a 1D array, it is assumed that the off-diagonal elements of the noise covariance
@@ -545,12 +551,14 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
     which we do not want. This could all be accomplished with a loop over dimensions and
     separate applications of multivariate_normal, but hopefully this parallelizes.
 
-    Inputs:
+    Parameters
+    ----------
         x : NxD where here N is the number of input locations and D is the dimensionality
         mu : NxD (or broadcastable to NxD) mean values
         L : DxNxN Cholesky decomposition of D independent covariance matrices
 
-    Output:
+    Returns
+    ----------
         p : (D,) vector of log probabilites for each dimension (summed over input locations)
             Since covariance matrices independent across dimensions but convey covariances
             across locations, makes sense to sum over locations as would for multivariate
@@ -618,6 +626,20 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     Even if derivatives actually more certain, typically want to focus on
     Fitting the function itself, not the derivatives
     In that case, can set p effectively to zero and will emphasize derivatives more
+
+    Parameters
+    ----------
+    cov - covariance matrix (or its diagonal) for the uncertainty (noise) in the data
+    d_orders - derivative order of the data; should be in same order as columns/rows of
+               the covariance matrix
+    p - (default 10.0) scaling of the covariance matrix dependent on derivative order
+    s - (default 0.0) scaling of the covariance matrix indepedent of derivative order
+    transform_p - (default gpflow.utilities.positive()) transformation of p during training
+                  of the GP model; the default is to require it be positive
+    transform_s - (default None) transformation of s during GP model training
+    constrain_p - (default False) whether or not p should be constrained and not altered
+                  during GP model training
+    constrain_s - (default True) whether or not to contrain s during GP model training
     """
 
     def __init__(
@@ -662,6 +684,10 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     def build_scaled_cov_mat(self):
         """
         Creates scaled covariance matrix using noise scale parameters
+
+        Returns
+        -------
+        tf.Tensor of the scaled covariance matrix
         """
         # First step is determining scaling based on exponential function
         # Add 1 so even zeroth order can be scaled
@@ -727,6 +753,8 @@ class HeteroscedasticGPR_analytical_scale(
     gpflow.models.GPModel, gpflow.models.InternalDataTrainingLossMixin
 ):
     """
+    EXPERIMENTAL! NOT INTENDED FOR USE, BUT MAYBE INTERESTING TO CONSIDER IN FUTURE!
+
     Implements a GPR model with heteroscedastic input noise, which can be just a vector
     (diagonal noise covariance matrix) or the full noise covariance matrix if noise is
     correlated within some of the input data. The latter is useful for derivatives from
@@ -890,6 +918,22 @@ class HeteroscedasticGPR(
     first column of X is for the locations and the second is for the derivative order of
     the observation at that location, so only 1D inputs can be handled, though the output
     dimension, D, is not restricted.
+
+    Parameters
+    ----------
+    data - a list or tuple of the input locations, output data, and noise covariance matrix,
+           in that order
+    kernel - the kernel to use; must be DerivativeKernel or compatible subclass expecting
+             derivative information provided in extra columns of the input locations
+    mean_function - (default None) mean function to be used (probably should be one that
+                    handles inputs including the derivative order)
+    scale_fac - (default 1.0) scaling factor on the output data; can apply to each dimension
+                separately if an array; helpful to ensure all output dimensions have similar
+                variance
+    x_scale_fac - (default 1.0) scaling factor on input locations; NOT USEFUL AND SOON TO
+                  BE DEPRECATED
+    likelihood_kwargs - (default {}) a dictionary of keyword arguments to pass to the
+                        HetGaussianDeriv likelihood model used by this GP model
     """
 
     def __init__(
@@ -1059,6 +1103,10 @@ class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
     Constant mean function that takes derivative-augmented X as input.
     Only applies mean function constant to zeroth order derivatives.
     Because added constant, adding mean function does not change variance or derivatives.
+
+    Parameters
+    ----------
+    y_data - the data for which the mean should be taken
     """
 
     def __init__(self, y_data) -> None:
@@ -1080,6 +1128,11 @@ class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
     has to be modified (by a constant that is the slope). Currently handles y of
     multiple dimensions, but scalar output only (so fits hyperplane). Columns of
     y_data should be different dimensions while rows are observations.
+
+    Parameters
+    ----------
+    x_data - input locations of data points
+    y_data - output data to learn linear function for based on input locations
     """
 
     def __init__(self, x_data, y_data) -> None:
@@ -1117,6 +1170,14 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
     'X', otherwise this will not work. For consistency with other mean functions, only
     fit based on zero-order data, rather than fitting during training of full GP model.
     params is an optional dictionary specifying starting parameter values.
+
+    Parameters
+    ----------
+    expr - sympy expression representing the functional form of the mean function
+    x_data - the input locations of the data
+    y_data - the output values of the data to fit the mean function to
+    params - dictionary specifying starting parameter values for the mean function; in other
+             words, these values will be substituted into the sympy expression to start with
     """
 
     def __init__(self, expr, x_data, y_data, params=None):
