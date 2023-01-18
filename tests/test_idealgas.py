@@ -1,7 +1,7 @@
 import numpy as np
 
-from thermoextrap.ig import IGmodel
-from thermoextrap.xtrapy import idealgas
+from thermoextrap import idealgas
+from thermoextrap.legacy.ig import IGmodel
 
 
 def test_idealgas():

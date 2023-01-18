@@ -2,11 +2,11 @@ import numpy as np
 import pytest
 import xarray as xr
 
-import thermoextrap
-import thermoextrap.xtrapy.data as xtrapy_data
-import thermoextrap.xtrapy.models as xtrapy_models
-import thermoextrap.xtrapy.xpan_beta as xpan_beta
-from thermoextrap.xtrapy.cached_decorators import gcached
+import thermoextrap as xtrap
+import thermoextrap.legacy
+
+# import thermoextrap.xpan_beta as betaxtrap
+from thermoextrap.core.cached_decorators import gcached
 
 
 class FixtureData:
@@ -31,19 +31,19 @@ class FixtureData:
     # bunch of things to test
     @gcached()
     def rdata(self):
-        return xpan_beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=False
         )
 
     @gcached()
     def cdata(self):
-        return xpan_beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=True
         )
 
     @gcached()
     def xdata(self):
-        return xtrapy_data.DataCentralMoments.from_vals(
+        return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
             uv=self.u,
             order=self.order,
@@ -53,13 +53,13 @@ class FixtureData:
 
     @gcached()
     def xdata_val(self):
-        return xtrapy_data.DataCentralMomentsVals.from_vals(
+        return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x, uv=self.u, order=self.order, central=True
         )
 
     @gcached()
     def xrdata(self):
-        return xtrapy_data.DataCentralMoments.from_vals(
+        return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
             uv=self.u,
             order=self.order,
@@ -69,7 +69,7 @@ class FixtureData:
 
     @gcached()
     def xrdata_val(self):
-        return xtrapy_data.DataCentralMomentsVals.from_vals(
+        return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x,
             uv=self.u,
             order=self.order,
@@ -79,45 +79,47 @@ class FixtureData:
     # bunch of things to test
     @gcached()
     def rdata(self):
-        return xpan_beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=False
         )
 
     @gcached()
     def cdata(self):
-        return xpan_beta.factory_data(
+        return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=True
         )
 
     @gcached()
     def xdata(self):
-        return xtrapy_data.DataCentralMoments.from_vals(
+        return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
             uv=self.u,
             order=self.order,
             central=True,
             dims=["val"],
+            axis=0,
         )
 
     @gcached()
     def xdata_val(self):
-        return xtrapy_data.DataCentralMomentsVals.from_vals(
+        return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x, uv=self.u, order=self.order, central=True
         )
 
     @gcached()
     def xrdata(self):
-        return xtrapy_data.DataCentralMoments.from_vals(
+        return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
             uv=self.u,
             order=self.order,
             central=False,
             dims=["val"],
+            axis=0,
         )
 
     @gcached()
     def xrdata_val(self):
-        return xtrapy_data.DataCentralMomentsVals.from_vals(
+        return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x,
             uv=self.u,
             order=self.order,
@@ -136,20 +138,29 @@ class FixtureData:
     def em(self):
         """extrapolation model fixture"""
 
-        em = thermoextrap.ExtrapModel(maxOrder=self.order)
+        em = thermoextrap.legacy.ExtrapModel(maxOrder=self.order)
         params = em.train(self.beta0, xData=self.x, uData=self.u, saveParams=True)
 
         return em
 
+    # @staticmethod
+    # def fix_ufunc_xufunc(ufunc, xufunc):
+
+    #     ufunc_out = lambda x: float(ufunc(x))
+    #     xufunc_out = lambda x: xufunc.avgdict[x]
+
+    #     return ufunc_out, xufunc_out
+
     @gcached()
     def u_xu_funcs(self):
-        ufunc, xufunc = thermoextrap.buildAvgFuncs(self.x, self.u, self.order)
+        ufunc, xufunc = thermoextrap.legacy.buildAvgFuncs(self.x, self.u, self.order)
         return ufunc, xufunc
 
     @gcached()
     def derivs_list(self):
-        fs = [thermoextrap.symDerivAvgX(i) for i in range(self.order + 1)]
+        fs = [thermoextrap.legacy.symDerivAvgX(i) for i in range(self.order + 1)]
         ufunc, xufunc = self.u_xu_funcs
+
         return [fs[i](ufunc, xufunc) for i in range(self.order + 1)]
 
     def xr_test_raw(self, b, a=None):
@@ -231,12 +242,12 @@ def pytest_collection_modifyitems(config, items):
 
 #     @gcached()
 #     def u_xu_funcs(self):
-#         ufunc, xufunc = thermoextrap.buildAvgFuncs(self.x, self.u, self.order)
+#         ufunc, xufunc = thermoextrap.legacy.buildAvgFuncs(self.x, self.u, self.order)
 #         return ufunc, xufunc
 
 #     @gcached(prop=False)
 #     def em(self, alpha0=0.5):
-#         return thermoextrap.ExtrapModel(self.order, alpha0, self.x, self.u)
+#         return thermoextrap.legacy.ExtrapModel(self.order, alpha0, self.x, self.u)
 
 
 # class Fixture_New:
@@ -245,7 +256,7 @@ def pytest_collection_modifyitems(config, items):
 
 #     @gcached(prop=False)
 #     def xem(self, alpha0=0.5, minus_log=False):
-#         return xpan_beta.factory_extrapmodel(alpha0=alpha0, data=self.data,
+#         return xtrap.beta.factory_extrapmodel(alpha0=alpha0, data=self.data,
 #                                              minus_log=minus_log)
 
 #     def xr_test_raw(self, other):
@@ -287,39 +298,39 @@ def pytest_collection_modifyitems(config, items):
 # @pytest.fixture
 # def fix_rdata(test_ux):
 #     u, x, order = test_ux
-#     data = xpan_beta.factory_data(uv=u, xv=x, order=order, central=False)
+#     data = xtrap.factory_data_values(uv=u, xv=x, order=order, central=False)
 #     return Fixture_New(data)
 
 # @pytest.fixture
 # def fix_cdata(test_ux):
 #     u, x, order = test_ux
-#     data = xpan_beta.factory_data(uv=u, xv=x, order=order, central=True)
+#     data = xtrap.factory_data_values(uv=u, xv=x, order=order, central=True)
 #     return Fixture_New(data)
 
 # @pytest.fixture
 # def fix_xdata(test_ux):
 #     u, x, order = test_ux
-#     data = xtrapy_data.DataCentralMoments.from_vals(
+#     data = xtrap.DataCentralMoments.from_vals(
 #         xv=x, uv=u, order=order, central=True, dims=['val'])
 #     return Fixture_New(data)
 
 # @pytest.fixture
 # def fix_xrdata(test_ux):
 #     u, x, order = test_ux
-#     data = xtrapy_data.DataCentralMoments.from_vals(
+#     data = xtrap.DataCentralMoments.from_vals(
 #         xv=x, uv=u, order=order, central=False, dims=['val'])
 #     return Fixture_New(data)
 
 # @pytest.fixture
 # def fix_xdata_val(test_ux):
 #     u, x, order = test_ux
-#     data = xtrapy_data.DataCentralMomentsVals.from_vals(
+#     data = xtrap.DataCentralMomentsVals.from_vals(
 #         xv=x, uv=u, order=order, central=True)
 #     return Fixture_New(data)
 
 # @pytest.fixture
 # def fix_xrdata_val(test_ux):
 #     u, x, order = test_ux
-#     data = xtrapy_data.DataCentralMomentsVals.from_vals(
+#     data = xtrap.DataCentralMomentsVals.from_vals(
 #         xv=x, uv=u, order=order, central=False)
 #     return Fixture_New(data)

@@ -76,26 +76,25 @@ init: .git pre-commit-init ## run git-init pre-commit
 ################################################################################
 # virtual env
 ################################################################################
-.PHONY: conda-env conda-dev conda-all mamba-env mamba-dev mamba-all activate
-conda-env: ## conda create base env
-	conda env create -f environment.yml
+.PHONY: mamba-env mamba-dev mamba-env-update mamba-dev-update activate
 
-conda-dev: ## conda update development dependencies
-	conda env update -n thermoextrap-env -f environment-dev.yml
+environment-dev.yaml: environment.yaml environment-tools.yaml
+	conda-merge environment.yaml environment-tools.yaml > environment-dev.yaml
 
-conda-all: conda-env conda-dev ## conda create development env
+mamba-env: environment.yaml
+	mamba env create -f environment.yaml
 
-mamba-env: ## mamba create base env
-	mamba env create -f environment.yml
+mamba-dev: environment-dev.yaml
+	mamba env create -f environment-dev.yaml
 
-mamba-dev: ## mamba update development dependencies
-	mamba env update -n thermoextrap-env -f environment-dev.yml
+mamba-env-update: environment.yaml
+	mamba env update -f environment.yaml
 
-mamba-all: mamba-env mamba-dev ## mamba create development env
+mamba-dev-update: environment-dev.yaml
+	mamba env update -f environment-dev.yaml
 
 activate: ## activate base env
 	conda activate thermoextrap-env
-
 
 ################################################################################
 # my convenience functions
@@ -114,12 +113,9 @@ user-all: user-venv user-autoenv-zsh ## runs user scripts
 ################################################################################
 # Testing
 ################################################################################
-.PHONY: test test-all coverage
+.PHONY: test coverage
 test: ## run tests quickly with the default Python
 	pytest -x -v
-
-test-all: ## run tests on every Python version with tox
-	tox -- -x -v
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source thermoextrap -m pytest
@@ -128,55 +124,106 @@ coverage: ## check code coverage quickly with the default Python
 	$(BROWSER) htmlcov/index.html
 
 
-version: ## check version of package
-	python setup.py --version
+################################################################################
+# versioning
+################################################################################
+.PHONY: version-scm version-import version
+version-scm: ## check version of package
+	python -m setuptools_scm
+
+version-import: ## check version from python import
+	python -c 'import thermoextrap; print(thermoextrap.__version__)'
+
+version: version-scm version-import
 
 
 ################################################################################
 # Docs
 ################################################################################
-.PHONY: docs serverdocs
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/thermoextrap.rst
-	rm -f docs/modules.rst
-	rm -fr docs/generated
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+# .PHONY: docs serverdocs doc-spelling
+# docs: ## generate Sphinx HTML documentation, including API docs
+# 	rm -fr docs/generated
+# 	$(MAKE) -C docs clean
+# 	$(MAKE) -C docs html
+# 	$(BROWSER) docs/_build/html/index.html
 
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+# servedocs: docs ## compile the docs watching for changes
+# 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+
+# docs-spelling:
+# 	sphinx-build -b spelling docs docs/_build
 
 
 ################################################################################
-# distribution
+# TOX
 ################################################################################
-dist: ## builds source and wheel package (run clean?)
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
+tox_posargs?=-v
+TOX=CONDA_EXE=mamba tox $(tox_posargs)
 
-.PHONY: release release-test conda-dist
-release: dist ## package and upload a release
-	twine upload dist/*
+## testing
+.PHONY: test-all
+test-all: ## run tests on every Python version with tox
+	$(TOX) -- $(posargs)
 
-release-test: dist ## package and upload to test
-	twine upload --repository testpypi dist/*
 
-conda-dist: ## build conda dist (run dist and clean?)
-	mkdir conda_dist; \
-	cd cond_dist; \
-	grayskull pypi thermoextrap ; \
-	conda-build ; \
-	echo 'upload now'
+## docs
+.PHONY: docs-build docs-release docs-clean docs-spelling docs-nist-pages
+posargs=
+docs-build: ## build docs in isolation
+	$(TOX) -e docs-build -- $(posargs)
+docs-release: ## release docs.  use posargs=... to override stuff
+	$(TOX) -e docs-release -- $(posargs)
+docs-clean: ## clean docs
+	rm -rf docs/_build/*
+	rm -rf docs/generated/*
+docs-spelling:
+	$(TOX) -e docs-spelling -- $(posargs)
+docs-nist-pages: ## do both build and releas
+	$(TOX) -e docs-build,docs-release -- $(posargs)
 
+
+## distribution
+.PHONY: dist-pypi-build dist-pypi-testrelease dist-pypi-release dist-conda-recipe dist-conda-build
+
+
+dist-pypi-build: ## build dist, can pass posargs=... and tox_posargs=...
+	$(TOX) -e $@ -- $(posargs)
+
+dist-pypi-testrelease: ## test release on testpypi. can pass posargs=... and tox_posargs=...
+	$(TOX) -e $@ -- $(posargs)
+
+dist-pypi-release: ## release to pypi, can pass posargs=...
+	$(TOX) -e $@ -- $(posargs)
+
+dist-conda-recipe: ## build conda recipe can pass posargs=...
+	$(TOX) -e $@ -- $(posargs)
+
+dist-conda-build: ## build conda recipe can pass posargs=...
+	$(TOX) -e $@ -- $(pasargs)
+
+
+## test distribution
+.PHONY: test-dist-pypi-remote test-dist-conda-remote test-dist-pypi-local test-dist-conda-local
+
+py?=39
+test-dist-pypi-remote: ## test pypi install, can run as `make test-dist-pypi-remote py=39` to run test-dist-pypi-local-py39
+	$(TOX) -e $@-py$(py) -- $(posargs)
+
+test-dist-conda-remote: ## test conda install, can run as `make test-dist-conda-remote py=39` to run test-dist-conda-local-py39
+	$(TOX) -e $@-py$(py) -- $(poasargs)
+
+test-dist-pypi-local: ## test pypi install, can run as `make test-dist-pypi-local py=39` to run test-dist-pypi-local-py39
+	$(TOX) -e $@-py$(py) -- $(posargs)
+
+test-dist-conda-local: ## test conda install, can run as `make test-dist-conda-local py=39` to run test-dist-conda-local-py39
+	$(TOX) -e $@-py$(py) -- $(poasargs)
 
 ################################################################################
 # installation
 ################################################################################
 .PHONY: install install-dev
 install: ## install the package to the active Python's site-packages (run clean?)
-	python setup.py install
+	pip install .
 
 install-dev: ## install development version (run clean?)
 	pip install -e . --no-deps
