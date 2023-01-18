@@ -2,11 +2,9 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from numpy.core import multiarray
 
-import thermoextrap.xtrapy.models as xtrapy_models
-import thermoextrap.xtrapy.stack as stack
-import thermoextrap.xtrapy.xpan_beta as xpan_beta
+import thermoextrap as xtrap
+from thermoextrap.core import stack
 
 
 @pytest.fixture
@@ -20,9 +18,9 @@ def states():
     for beta in [0.1, 10.0]:
         x = xr.DataArray(np.random.rand(*shape), dims=dims, coords=coords)
         u = xr.DataArray(np.random.rand(shape[0]), dims=dims[0])
-        data = xpan_beta.DataCentralMomentsVals.from_vals(x, u, order=3, central=True)
-        xems.append(xpan_beta.factory_extrapmodel(beta, data))
-    s = xtrapy_models.StateCollection(xems)
+        data = xtrap.DataCentralMomentsVals.from_vals(x, u, order=3, central=True)
+        xems.append(xtrap.beta.factory_extrapmodel(beta, data))
+    s = xtrap.StateCollection(xems)
 
     return s.resample(nrep=3)
 

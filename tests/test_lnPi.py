@@ -7,16 +7,14 @@ import numpy as np
 import pytest
 import xarray as xr
 
-import thermoextrap.xtrapy.data as xtrapy_data
-import thermoextrap.xtrapy.xpan_beta as xpan_beta
-import thermoextrap.xtrapy.xpan_lnPi as xpan_lnPi
+import thermoextrap as xtrap
 
 
 # Equations
 @pytest.mark.parametrize("order", [6])
 def test_equations(central, order):
-    f0 = xpan_beta.factory_derivatives("u_ave", central=central)
-    f1 = xpan_lnPi.factory_derivatives(central=central)
+    f0 = xtrap.beta.factory_derivatives("u_ave", central=central)
+    f1 = xtrap.lnpi.factory_derivatives(central=central)
 
     for i in range(2, order):
         assert f0.exprs[i] + f1.exprs[i + 1] == 0
@@ -102,14 +100,14 @@ def test_data(ref, samples, betas, temps):
 
 @pytest.fixture
 def data_u(ref, central):
-    return xtrapy_data.DataCentralMoments.from_ave_raw(
+    return xtrap.DataCentralMoments.from_ave_raw(
         u=ref["energy"], xu=None, x_is_u=True, central=central, meta=None
     )
 
 
 @pytest.fixture
 def em_u(data_u, ref):
-    return xpan_beta.factory_extrapmodel(beta=ref["beta"], data=data_u, name="u_ave")
+    return xtrap.beta.factory_extrapmodel(beta=ref["beta"], data=data_u, name="u_ave")
 
 
 @pytest.fixture
@@ -127,7 +125,7 @@ def test_out_u(samples, out_u):
 
 @pytest.fixture
 def meta_lnpi(ref):
-    return xpan_lnPi.lnPiDataCallback(
+    return xtrap.lnpi.lnPiDataCallback(
         ref["lnPi"], ref["mu"], dims_n=["n"], dims_comp="comp"
     )
 
@@ -139,7 +137,7 @@ def data_lnpi(data_u, meta_lnpi):
 
 @pytest.fixture
 def em_lnpi(data_lnpi, ref):
-    return xpan_lnPi.factory_extrapmodel_lnPi(beta=ref["beta"], data=data_lnpi)
+    return xtrap.lnpi.factory_extrapmodel_lnPi(beta=ref["beta"], data=data_lnpi)
 
 
 @pytest.fixture

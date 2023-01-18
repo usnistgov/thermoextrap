@@ -8,19 +8,29 @@ Installation
 Stable release
 --------------
 
-To install thermodynamic-extrapolation, run this command in your terminal:
+To install thermodynamic-extrapolation, run this command in your terminal::
 
-.. code-block:: console
+  $ pip install thermoextrap
 
-    $ pip install thermoextrap
+or, if you use conda, run::
 
-This is the preferred method to install thermodynamic-extrapolation, as it will always install the most recent stable release.
+  $ conda install c wpk-nist thermoextrap
 
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
 
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
+Additional dependencies
+-----------------------
+
+To utilize the full potential of `thermoextrap`, additional dependencies are needed.  This can be done via pip by using::
+
+  $ pip install thermoextrap[all]
+
+If using conda, then you'll have to manually install some dependencies.  For example, you can run::
+
+  $ conda install bottleneck dask pymbar<4.0
+
+At this time, it is recommended to install the Gaussian Process Regression (GPR) dependencies via pip, as the conda-forge recipes are slightly out of date::
+
+  $ pip install tensorflow tensorflow-probability gpflow
 
 
 From sources
