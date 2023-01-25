@@ -147,10 +147,16 @@ Gaussian Process Regression
    ig_active.SimulateIG
 
    active_utils.DataWrapper
+   active_utils.SimWrapper
    active_utils.input_GP_from_states
    active_utils.create_base_GP_model
    active_utils.train_GPR
+   active_utils.create_GPR
    active_utils.make_poly_expr
+   active_utils.make_matern_expr
+   active_utils.make_rbr_expr
+   active_utils.DerivateKernel
+   active_utils.ChangeInnerOuterRBFDerivKernel
    active_utils.UpdateALMbrute
    active_utils.UpdateSpaceFill
    active_utils.UpdateFuncBase
@@ -158,9 +164,7 @@ Gaussian Process Regression
    active_utils.MaxAbsRelGlobalDeviation
    active_utils.MaxRelVar
    active_utils.StopCriteria
-   active_utils.create_GPR
 
-   gp_models.DerivativeKernel
 
 
 .. autosummary::
@@ -168,3 +172,16 @@ Gaussian Process Regression
 
    active_utils.active_learning
    active_utils.get_logweights
+
+
+
+.. autosummary::
+   :toctree: generated/
+   :template: custom-class.rst
+   :recursive:
+
+
+
+   gp_models.DerivativeKernel
+   gp_models.HetGaussianDeriv
+   gp_models.HeteroscedasticGPR(
