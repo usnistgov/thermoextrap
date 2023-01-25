@@ -48,22 +48,27 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
 
     Parameters
     ----------
-    state - an ExtrapModel object containing derivative information
-    n_rep - (default 100) number of bootstrap draws of data to perform to compute variances
-    log_scale - (default False) whether or not to apply a log scale in the input locations
-                (i.e., compute derivatives of dy/dlog(x) instead of dy/dx)
+    state : an ExtrapModel object containing derivative information
+    n_rep : int, default=100
+        Number of bootstrap draws of data to perform to compute variances
+    log_scale : bool, default=False
+        Whether or not to apply a log scale in the input locations
+        (i.e., compute derivatives of dy/dlog(x) instead of dy/dx)
 
     Returns
     ----------
-    x_data - input locations, likely state points (e.g., temperature, pressure, etc.),
-             augmented with derivative order of each observation, as required for GP
-             models
-    y_data - output data, which includes both function values and derivative information
-    cov_data - covariance matrix between function observations, including derivative
-               observations; note that this will be block-diagonal since it is expected
-               that the state objects at different conditions are based on information
-               from independent simulations, while the observations at different derivative
-               orders from a single simulation are correlated
+    x_data
+        input locations, likely state points (e.g., temperature, pressure, etc.),
+        augmented with derivative order of each observation, as required for GP
+        models
+    y_data
+        Output data, which includes both function values and derivative information
+    cov_data
+        covariance matrix between function observations, including derivative
+        observations; note that this will be block-diagonal since it is expected
+        that the state objects at different conditions are based on information
+        from independent simulations, while the observations at different derivative
+        orders from a single simulation are correlated
     """
     # Prepare x data
     alphas = state.alpha0 * np.ones((state.order + 1, 1))
@@ -131,21 +136,29 @@ class DataWrapper:
 
     Parameters
     ----------
-    sim_info_files - list of files containing simulation information, such as potential
-                     energy timeseries
-    cv_bias_files - list of files containing the collective variable, or quantity of interest
-                    for the active learning procedure; a bias along this quantity or
-                    another CV may also be included for a simulation with enhanced sampling
-    beta - the reciprocal temperature (1/(kB*T)) of the simulations in this data set
-    x_files - (default None) the files containing the quantity of interest for the active
-              learning procedure; default is to asssume this is the CV in cv_bias_files
-              and that these are not necessary
-    n_frames - (default 10000) number of frames from the END of simulation(s), or the files
-               read in, to use for computations; allows exclusion of equilibration periods
-    u_col - (default 2) column of sim_info_files in which potential energy is found
-    cv_cols - (default [1, 2]) columns of cv_bias_files in which the CV and bias are found
-    x_col - (default [1]) list of columns from x_files to pull out; can be multiple if
-            the are multiple outputs of interest
+    sim_info_files : list of str
+        list of files containing simulation information, such as potential
+        energy timeseries
+    cv_bias_files : list of str
+        list of files containing the collective variable, or quantity of interest
+        for the active learning procedure; a bias along this quantity or
+        another CV may also be included for a simulation with enhanced sampling
+    beta : float
+        the reciprocal temperature (1/(kB*T)) of the simulations in this data set
+    x_files : list of str, optional
+        the files containing the quantity of interest for the active
+        learning procedure; default is to asssume this is the CV in cv_bias_files
+        and that these are not necessary
+    n_frames : int, default=10000
+        number of frames from the END of simulation(s), or the files read in, to
+        use for computations; allows exclusion of equilibration periods
+    u_col : int, default=2
+        column of sim_info_files in which potential energy is found
+    cv_cols : list, default=[1,2]
+        columns of cv_bias_files in which the CV and bias are found
+    x_col : list, default=[1]
+        list of columns from x_files to pull out; can be multiple if
+        the are multiple outputs of interest
     """
 
     def __init__(
@@ -270,23 +283,33 @@ class SimWrapper:
 
     Parameters
     ----------
-    sim_func - function that runs a new simulation
-    struc_name - name of structure file inputs to simulation
-    sys_name - name of system or topological file inputs to simulation
-    info_name - name of information file for simulation to produce
-    bias_name - name of file with CV values and bias for simulation to produce
-    kw_inputs - (default {}) additional keyword inputs to the simulation
-    data_class - (default DataWrapper) class to use for wrapping simulation output data;
-                 data will be wrapped before returned to the active learning algorithm
-    post_process_func - (None) function for post-processing simulation outputs but before
-                        wrapping in data_class
-    post_process_out_name - (None) name of output files produced by post_process_func
-    post_process_kw_inputs - (default {}) additional dictionary of arguments for the
-                             post_process_func
-    pre_process_func - (None) function to apply before a simulation run in order
-                       to produce extra keyword arguments for the simulation run;
-                       useful if have an extra model that predicts info needed by or
-                       helpful for the simulation
+    sim_func : callable
+        function that runs a new simulation
+    struc_name : str
+        name of structure file inputs to simulation
+    sys_name : str
+        name of system or topological file inputs to simulation
+    info_name : str
+        name of information file for simulation to produce
+    bias_name : str
+        name of file with CV values and bias for simulation to produce
+    kw_inputs : dict, optional
+        additional keyword inputs to the simulation
+    data_class : DataWrapper like object
+        class to use for wrapping simulation output data;
+        data will be wrapped before returned to the active learning algorithm
+    post_process_func : callable, optional
+        Function for post-processing simulation outputs but before
+        wrapping in data_class
+    post_process_out_name : str, optional
+        name of output files produced by post_process_func
+    post_process_kw_inputs : dict, optional
+        additional dictionary of arguments for the
+        post_process_func
+    pre_process_func : callable, optional
+        function to apply before a simulation run in order to produce extra
+        keyword arguments for the simulation run; useful if have an extra model
+        that predicts info needed by or helpful for the simulation
     """
 
     def __init__(
@@ -420,12 +443,14 @@ def make_matern_expr(p):
 
     Parameters
     ----------
-    p - order of Matern kernel
+    p : int
+        order of Matern kernel
 
     Returns
-    ----------
-    expr - sympy expression
-    kern_params - dictionary of parameters matching naming in sympy expression
+    -------
+    expr : sympy expression
+    kern_params : dict
+        parameters matching naming in sympy expression
     """
     d = sp.symbols("d")
     k = sp.var("k")
@@ -454,9 +479,10 @@ def make_rbf_expr():
     Creates a sympy expression for an RBF kernel
 
     Returns
-    ----------
-    expr - sympy expression
-    kern_params - dictionary of parameters matching naming in sympy expression
+    -------
+    expr : sympy expression
+    kern_params : dict
+        parameters matching naming in sympy expression
     """
     var = sp.symbols("var", real=True)
     l = sp.symbols("l", real=True)  # noqa: E741
@@ -476,12 +502,14 @@ def make_poly_expr(p):
 
     Parameters
     ----------
-    p - order of polynomial
+    p : int
+        order of polynomial
 
     Returns
-    ----------
-    expr - sympy expression
-    kern_params - dictionary of parameters matching naming in sympy expression
+    -------
+    expr : sympy expression
+    kern_params : dict
+        parameters matching naming in sympy expression
     """
     var = sp.symbols("var", real=True)
     l = sp.symbols("l", real=True)  # noqa: E741
@@ -534,8 +562,17 @@ class ChangeInnerOuterRBFDerivKernel(DerivativeKernel):
 
     Parameters
     ----------
-    c1 - first change point
-    c2 - second change point
+    c1 : float
+        first change point
+    c2 : float
+        second change point
+    **kwargs
+        Extra Arguments to :class:`DerivativeKernel`
+
+
+    See Also
+    --------
+    DerivateKernel
     """
 
     def __init__(self, c1=-7.0, c2=-2.0, **kwargs):
@@ -589,35 +626,42 @@ def create_base_GP_model(
     likelihood_kwargs={},
 ):
     """
-    Creates just the base GP model without any training, just sets up sympy and GPflow.
-    kernel can either be a kernel object, in which case it is assumed you know what you're
-    doing and shared_kernel will be ignored (will not wrap in SharedIndependent or
-    SeparateIndependent and thus if the kernel is not a subclass of MultioutputKernel,
-    HeteroscedasticGPR will wrap it in a SharedIndependent kernel). If shared_kernel is
-    False and a kernel object is provided, only a warning will be printed, so beware.
-    If only a class is provided for kernel, then shared_kernel is respected - a class is
-    necessary so that if the kernel is not to be shared, separate instances can be created.
-    Note that if a class is provided for kernel, it must be initiated without any passed
-    parameters - this is easy to set up with a wrapper class as for RBFDerivKernel, the
-    default.
+    Creates just the base GP model without any training,just sets up sympy and
+    GPflow. kernel can either be a kernel object, in which case it is assumed
+    you know what you're doing and shared_kernel will be ignored (will not wrap
+    in SharedIndependent or SeparateIndependent and thus if the kernel is not a
+    subclass of MultioutputKernel, HeteroscedasticGPR will wrap it in a
+    SharedIndependent kernel). If shared_kernel is False and a kernel object is
+    provided, only a warning will be printed, so beware. If only a class is
+    provided for kernel, then shared_kernel is respected - a class is necessary
+    so that if the kernel is not to be shared, separate instances can be
+    created. Note that if a class is provided for kernel, it must be initiated
+    without any passed parameters - this is easy to set up with a wrapper class
+    as for RBFDerivKernel, the default.
 
     Parameters
     ----------
-    gpr_data - a tuple of input locations, output data, and the noise covariance matrix
-    d_order_ref - (default 0) derivative order to treat as the reference for constructing
-                  mean functions; PROBABLY BEST TO REMOVE THIS OPTION UNTIL HAVE MORE
-                  SOPHISTICATED MEAN FUNCTIONS - DEFAULT BEHAVIOR DEFENDS AGAINST SITUATION
-                  WITH NO ZEROTH ORDER DERIVATIVES, BUT DOES NOT CREATE MEANINGFUL MEAN
-                  FUNCTION IN THAT CASE (JUST ZEROS)
-    shared_kernel - (default True) whether or not the kernel will be shared across output
-                    dimensions
-    kernel - (default RBFDerivKernel) kernel use in GP model
-    mean_func - (default None) mean function to use for GP model
-    likelihood_kwargs - (default {}) keyword arguments to pass to the likelihood model
+    gpr_data : tuple
+        a tuple of input locations, output data, and the noise covariance matrix
+    d_order_ref : int, default=0
+        derivative order to treat as the reference for constructing mean
+        functions; PROBABLY BEST TO REMOVE THIS OPTION UNTIL HAVE MORE
+        SOPHISTICATED MEAN FUNCTIONS - DEFAULT BEHAVIOR DEFENDS AGAINST
+        SITUATION WITH NO ZEROTH ORDER DERIVATIVES, BUT DOES NOT CREATE
+        MEANINGFUL MEAN FUNCTION IN THAT CASE (JUST ZEROS)
+    shared_kernel : bool, default=True
+        whether or not the kernel will be shared across output dimensions
+    kernel : kernel object.
+        Defaults to RBFDerivKernel.  Kernel to use in GP model.
+    mean_func : callable, optional
+        mean function to use for GP model
+    likelihood_kwargs : dict, optional
+        keyword arguments to pass to the likelihood model
 
     Returns
     ---------
-    gpr - a HeteroscedasticGPR class object; not trained!
+    gpr: HeteroscedasticGPR object
+        Note, that this is an untrained model.
     """
     # Will be helpful to know where have zero-order derivatives in data
     # Or more generally may want to specify which order to pay attention to rather than just 0
@@ -702,14 +746,17 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 
     Parameters
     ----------
-    gpr - the GPR model to train
-    record_loss - (False) whether or not to record the output of the optimizer and return it
-    start_params - (None) parameters to also try as starting points for the optimization;
-                   if these are provided as a list or numpy array, two optimizations are
-                   performed, one from the current GPR model parameters, and one with the
-                   GPR model parameters set to start_params; the optimization result with
-                   the lowest loss function value is selected and the GPR parameters are
-                   set to those values
+    gpr : object
+        The GPR model to train
+    record_loss : bool, default=False
+        Whether or not to record the output of the optimizer and return it
+    start_params : dict, optional
+        Parameters to also try as starting points for the optimization; if these
+        are provided as a list or numpy array, two optimizations are performed,
+        one from the current GPR model parameters, and one with the GPR model
+        parameters set to start_params; the optimization result with the lowest
+        loss function value is selected and the GPR parameters are set to those
+        values
     """
     optim = gpflow.optimizers.Scipy()
     loss_info = optim.minimize(
@@ -763,21 +810,26 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
     """
     Generates and trains a GPR model based on a list of ExtrapModel objects or a
-    StateCollection object from thermoextrap. If a list of another type of object, such
-    as a custom state function, will simply call it and expect to return GPR input
-    data.
+    StateCollection object from thermoextrap. If a list of another type of
+    object, such as a custom state function, will simply call it and expect to
+    return GPR input data.
 
     Parameters
     ----------
-    state_list - list of ExtrapModel objects at different conditions
-    log_scale - (False) whether or not to compute derivatives with respect to x or the
-                logarithm of x, where x is the input location
-    start_params - (None) starting parameter values to consider during optimization
-    base_kwargs - ({}) additional dictionary of keyword arguments to pass to create_base_GP_model
+    state_list : list of ExtrapModel objects
+        Each at different conditions.
+    log_scale : bool, default=False
+        whether or not to compute derivatives with respect to x or the logarithm
+        of x, where x is the input location
+    start_params : dict, optional
+        Starting parameter values to consider during optimization
+    base_kwargs : dict, optional
+        Additional dictionary of keyword arguments to pass to create_base_GP_model
 
     Returns
     ----------
-    gpr - a trained HeteroscedasticGPR model
+    gpr : HeteroscedasticGPR object
+        Trained model.
     """
 
     # Loop over states and collect information needed for GP
@@ -1216,9 +1268,10 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
 
     Parameters
     ----------
-    tol - (default 0.005) tolerance threshold to stay under when finding next point;
-          this is defined as the relative uncertainty, or the GPR-predicted standard
-          deviation divided by the absolute value of the GPR-predicted mean
+    tol : float, default=0.005
+        tolerance threshold to stay under when finding next point; this is
+        defined as the relative uncertainty, or the GPR-predicted standard
+        deviation divided by the absolute value of the GPR-predicted mean
     """
 
     def __init__(self, tol=0.005, **kwargs):
@@ -1415,8 +1468,10 @@ class MetricBase:
 
     Parameters
     ----------
-    name - name of this metric
-    tol - tolerance threshold for defining stopping
+    name : str
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
     """
 
     def __init__(self, name, tol):
@@ -1465,8 +1520,12 @@ class AvgVar(MetricBase):
 
     Parameters
     ----------
-    name - (AvgVar) name of this metric
-    tol - tolerance threshold for defining stopping
+    name : str, default='AvgVar'
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
+    **kwargs
+        Extrap arguments to :class:`MetricBase`
     """
 
     def __init__(self, tol, name="AvgVar", **kwargs):
@@ -1485,11 +1544,14 @@ class MaxRelVar(MetricBase):
 
     Parameters
     ----------
-    name - (MaxRelVar) name of this metric
-    tol - tolerance threshold for defining stopping
-    threshold - (default 1e-12) checks to make sure GPR-predicted means have absolute value
-                larger than this value so that do not divide by zero; if below this value,
-                those points are ignored for purposes of calculating metric (set to zero)
+    name : str, default='MaxRelVar'
+        Name of this metric
+    tol : float
+        tolerance threshold for defining stopping
+    threshold : float, default=1e-12
+        checks to make sure GPR-predicted means have absolute value larger than
+        this value so that do not divide by zero; if below this value, those
+        points are ignored for purposes of calculating metric (set to zero)
     """
 
     def __init__(self, tol, threshold=1e-12, name="MaxRelVar", **kwargs):
@@ -1514,8 +1576,10 @@ class MaxRelGlobalVar(MetricBase, UpdateStopABC):
 
     Parameters
     ----------
-    name - (MaxRelGlobalVar) name of this metric
-    tol - tolerance threshold for defining stopping
+    name : str, default='MaxRelGlobalVar'
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
     """
 
     def __init__(self, tol, name="MaxRelGlobalVar", **kwargs):
@@ -1539,11 +1603,14 @@ class AvgRelVar(MetricBase):
 
     Parameters
     ----------
-    name - (AvgRelVar) name of this metric
-    tol - tolerance threshold for defining stopping
-    threshold - (default 1e-12) checks to make sure GPR-predicted means have absolute value
-                larger than this value so that do not divide by zero; if below this value,
-                those points are ignored for purposes of calculating metric (set to zero)
+    name : str, default='AvgRelVar'
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
+    threshold : float, default=1e-12
+        checks to make sure GPR-predicted means have absolute value larger than
+        this value so that do not divide by zero; if below this value, those
+        points are ignored for purposes of calculating metric (set to zero)
     """
 
     def __init__(self, tol, threshold=1e-12, name="AvgRelVar", **kwargs):
@@ -1567,8 +1634,10 @@ class MSD(MetricBase):
 
     Parameters
     ----------
-    name - (MSD) name of this metric
-    tol - tolerance threshold for defining stopping
+    name : str, default='MSD'
+        Name of this metric
+    tol : float
+        tolerance threshold for defining stopping
     """
 
     def __init__(self, tol, name="MSD", **kwargs):
@@ -1590,11 +1659,14 @@ class MaxAbsRelDeviation(MetricBase):
 
     Parameters
     ----------
-    name - (MaxAbsRelDev) name of this metric
-    tol - tolerance threshold for defining stopping
-    threshold - (default 1e-12) checks to make sure GPR-predicted means have absolute value
-                larger than this value so that do not divide by zero; if below this value,
-                those points are ignored for purposes of calculating metric (set to zero)
+    name : str, default='MaxAbsRelDev'
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
+    threshold : float, default=1e-12
+        checks to make sure GPR-predicted means have absolute value larger than
+        this value so that do not divide by zero; if below this value, those
+        points are ignored for purposes of calculating metric (set to zero)
     """
 
     def __init__(self, tol, threshold=1e-12, name="MaxAbsRelDev", **kwargs):
@@ -1625,8 +1697,10 @@ class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
 
     Parameters
     ----------
-    name - (MaxAbsRelGlobalDeviation) name of this metric
-    tol - tolerance threshold for defining stopping
+    name : str, default='MaxAbsRelGlobalDeviation'
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
     """
 
     def __init__(self, tol, name="MaxAbsRelGlobalDeviation", **kwargs):
@@ -1655,8 +1729,10 @@ class AvgAbsRelDeviation(MetricBase):
 
     Parameters
     ----------
-    name - (AvgAbsRelDev) name of this metric
-    tol - tolerance threshold for defining stopping
+    name : str, default='AvgAbsRelDev'
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
     """
 
     def __init__(self, tol, threshold=1e-12, name="AvgAbsRelDev", **kwargs):
@@ -1693,8 +1769,10 @@ class ErrorStability(MetricBase, UpdateStopABC):
 
     Parameters
     ----------
-    name - (ErrorStability) name of this metric
-    tol - tolerance threshold for defining stopping
+    name : str
+        name of this metric
+    tol : float
+        tolerance threshold for defining stopping
     """
 
     def __init__(self, tol, name="ErrorStability", **kwargs):
@@ -1834,7 +1912,8 @@ class MaxIter(MetricBase):
 
     Parameters
     ----------
-    name - (MaxIter) name of this metric
+    name : str
+        name of this metric
     """
 
     def __init__(self, name="MaxIter", **kwargs):
@@ -1859,8 +1938,9 @@ class StopCriteria(UpdateStopABC):
 
     Parameters
     ----------
-    metric_funcs - a dictionary {name: function} of metric names and associated functions;
-                   this will be looped over with metrics calculated to determine stopping
+    metric_funcs : dict
+        A dictionary {name: function} of metric names and associated functions;
+        this will be looped over with metrics calculated to determine stopping
     """
 
     def __init__(self, metric_funcs, **kwargs):

@@ -13,41 +13,37 @@ from scipy import optimize
 # A general derivative kernel based on a sympy expression
 class DerivativeKernel(gpflow.kernels.Kernel):
     """
-    Creates a kernel that can be differentiated based on a sympy expression for the kernel.
-    Given observations that are tagged with the order of the derivative, builds the appropriate
-    kernel. Be warned that your kernel_expr will not be checked to make sure it is positive
-    definite, stationary, etc.
+    Creates a kernel that can be differentiated based on a sympy expression for
+    the kernel. Given observations that are tagged with the order of the
+    derivative, builds the appropriate kernel. Be warned that your kernel_expr
+    will not be checked to make sure it is positive definite, stationary, etc.
 
-    There are rules for kernel_expr and kernel_params that guarantee consistency. First, the
-    variable names supplied as keys to kernel_params should match the symbol names in
-    kernel_expr. Symbol names for the inputs should be 'x1' and 'x2' (ignoring case). We could
-    accept anything as long as 2 symbols are left over after those in kernel_params, but these
-    two rules will guarantee that nothing breaks.
+    There are rules for kernel_expr and kernel_params that guarantee
+    consistency. First, the variable names supplied as keys to kernel_params
+    should match the symbol names in kernel_expr. Symbol names for the inputs
+    should be 'x1' and 'x2' (ignoring case). We could accept anything as long as
+    2 symbols are left over after those in kernel_params, but these two rules
+    will guarantee that nothing breaks.
 
     Currently, everything is only intended to work with 1D observables.
 
     Parameters
     ----------
     kernel_expr : sympy expression
-        Expression for the kernel that can be differentiated - must
-        have at least 2 symbols
-        (symbol names should be 'x1' and 'x2', case insensitive, if have
-        only 2)
+        Expression for the kernel that can be differentiated - must have at
+        least 2 symbols (symbol names should be 'x1' and 'x2', case insensitive,
+        if have only 2)
     obs_dims : int
-        Number of dimensions for observable input
-        (input should be twice this with obs_dims values then obs_dims
-        derivative labels each row)
+        Number of dimensions for observable input (input should be twice this
+        with obs_dims values then obs_dims derivative labels each row)
     kernel_params : mapping
         A dictionary of kernel parameters that can be optimized by tensorflow
-        (key should be name, then references list with value then
-        another dict with kwargs for gpflow.Parameter, i.e.,
-        {'variance', [1.0, {'transform':gpflow.utilities.positive()}]}
-        so if you don't want to set any kwargs, just pass empty
-        dictionary
-        NOTE THAT THE KEYS MUST MATCH THE SYMBOL NAMES IN kernel_expr
-        OTHER THAN 'x1' and 'x2'
-        Default is empty dict, so will mine names from kernel_expr and
-        set all parameters to 1.0
+        (key should be name, then references list with value then another dict
+        with kwargs for gpflow.Parameter, i.e., {'variance', [1.0,
+        {'transform':gpflow.utilities.positive()}]} so if you don't want to set
+        any kwargs, just pass empty dictionary NOTE THAT THE KEYS MUST MATCH THE
+        SYMBOL NAMES IN kernel_expr OTHER THAN 'x1' and 'x2' Default is empty
+        dict, so will mine names from kernel_expr and set all parameters to 1.0
     """
 
     def __init__(
@@ -553,16 +549,23 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
 
     Parameters
     ----------
-        x : NxD where here N is the number of input locations and D is the dimensionality
-        mu : NxD (or broadcastable to NxD) mean values
-        L : DxNxN Cholesky decomposition of D independent covariance matrices
+    x : array
+        Shape `N x D` where here `N` is the number of input locations and `D` is
+        the dimensionality
+    mu : array
+        Shape `N x D`, or broadcastable to NxD. mean values
+    L : array
+        Shape `DxNxN` Cholesky decomposition of `D` independent covariance
+        matrices
 
     Returns
-    ----------
-        p : (D,) vector of log probabilites for each dimension (summed over input locations)
-            Since covariance matrices independent across dimensions but convey covariances
-            across locations, makes sense to sum over locations as would for multivariate
-            Gaussian over each dimension
+    -------
+    p : array
+        Shape of length `D`. Vector of log probabilites for each dimension
+        (summed over input locations) Since covariance matrices independent
+        across dimensions but convey covariances across locations, makes sense
+        to sum over locations as would for multivariate Gaussian over each
+        dimension
     """
 
     d = tf.expand_dims(tf.transpose(x - mu), -1)
@@ -586,36 +589,42 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
 
 
 class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
-    """
-    Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise
-    variance. Note that the noise variance can be provided as a matrix or a 1D array.
-    If a 1D array, it is assumed that the off-diagonal elements of the noise covariance
-    matrix are all zeros, otherwise the noise covariance is used. For diagonal elements,
-    it would make sense to also provide this information as an additional column in the
-    target outputs, Y. However, this is not possible for a provided covariance matrix,
-    when some of the noise values may be correlated as for derivatives at the same input
-    location, X, measured from the same simulation. Just be careful to make sure shapes of
-    Y and F (predicted GP mean values) match shape of provided covariance matrix - if matrix
-    is NxN, each of Y and F should be N.
+    r"""Heteroscedastic Gaussian likelihood with variance provided and no modeling
+    of noise variance. Note that the noise variance can be provided as a matrix
+    or a 1D array. If a 1D array, it is assumed that the off-diagonal elements
+    of the noise covariance matrix are all zeros, otherwise the noise covariance
+    is used. For diagonal elements, it would make sense to also provide this
+    information as an additional column in the target outputs, Y. However, this
+    is not possible for a provided covariance matrix, when some of the noise
+    values may be correlated as for derivatives at the same input location, X,
+    measured from the same simulation. Just be careful to make sure shapes of Y
+    and F (predicted GP mean values) match shape of provided covariance matrix -
+    if matrix is NxN, each of Y and F should be N.
 
-    Additionally, takes derivative orders of each input point. This model by default will
-    scale noise differently for different derivative orders, effectively assuming that
-    uncertainty is likely to be estimated incorrectly at some orders and accurately at
-    others.
+    Additionally, takes derivative orders of each input point. This model by
+    default will scale noise differently for different derivative orders,
+    effectively assuming that uncertainty is likely to be estimated incorrectly
+    at some orders and accurately at others.
 
     Won't learn full model on noise, but can still allow scaling of it to be learned
     Imagine adding parameter to indicate "trust" of given noise and scale it
     So just add parameter to train that scales noise
     For scaling model, effectively model logarithm of each element in covariance matrix
-        ln(cov_i,j) = ln(cov_i,j,0) + p*(d_i + d_j) + s
+
+    .. math::
+        \ln cov_{i,j} = ln cov_{i,j,0} + p (d_i + d_j) + s
+
     or
-        cov_i,j = cov_i,j,0 * exp(s) * (exp(p*(d_i + d_j)))
+
+    .. math::
+        cov_{i,j} = cov_{i,j,0} \exp[ p (d_i + d_j)] \exp(s)
+
     We can accomplish this while keeping the scaled covariance matrix positive
     semidefinite by making the scaling matrix diagonal with positive entries
     If we then take S*Cov*S, with S being the diagonal scaling matrix with positive
     entries, the result will be positive semi-definite because S is positive definite
     and Cov is positive semidefinite
-    The scaling matrix is given by exp(s + p*d_i,j) if i=j and 0 otherwise
+    The scaling matrix is given by `exp(s + p*d_i,j)` if i=j and 0 otherwise
     While could make parameters s and p unconstrained, default will set...
         s = 0    ;    p >= 0
     This means that we CANNOT decrease the uncertainty, only increase it
@@ -629,17 +638,27 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
 
     Parameters
     ----------
-    cov - covariance matrix (or its diagonal) for the uncertainty (noise) in the data
-    d_orders - derivative order of the data; should be in same order as columns/rows of
-               the covariance matrix
-    p - (default 10.0) scaling of the covariance matrix dependent on derivative order
-    s - (default 0.0) scaling of the covariance matrix indepedent of derivative order
-    transform_p - (default gpflow.utilities.positive()) transformation of p during training
-                  of the GP model; the default is to require it be positive
-    transform_s - (default None) transformation of s during GP model training
-    constrain_p - (default False) whether or not p should be constrained and not altered
-                  during GP model training
-    constrain_s - (default True) whether or not to contrain s during GP model training
+    cov : array
+        covariance matrix (or its diagonal) for the uncertainty (noise) in the data
+    d_orders : int
+        derivative order of the data; should be in same order as columns/rows of
+        the covariance matrix
+    p : float, default=10.0
+        scaling of the covariance matrix dependent on derivative order
+    s : float, default=0.0
+        scaling of the covariance matrix indepedent of derivative order
+    transform_p : object, default=gpflow.utilities.positive()
+      transformation of p during training of the GP model; the default is to
+      require it be positive
+    transform_s : object, optional
+        transformation of s during GP model training
+    constrain_p : bool, default=False
+        whether or not p should be constrained and not altered during GP model
+        training
+    constrain_s : bool, default=True
+        whether or not to contrain s during GP model training
+    **kwargs
+        Extra keyword arguments passed to :class:`ScalarLikelihood`
     """
 
     def __init__(
@@ -654,10 +673,6 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         constrain_s=True,
         **kwargs: Any,
     ) -> None:
-        """
-        :param cov: The covariance matrix (or its diagonal) for the noise.
-        :param kwargs: Keyword arguments forwarded to :class:`ScalarLikelihood`.
-        """
         super().__init__(**kwargs)
 
         if len(cov.shape) == 1:
@@ -921,19 +936,25 @@ class HeteroscedasticGPR(
 
     Parameters
     ----------
-    data - a list or tuple of the input locations, output data, and noise covariance matrix,
-           in that order
-    kernel - the kernel to use; must be DerivativeKernel or compatible subclass expecting
-             derivative information provided in extra columns of the input locations
-    mean_function - (default None) mean function to be used (probably should be one that
-                    handles inputs including the derivative order)
-    scale_fac - (default 1.0) scaling factor on the output data; can apply to each dimension
-                separately if an array; helpful to ensure all output dimensions have similar
-                variance
-    x_scale_fac - (default 1.0) scaling factor on input locations; NOT USEFUL AND SOON TO
-                  BE DEPRECATED
-    likelihood_kwargs - (default {}) a dictionary of keyword arguments to pass to the
-                        HetGaussianDeriv likelihood model used by this GP model
+    data : list of tuple
+        A list or tuple of the input locations, output data, and noise
+        covariance matrix, in that order
+    kernel : DerivativeKernel object
+        The kernel to use; must be DerivativeKernel or compatible subclass
+        expecting derivative information provided in extra columns of the input
+        locations
+    mean_function : callable, optional
+        Mean function to be used (probably should be one that
+        handles inputs including the derivative order)
+    scale_fac : float, default=1.0
+        scaling factor on the output data; can apply to each dimension
+        separately if an array; helpful to ensure all output dimensions have
+        similar variance
+    x_scale_fac : float, default=1.0
+        scaling factor on input locations; NOT USEFUL AND SOON TO BE DEPRECATED
+    likelihood_kwargs, dict, optional
+        Dictionary of keyword arguments to pass to the HetGaussianDeriv
+        likelihood model used by this GP model
     """
 
     def __init__(
@@ -1106,7 +1127,8 @@ class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
 
     Parameters
     ----------
-    y_data - the data for which the mean should be taken
+    y_data : array-like
+        The data for which the mean should be taken
     """
 
     def __init__(self, y_data) -> None:
@@ -1131,8 +1153,10 @@ class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
 
     Parameters
     ----------
-    x_data - input locations of data points
-    y_data - output data to learn linear function for based on input locations
+    x_data : array-like
+        input locations of data points
+    y_data : array-like
+        output data to learn linear function for based on input locations
     """
 
     def __init__(self, x_data, y_data) -> None:
@@ -1165,19 +1189,25 @@ class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
 
 class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
     """
-    Mean function based on sympy expression. This way, can take derivatives up to
-    any order. In the provided expression, the input variable should be 'x' or
-    'X', otherwise this will not work. For consistency with other mean functions, only
-    fit based on zero-order data, rather than fitting during training of full GP model.
-    params is an optional dictionary specifying starting parameter values.
+    Mean function based on sympy expression. This way, can take derivatives up
+    to any order. In the provided expression, the input variable should be 'x'
+    or 'X', otherwise this will not work. For consistency with other mean
+    functions, only fit based on zero-order data, rather than fitting during
+    training of full GP model. params is an optional dictionary specifying
+    starting parameter values.
 
     Parameters
     ----------
-    expr - sympy expression representing the functional form of the mean function
-    x_data - the input locations of the data
-    y_data - the output values of the data to fit the mean function to
-    params - dictionary specifying starting parameter values for the mean function; in other
-             words, these values will be substituted into the sympy expression to start with
+    expr : sympy expression
+        Representing the functional form of the mean function.
+    x_data : array-like
+        the input locations of the data
+    y_data : array-like
+        the output values of the data to fit the mean function to
+    params : dict, optional
+        dictionary specifying starting parameter values for the mean function;
+        in other words, these values will be substituted into the sympy
+        expression to start with
     """
 
     def __init__(self, expr, x_data, y_data, params=None):
