@@ -3,7 +3,12 @@ This repository contains code used and described in:
 
 Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
 
+Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estiamtes and Derivative Information in Gaussian Process Regression for Expediated Data Collection in Molecular Simulations. In preparation.
+
 If you find this code useful in producing published works, please provide an appropriate citation.
+Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
+For now, the GPR code, along with more information, may be found under docs/notebooks/gpr.
+In a future release, we expect this to be fully integrated into the code base rather than a standalone module.
 
 Code included here can be used to perform thermodynamic extrapolation and interpolation of observables calculated from molecular simulations.
 This allows for more efficient use of simulation data for calculating how observables change with simulation conditions, including temperature, density, pressure, chemical potential, or force field parameters.
@@ -23,7 +28,7 @@ If specific features would be helpful just let us know and we will be happy to w
 - matplotlib (optional --- for visual consistency checks)
 - pymbar (optional --- for comparisons)
 
-cmomy may e installed with either (recommended)
+cmomy may be installed with either (recommended)
 ```
 conda install -c wpk-nist cmomy
 ```
@@ -72,4 +77,4 @@ To test installation, run `python test_thermoextrap.py` and diff the output agai
 If pymbar is not installed, the output will differ by a single test to check MBAR.
 
 # Contact
-Questions may be addressed to Jacob Monroe at jacob.monroe@nist.gov.
+Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
