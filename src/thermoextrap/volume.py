@@ -83,14 +83,6 @@ class VolumeDerivFuncs:
 def factory_derivatives():
     """
     factory function to provide coefficients of expansion
-
-    Parameters
-    ----------
-    refV : reference volume (default 1 - if already divided by volume no need to set)
-
-    Returns
-    -------
-    coefs : Coefs object used to calculate moments
     """
     deriv_funcs = VolumeDerivFuncs()
     return Derivatives(deriv_funcs)
@@ -111,7 +103,7 @@ class VolumeDataCallback(DataCallbackABC):
 
     See Also
     --------
-    thermoextrap.DataCallbackABC
+    thermoextrap.core.data.DataCallbackABC
     """
 
     volume: float = field(validator=attv.instance_of(float))
@@ -178,11 +170,11 @@ def factory_extrapmodel(
     {val_dims}
     {rep_dim}
     **kws :
-        Extra arguments to :func:`factory_data_values`
+        Extra arguments to :meth:`thermoextrap.DataValues.from_vals`
 
     Returns
     -------
-    extrapmodel : ExtrapModel object
+    extrapmodel : :class:`thermoextrap.ExtrapModel`
 
     """
 

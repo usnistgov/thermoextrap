@@ -16,10 +16,14 @@ Data Models
 
    DataCentralMoments
    DataCentralMomentsVals
+   ..
+      ~core.data.DataCentralMomentsBase
 
 
    DataValues
    DataValuesCentral
+
+   AbstractData
 
 
 .. autosummary::
@@ -27,6 +31,8 @@ Data Models
 
    factory_data_values
    resample_indices
+
+
 
 
 General extrapolation and interpolation models
@@ -44,6 +50,8 @@ General extrapolation and interpolation models
    MBARModel
    PerturbModel
    StateCollection
+   Derivatives
+
 
 
 
@@ -148,14 +156,6 @@ Gaussian Process Regression
 
    active_utils.DataWrapper
    active_utils.SimWrapper
-   active_utils.input_GP_from_states
-   active_utils.create_base_GP_model
-   active_utils.train_GPR
-   active_utils.create_GPR
-   active_utils.make_poly_expr
-   active_utils.make_matern_expr
-   active_utils.make_rbr_expr
-   active_utils.DerivateKernel
    active_utils.ChangeInnerOuterRBFDerivKernel
    active_utils.UpdateALMbrute
    active_utils.UpdateSpaceFill
@@ -172,8 +172,13 @@ Gaussian Process Regression
 
    active_utils.active_learning
    active_utils.get_logweights
-
-
+   active_utils.input_GP_from_state
+   active_utils.create_base_GP_model
+   active_utils.train_GPR
+   active_utils.create_GPR
+   active_utils.make_poly_expr
+   active_utils.make_matern_expr
+   active_utils.make_rbf_expr
 
 .. autosummary::
    :toctree: generated/
@@ -184,4 +189,4 @@ Gaussian Process Regression
 
    gp_models.DerivativeKernel
    gp_models.HetGaussianDeriv
-   gp_models.HeteroscedasticGPR(
+   gp_models.HeteroscedasticGPR
