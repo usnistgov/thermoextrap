@@ -58,9 +58,10 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
 
     Parameters
     ----------
-    func : sympy function
+    func : symFunction
         Function to differentiate
-    args : Sequence of arguments to func
+    args : Sequence of Symbol
+        Arguments to func
     {expand}
     {post_func}
     """
@@ -107,7 +108,7 @@ class SymSubs:
 
     Parameters
     ----------
-    funcs : sequence of sympy.Functions
+    funcs : sequence of SymFunction
         Symbolic functions to consider.
     subs : Sequence, optional
         Substitutions.
@@ -162,15 +163,16 @@ class SymSubs:
 @attrs.define
 class Lambdify:
     """
-    Create python function from list of sympy expression
+    Create python function from list of expressions
+
     Parameters
     ----------
-    exprs : sequence
-        array of sympy expressions to lambdify
-    args : sequence
-        array of sympy symbols which will be in args of the resulting function
+    exprs : sequence of symFunction
+        array of sympy expressions to :func:`~sympy.utilities.lambdify`
+    args : sequence of Symbol
+        array of symbols which will be in args of the resulting function
     lambdify_kws : dict
-        extra arguments to sympy.lambdify
+        extra arguments to :func:`~sympy.utilities.lambdify`
     """
 
     exprs: Sequence[sp.Function] = field()
@@ -241,9 +243,9 @@ class Derivatives(MyAttrsMixin):
 
     Parameters
     ----------
-    funcs : seqeunce of callables
+    funcs : sequence of callable
         funcs[i](*args) gives the ith derivative
-    exprs : sequence sympy expresions, optional
+    exprs : sequence of Expr, optional
         expressions corresponding to the `funcs`
         Mostly for debuggin purposes.
     """
@@ -274,7 +276,8 @@ class Derivatives(MyAttrsMixin):
 
         Parameters
         ----------
-        data : AbstracData subclass
+        data : object
+            Data object.
             If passed, use `args=data.derivs_args`
         order : int, optional
             If pass `data` and `order` is `None`, then `order=data.order`
@@ -348,18 +351,18 @@ class Derivatives(MyAttrsMixin):
     @classmethod
     def from_sympy(cls, exprs, args):
         """
-        Create object from list of sympy expressions.
+        Create object from list of sympy functions.
 
         Parameters
         ----------
-        exprs : sequence
-            sequence of sympy expressions.
-        args : sequence
+        exprs : sequence of symFunction
+            sequence of sympy functions.
+        args : sequence of Symbol
             Arguments
 
         Returns
         -------
-        output : instance of cls
+        output : object
         """
         funcs = Lambdify(exprs, args=args)
         return cls(funcs=funcs, exprs=exprs, args=args)
@@ -600,10 +603,10 @@ class StateCollection(MyAttrsMixin):
     def map(self, func, *args, **kwargs):
         """
         apply a function to elements self.
-        out = [func(s, *args, **kwargs) for s in self]
+        ``out = [func(s, *args, **kwargs) for s in self]``
 
         if func is a str, then
-        out = [getattr(s, func)(*args, **kwargs) for s in self]
+        ``out = [getattr(s, func)(*args, **kwargs) for s in self]``
         """
 
         if isinstance(func, str):
@@ -648,8 +651,8 @@ class StateCollection(MyAttrsMixin):
 
         Returns
         -------
-        out : type(self)
-            same type as `self` with new states added to self.states
+        out : object
+            same type as `self` with new states added to `states` list
         """
 
         new_states = list(self.states) + list(states)
@@ -749,14 +752,15 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
         method : {None, 'between', 'nearest'}
             method to select which models are chosen to predict value for given
             value of alpha.
-            * None or between: use states such that `state[i].alpha0 <= alpha < states[i+1]`
+
+            - None or between: use states such that `state[i].alpha0 <= alpha < states[i+1]`
               if alpha < state[0].alpha0 use first two states
               if alpha > states[-1].alpha0 use last two states
-            * nearest: use two states with minimum `abs(state[k].alpha0 - alpha)`
+            - nearest: use two states with minimum `abs(state[k].alpha0 - alpha)`
 
         Notes
         -----
-        This requires that self.states are ordered in ascending alpha0 order
+        This requires that :attr:`states` are ordered in ascending :attr:`alpha0` order
         """
 
         self._check_alpha(alpha, bounded)
@@ -918,7 +922,7 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
         """
         Parameters
         ----------
-        alpha : float or sequence of floats
+        alpha : float or sequence of float
 
         """
 

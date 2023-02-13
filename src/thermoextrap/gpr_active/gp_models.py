@@ -612,21 +612,20 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     For scaling model, effectively model logarithm of each element in covariance matrix
 
     .. math::
-        \ln cov_{i,j} = ln cov_{i,j,0} + p (d_i + d_j) + s
+        \ln {\rm cov}_{i,j} = \ln {\rm cov}_{i,j,0} + p (d_i + d_j) + s
 
     or
 
     .. math::
-        cov_{i,j} = cov_{i,j,0} \exp[ p (d_i + d_j)] \exp(s)
+        {\rm cov}_{i,j} = {\rm cov}_{i,j,0} \exp[ p (d_i + d_j)] \exp(s)
 
     We can accomplish this while keeping the scaled covariance matrix positive
     semidefinite by making the scaling matrix diagonal with positive entries
     If we then take S*Cov*S, with S being the diagonal scaling matrix with positive
     entries, the result will be positive semi-definite because S is positive definite
     and Cov is positive semidefinite
-    The scaling matrix is given by `exp(s + p*d_i,j)` if i=j and 0 otherwise
-    While could make parameters s and p unconstrained, default will set...
-        s = 0    ;    p >= 0
+    The scaling matrix is given by :math:`exp(s + p*d_i,j)` if :math:`i=j` and 0 otherwise
+    While could make parameters s and p unconstrained, default will set ``s=0``, `p>=0``.
     This means that we CANNOT decrease the uncertainty, only increase it
     Further, if we increase the uncertainty, we must do it MORE for higher order
     derivatives
@@ -925,14 +924,11 @@ class HeteroscedasticGPR(
     multioutput kernel should be used to wrap whatever kernel has been specified. If it is
     detected that the kernel does not satisfy this property, the model will attempt to
     appropriately wrap the specified kernel. The covariance matrix is expected to
-    be the third element of the input data tuple (X, Y, noise_cov). Specific shapes should be
-        X - (Nx2)
-        Y - (NxD)
-        noise_cov - (NxDxD or DxD)
-    where N is the number of input locations and D is the input dimensionality. Note that the
-    first column of X is for the locations and the second is for the derivative order of
+    be the third element of the input data tuple (`X, Y, noise_cov`). Specific shapes should be ``X.shape == (N, 2)``, ``Y.shape == (N, D)``, ``noise_cov.shape == (N, D, D) or (D, D)``,
+    where `N` is the number of input locations and `D` is the input dimensionality. Note that the
+    first column of `X` is for the locations and the second is for the derivative order of
     the observation at that location, so only 1D inputs can be handled, though the output
-    dimension, D, is not restricted.
+    dimension, `D`, is not restricted.
 
     Parameters
     ----------
