@@ -6,10 +6,12 @@ include README.rst
 include Makefile
 
 recursive-include tests *.py
-recursive-exclude * __pycache__
-recursive-exclude * [.]mypy_cache
-recursive-exclude * [.]ipynb_checkpoints
 
 global-exclude *.py[co]
+prune */*.egg-info
+prune */*mypy_cache
+prune */*ipynb_checkpoints
+prune */__pycache__
+
 prune docs
 prune notebooks
