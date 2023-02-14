@@ -48,13 +48,15 @@ extensions = [
     # "sphinx.ext.linkcode",
 ]
 
+
+nitpicky = True
 # defined stuff, from xarray
 nbsphinx_prolog = """
 
 {% set docname = env.doc2path(env.docname, base=None) %}
 
 
-You can view this notebook `on Github <https://github.com/wpk-nist-gov/thermoextrap/blob/master/doc/{{ docname }}>`_.
+You can view this notebook `on Github <https://github.com/usnistgov/thermo-extrap/blob/master/doc/{{ docname }}>`_.
 """
 
 autosummary_generate = True
@@ -69,8 +71,8 @@ autodoc_default_flags = [
 # # for scanpydoc's jinja filter
 # project_dir = pathlib.Path(__file__).parent.parent
 html_context = {
-    "github_user": "wpk-nist-gov",
-    "github_repo": "thermoextrap",
+    "github_user": "usnistgov",
+    "github_repo": "thermo-extrap",
     "github_version": "master",
 }
 
@@ -130,6 +132,11 @@ napoleon_type_aliases = {
     # objects with abbreviated namespace (from pandas)
     "pd.Index": "~pandas.Index",
     "pd.NaT": "~pandas.NaT",
+    "xCentralMoments": "cmomy.xCentralMoments",
+    "Expr": "~sympy.core.expr.Expr",
+    "Symbol": "~sympy.core.symbol.Symbol",
+    "symFunction": "~sympy.core.function.Function"
+    # "DataCentralMoments": "~cmomy.core.data.DataCentralMoments"
 }
 
 numpydoc_class_members_toctree = True
@@ -149,7 +156,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "thermodynamic-extrapolation"
+project = "thermo-extrap"
 copyright = "2021, William P. Krekelberg"
 author = "William P. Krekelberg"
 
@@ -217,6 +224,63 @@ if not os.path.exists(ipython_savefig_dir):
 # using the given strftime format.
 today_fmt = "%Y-%m-%d"
 html_last_updated_fmt = today_fmt
+
+
+# based on numpy doc/source/conf.py
+def linkcode_resolve(domain, info):
+    """
+    Determine the URL corresponding to Python object
+    """
+    import inspect
+
+    if domain != "py":
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    submod = sys.modules.get(modname)
+    if submod is None:
+        return None
+
+    obj = submod
+    for part in fullname.split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return None
+
+    try:
+        fn = inspect.getsourcefile(inspect.unwrap(obj))
+    except TypeError:
+        fn = None
+    if not fn:
+        return None
+
+    try:
+        source, lineno = inspect.getsourcelines(obj)
+    except OSError:
+        lineno = None
+
+    if lineno:
+        linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
+    else:
+        linespec = ""
+
+    fn = os.path.relpath(fn, start=os.path.dirname(thermoextrap.__file__))
+
+    return f"https://github.com/usnistgov/thermo-extrap/blob/master/src/thermoextrap/{fn}{linespec}"
+
+
+# only set spelling stuff if installed:
+try:
+    import sphinxcontrib.spelling  # noqa: F401
+
+    extensions += ["sphinxcontrib.spelling"]
+    spelling_word_list_filename = "spelling_wordlist.txt"
+
+except ImportError:
+    pass
 
 
 # -- Options for HTMLHelp output ---------------------------------------
@@ -301,6 +365,9 @@ intersphinx_mapping = {
     "dask": ("https://docs.dask.org/en/latest", None),
     "cftime": ("https://unidata.github.io/cftime", None),
     "sparse": ("https://sparse.pydata.org/en/latest/", None),
+    "cmomy": ("https://pages.nist.gov/cmomy/", None),
+    "xarray": ("https://docs.xarray.dev/en/stable/", None),
+    "sympy": ("https://docs.sympy.org/latest/", None),
 }
 
 # think jinja stuff
