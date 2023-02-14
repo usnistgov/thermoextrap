@@ -3,9 +3,13 @@ include CONTRIBUTING.rst
 include HISTORY.rst
 include LICENSE
 include README.rst
+include Makefile
 
-recursive-include tests *
+recursive-include tests *.py
 recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
+recursive-exclude * [.]mypy_cache
+recursive-exclude * [.]ipynb_checkpoints
 
-recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
+global-exclude *.py[co]
+prune docs
+prune notebooks
