@@ -44,8 +44,8 @@ extensions = [
     "nbsphinx",
     # "sphinx_autosummary_accessors",
     # "scanpydoc.rtd_github_links",
-    "sphinx.ext.viewcode",
-    # "sphinx.ext.linkcode",
+    # "sphinx.ext.viewcode",
+    "sphinx.ext.linkcode",
 ]
 
 
