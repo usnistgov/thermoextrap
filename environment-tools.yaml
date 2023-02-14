@@ -1,0 +1,42 @@
+# packages for development
+dependencies:
+  # linting
+  # - black
+  # - blackdoc
+  # - flake8
+  # - isort
+  # testing
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  # - tox
+  # hooks
+  # - pre-commit
+ # repl
+  - ipython
+  - ipykernel
+  - nbconvert
+  # build
+  # - setuptools
+  - setuptools-scm
+  # - setuptools-scm-git-archive
+  # - build
+  # - twine
+  # conda specific
+  # - conda-build
+  # - anaconda-client
+  # - greyskull
+  # doc stuff
+  # - sphinx
+  # - sphinx_rtd_theme
+  # - recommonmark # if want markdown
+  # - nbsphinx # if want notebooks
+  # - sphinxcontrib-spelling
+  # lsp stuff
+  # - autoflake
+  # - pyls-mypy
+  # - pyls-black
+  # - pyls-isort
+  # - pip
+  # - pip:
+  #     - pyenchant

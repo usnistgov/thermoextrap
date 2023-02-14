@@ -1,0 +1,22 @@
+name: thermoextrap-env
+channels:
+  - conda-forge
+  - wpk-nist
+dependencies:
+  - python>=3.8
+  - sympy
+  - matplotlib
+  - numpy
+  - scipy
+  - xarray
+#  - openmm
+  - cmomy
+  - custom-inherit
+  - attrs
+  - pymbar<4.0
+  - pip
+  - pip:
+      - tensorflow
+      - tensorflow-probability
+      - gpflow
+# prefix: /Users/wpk/miniforge3/envs/gpflow_test

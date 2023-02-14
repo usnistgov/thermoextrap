@@ -1,56 +1,82 @@
-# Thermodynamic Extrapolation/Interpolation Library
+# `thermoextrap`: Thermodynamic Extrapolation/Interpolation Library
 This repository contains code used and described in:
 
 Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
 
+Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estiamtes and Derivative Information in Gaussian Process Regression for Expediated Data Collection in Molecular Simulations. In preparation.
+
+# Overview
+
 If you find this code useful in producing published works, please provide an appropriate citation.
+Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
+For now, the GPR code, along with more information, may be found under docs/notebooks/gpr.
+In a future release, we expect this to be fully integrated into the code base rather than a standalone module.
 
-Code included here can be used to perform thermodynamic extrapolation and interpolation of observables calculated from molecular simulations.
-This allows for more efficient use of simulation data for calculating how observables change with simulation conditions, including temperature, density, pressure, chemical potential, or force field parameters.
-Users are highly encourage to work through the Jupyter Notebook tutorial (Ideal_Gas_Example.ipynb) presenting examples for a variety of different observable functional forms.
-We only guarantee that this code is functional for the test cases we present here or for which it has previously been applied
-Additionally, the code may be in continuous development at any time.
-Use at your own risk and always check to make sure the produced results make sense.
-If bugs are found, please report them.
-If specific features would be helpful just let us know and we will be happy to work with you to come up with a solution.
+Code included here can be used to perform thermodynamic extrapolation and
+interpolation of observables calculated from molecular simulations. This allows
+for more efficient use of simulation data for calculating how observables change
+with simulation conditions, including temperature, density, pressure, chemical
+potential, or force field parameters. Users are highly encourage to work through
+the Jupyter Notebook tutorial (Ideal_Gas_Example.ipynb) presenting examples for
+a variety of different observable functional forms. We only guarantee that this
+code is functional for the test cases we present here or for which it has
+previously been applied Additionally, the code may be in continuous development
+at any time. Use at your own risk and always check to make sure the produced
+results make sense. If bugs are found, please report them. If specific features
+would be helpful just let us know and we will be happy to work with you to come
+up with a solution.
 
-# Dependencies
-- python 3 (python 2 may also work but is not tested or officially supported)
-- numpy
-- scipy
-- sympy
-- matplotlib (optional --- for visual consistency checks)
-- pymbar (optional --- for comparisons)
+
+# Status
+
+This package is actively used by the author.  Please feel free to create a pull request for wanted features and suggestions!
+
 
 # Installation
-Move into the repository directory and run
-```
-pip install .
-```
-It is recommended that this is done in a python environment, such as one created with conda.
-The above command will also install numpy, scipy, and sympy if these packages are not detected.
-To disable automatic installation of these packages, use
-```
-pip install --no-deps .
-```
-Note, however, that if these packages are not installed, the code will not work.
-The initial version of the code was developed and tested with numpy 1.17.2, scipy 1.3.1, and sympy 1.4.
-Earlier versions of these packages may also be compatible, but have not been tested.
-The code may also be used without pip installation by placing the libextrap directory into a directory pointed to by your system and/or python path.
 
-The matplotlib and pymbar packages are optional.
-The main body of the code will run without these packages, with the exception of reweighting.py which requires pymbar for all of its functionality as this involves performing perturbation theory or MBAR predictions.
-Plotting is only used for visual consistency checks for polynomial interpolation in recursive_interp.py and is disabled by default.
-To install matplotlib or pymbar, you can use you favorite package manager like pip or conda.
-Directions for installing pymbar may include additional subtleties which may be found [here](https://pymbar.readthedocs.io/en/master/getting_started.html#installing-pymbar).
+`thermoextrap` may be installed with either (recommended)
+```bash
+conda install -c wpk-nist thermoextrap
+```
+or
+```bash
+pip install thermoextrap
+```
 
-With succesful installation, you should be able to load in all classes and functions with `from thermoextrap import *`.
-The exception is utilities.py, which contains low-level code that will not be necessary for most use cases.
-If you want to import specific modules rather than everything, you of course can also do that.
-To test installation, run `python test_thermoextrap.py` and diff the output against test_output.txt.
-If pymbar is not installed, the output will differ by a single test to check MBAR.
+If you use pip, then you can include additional dependencies using
+```bash
+pip install thermoextrap[all]
+```
+
+If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the verisons on the conda/conda-forge channels are often a bit old.
+```bash
+pip install tensorflow tensorflow-probability gpflow
+```
 
 # Contact
-Questions may be addressed to Jacob Monroe at jacob.monroe@nist.gov.
+Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
 
+
+# Documentation
+
+Documentation can be found at
+For a deeper dive, look at the [documentation](https://pages.nist.gov/thermo-extrap/)
+
+
+## License
+
+This is free software.  See [LICENSE](LICENSE).
+
+## Related work
+
+This package extensively uses the ``cmomy`` package to handle central comoments.  See [here](https://github.com/usnistgov/cmomy).
+
+
+## Credits
+
+This package was created with
+[Cookiecutter](https://github.com/audreyr/cookiecutter) and the
+[wpk-nist-gov/cookiecutter-pypackage](https://github.com/wpk-nist-gov/cookiecutter-pypackage)
+Project template forked from
+[audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage).
 
