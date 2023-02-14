@@ -8,11 +8,12 @@ Extrapolation and Interpolation Strategies for Efficiently Estimating
 Structural Observables as a Function of Temperature and Density. J.
 Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
 
-Overview
-========
+Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estiamtes and Derivative Information in Gaussian Process Regression for Expediated Data Collection in Molecular Simulations. In preparation.
 
-If you find this code useful in producing published works, please
-provide an appropriate citation.
+If you find this code useful in producing published works, please provide an appropriate citation.
+Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
+For now, the GPR code, along with more information, may be found under docs/notebooks/gpr.
+In a future release, we expect this to be fully integrated into the code base rather than a standalone module.
 
 Code included here can be used to perform thermodynamic extrapolation
 and interpolation of observables calculated from molecular simulations.

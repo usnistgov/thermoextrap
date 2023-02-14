@@ -16,7 +16,10 @@ from thermoextrap.gpr_active import active_utils
 
 N_cutoff = 481  # N value beyond which ln_Pi becomes unreliable, so won't use
 
-SRS_base_dir = os.path.expanduser("~/GPR_Extrapolation/gpr_active/SRS_data")
+# Change path below to set which data set to use
+# SRS_data was used for the main text, higher_order_LJ_lnPi_data for Fig. S4 in the SI
+SRS_base_dir = os.path.expanduser("~/bin/thermo-extrap/docs/notebooks/gpr/SRS_data")
+#SRS_base_dir = os.path.expanduser("~/bin/thermo-extrap/docs/notebooks/gpr/higher_order_LJ_lnPi_data")
 
 
 # Necessary functions
@@ -25,13 +28,16 @@ def get_sim_activity(Tr):
         return -6.250
     elif Tr == 0.730 or Tr == 0.740:
         return -5.500
+    elif Tr == 0.770:
+        return -5.800
     elif Tr == 0.850:
         return -4.800
+    elif Tr == 0.950:
+        return -4.100
     elif Tr == 1.100:
         return -3.380
     elif Tr == 1.200:
         return -3.000
-    # Simulation activities for 0.77 and 0.95?
 
 
 def load_lnPi_info(Tr, ref_mu=-4.0, run_num=None):
@@ -95,7 +101,7 @@ class StatelnPi:
         return self.x, self.y, self.cov
 
 
-def state_from_info_dict(info):
+def state_from_info_dict(info, d_o=None):
     meta_lnpi = thermoextrap.lnpi.lnPiDataCallback(
         info["lnPi"],  # .isel(n=slice(1, None)),
         info["mu"],
@@ -118,7 +124,8 @@ def state_from_info_dict(info):
     # So providing custom state wrapper that, instead of providing state itself,
     # provides x, y, and derivative info directly
     # Essentially this is a simple, custom version of input_GP_from_state
-    d_o = info["energy"].sizes["umom"] - 1
+    if d_o is None:
+        d_o = info["energy"].sizes["umom"] - 1
     alphas = state_lnpi.alpha0 * np.ones((d_o + 1, 1))
     x_data = np.concatenate([alphas, np.arange(d_o + 1)[:, None]], axis=1)
 
@@ -324,90 +331,101 @@ def main():
     ref_mu = np.average([get_sim_activity(t) * t for t in ref_T])
     print("Reference chemical potential: %f" % ref_mu)
 
-    lnpi_info = [load_lnPi_info(t, ref_mu=ref_mu) for t in ref_T]
-    state_list = [state_from_info_dict(i) for i in lnpi_info]
-
-    # Create GP model
-    gp_model = active_utils.create_GPR(state_list)
-
-    gpflow.utilities.print_summary(gp_model)
-
-    # Now look at predictions with GP model
-    test_T = np.array([0.70, 0.74, 0.85, 1.10, 1.20])
-    test_beta = 1.0 / test_T
-    gp_pred = gp_model.predict_f(np.vstack([test_beta, np.zeros_like(test_beta)]).T)
-    gp_pred_mu = gp_pred[0].numpy()
-    gp_pred_std = np.sqrt(gp_pred[1])
-    # Add N=0 bin back in
-    gp_pred_mu = np.concatenate(
-        [np.zeros((gp_pred_mu.shape[0], 1)), gp_pred_mu], axis=-1
-    )
-    gp_pred_std = np.concatenate(
-        [np.zeros((gp_pred_std.shape[0], 1)), gp_pred_std], axis=-1
-    )
-    gp_pred_conf_int = np.array(
-        [gp_pred_mu - 2.0 * gp_pred_std, gp_pred_mu + 2.0 * gp_pred_std]
-    )
-    N_vals = np.arange(gp_pred_mu.shape[1])
-
-    # Save GP model info and predictions
-    gp_input_x = gp_model.data[0].numpy()
-    gp_input_y = gp_model.data[1].numpy()
-    gp_input_x = np.concatenate(
-        [gp_input_x[:, :1] / gp_model.x_scale_fac, gp_input_x[:, 1:]], axis=-1
-    )
-    gp_input_y = gp_input_y * (gp_model.x_scale_fac ** gp_input_x[:, 1:])
-    gp_input_y = gp_input_y * gp_model.scale_fac
-    gp_input_cov = gp_model.likelihood.cov.copy()
-    gp_input_cov = gp_input_cov * gp_model.x_scale_fac ** (
-        np.add(*np.meshgrid(gp_input_x[:, 1:], gp_input_x[:, 1:]))
-    )
-    gp_input_cov = gp_input_cov * (
-        np.expand_dims(
-            gp_model.scale_fac,
-            axis=tuple(range(gp_model.scale_fac.ndim, gp_input_cov.ndim)),
+    # To show impact of using different derivative order information, loop over orders
+    # Use parameters from previous order
+    # (Training not stable from default params for higher orders...)
+    # (due to p=10.0 being too high...)
+    # (higher order moments can be large with high variance, and get bigger when apply p>0)
+    # (leading to overlows)
+    curr_params = [1.0, 1.0, 10.0] #Start with defaults
+    for d_order in range(1, 6):
+        lnpi_info = [load_lnPi_info(t, ref_mu=ref_mu) for t in ref_T]
+        state_list = [state_from_info_dict(i, d_o=d_order) for i in lnpi_info]
+    
+        # Create GP model
+        gp_model = active_utils.create_GPR(state_list, start_params=curr_params)
+    
+        gpflow.utilities.print_summary(gp_model)
+    
+        # Now look at predictions with GP model
+        test_T = np.array([0.70, 0.74, 0.85, 1.10, 1.20])
+        test_beta = 1.0 / test_T
+        gp_pred = gp_model.predict_f(np.vstack([test_beta, np.zeros_like(test_beta)]).T)
+        gp_pred_mu = gp_pred[0].numpy()
+        gp_pred_std = np.sqrt(gp_pred[1])
+        # Add N=0 bin back in
+        gp_pred_mu = np.concatenate(
+            [np.zeros((gp_pred_mu.shape[0], 1)), gp_pred_mu], axis=-1
         )
-        ** 2
-    )
-    gp_params = np.array([p.numpy() for p in gp_model.trainable_parameters])
-    np.savez(
-        "gp_model_info.npz",
-        N=N_vals,
-        input_x=gp_input_x,
-        input_y=gp_input_y,
-        input_cov=gp_input_cov,
-        pred_mu=gp_pred_mu,
-        pred_std=gp_pred_std,
-        pred_conf_int=gp_pred_conf_int,
-        params=gp_params,
-    )
-
-    # For expanded set of temperatures, make predictions of lnPi, then use to predict
-    # VLE properties
-    extra_T = np.linspace(0.7, 1.2, 1000)
-    extra_betas = 1.0 / extra_T
-    extra_pred = gp_model.predict_f(
-        np.vstack([extra_betas, np.zeros_like(extra_betas)]).T
-    )
-
-    # Collect saturation properties
-    gp_sat_props = []
-    gp_sat_props_conf_ints = []
-    for i, t in enumerate(extra_T):
-        print(i, t)
-        this_lnPi = extra_pred[0][i, :].numpy()
-        this_props, this_prop_conf_int = get_sat_props(
-            this_lnPi, ref_mu / t, t, lnPi_vars=extra_pred[1][i, :].numpy(), N_boot=1000
+        gp_pred_std = np.concatenate(
+            [np.zeros((gp_pred_std.shape[0], 1)), gp_pred_std], axis=-1
         )
-        gp_sat_props.append(this_props)
-        gp_sat_props_conf_ints.append(this_prop_conf_int)
-
-    # Should be lnz, density_gas, density_liquid, pressure_gas, pressure_liquid
-    gp_sat_props = np.array(gp_sat_props)
-    gp_sat_props_conf_ints = np.array(gp_sat_props_conf_ints)
-
-    # Save saturation property predictions
-    np.savez("sat_props_GPR.npz", props=gp_sat_props, conf_ints=gp_sat_props_conf_ints)
+        gp_pred_conf_int = np.array(
+            [gp_pred_mu - 2.0 * gp_pred_std, gp_pred_mu + 2.0 * gp_pred_std]
+        )
+        N_vals = np.arange(gp_pred_mu.shape[1])
+    
+        # Save GP model info and predictions
+        gp_input_x = gp_model.data[0].numpy()
+        gp_input_y = gp_model.data[1].numpy()
+        gp_input_x = np.concatenate(
+            [gp_input_x[:, :1] / gp_model.x_scale_fac, gp_input_x[:, 1:]], axis=-1
+        )
+        gp_input_y = gp_input_y * (gp_model.x_scale_fac ** gp_input_x[:, 1:])
+        gp_input_y = gp_input_y * gp_model.scale_fac
+        gp_input_cov = gp_model.likelihood.cov.copy()
+        gp_input_cov = gp_input_cov * gp_model.x_scale_fac ** (
+            np.add(*np.meshgrid(gp_input_x[:, 1:], gp_input_x[:, 1:]))
+        )
+        gp_input_cov = gp_input_cov * (
+            np.expand_dims(
+                gp_model.scale_fac,
+                axis=tuple(range(gp_model.scale_fac.ndim, gp_input_cov.ndim)),
+            )
+            ** 2
+        )
+        gp_params = np.array([p.numpy() for p in gp_model.trainable_parameters])
+        np.savez(
+            "gp_model_info_order%i.npz"%d_order,
+            N=N_vals,
+            input_x=gp_input_x,
+            input_y=gp_input_y,
+            input_cov=gp_input_cov,
+            pred_mu=gp_pred_mu,
+            pred_std=gp_pred_std,
+            pred_conf_int=gp_pred_conf_int,
+            params=gp_params,
+        )
+        
+        # Update current parameters to use for next order training
+        curr_params = gp_params.tolist()
+    
+        # For expanded set of temperatures, make predictions of lnPi, then use to predict
+        # VLE properties
+        extra_T = np.linspace(0.7, 1.2, 1000)
+        extra_betas = 1.0 / extra_T
+        extra_pred = gp_model.predict_f(
+            np.vstack([extra_betas, np.zeros_like(extra_betas)]).T
+        )
+    
+        # Collect saturation properties
+        gp_sat_props = []
+        gp_sat_props_conf_ints = []
+        for i, t in enumerate(extra_T):
+            print(i, t)
+            this_lnPi = extra_pred[0][i, :].numpy()
+            this_props, this_prop_conf_int = get_sat_props(
+                this_lnPi, ref_mu / t, t, lnPi_vars=extra_pred[1][i, :].numpy(), N_boot=1000
+            )
+            gp_sat_props.append(this_props)
+            gp_sat_props_conf_ints.append(this_prop_conf_int)
+    
+        # Should be lnz, density_gas, density_liquid, pressure_gas, pressure_liquid
+        gp_sat_props = np.array(gp_sat_props)
+        gp_sat_props_conf_ints = np.array(gp_sat_props_conf_ints)
+    
+        # Save saturation property predictions
+        np.savez("sat_props_GPR_order%i.npz"%d_order, props=gp_sat_props, conf_ints=gp_sat_props_conf_ints)
 
 
 if __name__ == "__main__":

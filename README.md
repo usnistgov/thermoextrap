@@ -3,10 +3,14 @@ This repository contains code used and described in:
 
 Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
 
+Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estiamtes and Derivative Information in Gaussian Process Regression for Expediated Data Collection in Molecular Simulations. In preparation.
 
 # Overview
 
 If you find this code useful in producing published works, please provide an appropriate citation.
+Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
+For now, the GPR code, along with more information, may be found under docs/notebooks/gpr.
+In a future release, we expect this to be fully integrated into the code base rather than a standalone module.
 
 Code included here can be used to perform thermodynamic extrapolation and
 interpolation of observables calculated from molecular simulations. This allows
@@ -49,6 +53,9 @@ If you install `thermoextrap` with conda, there are additional optional dependen
 pip install tensorflow tensorflow-probability gpflow
 ```
 
+# Contact
+Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
+
 
 # Documentation
 
@@ -65,10 +72,6 @@ This is free software.  See [LICENSE](LICENSE).
 This package extensively uses the ``cmomy`` package to handle central comoments.  See [here](https://github.com/usnistgov/cmomy).
 
 
-## Contact
-
-The authors can be reached at wpk@nist.gov.
-
 ## Credits
 
 This package was created with
@@ -76,3 +79,4 @@ This package was created with
 [wpk-nist-gov/cookiecutter-pypackage](https://github.com/wpk-nist-gov/cookiecutter-pypackage)
 Project template forked from
 [audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage).
+
