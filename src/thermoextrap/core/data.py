@@ -932,7 +932,7 @@ def factory_data_values(
 
     Returns
     -------
-    output : Data object
+    output : DataValues or DataValuesCentral
 
 
     See Also
@@ -1138,16 +1138,16 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
         Block resample along axis
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         block_size : int
             number of sample to block average together
         {dim}
         {axis}
-        axis : int or str, default=self.rec_dim
+        axis : int or str, default=:attr:`rec_dim`
             axis or dimension to block average along
         **kwargs : dict
-            extra arguments to cmomy.xCentralMoments.block
+            extra arguments to :meth:`cmomy.xCentralMoments.block`
         """
 
         if dim is None and axis is None:
@@ -1262,13 +1262,14 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
         Convert raw moments to data object.
 
+        The raw moments have the form ``raw[..., i, j] = weight`` if ``i = j = 0``.  Otherwise,
+        ``raw[..., i, j] = <x ** i * u ** j>``.
+
         Parameters
         ----------
         raw : array-like
             raw moments.  The form of this array is such that
-            raw[..., i, j] = weight,        i = j = 0
-                           = <x**i * u**j>, otherwise
-           The shape should be (..., 2, order+1)
+            The shape should be ``(..., 2, order+1)``
         {rec_dim}
         {xmom_dim}
         {umom_dim}
@@ -1281,14 +1282,15 @@ class DataCentralMoments(DataCentralMomentsBase):
         {meta}
         {x_is_u}
 
+
         Returns
         -------
-        output : Data object
+        output : DataCentralMoments
+
 
         See Also
         --------
-        cmomy.xCentralMoments.from_raw
-
+        :meth:`cmomy.xCentralMoments.from_raw`
         """
 
         if x_is_u:
@@ -1382,11 +1384,11 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         Returns
         -------
-        output : Data object
+        output : DataCentralMoments
 
         See Also
         --------
-        cmomy.xCentralMoments.from_vals
+        :meth:`cmomy.xCentralMoments.from_vals`
         """
 
         if axis is None and dim is None:
@@ -1469,11 +1471,11 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         Returns
         -------
-        output : Data object
+        output : DataCentralMoments
 
         See Also
         --------
-        cmomy.xCentralMoments.from_data
+        :meth:`cmomy.xCentralMoments.from_data`
         """
 
         if x_is_u:
@@ -1576,7 +1578,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         See Also
         --------
-        cmomy.xCentralMoments.from_resample_vals
+        :meth:`cmomy.xCentralMoments.from_resample_vals`
         """
         if xv is None or x_is_u:
             xv = uv
@@ -1679,7 +1681,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         See Also
         --------
-        cmomy.xCentralMoments.from_raw
+        :meth:`cmomy.xCentralMoments.from_raw`
         """
 
         if xu is None or x_is_u:
@@ -1811,7 +1813,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         See Also
         --------
-        cmomy.xCentralMoments.from_data
+        :meth:`cmomy.xCentralMoments.from_data`
 
         """
 
@@ -1984,11 +1986,11 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
 
         Returns
         -------
-        output : Data object
+        output : DataCentralMomentsVals
 
         See Also
         --------
-        cmomy.xCentralMoments.from_vals
+        :meth:`cmomy.xCentralMoments.from_vals`
         """
 
         # make sure "val" is a list
@@ -2054,7 +2056,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
 
         See Also
         --------
-        cmomy.xCentralMoments.resample
+        :meth:`cmomy.xCentralMoments.resample`
         """
 
         if dim is None and axis is None:

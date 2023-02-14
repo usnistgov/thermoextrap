@@ -15,7 +15,7 @@ verify : bool, optional
     If True, make sure data is c-contiguous
 check_shape : bool, optional
     If True, check that shape of resulting object is correct.
-mom : int or (int, int)
+mom : int or tuple of int
     Order or moments.  If integer or length one tuple, then moments are for
     a single variable.  If length 2 tuple, then comoments of two variables
 mom_ndim : {1, 2}
@@ -113,9 +113,9 @@ chunk : bool, optional
 compute : bool, optional
     whether to perform compute step on xarray outputs
 meta : dict, optional
-    extra meta data/parameters to be caried along with object and child objects.
+    extra meta data/parameters to be carried along with object and child objects.
     if 'checker' in meta, then perform a callback of the form meta['checker](self, meta)
-    this can also be used to hotwire things like derivs_args.
+    this can also be used to override things like derivs_args.
     Values passed through method `resample_meta`
 meta_kws : mapping, optional
     Optional parameters for meta.
@@ -127,7 +127,7 @@ uv_array | uv : array-like
 xv_array | xv : xarray.DataArray
     raw values of x (observable)
     if not DataArray, wrap with `xrwrap_xv`
-val_dims : str or list-like
+val_dims : str or sequence of str
     Names of extra dimensions
 xalpha : bool, default=False
     Flag whether `u` depends on variable `alpha`.
@@ -136,7 +136,7 @@ central : bool
 dxduave : xCentralMoments
     Central moments object.
 expand : bool
-    If True, apply :func:`sympy.expand`
+    If True, apply :meth:`~sympy.core.expr.Expr.expand`
 post_func : str or callable
     Transformation of base function.
     For example, `post_fuc = -sympy.log` is equivalent to passing `minus_log=True`
@@ -160,8 +160,8 @@ d_order | d : int
     Order of derivative of ``x``.
 beta : float
     reference value of inverse temperature
-data : Data object
-    Instance of :class:`thermoextrap.AbstractData`.
+data : object
+    Instance of data object, e.g. :class:`thermoextrap.DataCentralMoments`
 alpha_name : str, default='beta'
     name of expansion parameter
 """
@@ -174,7 +174,7 @@ Parameters
 ----------
 volume : float
     Reference value of system volume.
-ndim : int, default = 3
+ndim : int, default=3
     Number of dimensions of the system.
 dxdqv : array-like
     values of `sum dx/dq_i q_i` where `q_i` is the ith coordinate.

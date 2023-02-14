@@ -171,7 +171,7 @@ class dxdu_func_beta(sp.Function):
 
 class x_func_central_nobeta(sp.Function):
     r"""
-    Sympy funciton to evaluate derivatives of observable :math:`\langle x \rangle` using central moments.
+    Sympy functionn to evaluate derivatives of observable :math:`\langle x \rangle` using central moments.
     """
 
     nargs = 1
@@ -627,7 +627,7 @@ def factory_extrapmodel(
 
     Returns
     -------
-    extrapmodel : ExtrapModel object
+    extrapmodel : :class:`~thermoextrap.ExtrapModel`
 
 
     Notes
@@ -687,16 +687,16 @@ def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     {uv_xv_array}
     {alpha_name}
     kws : dict
-        extra arguments to `models.Data`
+        extra arguments to data object
 
     Returns
     -------
-    perturbmodel : PerturbModel object
+    perturbmodel : :class:`thermoextrap.PerturbModel`
 
 
     See Also
     --------
-    ~thermoextrap.PertubModel
+    ~thermoextrap.PerturbModel
     """
     from .core.data import factory_data_values
 

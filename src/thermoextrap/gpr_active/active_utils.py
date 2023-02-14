@@ -154,9 +154,9 @@ class DataWrapper:
         use for computations; allows exclusion of equilibration periods
     u_col : int, default=2
         column of sim_info_files in which potential energy is found
-    cv_cols : list, default=[1,2]
+    cv_cols : list, default=`[1,2]`
         columns of cv_bias_files in which the CV and bias are found
-    x_col : list, default=[1]
+    x_col : list, default=`[1]`
         list of columns from x_files to pull out; can be multiple if
         the are multiple outputs of interest
     """
@@ -567,12 +567,12 @@ class ChangeInnerOuterRBFDerivKernel(DerivativeKernel):
     c2 : float
         second change point
     **kwargs
-        Extra Arguments to :class:`DerivativeKernel`
+        Extra Arguments to :class:`~thermoextrap.gpr_active.gp_models.DerivativeKernel`
 
 
     See Also
     --------
-    DerivateKernel
+    ~thermoextrap.gpr_active.gp_models.DerivativeKernel
     """
 
     def __init__(self, c1=-7.0, c2=-2.0, **kwargs):
@@ -915,21 +915,6 @@ class UpdateStopABC:
     Class that forms basis for both update and stopping criteria classes, which both need to
     define transformation functions and create grids of alpha values.
 
-    Parameters
-    ----------
-    d_order_pred : int, default=0
-        Derivative order at which predictions should be made
-    transform_func : identityTransform function
-        For transforming GP model output
-        should take the x, y, and y_var (input, output, and variance
-        in y) of GP as input; output should be transformed mu (or
-        median, which is better), transformed uncertainty (could be
-        std or confidence interval width), and finally the confidence
-        interval itself, which is best for plotting.
-    log_scale : bool, default=False
-        Whether to use log scale for input (x) or not.
-    avoid_repeats : bool, default=False
-        Whether or not to randomize grid of new locations.
     """
 
     def __init__(
@@ -940,18 +925,22 @@ class UpdateStopABC:
         avoid_repeats=False,
     ):
         """
-        Inputs:
-            d_order_pred - (0) derivative order at which predictions should be made
-            transform_func - (identityTransform) function for transforming GP model output
-                             should take the x, y, and y_var (input, output, and variance
-                             in y) of GP as input; output should be transformed mu (or
-                             median, which is better), transformed uncertainty (could be
-                             std or confidence interval width), and finally the confidence
-                             interval itself, which is best for plotting
-            log_scale - (False) to use log scale for input (x) or not
-            avoid_repeats - (False) whether or not to randomize grid of new locations
+        Parameters
+        ----------
+        d_order_pred : int, default=0
+            Derivative order at which predictions should be made
+        transform_func : identityTransform function
+            For transforming GP model output
+            should take the x, y, and y_var (input, output, and variance
+            in y) of GP as input; output should be transformed mu (or
+            median, which is better), transformed uncertainty (could be
+            std or confidence interval width), and finally the confidence
+            interval itself, which is best for plotting.
+        log_scale : bool, default=False
+            Whether to use log scale for input (x) or not.
+        avoid_repeats : bool, default=False
+            Whether or not to randomize grid of new locations.
         """
-        super().__init__()
         self.d_order_pred = d_order_pred
         self.transform_func = transform_func
         self.log_scale = log_scale
@@ -1110,6 +1099,9 @@ class UpdateFuncBase(UpdateStopABC):
             new_alpha = 10.0 ** (new_alpha)
 
         return new_alpha, pred_mu, pred_std
+
+
+# TODO: update structure to inherit docstrings.  Can simplify a bunch of stuff.
 
 
 class UpdateALMbrute(UpdateFuncBase):

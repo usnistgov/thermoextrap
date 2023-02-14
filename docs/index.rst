@@ -8,8 +8,6 @@ Welcome to thermodynamic-extrapolation's documentation!
    readme
    installation
    examples
-   ..
-      usage
    api
    contributing
    authors

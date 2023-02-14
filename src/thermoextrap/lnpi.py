@@ -179,13 +179,13 @@ class lnPiDataCallback(DataCallbackABC):
     ----------
     lnPi0 : DataArray
         Reference value of lnPi.
-    mu : xr.DataArray
+    mu : DataArray
         Value of chemical potential.  Must have dimension ``dims_comp``.
     dims_n : hashable or sequence of hashable
         Dimension(s) for number of particle(s).  That is, the dimensions of lnPi0 corresponding to particle number.
     dims_comp : hashable
         Dimension corresponding to components.
-    ncoords : DataArray, optional.
+    ncoords : DataArray, optional
         Count of number of particles for given particle number (vector) and component.
         Must have dimensions ``dims_comp`` and ``dims_n``.
     allow_resample : bool, default=False
@@ -386,9 +386,9 @@ def factory_extrapmodel_lnPi(
     Parameters
     ----------
     {beta}
-    data : Data object
+    data : object
+        Data object.
         Should include lnPiDataCallback object as well
-        See data.AbstractData
     order : int, optional
         maximum order.
         If not specified, default to `data.order + 1`
@@ -402,11 +402,11 @@ def factory_extrapmodel_lnPi(
 
     Returns
     -------
-    extrapmodel : ExtrapModel
+    extrapmodel : :class:`~thermoextrap.ExtrapModel`
 
     See Also
     --------
-    thermoextrap.lnpi.factory_derivaties
+    thermoextrap.lnpi.factory_derivatives
     ~thermoextrap.ExtrapModel
     """
 

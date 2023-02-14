@@ -15,6 +15,7 @@ from .core.data import (
 
 # expose some data/models
 from .core.models import (
+    Derivatives,
     ExtrapModel,
     ExtrapWeightedModel,
     InterpModel,
@@ -48,6 +49,7 @@ __all__ = [
     "MBARModel",
     "PerturbModel",
     "StateCollection",
+    "Derivatives",
     "DataCentralMoments",
     "DataCentralMomentsVals",
     "DataValues",
