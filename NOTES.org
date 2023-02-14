@@ -1,0 +1,46 @@
+* Install for development
+  #+begin_src sh
+    pip install --no-deps -e .
+  #+end_src
+
+* creating enviroments for development
+
+  create the base runtime enviroment with
+  #+begin_src sh
+    conda env create -n 'env name' -f environment.yml
+  #+end_src
+
+  To add development stuff do
+  #+begin_src sh
+    conda env update -n 'env name' -f environment-dev.yml -f 'optional-recipes'
+  #+end_src
+
+
+* Using pre-commit
+  see https://pre-commit.com/
+
+  pre-commit adds hooks to autocheck
+
+  #+begin_src sh
+    # install
+    conda install -n env-name pre-commit
+
+    # init
+    pre-commit install
+
+    # run on all files
+    pre-commit run --all-files
+
+    # run on staged
+    pre-commit run
+  #+end_src
+
+* Testing
+  #+begin_src sh
+    # run all tests
+    pytest -x -v --runslow
+
+    # omit slow tests
+    pytest -x -v
+
+  #+end_src
