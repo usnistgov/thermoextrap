@@ -4,7 +4,6 @@ import os
 import time
 
 import gpflow
-import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 
@@ -1046,6 +1045,9 @@ class UpdateFuncBase(UpdateStopABC):
         Plots output used to select new update point.
         err is expected to be length 2 list with upper and lower confidence intervals
         """
+
+        import matplotlib.pyplot as plt
+
         fig, ax = plt.subplots()
         if self.compare_func is not None:
             compare_y = self.compare_func(x[:, None])
