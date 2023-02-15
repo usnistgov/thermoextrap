@@ -1,5 +1,6 @@
 # packages for development
 dependencies:
+  - matplotlib
   # linting
   # - black
   # - blackdoc
