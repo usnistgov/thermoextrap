@@ -17,11 +17,21 @@ from .core.models import ExtrapModel, InterpModel
 
 try:
     import matplotlib.pyplot as plt
+
+    _HAS_PLT = True
 except ImportError:
-    print(
-        "Could not find matplotlib - plotting will fail, so ensure that all"
-        " doPlot options are set to False, which is the default."
-    )
+    _HAS_PLT = False
+    # print(
+    #     "Could not find matplotlib - plotting will fail, so ensure that all"
+    #     " doPlot options are set to False, which is the default."
+    # )
+
+
+def _has_plt():
+    if _HAS_PLT:
+        pass
+    else:
+        raise ImportError("install matplotlib for this functionality")
 
 
 class RecursiveInterp:
@@ -160,6 +170,7 @@ class RecursiveInterp:
 
         # Do some plotting just as a visual for how things are going, if desired
         if doPlot:
+            _has_plt()
             if "val" in predictVals.dims:
                 toplot = predictVals.isel(val=0)
             else:
@@ -388,6 +399,7 @@ class RecursiveInterp:
 
         # Before loop, set up plot if wanted
         if doPlot:
+            _has_plt()
             pColors = plt.cm.cividis(np.linspace(0.0, 1.0, len(edgeSets)))
             pFig, pAx = plt.subplots()
             plotYmin = 1e10
@@ -450,6 +462,7 @@ class RecursiveInterp:
                     plotYmax = np.max(allPlotY)
 
         if doPlot:
+            _has_plt()
             for edge in self.edgeB:
                 pAx.plot([edge] * 2, [plotYmin, plotYmax], "k-")
             pAx.set_xlabel(r"$\beta$")
