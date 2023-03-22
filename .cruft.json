@@ -3,8 +3,8 @@
   "commit": "a56f6e80fd47652786faa0d0bea3b6cfb079d40e",
   "checkout": "feature/markdown",
   "skip": [
-      "src/thermoextrap/__init__.py"
-      "environment.yaml",
+      "src/thermoextrap/__init__.py",
+      "environment.yaml"
   ],
   "context": {
     "cookiecutter": {
