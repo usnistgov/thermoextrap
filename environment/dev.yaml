@@ -1,0 +1,19 @@
+channels:
+- conda-forge
+dependencies:
+- custom-inherit
+- ipykernel
+- ipython
+- numba
+- numpy<1.24
+- pip
+- pytest
+- pytest-cov
+- pytest-xdist
+- python>=3.8,<3.11
+- setuptools-scm
+- typing-extensions
+- xarray
+- pip:
+  - pytest-accept
+name: cmomy-env

@@ -1,6 +1,8 @@
 {{ fullname | escape | underline}}
 
 .. automodule:: {{ fullname }}
+   :members:
+   :imported-members:
 
    {% block attributes %}
    {% if attributes %}
@@ -56,7 +58,7 @@
 {% if modules %}
 .. autosummary::
    :toctree:
-   :template: custom-module-template.rst
+   :template: module-custom.rst
    :recursive:
 {% for item in modules %}
    {{ item }}
