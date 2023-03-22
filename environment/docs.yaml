@@ -1,0 +1,23 @@
+channels:
+- conda-forge
+dependencies:
+- custom-inherit
+- ipython
+- numba
+- numpy<1.24
+- pip
+- python>=3.8,<3.11
+- setuptools-scm
+- typing-extensions
+- xarray
+- pip:
+  - autodocsumm
+  - ghp-import
+  - myst-nb
+  - pyenchant
+  - sphinx
+  - sphinx-autobuild
+  - sphinx-book-theme
+  - sphinx-copybutton
+  - sphinxcontrib-spelling
+name: cmomy-env

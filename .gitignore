@@ -108,3 +108,4 @@ pyrightconfig.json
 .autoenv_leave.zsh
 /docs/generated/
 /environment-dev.yaml
+/dist-conda/
