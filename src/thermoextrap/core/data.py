@@ -1,5 +1,6 @@
 """
-Routines and classes to process input data to expected average format.
+Data handlers (:mod:`~thermoextrap.data`)
+=========================================
 
 The general scheme is to use the following:
 
@@ -45,6 +46,17 @@ except ImportError:
 docfiller_shared = factory_docfiller_shared(
     names=("default",),
 )
+
+__all__ = [
+    "DataCentralMoments",
+    "DataCentralMomentsVals",
+    "DataValues",
+    "DataValuesCentral",
+    "DataCallbackABC",
+    "AbstractData",
+    "factory_data_values",
+    "resample_indices",
+]
 
 
 @docfiller_shared
@@ -147,7 +159,7 @@ class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_m
         if not isinstance(idx, tuple):
             idx = (idx,)
         if len(idx) != len(self.dims):
-            raise ValueError("bad idx {}, vs dims {}".format(idx, self.dims))
+            raise ValueError(f"bad idx {idx}, vs dims {self.dims}")
         selector = dict(zip(self.dims, idx))
         return self.data.isel(**selector, drop=True)
 
@@ -814,7 +826,6 @@ class DataValues(DataValuesBase):
 
 @attrs.define
 class DataValuesCentral(DataValuesBase):
-
     _CENTRAL = True
 
     @gcached(prop=False)
@@ -1685,7 +1696,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
 
         if xu is None or x_is_u:
-
             raw = u
 
             if w is not None:

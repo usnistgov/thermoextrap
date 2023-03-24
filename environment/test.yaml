@@ -1,11 +1,21 @@
 channels:
 - conda-forge
+- wpk-nist
 dependencies:
+- attrs
+- cmomy>=0.1.9
 - custom-inherit
-- numba
-- numpy<1.24
+- numpy
+- pandas
+- pip
+- pymbar<4.0
 - pytest
-- python>=3.8,<3.11
-- typing-extensions
+- python>=3.8
+- scipy
+- sympy
 - xarray
-name: cmomy-env
+- pip:
+  - gpflow
+  - tensorflow
+  - tensorflow-probability
+name: thermoextrap-env

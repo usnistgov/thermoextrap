@@ -1,3 +1,7 @@
+"""
+GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
+------------------------------------------------------------
+"""
 import glob
 import multiprocessing
 import os
@@ -47,7 +51,8 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
 
     Parameters
     ----------
-    state : an ExtrapModel object containing derivative information
+    state : ExtrapModel
+      object containing derivative information
     n_rep : int, default=100
         Number of bootstrap draws of data to perform to compute variances
     log_scale : bool, default=False
@@ -56,13 +61,13 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
 
     Returns
     ----------
-    x_data
+    x_data : object
         input locations, likely state points (e.g., temperature, pressure, etc.),
         augmented with derivative order of each observation, as required for GP
         models
-    y_data
+    y_data : object
         Output data, which includes both function values and derivative information
-    cov_data
+    cov_data : object
         covariance matrix between function observations, including derivative
         observations; note that this will be block-diagonal since it is expected
         that the state objects at different conditions are based on information
@@ -294,8 +299,8 @@ class SimWrapper:
         name of file with CV values and bias for simulation to produce
     kw_inputs : dict, optional
         additional keyword inputs to the simulation
-    data_class : DataWrapper like object
-        class to use for wrapping simulation output data;
+    data_class : object
+        class (e.g., :class:`DataWrapper`) to use for wrapping simulation output data;
         data will be wrapped before returned to the active learning algorithm
     post_process_func : callable, optional
         Function for post-processing simulation outputs but before
@@ -403,7 +408,7 @@ class SimWrapper:
                     sim_dir,
                     self.pp_out_name,
                     sim_num=curr_sim_num + i,
-                    **self.pp_kw_inputs
+                    **self.pp_kw_inputs,
                 )
             sim_x_files = sorted(
                 glob.glob(os.path.join(sim_dir, self.pp_out_name + "*"))
@@ -419,7 +424,7 @@ class SimWrapper:
             sim_bias_files,
             alpha,
             x_files=sim_x_files,
-            **self.data_kw_inputs
+            **self.data_kw_inputs,
         )
 
         # If have pre-processing function provide sim info to update it
@@ -447,7 +452,7 @@ def make_matern_expr(p):
 
     Returns
     -------
-    expr : sympy expression
+    expr : Expr
     kern_params : dict
         parameters matching naming in sympy expression
     """
@@ -479,7 +484,7 @@ def make_rbf_expr():
 
     Returns
     -------
-    expr : sympy expression
+    expr : Expr
     kern_params : dict
         parameters matching naming in sympy expression
     """
@@ -506,7 +511,7 @@ def make_poly_expr(p):
 
     Returns
     -------
-    expr : sympy expression
+    expr : Expr
     kern_params : dict
         parameters matching naming in sympy expression
     """
@@ -575,7 +580,6 @@ class ChangeInnerOuterRBFDerivKernel(DerivativeKernel):
     """
 
     def __init__(self, c1=-7.0, c2=-2.0, **kwargs):
-
         x1 = sp.symbols("x1", real=True)
         x2 = sp.symbols("x2", real=True)
 
@@ -650,7 +654,7 @@ def create_base_GP_model(
         MEANINGFUL MEAN FUNCTION IN THAT CASE (JUST ZEROS)
     shared_kernel : bool, default=True
         whether or not the kernel will be shared across output dimensions
-    kernel : kernel object.
+    kernel : object
         Defaults to RBFDerivKernel.  Kernel to use in GP model.
     mean_func : callable, optional
         mean function to use for GP model
@@ -659,7 +663,7 @@ def create_base_GP_model(
 
     Returns
     ---------
-    gpr: HeteroscedasticGPR object
+    gpr: :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Note, that this is an untrained model.
     """
     # Will be helpful to know where have zero-order derivatives in data
@@ -764,7 +768,6 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 
     # If provided with starting parameters, also do optimization starting with them
     if start_params is not None:
-
         # Record optimized parameters with default starting values
         optim_params = [tpar.numpy() for tpar in gpr.trainable_parameters]
 
@@ -815,7 +818,7 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
 
     Parameters
     ----------
-    state_list : list of ExtrapModel objects
+    state_list : list of ExtrapModel
         Each at different conditions.
     log_scale : bool, default=False
         whether or not to compute derivatives with respect to x or the logarithm
@@ -827,7 +830,7 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
 
     Returns
     ----------
-    gpr : HeteroscedasticGPR object
+    gpr : :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Trained model.
     """
 
@@ -1029,7 +1032,7 @@ class UpdateFuncBase(UpdateStopABC):
         save_plot=False,
         save_dir="./",
         compare_func=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
 
@@ -2027,11 +2030,13 @@ def active_learning(
 
     Parameters
     ----------
-    init_states : list of initial DataWrapper objects
-    sim_wrapper : SimWrapper object for running simulations
+    init_states : list of :class:`DataWrapper`
+    sim_wrapper : :class:`SimWrapper`
+        Object for running simulations.
     update_func : callable
         For selecting the next state point.
-    base_dir : string (file path)
+    base_dir : string
+        File path.
         based directory in which active learning run performed and outputs generated
     stop_criteria : callable, optional
         callable taking GP to determine if should stop
@@ -2060,9 +2065,9 @@ def active_learning(
 
     Returns
     -------
-    data_list : list of DataWrapper objects
+    data_list : list of :class:`DataWrapper`
         List of DataWrapper objects describing how to load data (can be used to build states and create_GPR to generate GP model)
-    train_history - dict
+    train_history : dict
         Dictionary of information about results at each training
         iteration, like GP predictions, losses, parameters, etc.
     """
@@ -2090,7 +2095,7 @@ def active_learning(
             # Run simulation and return DataWrapper object for this state
             # Multiple simulation repeats will be performed in parallel
             data_list[i] = sim_wrapper.run_sim(
-                "{}/{}_{:f}".format(base_dir, alpha_name, state),
+                f"{base_dir}/{alpha_name}_{state:f}",
                 state,
                 n_repeats=num_state_repeats,
             )
@@ -2112,7 +2117,6 @@ def active_learning(
     # Loop over iterations, breaking if reach stopping criteria
     # Go to max_iter+1 so that have final model and its predictions
     for i in range(max_iter + 1):
-
         # Create GP model with current information, first building ExtrapModel objects
         state_list = [dat.build_state(max_order=max_order) for dat in data_list]
         if i == 0:
@@ -2164,10 +2168,10 @@ def active_learning(
 
         # Run simulations for current data
         this_data = sim_wrapper.run_sim(
-            "{}/{}_{:f}".format(base_dir, alpha_name, new_alpha),
+            f"{base_dir}/{alpha_name}_{new_alpha:f}",
             new_alpha,
             n_repeats=num_state_repeats,
-            **new_model_info
+            **new_model_info,
         )
 
         # If we're adding data to a previously sampled state, need to replace in data_list
@@ -2191,7 +2195,7 @@ def active_learning(
             pred_mu=stop_criteria.history[0],
             pred_std=stop_criteria.history[1],
             alpha=np.array(alpha_list),
-            **train_history
+            **train_history,
         )
 
     return data_list, train_history

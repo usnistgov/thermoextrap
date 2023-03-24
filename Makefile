@@ -30,6 +30,7 @@ clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and 
 
 clean-build: ## remove build artifacts
 	rm -fr build/
+	rm -fr docs/_build/
 	rm -fr dist/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
@@ -53,10 +54,10 @@ clean-test: ## remove test and coverage artifacts
 ################################################################################
 # utilities
 ################################################################################
-.PHONY: lint pre-commit-init pre-commit-run pre-commit-run-all init
+.PHONY: lint pre-commit-init pre-commit-run pre-commit-run-all pre-commit-lint-extra pre-commit-codespell init
 
 lint: ## check style with flake8
-	flake8 thermoextrap tests
+	flake8 cmomy tests
 
 pre-commit-init: ## install pre-commit
 	pre-commit install
@@ -67,34 +68,25 @@ pre-commit-run: ## run pre-commit
 pre-commit-run-all: ## run pre-commit on all files
 	pre-commit run --all-files
 
+pre-commit-manual: ## run pre-commit manual flags
+	pre-commit run --hook-stage manual
+
+pre-commit-lint-extra: ## run all linting
+	pre-commit run --all-files --hook-stage manual isort
+	pre-commit run --all-files --hook-stage manual flake8
+	pre-commit run --all-files --hook-stage manual pyupgrade
+
+pre-commit-mypy: ## run mypy
+	pre-commit run --all-files --hook-stage manual mypy
+
+pre-commit-codespell: ## run codespell. Note that this imports allowed words from docs/spelling_wordlist.txt
+	pre-commit run --all-files --hook-stage manual codespell
+
 .git: ## init git
 	git init
 
 init: .git pre-commit-init ## run git-init pre-commit
 
-
-################################################################################
-# virtual env
-################################################################################
-.PHONY: mamba-env mamba-dev mamba-env-update mamba-dev-update activate
-
-environment-dev.yaml: environment.yaml environment-tools.yaml
-	conda-merge environment.yaml environment-tools.yaml > environment-dev.yaml
-
-mamba-env: environment.yaml
-	mamba env create -f environment.yaml
-
-mamba-dev: environment-dev.yaml
-	mamba env create -f environment-dev.yaml
-
-mamba-env-update: environment.yaml
-	mamba env update -f environment.yaml
-
-mamba-dev-update: environment-dev.yaml
-	mamba env update -f environment-dev.yaml
-
-activate: ## activate base env
-	conda activate thermoextrap-env
 
 ################################################################################
 # my convenience functions
@@ -104,7 +96,7 @@ user-venv: ## create .venv file with name of conda env
 	echo thermoextrap-env > .venv
 
 user-autoenv-zsh: ## create .autoenv.zsh files
-	echo conda activate thermoextrap-env > .autoenv.zsh
+	echo conda activate $$(cat .venv) > .autoenv.zsh
 	echo conda deactivate > .autoenv_leave.zsh
 
 user-all: user-venv user-autoenv-zsh ## runs user scripts
@@ -136,76 +128,103 @@ version-import: ## check version from python import
 
 version: version-scm version-import
 
+################################################################################
+# Environment files
+################################################################################
+
+environment/dev.yaml: environment.yaml environment/dev-extras.yaml ## build development yaml file
+	conda-merge $^ > $@
+
+environment/docs.yaml: environment.yaml environment/docs-extras.yaml ## build docs yaml file
+	conda-merge $^ > $@
+
+environment/test.yaml: environment.yaml environment/test-extras.yaml ## build test yaml file
+	conda-merge $^ > $@
+
+.PHONY: environment-files
+
+environment-files: environment/dev.yaml environment/docs.yaml environment/test.yaml ## rebuild all environment files
+
 
 ################################################################################
-# Docs
+# virtual env
 ################################################################################
-# .PHONY: docs serverdocs doc-spelling
-# docs: ## generate Sphinx HTML documentation, including API docs
-# 	rm -fr docs/generated
-# 	$(MAKE) -C docs clean
-# 	$(MAKE) -C docs html
-# 	$(BROWSER) docs/_build/html/index.html
+.PHONY: mamba-env mamba-dev mamba-env-update mamba-dev-update
 
-# servedocs: docs ## compile the docs watching for changes
-# 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+mamba-env: environment.yaml ## create base environment
+	mamba env create -f environment.yaml
 
-# docs-spelling:
-# 	sphinx-build -b spelling docs docs/_build
+mamba-env-update: environment.yaml ## update base environment
+	mamba env update -f environment.yml
 
+mamba-dev: environment/dev.yaml ## create development environment
+	mamba env create -f environment-dev.yaml
+
+mamba-dev-update: environment/dev.yaml ## update development environment
+	mamba env update -f environment-dev.yml
 
 ################################################################################
 # TOX
-################################################################################
+###############################################################################
 tox_posargs?=-v
 TOX=CONDA_EXE=mamba tox $(tox_posargs)
 
 ## testing
+
 .PHONY: test-all
-test-all: ## run tests on every Python version with tox
+test-all: environment/test.yaml ## run tests on every Python version with tox
 	$(TOX) -- $(posargs)
 
 
 ## docs
-.PHONY: docs-build docs-release docs-clean docs-spelling docs-nist-pages
+.PHONY: docs-build docs-release docs-clean docs-spelling docs-nist-pages docs-open docs-live docs-clean-build docs-linkcheck
 posargs=
 docs-build: ## build docs in isolation
-	$(TOX) -e docs-build -- $(posargs)
-docs-release: ## release docs.  use posargs=... to override stuff
-	$(TOX) -e docs-release -- $(posargs)
+	$(TOX) -e $@ -- $(posargs)
 docs-clean: ## clean docs
 	rm -rf docs/_build/*
 	rm -rf docs/generated/*
-docs-spelling:
-	$(TOX) -e docs-spelling -- $(posargs)
+	rm -rf docs/reference/generated/*
+docs-clean-build: docs-clean docs-build ## clean and build
+docs-release: ## release docs.  use posargs=... to override stuff
+	$(TOX) -e $@ -- $(posargs)
+docs-spelling: ## run spell check with sphinx
+	$(TOX) -e $@ -- $(posargs)
 docs-nist-pages: ## do both build and releas
-	$(TOX) -e docs-build,docs-release -- $(posargs)
+	$(TOX) -e $@ -- $(posargs)
+docs-live: ## use autobuild for docs
+	$(TOX) -e $@ -- $(posargs)
+docs-open: ## open the build
+	$(BROWSER) docs/_build/html/index.html
+docs-linkcheck: ## check links
+	$(TOX) -e docs-build -- linkcheck
+
+docs-build docs-release docs-clean docs-spelling docs-nist-pages docs-live: environment/docs.yaml
 
 
 ## distribution
 .PHONY: dist-pypi-build dist-pypi-testrelease dist-pypi-release dist-conda-recipe dist-conda-build
 
-
+posargs=
 dist-pypi-build: ## build dist, can pass posargs=... and tox_posargs=...
 	$(TOX) -e $@ -- $(posargs)
-
 dist-pypi-testrelease: ## test release on testpypi. can pass posargs=... and tox_posargs=...
 	$(TOX) -e $@ -- $(posargs)
-
 dist-pypi-release: ## release to pypi, can pass posargs=...
 	$(TOX) -e $@ -- $(posargs)
+dist-pypi-build dist-pypi-testrelease dist-pypi-release: environment/dist-pypi.yaml
 
 dist-conda-recipe: ## build conda recipe can pass posargs=...
 	$(TOX) -e $@ -- $(posargs)
-
 dist-conda-build: ## build conda recipe can pass posargs=...
 	$(TOX) -e $@ -- $(pasargs)
+dist-conda-build dist-conda-recipe: environment/dist-conda.yaml
 
 
 ## test distribution
 .PHONY: test-dist-pypi-remote test-dist-conda-remote test-dist-pypi-local test-dist-conda-local
 
-py?=39
+py?=310
 test-dist-pypi-remote: ## test pypi install, can run as `make test-dist-pypi-remote py=39` to run test-dist-pypi-local-py39
 	$(TOX) -e $@-py$(py) -- $(posargs)
 
@@ -218,12 +237,23 @@ test-dist-pypi-local: ## test pypi install, can run as `make test-dist-pypi-loca
 test-dist-conda-local: ## test conda install, can run as `make test-dist-conda-local py=39` to run test-dist-conda-local-py39
 	$(TOX) -e $@-py$(py) -- $(poasargs)
 
+
+test-dist-pypi: environment/test.
+
+
+## list all options
+.PHONY: tox-list
+
+tox-list:
+	$(TOX) -a
+
+
 ################################################################################
 # installation
 ################################################################################
 .PHONY: install install-dev
 install: ## install the package to the active Python's site-packages (run clean?)
-	pip install .
+	pip install . --no-deps
 
 install-dev: ## install development version (run clean?)
 	pip install -e . --no-deps

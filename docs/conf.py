@@ -35,31 +35,103 @@ import thermoextrap
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "autodocsumm",
     "sphinx.ext.intersphinx",
-    # "sphinx.ext.extlinks",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "IPython.sphinxext.ipython_directive",
     "IPython.sphinxext.ipython_console_highlighting",
-    "nbsphinx",
-    # "sphinx_autosummary_accessors",
-    # "scanpydoc.rtd_github_links",
+    # "nbsphinx",
+    ## easier external links
+    # "sphinx.ext.extlinks",
+    ## view source code on created page
     # "sphinx.ext.viewcode",
+    ## view source code on github
     "sphinx.ext.linkcode",
+    ## add copy button
+    "sphinx_copybutton",
+    ## redirect stuff?
+    # "sphinxext.rediraffe",
+    ## pretty things up?
+    # "sphinx_design"
+    ## myst stuff
+    "myst_nb",
+]
+
+nitpicky = True
+
+# -- myst stuff ---------------------------------------------------------
+myst_enable_extensions = [
+    "dollarmath",
+    "amsmath",
+    "deflist",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "colon_fence",
+    "smartquotes",
+    "replacements",
+    # "linkify",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+    # "attrs_inline",
+    # "attrs_block",
 ]
 
 
-nitpicky = True
-# defined stuff, from xarray
-nbsphinx_prolog = """
+myst_heading_anchors = 2
+myst_footnote_transition = True
+myst_dmath_double_inline = True
+myst_enable_checkboxes = True
+myst_substitutions = {
+    "role": "[role](#syntax/roles)",
+    "directive": "[directive](#syntax/directives)",
+}
+# myst_enable_extensions = [
+#     "dollarmath",
+#     "amsmath",
+#     "deflist",
+#     # "html_admonition",
+#     "html_image",
+#     "colon_fence",
+#     # "smartquotes",
+#     # "replacements",
+#     # "linkify",
+#     # "substitution",
+#     "attrs_inline",
+#     "attrs_block",
+# ]
 
-{% set docname = env.doc2path(env.docname, base=None) %}
+myst_url_schemes = ("http", "https", "mailto")
 
+nb_execution_mode = "off"
+# nb_execution_mode = "cache"
+# nb_execution_mode = "auto"
 
-You can view this notebook `on Github <https://github.com/usnistgov/thermo-extrap/blob/master/doc/{{ docname }}>`_.
-"""
+# set the kernel name
+nb_kernel_rgx_aliases = {"thermoextrap.*": "python3", "conda.*": "python3"}
 
+nb_execution_allow_errors = True
+
+# - top level variables --------------------------------------------------------
+# set github_username variable to be subbed later.
+# this makes it easy to switch from wpk -> usnistgov later
+github_username = "usnistgov"
+
+html_context = {
+    "github_user": "usnistgov",
+    "github_repo": "thermo-extrap",
+    "github_version": "master",
+    "doc_path": "docs",
+}
+
+# -- python3 ---------------------------------------------------------------
 autosummary_generate = True
+# autosummary_generate = False
+autodoc_member_order = "bysource"
+
+# autosummary_ignore_module_all = False
 # autoclass_content = "both"  # include both class docstring and __init__
 autodoc_default_flags = [
     # Make sure that any autodoc declarations show the right members
@@ -68,16 +140,9 @@ autodoc_default_flags = [
     "private-members",
     "show-inheritance",
 ]
-# # for scanpydoc's jinja filter
-# project_dir = pathlib.Path(__file__).parent.parent
-html_context = {
-    "github_user": "usnistgov",
-    "github_repo": "thermo-extrap",
-    "github_version": "master",
-}
-
 autodoc_typehints = "none"
 
+# -- napolean ------------------------------------------------------------------
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
@@ -91,7 +156,9 @@ napoleon_type_aliases = {
     "callable": ":py:func:`callable`",
     "dict_like": ":term:`dict-like <mapping>`",
     "dict-like": ":term:`dict-like <mapping>`",
+    "path-like": ":term:`path-like <path-like object>`",
     "mapping": ":term:`mapping`",
+    "hashable": ":term:`hashable`",
     "file-like": ":term:`file-like <file-like object>`",
     # special terms
     # "same type as caller": "*same type as caller*",  # does not work, yet
@@ -106,20 +173,25 @@ napoleon_type_aliases = {
     "array-like": ":term:`array-like <array_like>`",
     "scalar": ":term:`scalar`",
     "array": ":term:`array`",
-    "hashable": ":term:`hashable <name>`",
     # matplotlib terms
     "color-like": ":py:func:`color-like <matplotlib.colors.is_color_like>`",
-    "matplotlib colormap name": ":doc:matplotlib colormap name <Colormap reference>",
+    "matplotlib colormap name": ":doc:`matplotlib colormap name <matplotlib:gallery/color/colormap_reference>`",
     "matplotlib axes object": ":py:class:`matplotlib axes object <matplotlib.axes.Axes>`",
     "colormap": ":py:class:`colormap <matplotlib.colors.Colormap>`",
-    # objects without namespace
+    # objects without namespace: xarray
     "DataArray": "~xarray.DataArray",
     "Dataset": "~xarray.Dataset",
     "Variable": "~xarray.Variable",
+    "DatasetGroupBy": "~xarray.core.groupby.DatasetGroupBy",
+    "DataArrayGroupBy": "~xarray.core.groupby.DataArrayGroupBy",
+    "CentralMoments": "~cmomy.CentralMoments",
+    "xCentralMoments": "~cmomy.xCentralMoments",
+    # objects without namespace: numpy
     "ndarray": "~numpy.ndarray",
     "MaskedArray": "~numpy.ma.MaskedArray",
     "dtype": "~numpy.dtype",
     "ComplexWarning": "~numpy.ComplexWarning",
+    # objects without namespace: pandas
     "Index": "~pandas.Index",
     "MultiIndex": "~pandas.MultiIndex",
     "CategoricalIndex": "~pandas.CategoricalIndex",
@@ -132,15 +204,12 @@ napoleon_type_aliases = {
     # objects with abbreviated namespace (from pandas)
     "pd.Index": "~pandas.Index",
     "pd.NaT": "~pandas.NaT",
-    "xCentralMoments": "cmomy.xCentralMoments",
     "Expr": "~sympy.core.expr.Expr",
     "Symbol": "~sympy.core.symbol.Symbol",
-    "symFunction": "~sympy.core.function.Function"
+    "symFunction": "~sympy.core.function.Function",
+    "ExtrapModel": "~thermoextrap.models.ExtrapModel",
     # "DataCentralMoments": "~cmomy.core.data.DataCentralMoments"
 }
-
-numpydoc_class_members_toctree = True
-numpydoc_show_class_members = False
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -150,7 +219,11 @@ templates_path = ["_templates"]
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".myst": "myst-nb",
+}
 
 # The master toctree document.
 master_doc = "index"
@@ -177,6 +250,9 @@ except ImportError:
     # The full version, including alpha/beta/rc tags.
     release = thermoextrap.__version__
 
+# if always want to print "latest"
+# release = "latest"
+# version = "latest"
 
 # The language for content autogenerated by Sphinx. Refer to documentation
 # for a list of supported languages.
@@ -202,16 +278,41 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-# html_theme = 'alabaster'
-html_theme = "sphinx_rtd_theme"
 
+html_theme = "sphinx_book_theme"
 
-# Theme options are theme-specific and customize the look and feel of a
-# theme further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {"logo_only": True}
+html_theme_options = dict(
+    # analytics_id=''  this is configured in rtfd.io
+    # canonical_url="",
+    repository_url="https://github.com/usnistgov/thermo-extrap",
+    repository_branch=html_context["github_version"],
+    path_to_docs=html_context["doc_path"],
+    # use_edit_page_button=True,
+    use_repository_button=True,
+    use_issues_button=True,
+    home_page_in_toc=True,
+    show_toc_level=2,
+    show_navbar_depth=0,
+)
+# handle nist css/js from here.
+html_css_files = [
+    # "css/nist-combined.css",
+    "https://pages.nist.gov/nist-header-footer/css/nist-combined.css",
+    "https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css",
+]
 
+html_js_files = [
+    "https://code.jquery.com/jquery-3.6.2.min.js",
+    "https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js",
+    # "js/nist-header-footer.js",
+    "https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js",
+    "js/leave_notice.js",
+    # google stuff:
+    (
+        "https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c",
+        {"async": "async", "id": "_fed_au_ua_tag", "type": "text/javascript"},
+    ),
+]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -233,6 +334,103 @@ if not os.path.exists(ipython_savefig_dir):
 # using the given strftime format.
 today_fmt = "%Y-%m-%d"
 html_last_updated_fmt = today_fmt
+
+
+# -- Options for HTMLHelp output ---------------------------------------
+
+# Output file base name for HTML help builder.
+htmlhelp_basename = "thermoextrapdoc"
+
+
+# -- Options for LaTeX output ------------------------------------------
+
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    # 'papersize': 'letterpaper',
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    # 'pointsize': '10pt',
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
+    # Latex figure (float) alignment
+    #
+    # 'figure_align': 'htbp',
+}
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title, author, documentclass
+# [howto, manual, or own class]).
+latex_documents = [
+    (
+        master_doc,
+        "thermoextrap.tex",
+        "thermo-extrap Documentation",
+        "William P. Krekelberg",
+        "manual",
+    ),
+]
+
+
+# -- Options for manual page output ------------------------------------
+
+# One entry per manual page. List of tuples
+# (source start file, name, description, authors, manual section).
+man_pages = [
+    (
+        master_doc,
+        "thermoextrap",
+        "thermo-extrap Documentation",
+        [author],
+        1,
+    ),
+]
+
+
+# -- Options for Texinfo output ----------------------------------------
+
+# Grouping the document tree into Texinfo files. List of tuples
+# (source start file, target name, title, author,
+#  dir menu entry, description, category)
+texinfo_documents = [
+    (
+        master_doc,
+        "thermoextrap",
+        "thermo-extrap Documentation",
+        author,
+        "thermoextrap",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
+]
+
+# -- user defined stuff ------------------------------------------------
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "numba": ("https://numba.pydata.org/numba-doc/latest", None),
+    "matplotlib": ("https://matplotlib.org", None),
+    "dask": ("https://docs.dask.org/en/latest", None),
+    "cftime": ("https://unidata.github.io/cftime", None),
+    "sparse": ("https://sparse.pydata.org/en/latest/", None),
+    "cmomy": ("https://pages.nist.gov/cmomy/", None),
+    "xarray": ("https://docs.xarray.dev/en/stable/", None),
+    "sympy": ("https://docs.sympy.org/latest/", None),
+    "gpflow": ("https://gpflow.github.io/GPflow/develop/", None),
+    "tensorflow": (
+        "https://www.tensorflow.org/api_docs/python",
+        "https://github.com/GPflow/tensorflow-intersphinx/raw/master/tf2_py_objects.inv",
+    ),
+    "tensorflow_probability": (
+        "https://www.tensorflow.org/probability/api_docs/python",
+        "https://github.com/GPflow/tensorflow-intersphinx/raw/master/tfp_py_objects.inv",
+    ),
+}
 
 
 # based on numpy doc/source/conf.py
@@ -278,7 +476,7 @@ def linkcode_resolve(domain, info):
 
     fn = os.path.relpath(fn, start=os.path.dirname(thermoextrap.__file__))
 
-    return f"https://github.com/usnistgov/thermo-extrap/blob/master/src/thermoextrap/{fn}{linespec}"
+    return f"https://github.com/{github_username}/thermo-extrap/blob/{html_context['github_version']}/src/thermoextrap/{fn}{linespec}"
 
 
 # only set spelling stuff if installed:
@@ -290,99 +488,3 @@ try:
 
 except ImportError:
     pass
-
-
-# -- Options for HTMLHelp output ---------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = "thermoextrapdoc"
-
-
-# -- Options for LaTeX output ------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author, documentclass
-# [howto, manual, or own class]).
-latex_documents = [
-    (
-        master_doc,
-        "thermoextrap.tex",
-        "thermodynamic-extrapolation Documentation",
-        "William P. Krekelberg",
-        "manual",
-    ),
-]
-
-
-# -- Options for manual page output ------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (
-        master_doc,
-        "thermoextrap",
-        "thermodynamic-extrapolation Documentation",
-        [author],
-        1,
-    )
-]
-
-
-# -- Options for Texinfo output ----------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (
-        master_doc,
-        "thermoextrap",
-        "thermodynamic-extrapolation Documentation",
-        author,
-        "thermoextrap",
-        "One line description of project.",
-        "Miscellaneous",
-    ),
-]
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
-    "iris": ("https://scitools.org.uk/iris/docs/latest", None),
-    "numpy": ("https://numpy.org/doc/stable", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "numba": ("https://numba.pydata.org/numba-doc/latest", None),
-    "matplotlib": ("https://matplotlib.org", None),
-    "dask": ("https://docs.dask.org/en/latest", None),
-    "cftime": ("https://unidata.github.io/cftime", None),
-    "sparse": ("https://sparse.pydata.org/en/latest/", None),
-    "cmomy": ("https://pages.nist.gov/cmomy/", None),
-    "xarray": ("https://docs.xarray.dev/en/stable/", None),
-    "sympy": ("https://docs.sympy.org/latest/", None),
-}
-
-# think jinja stuff
-# def escape_underscores(string):
-#     return string.replace("_", r"\_")
-
-
-# def setup(app):
-#     DEFAULT_FILTERS["escape_underscores"] = escape_underscores

@@ -1,5 +1,8 @@
-"""
-Routinese to temperature expand lnPi
+r"""
+Inverse temperature expansion of macrostate distribution (:mod:`~thermoextrap.lnpi`)
+====================================================================================
+
+This is used to extrapolate, in inverse temperature :math:`\beta = (k_{\rm B} T)^{-1}`, the macrostate distribution function :math:`\ln\Pi` from transition matrix Monte Carlo simulations.
 """
 
 from __future__ import annotations
@@ -18,9 +21,8 @@ from attrs import field
 from attrs import validators as attv
 from cmomy import xCentralMoments
 
-from .beta import ExtrapModel, SymDerivBeta
+from .beta import ExtrapModel, SymDerivBeta, u_func, u_func_central
 from .beta import factory_derivatives as factory_derivatives_beta
-from .beta import u_func, u_func_central
 from .core._attrs_utils import (  # MyAttrsMixin,; kw_only_field,
     _cache_field,
     convert_dims_to_tuple,
@@ -133,7 +135,7 @@ def factory_derivatives(
 
     Returns
     -------
-    ~thermoextrap.Derivatives
+    ~thermoextrap.models.Derivatives
 
     See Also
     --------
@@ -395,19 +397,19 @@ def factory_extrapmodel_lnPi(
     {central}
     {post_func}
     {alpha_name}
-    derivatives : :class:`thermoextrap.Derivatives`, optional
+    derivatives : :class:`thermoextrap.models.Derivatives`, optional
         Derivates object.  If not passed, construct derivatives using :func:`thermoextrap.lnpi.factory_derivatives`.
     derivates_kws : mapping, optional
         Optional parameters to :func:`thermoextrap.lnpi.factory_derivatives`.
 
     Returns
     -------
-    extrapmodel : :class:`~thermoextrap.ExtrapModel`
+    extrapmodel : :class:`~thermoextrap.models.ExtrapModel`
 
     See Also
     --------
     thermoextrap.lnpi.factory_derivatives
-    ~thermoextrap.ExtrapModel
+    ~thermoextrap.models.ExtrapModel
     """
 
     if central is None:

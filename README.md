@@ -1,85 +1,120 @@
-# `thermoextrap`: Thermodynamic Extrapolation/Interpolation Library
+[![Repo][repo-badge]][repo-link]
+[![Docs][docs-badge]][docs-link]
+[![PyPI license][license-badge]][license-link]
+[![PyPI version][pypi-badge]][pypi-link]
+[![Conda (channel only)][conda-badge]][conda-link]
+[![Code style: black][black-badge]][black-link]
 
+
+[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-link]: https://github.com/ambv/black
+[pypi-badge]: https://img.shields.io/pypi/v/thermoextrap
+<!-- [pypi-badge]: https://badge.fury.io/py/thermo-extrap -->
+[pypi-link]: https://pypi.org/project/thermoextrap
+[docs-badge]: https://img.shields.io/badge/docs-sphinx-informational
+[docs-link]: https://pages.nist.gov/thermo-extrap/
+[repo-badge]: https://img.shields.io/badge/--181717?logo=github&logoColor=ffffff
+[repo-link]: https://github.com/usnistgov/thermo-extrap
+[conda-badge]: https://img.shields.io/conda/v/wpk-nist/thermoextrap
+[conda-link]: https://anaconda.org/wpk-nist/thermoextrap
+<!-- Use total link so works from anywhere -->
+[license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
+[license-link]: https://github.com/usnistgov/thermo-extrap/blob/master/LICENSE
+<!-- For more badges, see https://shields.io/category/other and https://naereen.github.io/badges/ -->
+
+[numpy]: https://numpy.org
+[Numba]: https://numba.pydata.org/
+[xarray]: https://docs.xarray.dev/en/stable/
+[cmomy]: https://github.com/usnistgov/cmomy
+
+
+# `thermoextrap`: Thermodynamic Extrapolation/Interpolation Library
 This repository contains code used and described in:
 
-Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K.
-Extrapolation and Interpolation Strategies for Efficiently Estimating
-Structural Observables as a Function of Temperature and Density. J.
-Chem. Phys. 2020, 153 (14), 144101. <https://doi.org/10.1063/5.0014282>.
+Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
 
 Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estiamtes and Derivative Information in Gaussian Process Regression for Expediated Data Collection in Molecular Simulations. In preparation.
+
+
+## Overview
 
 If you find this code useful in producing published works, please provide an appropriate citation.
 Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
 For now, the GPR code, along with more information, may be found under docs/notebooks/gpr.
 In a future release, we expect this to be fully integrated into the code base rather than a standalone module.
 
-Code included here can be used to perform thermodynamic extrapolation
-and interpolation of observables calculated from molecular simulations.
-This allows for more efficient use of simulation data for calculating
-how observables change with simulation conditions, including
-temperature, density, pressure, chemical potential, or force field
-parameters. Users are highly encourage to work through the Jupyter
-Notebook tutorial (Ideal_Gas_Example.ipynb) presenting examples for a
-variety of different observable functional forms. We only guarantee that
-this code is functional for the test cases we present here or for which
-it has previously been applied Additionally, the code may be in
-continuous development at any time. Use at your own risk and always
-check to make sure the produced results make sense. If bugs are found,
-please report them. If specific features would be helpful just let us
-know and we will be happy to work with you to come up with a solution.
+Code included here can be used to perform thermodynamic extrapolation and
+interpolation of observables calculated from molecular simulations. This allows
+for more efficient use of simulation data for calculating how observables change
+with simulation conditions, including temperature, density, pressure, chemical
+potential, or force field parameters. Users are highly encourage to work through
+the Jupyter Notebook tutorial (Ideal_Gas_Example.ipynb) presenting examples for
+a variety of different observable functional forms. We only guarantee that this
+code is functional for the test cases we present here or for which it has
+previously been applied Additionally, the code may be in continuous development
+at any time. Use at your own risk and always check to make sure the produced
+results make sense. If bugs are found, please report them. If specific features
+would be helpful just let us know and we will be happy to work with you to come
+up with a solution.
 
-# Status
 
-This package is actively used by the author. Please feel free to create
-a pull request for wanted features and suggestions!
+## Features
 
-# Installation
+* Fast calculation of derivatives
+
+## Status
+
+This package is actively used by the author.  Please feel free to create a pull request for wanted features and suggestions!
+
+
+## Quick start
 
 `thermoextrap` may be installed with either (recommended)
-
 ```bash
 conda install -c wpk-nist thermoextrap
 ```
-
 or
-
 ```bash
 pip install thermoextrap
 ```
 
 If you use pip, then you can include additional dependencies using
-
 ```bash
 pip install thermoextrap[all]
 ```
 
-If you install `thermoextrap` with conda, there are additional
-optional dependencies that take some care for installation. We recommend
-installing the following via `pip`, as the verisons on the
-conda/conda-forge channels are often a bit old.
-
+If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the verisons on the conda/conda-forge channels are often a bit old.
 ```bash
 pip install tensorflow tensorflow-probability gpflow
 ```
 
-# Documentation
+## Example usage
 
-Documentation can be found at For a deeper dive, look at the
-[documentation](https://pages.nist.gov/thermo-extrap/)
+```python
+import thermoextrap
+
+```
+
+<!-- end-docs -->
+
+## Documentation
+
+See the [documentation][docs-link] for a look at `thermo-extrap` in action.
 
 ## License
 
-This is free software. See [LICENSE](LICENSE).
+This is free software.  See [LICENSE][license-link].
+
+## Related wor
 
 ## Related work
 
-This package extensively uses the `cmomy` package to handle central
-comoments. See [here](https://github.com/usnistgov/cmomy).
+This package extensively uses the [cmomy] package to handle central comoments.
 
-## Contact
 
-The authors can be reached at <mailto:wpk@nist.gov>.
+# Contact
+Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
+
 
 ## Credits
 
