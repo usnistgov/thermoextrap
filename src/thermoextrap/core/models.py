@@ -1,3 +1,7 @@
+"""
+General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
+========================================================================
+"""
 from __future__ import annotations
 
 from functools import lru_cache
@@ -34,6 +38,17 @@ docfiller_shared = factory_docfiller_shared(
     names="default",
 )
 
+__all__ = [
+    "ExtrapModel",
+    "ExtrapWeightedModel",
+    "InterpModel",
+    "InterpModelPiecewise",
+    "MBARModel",
+    "PerturbModel",
+    "StateCollection",
+    "Derivatives",
+]
+
 
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
@@ -60,7 +75,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
     ----------
     func : symFunction
         Function to differentiate
-    args : Sequence of Symbol
+    args : sequence of Symbol
         Arguments to func
     {expand}
     {post_func}
@@ -215,7 +230,6 @@ class SymMinusLog:
 
     @gcached(prop=False)
     def __getitem__(self, order):
-
         if order == 0:
             return -sp.log(self.X[0])
 
@@ -244,7 +258,7 @@ class Derivatives(MyAttrsMixin):
     Parameters
     ----------
     funcs : sequence of callable
-        funcs[i](*args) gives the ith derivative
+        ``funcs[i](*args)`` gives the ith derivative
     exprs : sequence of Expr, optional
         expressions corresponding to the `funcs`
         Mostly for debuggin purposes.
@@ -283,7 +297,7 @@ class Derivatives(MyAttrsMixin):
             If pass `data` and `order` is `None`, then `order=data.order`
             Otherwise, must mass order
         args : tuple
-            arguments passed to self.funcs[i](*args)
+            arguments passed to ``self.funcs[i](*args)``
         minus_log : bool, default=False
             If `True`, apply tranform for `Y = -log(<X>)`
         order_dim : str, default='order'
@@ -371,7 +385,7 @@ class Derivatives(MyAttrsMixin):
 @lru_cache(10)
 def taylor_series_norm(order, order_dim="order"):
     """
-    taylor_series_coefficients = derivs * taylor_series_norm
+    ``taylor_series_coefficients = derivs * taylor_series_norm``
     """
     out = np.array([1 / np.math.factorial(i) for i in range(order + 1)])
     if order_dim is not None:
@@ -716,7 +730,7 @@ class PiecewiseMixin:
         elif method == "nearest":
             return self._indices_nearest_alpha(alpha)
         else:
-            raise ValueError("unknown method {}".format(method))
+            raise ValueError(f"unknown method {method}")
 
     def _states_alpha(self, alpha, method):
         return [self[i] for i in self._indices_alpha(alpha, method)]
@@ -760,7 +774,7 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
 
         Notes
         -----
-        This requires that :attr:`states` are ordered in ascending :attr:`alpha0` order
+        This requires that `states` are ordered in ascending `alpha0` order
         """
 
         self._check_alpha(alpha, bounded)
@@ -820,7 +834,6 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
 class InterpModel(StateCollection):
     @gcached(prop=False)
     def coefs(self, order=None, order_dim="porder", minus_log=None):
-
         if order is None:
             order = self.order
 
@@ -878,7 +891,6 @@ class InterpModel(StateCollection):
     def predict(
         self, alpha, order=None, order_dim="porder", minus_log=None, alpha_name=None
     ):
-
         if order is None:
             order = self.order
         if alpha_name is None:
@@ -977,7 +989,6 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
 
 @attrs.define
 class PerturbModel(MyAttrsMixin):
-
     alpha0: float = field(converter=float)
     data: AbstractData = field(validator=attv.instance_of(AbstractData))
     alpha_name: str | None = field(
@@ -985,7 +996,6 @@ class PerturbModel(MyAttrsMixin):
     )
 
     def predict(self, alpha, alpha_name=None):
-
         if alpha_name is None:
             alpha_name = self.alpha_name
 
@@ -1027,7 +1037,6 @@ class MBARModel(StateCollection):
 
     @gcached(prop=False)
     def _default_params(self, state_dim="state", alpha_name="alpha"):
-
         # all xvalues:
         xv = xr.concat([m.data.xv for m in self], dim=state_dim)
         uv = xr.concat([m.data.uv for m in self], dim=state_dim)

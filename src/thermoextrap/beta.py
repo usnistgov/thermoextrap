@@ -1,5 +1,6 @@
 """
-Routines for beta expansion(s)
+Inverse temperature (beta) extrapolation (:mod:`~thermoextrap.beta`)
+====================================================================
 """
 
 
@@ -34,12 +35,12 @@ class du_func(sp.Function):
     r"""
     Sympy function to evaluate energy fluctuations using central moments.
 
-    :math:`du_func(\beta, n) = \langle (u(\beta) - \langle u(\beta) \rangle)^n \rangle`
+    :math:`\text{du_func}(\beta, n) = \langle (u(\beta) - \langle u(\beta) \rangle)^n \rangle`
 
     Notes
     -----
-    sub in {beta: 'None'} to convert to indexed objects
-    Have to use 'None' instead of None as sympy does some magic to
+    sub in ``{'beta': 'None'}`` to convert to indexed objects
+    Have to use ``'None'`` instead of ``None`` as sympy does some magic to
     the input arguments.
     """
 
@@ -58,6 +59,7 @@ class du_func(sp.Function):
 
     @classmethod
     def eval(cls, beta, n):
+        """Evaluate function."""
         if n == 0:
             out = 1
         elif n == 1:
@@ -70,10 +72,10 @@ class du_func(sp.Function):
 
 
 class u_func_central(sp.Function):
-    """
+    r"""
     Sympy function to evaluate energy averages using central moments.
 
-    :math:`u_func_central(beta, n) = \\langle u(\beta)^n \rangle`
+    :math:`\text{u_func_central}(beta, n) = \langle u(\beta)^n \rangle`
     """
 
     nargs = 1
@@ -90,6 +92,7 @@ class u_func_central(sp.Function):
 
     @classmethod
     def eval(cls, beta):
+        """Evaluate function."""
         if beta is None:
             return cls.u
         else:
@@ -98,10 +101,10 @@ class u_func_central(sp.Function):
 
 
 class dxdu_func_nobeta(sp.Function):
-    """
+    r"""
     Sympy function to evaluate observable energy fluctuations using central moments.
 
-    :math:`dxdu_func_nobeta(\beta, n) = \\langle \\delta x (\\delta u)^n \rangle`
+    :math:`\text{dxdu_func_nobeta}(\beta, n) = \langle \delta x (\delta u)^n \rangle`
 
     for use when x is not a function of beta.
     """
@@ -124,6 +127,7 @@ class dxdu_func_nobeta(sp.Function):
 
     @classmethod
     def eval(cls, beta, n):
+        """Evaluate function."""
         if n == 0:
             out = 0
         elif beta is None:
@@ -137,7 +141,7 @@ class dxdu_func_beta(sp.Function):
     r"""
     Sympy function to evaluate derivatives of observable fluctuations using central moments.
 
-    :math:`dxdu_func_beta(\beta, n, d) = \langle \delta  x^{(d)}(\beta)(\delta u)^n \rangle`, where :math:`x^{(k)} = d^k x / d\beta^k`.
+    :math:`\text{dxdu_func_beta}(\beta, n, d) = \langle \delta  x^{(d)}(\beta)(\delta u)^n \rangle`, where :math:`x^{(k)} = d^k x / d\beta^k`.
 
     """
 
@@ -160,6 +164,7 @@ class dxdu_func_beta(sp.Function):
 
     @classmethod
     def eval(cls, beta, n, deriv):
+        """Evaluate function."""
         if n == 0:
             out = 0
         elif beta is None:
@@ -187,6 +192,7 @@ class x_func_central_nobeta(sp.Function):
 
     @classmethod
     def eval(cls, beta):
+        """Evaluate function."""
         if beta is None:
             out = cls.x1_symbol
         else:
@@ -195,8 +201,8 @@ class x_func_central_nobeta(sp.Function):
 
 
 class x_func_central_beta(sp.Function):
-    """
-    Sympy function to evaluate derivatives of observable :math:`\\langle x(\beta) \rangle` using central moments.
+    r"""
+    Sympy function to evaluate derivatives of observable :math:`\langle x(\beta) \rangle` using central moments.
     """
 
     nargs = 2
@@ -214,6 +220,7 @@ class x_func_central_beta(sp.Function):
 
     @classmethod
     def eval(cls, beta, deriv):
+        """Evaluate function."""
         if beta is None:
             out = cls.x1_indexed[deriv]
         else:
@@ -225,8 +232,8 @@ class x_func_central_beta(sp.Function):
 # raw moments
 ####################
 class u_func(sp.Function):
-    """
-    Sympy funciton to evaluate derivatives of energy :math:`\\langle u \rangle` using raw moments.
+    r"""
+    Sympy funciton to evaluate derivatives of energy :math:`\langle u \rangle` using raw moments.
     """
 
     nargs = 2
@@ -242,6 +249,7 @@ class u_func(sp.Function):
 
     @classmethod
     def eval(cls, beta, n):
+        """Evaluate function."""
         if n == 0:
             out = 1
         elif beta is None:
@@ -252,10 +260,10 @@ class u_func(sp.Function):
 
 
 class xu_func(sp.Function):
-    """
-    Sympy function to evaluate derivatives of :math:`\\langle x u^n \rangle`.
+    r"""
+    Sympy function to evaluate derivatives of :math:`\langle x u^n \rangle`.
 
-    If ``x`` is a funciton of ``beta``, then :math:`xu_func(\beta, n, d) = \\langle x^{(d)} u^n \rangle`.
+    If ``x`` is a funciton of ``beta``, then :math:`\text{xu_func}(\beta, n, d) = \langle x^{(d)} u^n \rangle`.
     If ``x`` is not a function of ``beta``, drop argument ``d``.
     """
 
@@ -282,6 +290,7 @@ class xu_func(sp.Function):
 
     @classmethod
     def eval(cls, beta, n, deriv=None):
+        """Evaluate function."""
         if beta is None:
             if deriv is None:
                 out = cls.xu[n]
@@ -302,9 +311,9 @@ class SymDerivBeta(SymDerivBase):
     @docfiller_shared
     def x_ave(cls, xalpha=False, central=None, expand=True, post_func=None):
         r"""
-        General method to find derivatives of :math:`langle x \rangle`
+        General method to find derivatives of :math:`\langle x \rangle`
 
-        Paremeters
+        Parameters
         ----------
         {xalpha}
         {central}
@@ -355,8 +364,8 @@ class SymDerivBeta(SymDerivBase):
     @classmethod
     @docfiller_shared
     def dun_ave(cls, n, expand=True, post_func=None, central=None):
-        """
-        Constructor for derivatives of :math:`\\langle (\\delta u)^n\rangle`.
+        r"""
+        Constructor for derivatives of :math:`\langle (\delta u)^n\rangle`.
 
         Parameters
         ----------
@@ -570,7 +579,7 @@ def factory_derivatives(
 
     Returns
     -------
-    derivatives : :class:`thermoextrap.Derivatives` instance
+    derivatives : :class:`thermoextrap.models.Derivatives` instance
         Object used to calculate taylor series coefficients
     """
 
@@ -627,7 +636,7 @@ def factory_extrapmodel(
 
     Returns
     -------
-    extrapmodel : :class:`~thermoextrap.ExtrapModel`
+    extrapmodel : :class:`~thermoextrap.models.ExtrapModel`
 
 
     Notes
@@ -637,7 +646,7 @@ def factory_extrapmodel(
 
     See Also
     --------
-    ~thermoextrap.ExtrapModel
+    ~thermoextrap.models.ExtrapModel
     """
 
     if xalpha is None:
@@ -691,12 +700,12 @@ def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
 
     Returns
     -------
-    perturbmodel : :class:`thermoextrap.PerturbModel`
+    perturbmodel : :class:`thermoextrap.models.PerturbModel`
 
 
     See Also
     --------
-    ~thermoextrap.PerturbModel
+    ~thermoextrap.models.PerturbModel
     """
     from .core.data import factory_data_values
 

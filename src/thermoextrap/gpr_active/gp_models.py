@@ -1,3 +1,7 @@
+"""
+Models for Gaussian process regression (:mod:`~thermoextrap.gpr_active.gp_models`)
+----------------------------------------------------------------------------------
+"""
 from typing import Any, Optional
 
 import gpflow
@@ -29,7 +33,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
     Parameters
     ----------
-    kernel_expr : sympy expression
+    kernel_expr : Expr
         Expression for the kernel that can be differentiated - must have at
         least 2 symbols (symbol names should be 'x1' and 'x2', case insensitive,
         if have only 2)
@@ -49,7 +53,6 @@ class DerivativeKernel(gpflow.kernels.Kernel):
     def __init__(
         self, kernel_expr, obs_dims, kernel_params={}, active_dims=None, **kwargs
     ):
-
         #         if active_dims is not None:
         #             print("active_dims set to: ", active_dims)
         #             print("This is not implemented in this kernel, so setting to 'None'")
@@ -375,6 +378,7 @@ class FullyHeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
         X_data, Y_data = self.data
         n = Y_data[:, -1]
         Y_data = Y_data[:, :1]
@@ -402,6 +406,7 @@ class FullyHeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
         if full_cov or full_output_cov:
             # See https://github.com/GPflow/GPflow/issues/1461
             raise NotImplementedError(
@@ -461,7 +466,7 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
     ) -> None:
         """
         :param cov: The covariance matrix (or its diagonal) for the noise.
-        :param kwargs: Keyword arguments forwarded to :class:`ScalarLikelihood`.
+        :param kwargs: Keyword arguments forwarded to :class:`gpflow.likelihoods.ScalarLikelihood`.
         """
         super().__init__(**kwargs)
 
@@ -646,9 +651,9 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         scaling of the covariance matrix dependent on derivative order
     s : float, default=0.0
         scaling of the covariance matrix indepedent of derivative order
-    transform_p : object, default=gpflow.utilities.positive()
-      transformation of p during training of the GP model; the default is to
-      require it be positive
+    transform_p : object, optional
+        Defaults to ``gpflow.utilities.positive()`` transformation of p during
+        training of the GP model; the default is to require it be positive
     transform_s : object, optional
         transformation of s during GP model training
     constrain_p : bool, default=False
@@ -657,7 +662,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     constrain_s : bool, default=True
         whether or not to contrain s during GP model training
     **kwargs
-        Extra keyword arguments passed to :class:`ScalarLikelihood`
+        Extra keyword arguments passed to :class:`gpflow.likelihoods.ScalarLikelihood`
     """
 
     def __init__(
@@ -701,7 +706,8 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
 
         Returns
         -------
-        tf.Tensor of the scaled covariance matrix
+        :class:`tensorflow.Tensor`
+            Tensor of the scaled covariance matrix
         """
         # First step is determining scaling based on exponential function
         # Add 1 so even zeroth order can be scaled
@@ -860,6 +866,8 @@ class HeteroscedasticGPR_analytical_scale(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
+
         X_data, Y_data = self.data
         err = Y_data - (self.mean_function(X_data) / self.scale_fac)
 
@@ -895,6 +903,7 @@ class HeteroscedasticGPR_analytical_scale(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
         raise NotImplementedError(
             "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
         )
@@ -935,7 +944,7 @@ class HeteroscedasticGPR(
     data : list of tuple
         A list or tuple of the input locations, output data, and noise
         covariance matrix, in that order
-    kernel : DerivativeKernel object
+    kernel : :class:`DerivativeKernel` object
         The kernel to use; must be DerivativeKernel or compatible subclass
         expecting derivative information provided in extra columns of the input
         locations
@@ -962,7 +971,6 @@ class HeteroscedasticGPR(
         x_scale_fac: Optional[float] = 1.0,
         likelihood_kwargs: Optional[dict] = {},
     ):
-
         X_data, Y_data, noise_cov = data
         self.out_dim = Y_data.shape[-1]
 
@@ -1031,6 +1039,7 @@ class HeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
         X_data, Y_data = self.data
 
         # Account for scaling in x for new inputs
@@ -1100,6 +1109,7 @@ class HeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
         raise NotImplementedError(
             "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
         )
@@ -1194,7 +1204,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
 
     Parameters
     ----------
-    expr : sympy expression
+    expr : Expr
         Representing the functional form of the mean function.
     x_data : array-like
         the input locations of the data

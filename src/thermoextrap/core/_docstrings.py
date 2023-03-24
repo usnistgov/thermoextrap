@@ -144,6 +144,7 @@ post_func : str or callable
 
     * minus_log : post_func = -sympy.log
     * pow_i : post_func = lambda f: pow(f, i).  E.g., `pow_2` => pow(f, 2)
+
 """
 
 DOCFILLER_XTRAP = DocFiller.from_docstring(
@@ -161,7 +162,7 @@ d_order | d : int
 beta : float
     reference value of inverse temperature
 data : object
-    Instance of data object, e.g. :class:`thermoextrap.DataCentralMoments`
+    Instance of data object, e.g. :class:`thermoextrap.data.DataCentralMoments`
 alpha_name : str, default='beta'
     name of expansion parameter
 """

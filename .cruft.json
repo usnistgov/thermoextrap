@@ -1,10 +1,15 @@
 {
   "template": "https://github.com/wpk-nist-gov/cookiecutter-pypackage.git",
-  "commit": "a56f6e80fd47652786faa0d0bea3b6cfb079d40e",
+  "commit": "54f802e17db2a2f922595fc6a9401288c18ed509",
   "checkout": "feature/markdown",
   "skip": [
-      "src/thermoextrap/__init__.py",
-      "environment.yaml"
+    "src/thermoextrap/__init__.py",
+      "environment.yaml",
+      "HISTORY.md",
+      "AUTHORS.md",
+      "MANIFEST.in",
+      "docs/spelling_wordlist.txt",
+      "environment/",
   ],
   "context": {
     "cookiecutter": {
@@ -21,7 +26,7 @@
         "docs/_templates/autosummary/*.rst",
         "docs/_templates/autodocsumm/*.rst"
       ],
-        "project_short_description": "Thermodynamic extrapolation",
+      "project_short_description": "Thermodynamic extrapolation",
       "version": "0.0.1",
       "use_pytest": "y",
       "use_pypi_deployment_with_travis": "n",

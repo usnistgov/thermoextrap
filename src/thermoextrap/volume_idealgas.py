@@ -1,5 +1,6 @@
 """
-Routines for volume expansion(s) of ideal gas
+Volume expansion for ideal gas (:mod:`~thermoextrap.volume_idealgas`)
+=====================================================================
 """
 
 
@@ -39,7 +40,6 @@ class VolumeDerivFuncsIG:
         # Even if order is defined somewhere outside of this class, won't affect returned func
 
         def func(W, xW):
-
             if order == 0:
                 # Zeroth order derivative
                 deriv_val = xW[0]
@@ -64,11 +64,13 @@ def factory_derivatives(refV=1.0):
 
     Parameters
     ----------
-    refV : reference volume (default 1 - if already divided by volume no need to set)
+    refV : float
+        reference volume (default 1 - if already divided by volume no need to set)
 
     Returns
     -------
-    derivatives : Coefs object used to calculate moments
+    derivatives : :class:`thermoextrap.models.Derivatives` object
+        Object used to calculate moments
     """
     deriv_funcs = VolumeDerivFuncsIG(refV=refV)
     return Derivatives(deriv_funcs)
@@ -93,7 +95,7 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
 
     Returns
     -------
-    extrapmodel : ExtrapModel object
+    extrapmodel : ExtrapModel
     """
 
     if order != 1:
@@ -123,13 +125,13 @@ def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
     ----------
     volume : float
         reference value of volume
-    data : data object
+    data : object
         Note that this data object should have central=False, deriv_dim=None
     alpha_name, str, default='volume'
         name of expansion parameter
     Returns
     -------
-    extrapmodel : ExtrapModel object
+    extrapmodel : ExtrapModel
     """
 
     if order is None:

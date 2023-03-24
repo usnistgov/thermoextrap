@@ -1,0 +1,8 @@
+﻿thermoextrap.gpr\_active.ig\_active
+===================================
+
+.. automodule:: thermoextrap.gpr_active.ig_active
+   :autosummary:
+   :show-inheritance:
+   :members:
+   :special-members: __call__, __add__, __iadd__, __sub__, __isub__, __mul__, __imul__

@@ -1,7 +1,8 @@
 """
-Routines for volume expansion
+Volume extrapolation (:mod:`~thermoextrap.volume`)
+==================================================
 
-This only handles volume expansion to first order.
+Note: This only handles volume expansion to first order.
 Also, Only DataValues like objects are supported.
 """
 
@@ -103,7 +104,7 @@ class VolumeDataCallback(DataCallbackABC):
 
     See Also
     --------
-    thermoextrap.core.data.DataCallbackABC
+    thermoextrap.data.DataCallbackABC
     """
 
     volume: float = field(validator=attv.instance_of(float))
@@ -145,7 +146,7 @@ def factory_extrapmodel(
     rec_dim="rec",
     val_dims="val",
     rep_dim="rep",
-    **kws
+    **kws,
 ):
     """
     Factory function to create Extrapolation model for volume expansion
@@ -170,11 +171,11 @@ def factory_extrapmodel(
     {val_dims}
     {rep_dim}
     **kws :
-        Extra arguments to :meth:`thermoextrap.DataValues.from_vals`
+        Extra arguments to :meth:`thermoextrap.data.DataValues.from_vals`
 
     Returns
     -------
-    extrapmodel : :class:`thermoextrap.ExtrapModel`
+    extrapmodel : :class:`thermoextrap.models.ExtrapModel`
 
     """
 
@@ -196,7 +197,7 @@ def factory_extrapmodel(
         rep_dim=rep_dim,
         val_dims=val_dims,
         deriv_dim=None,
-        **kws
+        **kws,
     )
 
     derivatives = factory_derivatives()

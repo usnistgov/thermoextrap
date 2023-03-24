@@ -1,6 +1,8 @@
 # Written by Jacob I. Monroe, NIST employee
-
 """
+GPR for ideal gas (:mod:`~thermoextrap.gpr_active.ig_active`)
+-------------------------------------------------------------
+
 Generates ideal gas (1D in external potential) data to test GP models and active
 learning strategies.
 """
@@ -8,9 +10,8 @@ learning strategies.
 import numpy as np
 import xarray as xr
 
-from .. import DataCentralMomentsVals
+from .. import DataCentralMomentsVals, idealgas
 from .. import beta as xpan_beta
-from .. import idealgas
 from .active_utils import DataWrapper
 
 
@@ -78,7 +79,7 @@ class IG_DataWrapper(DataWrapper):
             all_data = self.get_data()
         U = all_data[0]
         x = all_data[1]
-        weights = all_data[2]
+        all_data[2]
         data = DataCentralMomentsVals.from_vals(
             order=max_order, rec_dim="rec", xv=x, uv=U, central=True
         )
