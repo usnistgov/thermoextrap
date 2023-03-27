@@ -35,8 +35,7 @@ F = TypeVar("F", bound=FuncType)
 
 
 def doc(*docstrings: str | Callable, **params) -> Callable[[F], F]:
-    """
-    A decorator take docstring templates, concatenate them and perform string
+    """A decorator take docstring templates, concatenate them and perform string
     substitution on it.
 
     This decorator will add a variable "_docstring_components" to the wrapped
@@ -95,8 +94,7 @@ def doc(*docstrings: str | Callable, **params) -> Callable[[F], F]:
 
 # Factory method to create docfiller
 def docfiller(*templates, **params):
-    """
-    To fill common docs.
+    """To fill common docs.
 
     Taken from pandas.utils._decorators
     """
@@ -127,8 +125,7 @@ def _get_nested_values(d, join_string="\n"):
 
 
 class AttributeDict(Mapping):
-    """
-    Dictionary with recusive attribute like access.
+    """Dictionary with recursive attribute like access.
 
     To be used in str.format calls, so can expand on fields like
     `{name.property}` in a nested manner.
@@ -160,7 +157,6 @@ class AttributeDict(Mapping):
         self._allow_missing = allow_missing
 
     def __getitem__(self, key):
-
         if isinstance(key, slice):
             return _get_nested_values(self._getslice(key), join_string="\n")
 
@@ -176,7 +172,6 @@ class AttributeDict(Mapping):
             return self._entries[key]
 
     def _getslice(self, s):
-
         start = s.start
         stop = s.stop
 
@@ -257,8 +252,7 @@ class AttributeDict(Mapping):
 
     @classmethod
     def from_dict(cls, params, max_level=1, recursive=True, level=0):
-        """
-        Create AttributeDict recursively for nested dictionaries.
+        """Create AttributeDict recursively for nested dictionaries.
 
         To be used in cases where need to apply AttibuteDict to parameters
         passed with ``func(**params)``.
@@ -293,10 +287,10 @@ class AttributeDict(Mapping):
 
 
 def _build_param_docstring(name, ptype, desc):
-    """
-    Create multiline documentation of single name, type, desc.
+    """Create multiline documentation of single name, type, desc.
 
     Parameters
+    ----------
     ==========
     name : str
         Parameter Name
@@ -337,8 +331,7 @@ def _build_param_docstring(name, ptype, desc):
 
 
 def _params_to_string(params, key_char="|"):
-    """
-    Parse list of Parameters objects to string
+    """Parse list of Parameters objects to string.
 
     Examples
     --------
@@ -377,8 +370,7 @@ def _params_to_string(params, key_char="|"):
 
 
 def parse_docstring(func_or_doc, key_char="|", expand=True):
-    """
-    Parse numpy style docstring from function or string to dictionary.
+    """Parse numpy style docstring from function or string to dictionary.
 
     Parameters
     ----------
@@ -438,7 +430,6 @@ def parse_docstring(func_or_doc, key_char="|", expand=True):
     parsed = NumpyDocString(doc)._parsed_data
 
     if expand:
-
         parsed = {
             k.replace(" ", "_").lower(): _params_to_string(parsed[k], key_char=key_char)
             for k in [
@@ -460,9 +451,7 @@ def parse_docstring(func_or_doc, key_char="|", expand=True):
 
 
 def dedent_recursive(data):
-    """
-    Dedent nested mapping of strings.
-    """
+    """Dedent nested mapping of strings."""
     out = type(data)()
     for k in data:
         v = data[k]
@@ -477,7 +466,6 @@ def dedent_recursive(data):
 def _recursive_keys(data):
     keys = []
     for k, v in data.items():
-
         if isinstance(v, dict):
             key_list = [f"{k}.{x}" for x in _recursive_keys(v)]
         elif isinstance(v, str):
@@ -491,9 +479,7 @@ def _recursive_keys(data):
 
 
 class DocFiller:
-    """
-
-    Parameters
+    """Parameters
     ----------
     func_or_doc : callable or str
         Docstring to parse.  If callable, extract from function signature.
@@ -524,9 +510,7 @@ class DocFiller:
         return _recursive_keys(self.data)
 
     def assign_combined_key(self, new_key, keys):
-        """
-        combine multiple keys into single key
-        """
+        """combine multiple keys into single key."""
 
         data = self.data.copy()
 
@@ -535,8 +519,7 @@ class DocFiller:
 
     @classmethod
     def concat(cls, *args, **kwargs):
-        """
-        Create new object from multiple DocFiller or dict objects.
+        """Create new object from multiple DocFiller or dict objects.
 
         Parameters
         ----------
@@ -574,9 +557,7 @@ class DocFiller:
         return cls(data)
 
     def append(self, *args, **kwargs):
-        """
-        Calls ``concat`` method with ``self`` as first argument.
-        """
+        """Calls ``concat`` method with ``self`` as first argument."""
 
         return type(self).concat(self, *args, **kwargs)
 
@@ -616,7 +597,6 @@ class DocFiller:
             return docfiller(*templates)
 
     def __call__(self, *templates, **params):
-
         if len(params) > 0:
             params = AttributeDict.from_dict({**self.data, **params}, max_level=1)
             return docfiller(*templates, **params)
@@ -636,8 +616,7 @@ class DocFiller:
         keep_keys=True,
         key_map=None,
     ):
-        """
-        Create a Docfiller instance from a dictionary.
+        """Create a Docfiller instance from a dictionary.
 
         Parameters
         ----------
@@ -707,8 +686,7 @@ class DocFiller:
         keep_keys=True,
         key_map=None,
     ):
-        """
-        create a Docfiller instance from a function or docstring.
+        """create a Docfiller instance from a function or docstring.
 
         Parameters
         ----------

@@ -186,11 +186,11 @@ def poly_sim_NVT(
         mc.attempt()
         this_rg2 = calc_Rg2(mc)
         if (n > 0) and (n % int(steps_per) == 0):
-            print("{:g}  {:g}  {:g}".format(n, this_rg2, 0.0), file=rg_file)
+            print(f"{n:g}  {this_rg2:g}  {0.0:g}", file=rg_file)
             rg_file.flush()
 
     # To match up with potential energy, write CV one more time
-    print("{:g}  {:g}  {:g}".format(n, this_rg2, 0.0), file=rg_file)
+    print(f"{n:g}  {this_rg2:g}  {0.0:g}", file=rg_file)
     rg_file.flush()
 
     rg_file.close()
@@ -425,11 +425,11 @@ def poly_sim_ExpandedBeta(
         mc.attempt()
         this_rg2 = calc_Rg2(mc)
         if (n > 0) and (n % int(steps_per) == 0):
-            print("{:g}  {:g}  {:g}".format(n, this_rg2, 0.0), file=rg_file)
+            print(f"{n:g}  {this_rg2:g}  {0.0:g}", file=rg_file)
             rg_file.flush()
 
     # To match up with potential energy, write CV one more time
-    print("{:g}  {:g}  {:g}".format(n, this_rg2, 0.0), file=rg_file)
+    print(f"{n:g}  {this_rg2:g}  {0.0:g}", file=rg_file)
     rg_file.flush()
 
     rg_file.close()
@@ -469,7 +469,6 @@ def calc_raw_U(
 
 
 def main(args):
-
     # Define required inputs
     struc_file = args[0]
     beta = float(args[1])

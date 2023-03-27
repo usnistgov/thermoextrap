@@ -1,15 +1,13 @@
 import glob
 import os
-import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 from scipy import interpolate
 from simtk import unit
 
 import thermoextrap
-from thermoextrap.gpr_active import active_utils, gp_models
+from thermoextrap.gpr_active import active_utils
 
 # Define some global constants
 kBT_over_eps = 0.12500e01
@@ -134,7 +132,6 @@ def run_active(
     init_mu=[-12.0, 3.8],
     max_order=2,
 ):
-
     # Create directory for this run
     os.mkdir(active_dir)
 
@@ -198,7 +195,7 @@ def run_active(
 def main():
     # To look at convergence, compute absorption curves with uncertainties at many mu values
     mu_plot = np.linspace(-12.0, 3.8, 100)
-    P_plot = np.array([get_bulk_P(m) for m in mu_plot])
+    np.array([get_bulk_P(m) for m in mu_plot])
     ads_vals = np.zeros((mu_plot.shape[0], 3))
     ads_derivs = np.zeros((mu_plot.shape[0], 3))
 

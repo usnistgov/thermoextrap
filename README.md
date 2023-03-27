@@ -33,7 +33,7 @@ This repository contains code used and described in:
 
 Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
 
-Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estiamtes and Derivative Information in Gaussian Process Regression for Expediated Data Collection in Molecular Simulations. In preparation.
+Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estimates and Derivative Information in Gaussian Process Regression for Expedited Data Collection in Molecular Simulations. In preparation.
 
 
 ## Overview
@@ -83,7 +83,7 @@ If you use pip, then you can include additional dependencies using
 pip install thermoextrap[all]
 ```
 
-If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the verisons on the conda/conda-forge channels are often a bit old.
+If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the versions on the conda/conda-forge channels are often a bit old.
 ```bash
 pip install tensorflow tensorflow-probability gpflow
 ```
@@ -100,6 +100,8 @@ import thermoextrap
 ## Documentation
 
 See the [documentation][docs-link] for a look at `thermo-extrap` in action.
+
+To have a look at using `thermo-extrap` with Gaussian process regression, look in the [gpr][docs/notebooks/gpr] directory.
 
 ## License
 

@@ -1,5 +1,4 @@
-﻿thermoextrap.data
-=================
+﻿
 
 
 .. automodule:: thermoextrap.data

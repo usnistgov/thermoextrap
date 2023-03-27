@@ -1,6 +1,5 @@
-"""
-General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
-========================================================================
+"""General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
+========================================================================.
 """
 from __future__ import annotations
 
@@ -68,8 +67,7 @@ class SympyDerivFuncBase(sp.Function):
 
 @docfiller_shared
 class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
-    """
-    Base class for working with recursive derivatives in expansions
+    """Base class for working with recursive derivatives in expansions.
 
     Parameters
     ----------
@@ -118,8 +116,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
 
 @attrs.define
 class SymSubs:
-    """
-    Class to handle substitution on :class:`SymDerivBase`
+    """Class to handle substitution on :class:`SymDerivBase`.
 
     Parameters
     ----------
@@ -177,8 +174,7 @@ class SymSubs:
 
 @attrs.define
 class Lambdify:
-    """
-    Create python function from list of expressions
+    """Create python function from list of expressions.
 
     Parameters
     ----------
@@ -204,14 +200,14 @@ class Lambdify:
 
     @classmethod
     def from_u_xu(cls, exprs, **lambdify_kws):
-        """factory for u/xu args"""
+        """factory for u/xu args."""
         u, xu = get_default_indexed("u", "xu")
         # args = (u, xu)
         return cls(exprs=exprs, args=(u, xu), lambdify_kws=lambdify_kws)
 
     @classmethod
     def from_du_dxdu(cls, exprs, xalpha=False, **lambdify_kws):
-        """factory for du/dxdu args"""
+        """factory for du/dxdu args."""
         if xalpha:
             x1 = get_default_indexed("x1")
         else:
@@ -222,9 +218,7 @@ class Lambdify:
 
 # -log<X>
 class SymMinusLog:
-    """
-    Class to compute derivatives of Y = -log(<X>)
-    """
+    """Class to compute derivatives of Y = -log(<X>)."""
 
     X, dX = get_default_indexed("X", "dX")
 
@@ -251,8 +245,7 @@ def factory_minus_log():
 
 @attrs.define
 class Derivatives(MyAttrsMixin):
-    """
-    Class to wrap functions calculating derivatives to specified order
+    """Class to wrap functions calculating derivatives to specified order.
 
 
     Parameters
@@ -285,8 +278,7 @@ class Derivatives(MyAttrsMixin):
         concat_kws=None,
         norm=False,
     ):
-        """
-        Calculate derivatives for orders range(0, order+1)
+        """Calculate derivatives for orders range(0, order+1).
 
         Parameters
         ----------
@@ -299,7 +291,7 @@ class Derivatives(MyAttrsMixin):
         args : tuple
             arguments passed to ``self.funcs[i](*args)``
         minus_log : bool, default=False
-            If `True`, apply tranform for `Y = -log(<X>)`
+            If `True`, apply transform for `Y = -log(<X>)`
         order_dim : str, default='order'
             If `None`, output will be a list
             If `order_dim` is a string, then apply `xarray.concat` to output
@@ -345,8 +337,7 @@ class Derivatives(MyAttrsMixin):
     def coefs(
         self, data=None, args=None, order=None, minus_log=False, order_dim="order"
     ):
-        """
-        Alias to `self.derivs(..., norm=True)`
+        """Alias to `self.derivs(..., norm=True)`.
 
         See Also
         --------
@@ -364,8 +355,7 @@ class Derivatives(MyAttrsMixin):
 
     @classmethod
     def from_sympy(cls, exprs, args):
-        """
-        Create object from list of sympy functions.
+        """Create object from list of sympy functions.
 
         Parameters
         ----------
@@ -384,9 +374,7 @@ class Derivatives(MyAttrsMixin):
 
 @lru_cache(10)
 def taylor_series_norm(order, order_dim="order"):
-    """
-    ``taylor_series_coefficients = derivs * taylor_series_norm``
-    """
+    """``taylor_series_coefficients = derivs * taylor_series_norm``."""
     out = np.array([1 / np.math.factorial(i) for i in range(order + 1)])
     if order_dim is not None:
         out = xr.DataArray(out, dims=order_dim)
@@ -395,9 +383,7 @@ def taylor_series_norm(order, order_dim="order"):
 
 @attrs.define
 class ExtrapModel(MyAttrsMixin):
-    """
-    Apply taylor series extrapolation
-    """
+    """Apply taylor series extrapolation."""
 
     #: Alpha value data is evalulated at
     alpha0: float = field(converter=float)
@@ -459,8 +445,7 @@ class ExtrapModel(MyAttrsMixin):
         dalpha_coords="dalpha",
         alpha0_coords=True,
     ):
-        """
-        Calculate taylor series at values "alpha"
+        """Calculate taylor series at values "alpha".
 
         Parameters
         ----------
@@ -477,7 +462,7 @@ class ExtrapModel(MyAttrsMixin):
             If True, do not sum the results.  Useful if manually performing any
             math with series.
         minus_log : bool, default=False
-            If True, transorm expansion to ``Y = - log(X)``.
+            If True, transform expansion to ``Y = - log(X)``.
         alpha_name : str, optional
             Name to apply to created alpha dimension.
         dalpha_coords : str, default="dalpha"
@@ -528,9 +513,7 @@ class ExtrapModel(MyAttrsMixin):
         return out
 
     def resample(self, indices=None, nrep=None, **kws):
-        """
-        Create new object with resampled data.
-        """
+        """Create new object with resampled data."""
         return self.new_like(
             order=self.order,
             alpha0=self.alpha0,
@@ -546,8 +529,7 @@ class ExtrapModel(MyAttrsMixin):
 
 @attrs.define
 class StateCollection(MyAttrsMixin):
-    """
-    Sequence of models.
+    """Sequence of models.
 
     Parameters
     ----------
@@ -583,9 +565,7 @@ class StateCollection(MyAttrsMixin):
         return alpha_name
 
     def resample(self, indices=None, nrep=None, **kws):
-        """
-        Resample underlying models
-        """
+        """Resample underlying models."""
         if indices is None:
             indices = [None] * len(self)
 
@@ -615,9 +595,8 @@ class StateCollection(MyAttrsMixin):
             )
 
     def map(self, func, *args, **kwargs):
-        """
-        apply a function to elements self.
-        ``out = [func(s, *args, **kwargs) for s in self]``
+        """apply a function to elements self.
+        ``out = [func(s, *args, **kwargs) for s in self]``.
 
         if func is a str, then
         ``out = [getattr(s, func)(*args, **kwargs) for s in self]``
@@ -631,8 +610,7 @@ class StateCollection(MyAttrsMixin):
         return out
 
     def map_concat(self, func, concat_dim=None, concat_kws=None, *args, **kwargs):
-        """
-        apply function and concat output
+        """apply function and concat output.
 
         defaults to concat with dim=pd.Index(self.alpha0, name=self.alpha_name)
         """
@@ -647,8 +625,7 @@ class StateCollection(MyAttrsMixin):
         return out
 
     def append(self, states, sort=True, key=None, **kws):
-        """
-        create new object with states appended to self.states
+        """create new object with states appended to self.states.
 
         Parameters
         ----------
@@ -706,9 +683,7 @@ def xr_weights_minkowski(deltas, m=20, dim="state"):
 
 @attrs.define
 class PiecewiseMixin:
-    """
-    Provide methods for Piecewise state collection
-    """
+    """Provide methods for Piecewise state collection."""
 
     def _indices_between_alpha(self, alpha):
         idx = np.digitize(alpha, self.alpha0, right=False) - 1
@@ -738,8 +713,7 @@ class PiecewiseMixin:
 
 @attrs.define
 class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
-    """
-    Weighted extrapolation model
+    """Weighted extrapolation model.
 
     Parameters
     ----------
@@ -760,8 +734,7 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
         method=None,
         bounded=False,
     ):
-        """
-        Parameters
+        """Parameters
         ----------
         method : {None, 'between', 'nearest'}
             method to select which models are chosen to predict value for given
@@ -909,9 +882,7 @@ class InterpModel(StateCollection):
 
 
 class InterpModelPiecewise(StateCollection, PiecewiseMixin):
-    """
-    Apposed to the multiple model InterpModel, perform a piecewise interpolation
-    """
+    """Apposed to the multiple model InterpModel, perform a piecewise interpolation."""
 
     # @gcached(prop=False)
     # def single_interpmodel(self, state0, state1):
@@ -931,8 +902,7 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
         method=None,
         bounded=False,
     ):
-        """
-        Parameters
+        """Parameters
         ----------
         alpha : float or sequence of float
 
@@ -1027,9 +997,7 @@ class PerturbModel(MyAttrsMixin):
 
 @attrs.define
 class MBARModel(StateCollection):
-    """
-    Sadly, this doesn't work as beautifully.
-    """
+    """Sadly, this doesn't work as beautifully."""
 
     def __attrs_pre_init__(self):
         if not _HAS_PYMBAR:

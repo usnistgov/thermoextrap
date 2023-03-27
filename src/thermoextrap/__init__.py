@@ -1,6 +1,5 @@
-"""
-Top level API (:mod:`thermoextrap`)
-===================================
+"""Top level API (:mod:`thermoextrap`)
+===================================.
 """
 
 from . import beta, lnpi, volume, volume_idealgas

@@ -1,7 +1,8 @@
 # Credits
 
-## Development Lead
+## Development Leads
 
+- Jacob Monroe \<jacob.monroe@uark.edu>
 - William P. Krekelberg \<wpk@nist.gov>
 
 ## Contributors

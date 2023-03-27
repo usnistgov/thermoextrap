@@ -25,9 +25,7 @@ def window(seq, n=2):
 
 
 def relative_fluctuations(da, dim):
-    """
-    Calculate relative mean and relative error of DataArray along dimension
-    """
+    """Calculate relative mean and relative error of DataArray along dimension."""
     ave = da.mean(dim)
     err = da.std(dim) / np.abs(ave)
     err = err.where(~np.isinf(err))
@@ -45,9 +43,7 @@ def test_relative_fluctuations(
     tol=0.003,
     alpha_tol=0.01,
 ):
-    """
-    test relative fluctuations of model
-    """
+    """Test relative fluctuations of model."""
 
     if predict_kws is None:
         predict_kws = {}
@@ -105,8 +101,7 @@ def train_iterative(
     callback=None,
     callback_kws=None,
 ):
-    """
-    add states to satisfy some tolerance.
+    """Add states to satisfy some tolerance.
 
     Each iteration calculates the relative error, then adds a state
     where error is largest.
@@ -156,7 +151,7 @@ def train_iterative(
         * info_dict['alpha0'] : alpha0 values in the model
         * info_dict['err'] : relative error in the model
         * info_dict['ave'] : average estimate of the model
-        * info_dict['depth'] : depth of interation
+        * info_dict['depth'] : depth of interaction
     callback_kws : dict, optional
         extra arguments to `callback`
 
@@ -241,8 +236,7 @@ def train_recursive(
     callback=None,
     callback_kws=None,
 ):
-    """
-    add states to satisfy some tolerance.
+    """add states to satisfy some tolerance.
 
     Each iteration calculates the relative error, then adds a state
     where error is largest.
@@ -294,9 +288,14 @@ def train_recursive(
         `info_dict` dictionary containing
         `info_dict['alpha0']` the alpha0 values in the model
         `info_dict['err']` the normalized error in the model
-        `info_dict['depth']` the depth of interation
+        `info_dict['depth']` the depth of interaction
     callback_kws : dict, optional
         extra arguments to `callback`
+    depth : int
+        Internal variable used during recursion.
+    info : list
+        Internal variable used during recursion.
+
 
 
     Returns
@@ -430,8 +429,7 @@ def check_polynomial_consistency(
     order=None,
     statecollection_kws=None,
 ):
-    """
-    Check polynomial consistency across subsegments
+    """Check polynomial consistency across subsegments.
 
     Parameters
     ----------
@@ -461,7 +459,6 @@ def check_polynomial_consistency(
     models = {}
 
     for state_pair in chain(zip(states[:-1], states[1:]), zip(states[:-2], states[2:])):
-
         model = factory_statecollection(list(state_pair))
         key = tuple(model.alpha0)
         coef = model.coefs(order=None)
@@ -503,8 +500,7 @@ def factory_state_idealgas(
     nconfig=10_000,
     npart=1_000,
 ):
-    """
-    Example factory function to create single state.
+    """Example factory function to create single state.
 
     This particular state function returns the a `beta` extrapolation model for the position
     of an ideal gas particle in an external field.
@@ -531,14 +527,14 @@ def factory_state_idealgas(
     from .core import idealgas
     from .core.data import DataCentralMomentsVals
 
-    # NOTE: this is for reproducable results.
+    # NOTE: this is for reproducible results.
     if seed_from_beta:
         np.random.seed(int(beta * 1000))
 
     xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
     data = DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
 
-    # use indices for reproducability
+    # use indices for reproducibility
     nrec = len(xdata)
     indices = np.random.choice(nrec, (nrep, nrec))
     return xpan_beta.factory_extrapmodel(beta=beta, data=data).resample(
@@ -549,8 +545,7 @@ def factory_state_idealgas(
 def callback_plot_progress(
     model, alphas, info_dict, verbose=True, maxdepth_stop=None, ax=None
 ):
-    """
-    The callback function is called each iteration after model is created
+    """The callback function is called each iteration after model is created.
 
     Optionally, it can return value `True` to stop iteration
 
@@ -559,7 +554,7 @@ def callback_plot_progress(
     ----------
     verbose : bool, default=True
     maxdepth_stop : int, optional
-        Note that this is redundant with `maxdepth`, but for demostration
+        Note that this is redundant with `maxdepth`, but for demonstration
         purposes
     ax : matplotlib axes, optional
     """
@@ -599,7 +594,6 @@ def callback_plot_progress(
 
 
 def plot_polynomial_consistency(alphas, states, factory_statecollection):
-
     import matplotlib.pyplot as plt
 
     P, models_dict = check_polynomial_consistency(states, factory_statecollection)

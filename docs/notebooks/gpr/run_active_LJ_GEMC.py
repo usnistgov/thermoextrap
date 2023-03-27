@@ -178,23 +178,16 @@ def main(
     avoid_repeats,
     no_stop,
 ):
-
     # Working in all reduced units, so if reduced temperatures provided, good to go
     beta1 = 1.0 / lowT
     beta2 = 1.0 / highT
 
     dat_in = []
     for b in [beta1, beta2]:
-        if os.path.isdir("{}/beta_{:f}".format(output_dir, b)):
-            info_files = sorted(
-                glob.glob("{}/beta_{:f}/sim_info_out*.txt".format(output_dir, b))
-            )
-            bias_files = sorted(
-                glob.glob("{}/beta_{:f}/cv_bias_out*.txt".format(output_dir, b))
-            )
-            x_files = sorted(
-                glob.glob("{}/beta_{:f}/dens_out*.txt".format(output_dir, b))
-            )
+        if os.path.isdir(f"{output_dir}/beta_{b:f}"):
+            info_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/sim_info_out*.txt"))
+            bias_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/cv_bias_out*.txt"))
+            x_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/dens_out*.txt"))
             dat_in.append(
                 DataWrapDensities(
                     info_files,
@@ -245,21 +238,21 @@ def main(
             **update_stop_kwargs,
             compare_func=ground_truth_dens,
             save_dir=output_dir,
-            save_plot=True
+            save_plot=True,
         )
     elif update_type == "Space":
         update_func = active_utils.UpdateSpaceFill(
             **update_stop_kwargs,
             compare_func=ground_truth_dens,
             save_dir=output_dir,
-            save_plot=True
+            save_plot=True,
         )
     elif update_type == "Random":
         update_func = active_utils.UpdateRandom(
             **update_stop_kwargs,
             compare_func=ground_truth_dens,
             save_dir=output_dir,
-            save_plot=True
+            save_plot=True,
         )
 
     # Define stopping criteria
@@ -271,7 +264,7 @@ def main(
         metrics.append(active_utils.MaxIter())
     stop_func = active_utils.StopCriteria(metrics, **update_stop_kwargs)
 
-    act_info_out = active_utils.active_learning(
+    active_utils.active_learning(
         dat_in,
         sim_wrap,
         update_func,

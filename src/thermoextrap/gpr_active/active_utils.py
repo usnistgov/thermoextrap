@@ -1,6 +1,5 @@
-"""
-GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
-------------------------------------------------------------
+"""GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
+------------------------------------------------------------.
 """
 import glob
 import multiprocessing
@@ -29,8 +28,7 @@ from .gp_models import (
 
 
 def get_logweights(bias):
-    """
-    Given values of the biasing potential for each configuration, calculates the weights
+    """Given values of the biasing potential for each configuration, calculates the weights
     for averaging over those configurations for the biased ensemble so that the
     average represents the unbiased ensemble.
     """
@@ -45,8 +43,7 @@ def get_logweights(bias):
 
 
 def input_GP_from_state(state, n_rep=100, log_scale=False):
-    """
-    Builds input for GP model up to specified order from ExtrapModel object of thermoextrap.
+    """Builds input for GP model up to specified order from ExtrapModel object of thermoextrap.
     If log_scale, adjust x inputs and derivatives to reflect taking the logarithm of x.
 
     Parameters
@@ -60,7 +57,7 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
         (i.e., compute derivatives of dy/dlog(x) instead of dy/dx)
 
     Returns
-    ----------
+    -------
     x_data : object
         input locations, likely state points (e.g., temperature, pressure, etc.),
         augmented with derivative order of each observation, as required for GP
@@ -151,7 +148,7 @@ class DataWrapper:
         the reciprocal temperature (1/(kB*T)) of the simulations in this data set
     x_files : list of str, optional
         the files containing the quantity of interest for the active
-        learning procedure; default is to asssume this is the CV in cv_bias_files
+        learning procedure; default is to assume this is the CV in cv_bias_files
         and that these are not necessary
     n_frames : int, default=10000
         number of frames from the END of simulation(s), or the files read in, to
@@ -442,8 +439,7 @@ class SimWrapper:
 
 
 def make_matern_expr(p):
-    """
-    Creates a sympy expression for the Matern kernel of order p
+    """Creates a sympy expression for the Matern kernel of order p.
 
     Parameters
     ----------
@@ -479,8 +475,7 @@ def make_matern_expr(p):
 
 
 def make_rbf_expr():
-    """
-    Creates a sympy expression for an RBF kernel
+    """Creates a sympy expression for an RBF kernel.
 
     Returns
     -------
@@ -501,8 +496,7 @@ def make_rbf_expr():
 
 
 def make_poly_expr(p):
-    """
-    Creates a sympy expression for a polynomial kernel
+    """Creates a sympy expression for a polynomial kernel.
 
     Parameters
     ----------
@@ -544,8 +538,7 @@ def make_poly_expr(p):
 
 
 class RBFDerivKernel(DerivativeKernel):
-    """
-    For convenience, create a derivative kernel specific to RBF function.
+    """For convenience, create a derivative kernel specific to RBF function.
     Use it most often, so convenient to have.
     """
 
@@ -555,8 +548,7 @@ class RBFDerivKernel(DerivativeKernel):
 
 
 class ChangeInnerOuterRBFDerivKernel(DerivativeKernel):
-    """
-    Implements a change-points kernel via logistic switching functions (as in GPflow's
+    """Implements a change-points kernel via logistic switching functions (as in GPflow's
     ChangePoints kernel), but only for two points, where two instead of three kernels
     are utilized: one for the outer region and one for the inner. Both kernels are
     RBF kernels with a shared variance parameter. The resulting kernel is differentiable,
@@ -628,8 +620,7 @@ def create_base_GP_model(
     mean_func=None,
     likelihood_kwargs={},
 ):
-    """
-    Creates just the base GP model without any training,just sets up sympy and
+    """Creates just the base GP model without any training,just sets up sympy and
     GPflow. kernel can either be a kernel object, in which case it is assumed
     you know what you're doing and shared_kernel will be ignored (will not wrap
     in SharedIndependent or SeparateIndependent and thus if the kernel is not a
@@ -662,7 +653,7 @@ def create_base_GP_model(
         keyword arguments to pass to the likelihood model
 
     Returns
-    ---------
+    -------
     gpr: :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Note, that this is an untrained model.
     """
@@ -741,8 +732,7 @@ def create_base_GP_model(
 
 
 def train_GPR(gpr, record_loss=False, start_params=None):
-    """
-    Trains a given gpr model for n_opt steps.
+    """Trains a given gpr model for n_opt steps.
     Actually uses scipy wrapper in gpflow, which seems faster.
     If starting parameter values are provided in start_params, should be
     iterable with numpy array or float values (e.g., in tuple or list).
@@ -810,8 +800,7 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 
 
 def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
-    """
-    Generates and trains a GPR model based on a list of ExtrapModel objects or a
+    """Generates and trains a GPR model based on a list of ExtrapModel objects or a
     StateCollection object from thermoextrap. If a list of another type of
     object, such as a custom state function, will simply call it and expect to
     return GPR input data.
@@ -829,7 +818,7 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
         Additional dictionary of keyword arguments to pass to create_base_GP_model
 
     Returns
-    ----------
+    -------
     gpr : :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Trained model.
     """
@@ -901,7 +890,7 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
 # Then it should return the median of the transformed distribution, an uncertainty estimate,
 # which for a Gaussian should be the std, but for other distributions could be std or some
 # confidence width, and finally upper and lower bounds of a confidence interval
-# (preferrably around 95%)
+# (preferably around 95%)
 # Here only implement the simplest (and default) transformation, the identity transform
 # (which also computes std given variance and upper and lower confidence interval values)
 def identityTransform(x, y, y_var):
@@ -913,8 +902,7 @@ def identityTransform(x, y, y_var):
 # The following functions will be useful in both update function and stopping criteria classes
 # So creating a class that just implements those to inherit
 class UpdateStopABC:
-    """
-    Class that forms basis for both update and stopping criteria classes, which both need to
+    """Class that forms basis for both update and stopping criteria classes, which both need to
     define transformation functions and create grids of alpha values.
 
     """
@@ -926,8 +914,7 @@ class UpdateStopABC:
         log_scale=False,
         avoid_repeats=False,
     ):
-        """
-        Parameters
+        """Parameters
         ----------
         d_order_pred : int, default=0
             Derivative order at which predictions should be made
@@ -949,8 +936,7 @@ class UpdateStopABC:
         self.avoid_repeats = avoid_repeats
 
     def create_alpha_grid(self, alpha_list):
-        """
-        Given a list of alpha values used in the GP model, creates a grid of values
+        """Given a list of alpha values used in the GP model, creates a grid of values
         to evaluate the GP model at. This grid, alpha_grid is returned along with values
         of possible points to select to add to the GP model, alpha_select. Depending
         on the update strategy, these may be different points (e.g., if using integrated
@@ -981,9 +967,7 @@ class UpdateStopABC:
         return alpha_grid, alpha_select
 
     def get_transformed_GP_output(self, gpr, x_vals):
-        """
-        Returns output of GP and transforms it, evaluating GP using predict_f at alpha values.
-        """
+        """Returns output of GP and transforms it, evaluating GP using predict_f at alpha values."""
         # Could use predict_y instead
         # But cannot unless have model for noise at new points, so just work with predict_f
         # If do have reason to work with predict_y, inherit this class and modify this method
@@ -1007,8 +991,7 @@ class UpdateStopABC:
 
 
 class UpdateFuncBase(UpdateStopABC):
-    """
-    Base update function class defining structure and implementing basic methods.
+    """Base update function class defining structure and implementing basic methods.
     This class will be callable and will use the do_update() function to perform updates,
     which means that for new classes inheriting from this do_update() must be implemented.
     The update function should typically take two arguments: the GP model and the list of
@@ -1044,9 +1027,8 @@ class UpdateFuncBase(UpdateStopABC):
         self.compare_func = compare_func
 
     def do_plotting(self, x, y, err, alpha_list):
-        """
-        Plots output used to select new update point.
-        err is expected to be length 2 list with upper and lower confidence intervals
+        """Plots output used to select new update point.
+        err is expected to be length 2 list with upper and lower confidence intervals.
         """
 
         import matplotlib.pyplot as plt
@@ -1110,9 +1092,7 @@ class UpdateFuncBase(UpdateStopABC):
 
 
 class UpdateALMbrute(UpdateFuncBase):
-
-    """
-    Performs active learning with a GPR to select new location for performing simulation.
+    """Performs active learning with a GPR to select new location for performing simulation.
     This is called "Active Learning Mackay" in the book by Grammacy (Surrogates, 2022).
     Selection is based on maximizing uncertainty over the interval, which is done with brute
     force evaluation on a grid of points (this is cheap compared to running simulations or
@@ -1178,9 +1158,7 @@ class UpdateALMbrute(UpdateFuncBase):
 
 
 class UpdateRandom(UpdateFuncBase):
-
-    """
-    Select point randomly along a grid based on previously sampled points.
+    """Select point randomly along a grid based on previously sampled points.
     This does not require training a GP model, but one is trained anyway for plotting, etc.
     """
 
@@ -1209,9 +1187,7 @@ class UpdateRandom(UpdateFuncBase):
 
 
 class UpdateSpaceFill(UpdateFuncBase):
-
-    """
-    Select point as far as possible from previously sampled points.
+    """Select point as far as possible from previously sampled points.
     This will just be halfway between for two points. For situations where
     multiple locations work equally well, locations are chosen randomly.
     This does not require training a GP model, but one is trained anyway for plotting, etc.
@@ -1256,9 +1232,7 @@ class UpdateSpaceFill(UpdateFuncBase):
 
 
 class UpdateAdaptiveIntegrate(UpdateFuncBase):
-
-    """
-    Select point as far as possible from previously sampled points, but within
+    """Select point as far as possible from previously sampled points, but within
     specified error tolerance based on model relative uncertainty predictions.
     If all values in the interval satisfy the tolerance, the furthest point from
     all others will be chosen, as in a space-filling update.
@@ -1360,8 +1334,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
 
 
 class UpdateALCbrute(UpdateFuncBase):
-    """
-    EXPERIMENTAL! MAY BE USEFUL IN FUTURE WORK, BUT NOT NOW!
+    """EXPERIMENTAL! MAY BE USEFUL IN FUTURE WORK, BUT NOT NOW!
 
     Performs active learning with a GPR to select new location for performing simulation.
     This is called "Active Learning Cohn" in the book by Grammacy (Surrogates, 2022).
@@ -1454,8 +1427,7 @@ class UpdateALCbrute(UpdateFuncBase):
 
 
 class MetricBase:
-    """
-    Base class for structure of metrics used for stopping criteria.
+    """Base class for structure of metrics used for stopping criteria.
     To create a metric, write the calc_metric method.
     Inputs can be history, x_vals, and gp. See below for definition of history.
     x_vals are the values at which the means and variances were evaluated, and
@@ -1472,10 +1444,9 @@ class MetricBase:
     """
 
     def __init__(self, name, tol):
-        """
-        Inputs:
-            name - name of metric
-            tol - tolerance to define stopping criteria
+        """Inputs:
+        name - name of metric
+        tol - tolerance to define stopping criteria.
         """
         super().__init__()
         self.name = name
@@ -1498,9 +1469,7 @@ class MetricBase:
 
 
 class MaxVar(MetricBase):
-    """
-    Metric based on maximum variance of GP output.
-    """
+    """Metric based on maximum variance of GP output."""
 
     def __init__(self, tol, name="MaxVar", **kwargs):
         super().__init__(tol=tol, name=name, **kwargs)
@@ -1512,8 +1481,7 @@ class MaxVar(MetricBase):
 
 
 class AvgVar(MetricBase):
-    """
-    Metric based on average variance of GP output.
+    """Metric based on average variance of GP output.
 
     Parameters
     ----------
@@ -1535,8 +1503,7 @@ class AvgVar(MetricBase):
 
 
 class MaxRelVar(MetricBase):
-    """
-    Metric based on maximum relative variance of GP output (actually std).
+    """Metric based on maximum relative variance of GP output (actually std).
 
 
     Parameters
@@ -1567,8 +1534,7 @@ class MaxRelVar(MetricBase):
 
 
 class MaxRelGlobalVar(MetricBase, UpdateStopABC):
-    """
-    Metric based on maximum ratio of GP output variance to variance of data input to the
+    """Metric based on maximum ratio of GP output variance to variance of data input to the
     GP (actually ratio of std devs).
 
     Parameters
@@ -1595,8 +1561,7 @@ class MaxRelGlobalVar(MetricBase, UpdateStopABC):
 
 
 class AvgRelVar(MetricBase):
-    """
-    Metric based on average relative variance of GP output.
+    """Metric based on average relative variance of GP output.
 
     Parameters
     ----------
@@ -1626,8 +1591,7 @@ class AvgRelVar(MetricBase):
 
 
 class MSD(MetricBase):
-    """
-    Metric based on mean squared deviation between GP model outputs.
+    """Metric based on mean squared deviation between GP model outputs.
 
     Parameters
     ----------
@@ -1651,8 +1615,7 @@ class MSD(MetricBase):
 
 
 class MaxAbsRelDeviation(MetricBase):
-    """
-    Metric based on maximum absolute relative deviation between GP model outputs.
+    """Metric based on maximum absolute relative deviation between GP model outputs.
 
     Parameters
     ----------
@@ -1688,8 +1651,7 @@ class MaxAbsRelDeviation(MetricBase):
 
 
 class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
-    """
-    Metric based on maximum absolute deviation between GP model outputs divided by the
+    """Metric based on maximum absolute deviation between GP model outputs divided by the
     std of the data.
 
     Parameters
@@ -1721,8 +1683,7 @@ class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
 
 
 class AvgAbsRelDeviation(MetricBase):
-    """
-    Metric based on average absolute relative deviation between GP model outputs.
+    """Metric based on average absolute relative deviation between GP model outputs.
 
     Parameters
     ----------
@@ -1754,8 +1715,7 @@ class AvgAbsRelDeviation(MetricBase):
 
 
 class ErrorStability(MetricBase, UpdateStopABC):
-    """
-    Implements the stopping metric introduced by Ishibashi and Hino (2021).
+    """Implements the stopping metric introduced by Ishibashi and Hino (2021).
     Note that for this metric, also inherits UpdateStopABC, so has its own
     parameters for log_scale, d_order_pred, and transform_func, that are
     separate from the StopCriteria it's used in.
@@ -1901,8 +1861,7 @@ class ErrorStability(MetricBase, UpdateStopABC):
 
 
 class MaxIter(MetricBase):
-    """
-    Metric that always returns False so that will reach maximum number of iterations.
+    """Metric that always returns False so that will reach maximum number of iterations.
     This can be used with or without other metrics to reach maximum iterations since
     all metrics must be True to reach stopping criteria. Note that do not need to (and
     should not) set the tolerance here.
@@ -1921,8 +1880,7 @@ class MaxIter(MetricBase):
 
 
 class StopCriteria(UpdateStopABC):
-    """
-    Class that calculates metrics used to determine stopping criteria for active learning.
+    """Class that calculates metrics used to determine stopping criteria for active learning.
     The key component of this class is a list of metric functions which have names and define
     tolerances. All of the metrics must be less than the tolerance to trigger stopping.
 
@@ -1941,9 +1899,8 @@ class StopCriteria(UpdateStopABC):
     """
 
     def __init__(self, metric_funcs, **kwargs):
-        """
-        Inputs:
-            metric_funcs - dictionary of (name, function) pairs; just nice to have names
+        """Inputs:
+        metric_funcs - dictionary of (name, function) pairs; just nice to have names.
         """
         # Make sure avoid repeats is False for reproducibility
         kwargs["avoid_repeats"] = False
@@ -1966,8 +1923,7 @@ class StopCriteria(UpdateStopABC):
         self.history = None
 
     def compute_metrics(self, alpha_grid, history=None, gpr=None):
-        """
-        Uses current history (default) or one provided to compute all metrics.
+        """Uses current history (default) or one provided to compute all metrics.
         Must provide grid of alpha values as well to input to metrics.
         """
         if history is None:

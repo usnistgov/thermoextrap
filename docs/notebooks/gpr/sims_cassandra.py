@@ -12,7 +12,7 @@ from openmm import unit
 def set_inp_param(inp_file, out_file, **kwargs):
     """
     Creates a new (copy) of an Cassandra input file with the specified parameters
-    changed, where the keyword arguments are taken as the paramter names and
+    changed, where the keyword arguments are taken as the parameter names and
     the associated values are the new entries.
     Inputs:
             inp_file - file to modify and save modified copy of
@@ -36,11 +36,10 @@ def set_inp_param(inp_file, out_file, **kwargs):
 
     # Loop over elements of kwargs dictionary, which are parameters to change
     for param_name, new_entry in kwargs.items():
-
         # Get starting index for this parameter
         start_ind = new_contents.index("# %s" % param_name)
 
-        # Find ending index by looking for next occurence of '!----', etc.
+        # Find ending index by looking for next occurrence of '!----', etc.
         # Or just a blank line (could have spaces only) if 'Prob' starts this param_name
         end_ind = start_ind + 1
         for i in range(start_ind + 1, len(new_contents)):
@@ -82,7 +81,7 @@ def calc_temp_and_mass(T_red, eps=1.0 * unit.kilojoule_per_mole):
     kB = unit.MOLAR_GAS_CONSTANT_R.value_in_unit(unit.kilojoules_per_mole / unit.kelvin)
     T_vals = T_red * eps.value_in_unit(unit.kilojoule_per_mole) / kB
 
-    # Also need to calulate mass to get 1 for thermal de Broglie wavelength AT EACH TEMPERATURE
+    # Also need to calculate mass to get 1 for thermal de Broglie wavelength AT EACH TEMPERATURE
     # Expression is: m = 2*pi*h_bar^2 / (kB*T*lambda^2)
     # Want lambda^2 to be 1 and T = eps*T_r/kB, where eps = 1 kJ/mol for convenience
     # So then have: m = 2*pi*h_bar^2 / (eps*T_r)
@@ -186,7 +185,7 @@ def run_NVT(
     """
     # Create directory for this run and copy files into it
     output_path = os.path.join(
-        output_base_dir, "{}_T{:1.1f}_rho{:1.2f}".format(output_prefix, T_red, dens_red)
+        output_base_dir, f"{output_prefix}_T{T_red:1.1f}_rho{dens_red:1.2f}"
     )
     ff_file, pdb_file = setup_sim_dir(output_path, ff_file, pdb_file)
 
@@ -221,12 +220,12 @@ def run_NVT(
 
     # Change to simulation directory and run simulation
     os.chdir(output_path)
-    shell_ouptut = subprocess.run(
+    subprocess.run(
         [library_setup, cassandra_exe, inp_name, pdb_file],
         check=True,
         capture_output=True,
     )
-    shell_output = subprocess.run(
+    subprocess.run(
         [cassandra_exe, inp_name],
         check=True,
         capture_output=True,
@@ -258,7 +257,7 @@ def run_NPT(
     # Create directory for this run and copy files into it
     output_path = os.path.join(
         output_base_dir,
-        "{}_T{:1.1f}_p{:1.3f}_rho{:1.2f}".format(output_prefix, T_red, p_red, dens_red),
+        f"{output_prefix}_T{T_red:1.1f}_p{p_red:1.3f}_rho{dens_red:1.2f}",
     )
     ff_file, pdb_file = setup_sim_dir(output_path, ff_file, pdb_file)
 
@@ -297,12 +296,12 @@ def run_NPT(
 
     # Change to simulation directory and run simulation
     os.chdir(output_path)
-    shell_ouptut = subprocess.run(
+    subprocess.run(
         [library_setup, cassandra_exe, inp_name, pdb_file],
         check=True,
         capture_output=True,
     )
-    shell_output = subprocess.run(
+    subprocess.run(
         [cassandra_exe, inp_name],
         check=True,
         capture_output=True,
@@ -334,7 +333,7 @@ def run_GCMC(
     # Create directory for this run and copy files into it
     output_path = os.path.join(
         output_base_dir,
-        "{}_T{:1.1f}_lnz{:1.3f}_rho{:1.2f}".format(output_prefix, T_red, lnz, dens_red),
+        f"{output_prefix}_T{T_red:1.1f}_lnz{lnz:1.3f}_rho{dens_red:1.2f}",
     )
     ff_file, pdb_file = setup_sim_dir(output_path, ff_file, pdb_file)
 
@@ -373,12 +372,12 @@ def run_GCMC(
 
     # Change to simulation directory and run simulation
     os.chdir(output_path)
-    shell_ouptut = subprocess.run(
+    subprocess.run(
         [library_setup, cassandra_exe, inp_name, pdb_file],
         check=True,
         capture_output=True,
     )
-    shell_output = subprocess.run(
+    subprocess.run(
         [cassandra_exe, inp_name],
         check=True,
         capture_output=True,
@@ -408,9 +407,7 @@ def run_GEMC(
     and necessary input files, runs a GEMC simulation with Cassandra.
     """
     # Create directory for this run and copy files into it
-    output_path = os.path.join(
-        output_base_dir, "{}_T{:1.1f}".format(output_prefix, T_red)
-    )
+    output_path = os.path.join(output_base_dir, f"{output_prefix}_T{T_red:1.1f}")
     ff_file, pdb_file = setup_sim_dir(output_path, ff_file, pdb_file)
 
     # Get temperature, mass, and edge length
@@ -444,12 +441,12 @@ def run_GEMC(
 
     # Change to simulation directory and run simulation
     os.chdir(output_path)
-    shell_ouptut = subprocess.run(
+    subprocess.run(
         [library_setup, cassandra_exe, inp_name, pdb_file],
         check=True,
         capture_output=True,
     )
-    shell_output = subprocess.run(
+    subprocess.run(
         [cassandra_exe, inp_name],
         check=True,
         capture_output=True,
@@ -596,7 +593,7 @@ def sim_VLE_GEMC(
             file_prefix, this_run_dir, "prod.out.box%i.prp" % (i + 1)
         )
         with open(this_prop_file) as f:
-            unused = f.readline()
+            f.readline()
             this_header = f.readline()
             this_units = f.readline().strip()
         this_header = this_header.strip().split()
@@ -694,7 +691,7 @@ def sim_VLE_NPT(
         run_dirs = glob.glob(os.path.join(file_prefix, run_prefix + "*_T*"))
         sim_num = len(run_dirs)
     run_prefix = run_prefix + "%i" % sim_num
-    this_run_dir = "{}_T{:1.1f}".format(run_prefix, Tr)
+    this_run_dir = f"{run_prefix}_T{Tr:1.1f}"
 
     # Run simulations for both densities
     # On the way, assemble files for DataWrapper class
@@ -756,7 +753,7 @@ def sim_VLE_NPT(
         # Collect necessary output info
         this_prop_file = os.path.join(this_path, "prod.out.prp")
         with open(this_prop_file) as f:
-            unused = f.readline()
+            f.readline()
             this_header = f.readline()
             this_units = f.readline().strip()
         this_header = this_header.strip().split()

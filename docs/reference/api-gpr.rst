@@ -1,5 +1,5 @@
 Gaussian process regression (:mod:`~thermoextrap.gpr_active`)
-============================================================
+=============================================================
 
 
 .. automodule:: thermoextrap.gpr_active

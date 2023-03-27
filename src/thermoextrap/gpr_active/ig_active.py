@@ -1,7 +1,6 @@
 # Written by Jacob I. Monroe, NIST employee
-"""
-GPR for ideal gas (:mod:`~thermoextrap.gpr_active.ig_active`)
--------------------------------------------------------------
+"""GPR for ideal gas (:mod:`~thermoextrap.gpr_active.ig_active`)
+-------------------------------------------------------------.
 
 Generates ideal gas (1D in external potential) data to test GP models and active
 learning strategies.

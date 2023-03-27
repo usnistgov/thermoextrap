@@ -61,3 +61,10 @@ len
 repr
 xCentralMoments
 cmomy
+wpk
+nist
+docstring
+numer
+equil
+highT
+hight

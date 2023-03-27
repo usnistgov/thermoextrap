@@ -29,8 +29,8 @@ and "help wanted" is open to whoever wants to implement it.
 
 ### Write Documentation
 
-thermo-extrap could always use more documentation, whether as part of the
-official thermo-extrap docs, in docstrings, or even on the web in blog posts,
+`thermo-extrap` could always use more documentation, whether as part of the
+official `thermo-extrap` docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 ### Submit Feedback
@@ -169,7 +169,7 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
 10. Submit a pull request through the GitHub website.
 
 
-### Dependency managment
+### Dependency management
 
 Dependencies need to be placed in a few locations, which depend on the nature of the dependency.
 
@@ -198,7 +198,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
 ## Building the docs
 
-We use [tox] to isolate the documentaion build.  Useful commands are as follows.
+We use [tox] to isolate the documentation build.  Useful commands are as follows.
 
 * Build the docs:
 
@@ -212,7 +212,7 @@ We use [tox] to isolate the documentaion build.  Useful commands are as follows.
     tox -e docs-spelling
     ```
 
-* Create a relese of the docs:
+* Create a release of the docs:
 
     ```bash
     tox -e docs-release
@@ -224,7 +224,7 @@ We use [tox] to isolate the documentaion build.  Useful commands are as follows.
 
 ## Using tox
 
-The package is setup to use tox to test, build and release pip and conda distributions, and release the docs.  Most of these tasks have a command in the makefie.  To test against multiple versions, use:
+The package is setup to use tox to test, build and release pip and conda distributions, and release the docs.  Most of these tasks have a command in the `Makefile`.  To test against multiple versions, use:
 
 ```
 $ make test-all

@@ -1,5 +1,4 @@
-﻿thermoextrap.volume\_idealgas
-=============================
+﻿
 
 .. automodule:: thermoextrap.volume_idealgas
    :autosummary:

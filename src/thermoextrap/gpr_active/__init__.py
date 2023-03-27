@@ -1,6 +1,4 @@
-"""
-Modules to apply Gaussian process regresssion to thermodynamic extrapolation.
-"""
+"""Modules to apply Gaussian process regression to thermodynamic extrapolation."""
 
 from . import active_utils, gp_models, ig_active
 

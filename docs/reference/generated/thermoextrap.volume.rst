@@ -1,5 +1,4 @@
-﻿thermoextrap.volume
-===================
+﻿
 
 .. automodule:: thermoextrap.volume
    :autosummary:

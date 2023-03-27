@@ -1,5 +1,4 @@
-﻿thermoextrap.models
-===================
+﻿
 
 
 .. automodule:: thermoextrap.models

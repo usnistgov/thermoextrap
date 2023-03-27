@@ -8,7 +8,6 @@ import gpflow
 import numpy as np
 import pytest
 import sympy as sp
-import xarray as xr
 from scipy import linalg
 
 from thermoextrap import idealgas
@@ -236,7 +235,7 @@ def test_base_GP_creation():
     # and wrapped as SharedIndependent, even though shared_kernel is False
     # Warning should be printed, so should come up with some way to check for that...
     k_rbf = active_utils.RBFDerivKernel()
-    # Changing paramater values to check if passed faithfully
+    # Changing parameter values to check if passed faithfully
     k_rbf.l.assign(0.5)
     k_rbf.var.assign(5.0)
     check_kernel = active_utils.create_base_GP_model(
@@ -626,7 +625,7 @@ def test_stop_criteria():
     )
     assert m_es.d_order_pred == 1
     assert m_es.transform_func == check_stop_withES.transform_func
-    assert m_es.log_scale == True
+    assert m_es.log_scale is True
 
 
 # Test full active learning routine on ideal gas
@@ -655,7 +654,7 @@ def test_active_learning():
     with io.StringIO() as buf, redirect_stdout(buf):
         # Once where should reach maximum iterations
         stops = active_utils.StopCriteria(metrics)
-        out_list = active_utils.active_learning(
+        active_utils.active_learning(
             init_states,
             sims,
             updates,
@@ -668,7 +667,7 @@ def test_active_learning():
     with io.StringIO() as buf, redirect_stdout(buf):
         # And once where expect to stop early
         stops_early = active_utils.StopCriteria(metrics[:-1])
-        out_list = active_utils.active_learning(
+        active_utils.active_learning(
             init_states,
             sims,
             updates,
