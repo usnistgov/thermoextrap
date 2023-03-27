@@ -48,7 +48,7 @@ If you use pip, then you can include additional dependencies using
 pip install thermoextrap[all]
 ```
 
-If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the verisons on the conda/conda-forge channels are often a bit old.
+If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the versions on the conda/conda-forge channels are often a bit old.
 ```bash
 pip install tensorflow tensorflow-probability gpflow
 ```

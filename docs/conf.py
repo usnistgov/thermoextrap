@@ -142,7 +142,7 @@ autodoc_default_flags = [
 ]
 autodoc_typehints = "none"
 
-# -- napolean ------------------------------------------------------------------
+# -- napoleon ------------------------------------------------------------------
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
@@ -435,9 +435,7 @@ intersphinx_mapping = {
 
 # based on numpy doc/source/conf.py
 def linkcode_resolve(domain, info):
-    """
-    Determine the URL corresponding to Python object
-    """
+    """Determine the URL corresponding to Python object."""
     import inspect
 
     if domain != "py":

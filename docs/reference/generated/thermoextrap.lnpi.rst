@@ -1,5 +1,4 @@
-﻿thermoextrap.lnpi
-=================
+﻿
 
 .. automodule:: thermoextrap.lnpi
    :autosummary:

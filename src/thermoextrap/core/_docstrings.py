@@ -96,7 +96,7 @@ uv : xarray.DataArray
 xv : xarray.DataArray
     raw values of x (observable)
 w : array-like, optional
-    optional weigth array.  Note that this array/xarray must be conformable to uv, xv
+    optional weight array.  Note that this array/xarray must be conformable to uv, xv
 order : int
     maximum order of moments/expansion to calculate
 umom_dim : str, default='umom'
@@ -239,8 +239,7 @@ def _factory_get_mapping(
 
 
 def factory_docfiller_shared(names=None, *, dotted=False, shared_docs=None, **kws):
-    """
-    Create a decorator for filling in documentation.
+    """Create a decorator for filling in documentation.
 
     Based on pandas private method. This is not ideal, but going with it for now.
 

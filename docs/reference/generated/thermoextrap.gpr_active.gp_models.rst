@@ -1,5 +1,4 @@
-﻿thermoextrap.gpr\_active.gp\_models
-===================================
+﻿
 
 .. automodule:: thermoextrap.gpr_active.gp_models
    :autosummary:

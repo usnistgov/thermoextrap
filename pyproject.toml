@@ -119,6 +119,8 @@ select = [
   "I",
   # pyupgrade
   "UP",
+  # pydocstyle
+  # "D"
   # # flake8-2020
   # "YTT",
   # # flake8-bugbear
@@ -164,7 +166,12 @@ exclude = [
     "dist",
     "node_modules",
     "venv",
+    "docs/conf.py",
     "src/thermoextrap/tests",
+    "tests/",
+    "src/thermoextrap/legacy/",
+    "docs/notebooks/gpr/",
+
 ]
 
 
@@ -185,6 +192,9 @@ ignore = [
     "D205",
     "D400",
     "D401",
+    "D102",
+    "D103",
+
 ]
 
 per-file-ignores = {}

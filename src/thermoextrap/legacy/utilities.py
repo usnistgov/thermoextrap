@@ -3,7 +3,6 @@ Mainly this is the code to automatically compute derivatives with sympy.
 Also includes other useful functions.
 """
 
-import copy
 
 import numpy as np
 import sympy as sym
@@ -220,7 +219,7 @@ def symDerivAvgXdependent(order):
                         # (4th order as an example)
                         # f(4)(b) = xu(4,0) - 4*xu(3,1) + 6*xu(2,2) - 4*xu(1,3) + xu(0,4)
                         #        = <x(4)> - 4*<x(3)*u> + 6*<x(2)*u^2> - 4*<x(1)*u^3> + <x*u^4>
-                        # In the above, f(4) or x(4) represents the 4th derivtive of f or x with
+                        # In the above, f(4) or x(4) represents the 4th derivative of f or x with
                         # respect to the extrapolation variable b.
                         subvals[d] = (
                             sym.Sum(

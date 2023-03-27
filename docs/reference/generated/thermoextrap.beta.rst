@@ -1,5 +1,4 @@
-﻿thermoextrap.beta
-=================
+﻿
 
 .. automodule:: thermoextrap.beta
    :autosummary:

@@ -1,6 +1,5 @@
-"""
-Inverse temperature (beta) extrapolation (:mod:`~thermoextrap.beta`)
-====================================================================
+"""Inverse temperature (beta) extrapolation (:mod:`~thermoextrap.beta`)
+====================================================================.
 """
 
 
@@ -32,8 +31,7 @@ docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
 
 
 class du_func(sp.Function):
-    r"""
-    Sympy function to evaluate energy fluctuations using central moments.
+    r"""Sympy function to evaluate energy fluctuations using central moments.
 
     :math:`\text{du_func}(\beta, n) = \langle (u(\beta) - \langle u(\beta) \rangle)^n \rangle`
 
@@ -49,7 +47,7 @@ class du_func(sp.Function):
 
     @classmethod
     def deriv_args(cls):
-        """list of arguments to function evaluation"""
+        """list of arguments to function evaluation."""
         return [cls.du]
 
     def fdiff(self, argindex=1):
@@ -72,8 +70,7 @@ class du_func(sp.Function):
 
 
 class u_func_central(sp.Function):
-    r"""
-    Sympy function to evaluate energy averages using central moments.
+    r"""Sympy function to evaluate energy averages using central moments.
 
     :math:`\text{u_func_central}(beta, n) = \langle u(\beta)^n \rangle`
     """
@@ -101,8 +98,7 @@ class u_func_central(sp.Function):
 
 
 class dxdu_func_nobeta(sp.Function):
-    r"""
-    Sympy function to evaluate observable energy fluctuations using central moments.
+    r"""Sympy function to evaluate observable energy fluctuations using central moments.
 
     :math:`\text{dxdu_func_nobeta}(\beta, n) = \langle \delta x (\delta u)^n \rangle`
 
@@ -138,8 +134,7 @@ class dxdu_func_nobeta(sp.Function):
 
 
 class dxdu_func_beta(sp.Function):
-    r"""
-    Sympy function to evaluate derivatives of observable fluctuations using central moments.
+    r"""Sympy function to evaluate derivatives of observable fluctuations using central moments.
 
     :math:`\text{dxdu_func_beta}(\beta, n, d) = \langle \delta  x^{(d)}(\beta)(\delta u)^n \rangle`, where :math:`x^{(k)} = d^k x / d\beta^k`.
 
@@ -175,9 +170,7 @@ class dxdu_func_beta(sp.Function):
 
 
 class x_func_central_nobeta(sp.Function):
-    r"""
-    Sympy functionn to evaluate derivatives of observable :math:`\langle x \rangle` using central moments.
-    """
+    r"""Sympy functionn to evaluate derivatives of observable :math:`\langle x \rangle` using central moments."""
 
     nargs = 1
     x1_symbol = get_default_symbol("x1")
@@ -201,9 +194,7 @@ class x_func_central_nobeta(sp.Function):
 
 
 class x_func_central_beta(sp.Function):
-    r"""
-    Sympy function to evaluate derivatives of observable :math:`\langle x(\beta) \rangle` using central moments.
-    """
+    r"""Sympy function to evaluate derivatives of observable :math:`\langle x(\beta) \rangle` using central moments."""
 
     nargs = 2
     x1_indexed = get_default_indexed("x1")
@@ -232,9 +223,7 @@ class x_func_central_beta(sp.Function):
 # raw moments
 ####################
 class u_func(sp.Function):
-    r"""
-    Sympy funciton to evaluate derivatives of energy :math:`\langle u \rangle` using raw moments.
-    """
+    r"""Sympy function to evaluate derivatives of energy :math:`\langle u \rangle` using raw moments."""
 
     nargs = 2
     u = get_default_indexed("u")
@@ -260,10 +249,9 @@ class u_func(sp.Function):
 
 
 class xu_func(sp.Function):
-    r"""
-    Sympy function to evaluate derivatives of :math:`\langle x u^n \rangle`.
+    r"""Sympy function to evaluate derivatives of :math:`\langle x u^n \rangle`.
 
-    If ``x`` is a funciton of ``beta``, then :math:`\text{xu_func}(\beta, n, d) = \langle x^{(d)} u^n \rangle`.
+    If ``x`` is a function of ``beta``, then :math:`\text{xu_func}(\beta, n, d) = \langle x^{(d)} u^n \rangle`.
     If ``x`` is not a function of ``beta``, drop argument ``d``.
     """
 
@@ -302,16 +290,14 @@ class xu_func(sp.Function):
 
 
 class SymDerivBeta(SymDerivBase):
-    r"""
-    Provide symbolic expressions for :math:`d^n \langle x \rangle /d\beta^n`.
-    """
+    r"""Provide symbolic expressions for :math:`d^n \langle x \rangle /d\beta^n`."""
+
     beta = get_default_symbol("beta")
 
     @classmethod
     @docfiller_shared
     def x_ave(cls, xalpha=False, central=None, expand=True, post_func=None):
-        r"""
-        General method to find derivatives of :math:`\langle x \rangle`
+        r"""General method to find derivatives of :math:`\langle x \rangle`.
 
         Parameters
         ----------
@@ -341,8 +327,7 @@ class SymDerivBeta(SymDerivBase):
     @classmethod
     @docfiller_shared
     def u_ave(cls, central=None, expand=True, post_func=None):
-        r"""
-        General constructor for symbolic derivatives of :math:`\langle u \rangle`
+        r"""General constructor for symbolic derivatives of :math:`\langle u \rangle`.
 
         Parameters
         ----------
@@ -364,8 +349,7 @@ class SymDerivBeta(SymDerivBase):
     @classmethod
     @docfiller_shared
     def dun_ave(cls, n, expand=True, post_func=None, central=None):
-        r"""
-        Constructor for derivatives of :math:`\langle (\delta u)^n\rangle`.
+        r"""Constructor for derivatives of :math:`\langle (\delta u)^n\rangle`.
 
         Parameters
         ----------
@@ -397,8 +381,7 @@ class SymDerivBeta(SymDerivBase):
     def dxdun_ave(
         cls, n, xalpha=False, expand=True, post_func=None, d=None, central=None
     ):
-        r"""
-        Constructor for derivatives of :math:`\langle \delta x \delta u^n\rangle`.
+        r"""Constructor for derivatives of :math:`\langle \delta x \delta u^n\rangle`.
 
         Parameters
         ----------
@@ -439,8 +422,7 @@ class SymDerivBeta(SymDerivBase):
     @classmethod
     @docfiller_shared
     def un_ave(cls, n, expand=True, post_func=None, central=None):
-        r"""
-        Constructor for derivatives of :math:`\langle u^n\rangle`.
+        r"""Constructor for derivatives of :math:`\langle u^n\rangle`.
 
         Parameters
         ----------
@@ -462,8 +444,7 @@ class SymDerivBeta(SymDerivBase):
     def xun_ave(
         cls, n, d=None, xalpha=False, expand=True, post_func=None, central=None
     ):
-        r"""
-        Constructor for deriatives of :math:`\langle x^{{(d)}} u^n\rangle`.
+        r"""Constructor for deriatives of :math:`\langle x^{{(d)}} u^n\rangle`.
 
         Parameters
         ----------
@@ -501,8 +482,7 @@ class SymDerivBeta(SymDerivBase):
         n=None,
         d=None,
     ):
-        """
-        create a derivative expressions indexer by name
+        """create a derivative expressions indexer by name.
 
         Parameters
         ----------
@@ -545,7 +525,7 @@ class SymDerivBeta(SymDerivBase):
             kws.update(n=n, xalpha=xalpha, d=d)
 
         elif name == "lnPi_correction":
-            # aleady have central
+            # already have central
             pass
 
         return func(**kws)
@@ -567,8 +547,7 @@ def factory_derivatives(
     post_func=None,
     expand=True,
 ):
-    r"""
-    Factory function to provide derivative function for expansion
+    r"""Factory function to provide derivative function for expansion.
 
     Parameters
     ----------
@@ -617,8 +596,7 @@ def factory_extrapmodel(
     post_func=None,
     derivatives_kws=None,
 ):
-    """
-    Factory function to create Extrapolation model for beta expansion
+    """Factory function to create Extrapolation model for beta expansion.
 
     Parameters
     ----------
@@ -642,7 +620,7 @@ def factory_extrapmodel(
     Notes
     -----
     Note that default values for parameters ``order``, ``xalpha``, and ``central``
-    are infered from corresponding attributes of ``data``.
+    are inferred from corresponding attributes of ``data``.
 
     See Also
     --------
@@ -687,8 +665,7 @@ def factory_extrapmodel(
 
 @docfiller_shared
 def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
-    """
-    Factory function to create PerturbModel for beta expansion
+    """Factory function to create PerturbModel for beta expansion.
 
     Parameters
     ----------

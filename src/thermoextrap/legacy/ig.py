@@ -81,6 +81,7 @@ class IGmodel:
         """Analytical perturbation of the system from B0 to B.
         Nice check to see if get same thing as avgX
         """
+
         # Really just the same as average of x, but it's a nice check all the math
         def pertNumer(B, B0):
             prefac = B0 / (1.0 - np.exp(-B0 * L))

@@ -29,7 +29,7 @@ data_path = Path(__file__).parent / "lnpi_data"
 
 
 def load_data():
-    with open(data_path / "sample_data.json", "r") as f:
+    with open(data_path / "sample_data.json") as f:
         d = json.load(f)
 
     ref, samples = d["ref"], d["samples"]
@@ -116,7 +116,6 @@ def out_u(em_u, betas):
 
 
 def test_out_u(samples, out_u):
-
     for s in samples:
         a = s["energy"].sel(umom=1)
         b = out_u.sel(beta=s["beta"], order=s["order"])

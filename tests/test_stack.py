@@ -26,7 +26,6 @@ def states():
 
 
 def test_mean_var(states):
-
     x = states[0].derivs(norm=False)
 
     out = stack.to_mean_var(x, dim="rep")
@@ -42,7 +41,6 @@ def test_mean_var(states):
 
 
 def test_derivs_concat(states):
-
     a = xr.concat(
         (s.derivs(norm=False) for s in states),
         dim=pd.Index(states.alpha0, name=states.alpha_name),
@@ -52,7 +50,6 @@ def test_derivs_concat(states):
 
 
 def test_stack(states):
-
     Y_unstack = stack.states_derivs_concat(states).pipe(stack.to_mean_var, "rep")
     Y = stack.stack_dataarray(Y_unstack, x_dims=["beta", "order"], stats_dim="stats")
 

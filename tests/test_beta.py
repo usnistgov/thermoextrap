@@ -4,7 +4,6 @@ import xarray as xr
 
 import thermoextrap as xtrap
 import thermoextrap.legacy
-from thermoextrap.core.cached_decorators import gcached
 
 
 @pytest.mark.slow
@@ -156,7 +155,6 @@ def test_perturbmodel(fixture):
 
 @pytest.mark.slow
 def test_extrapmodel_weighted_slow(fixture):
-
     beta0 = [0.05, 0.5]
 
     X = np.array((fixture.x, fixture.xb))
@@ -185,7 +183,6 @@ def test_extrapmodel_weighted_slow(fixture):
 
 
 def test_extrapmodel_weighted(fixture):
-
     beta0 = [0.05, 0.5]
     betas = [0.3, 0.4]
 
@@ -237,7 +234,6 @@ def test_extrapmodel_weighted(fixture):
 
 
 def test_extrapmodel_weighted_multi(fixture):
-
     beta0 = [0.05, 0.2, 1.0]
     betas = [0.3, 0.4, 0.6, 0.7]
 
@@ -307,7 +303,6 @@ def test_extrapmodel_weighted_multi(fixture):
 
 @pytest.mark.slow
 def test_interpmodel_slow(fixture):
-
     beta0 = [0.05, 0.5, 1.0]
 
     X = np.array([np.random.rand(*fixture.x.shape) for _ in beta0])
@@ -333,7 +328,6 @@ def test_interpmodel_slow(fixture):
 
 
 def test_interpmodel(fixture):
-
     beta0 = [0.05, 0.5, 1.0]
     betas = [0.3, 0.4, 0.6, 0.7]
 
@@ -390,9 +384,7 @@ def test_interpmodel(fixture):
 
 
 def test_interpmodelpiecewise(fixture):
-
     beta0 = [0.05, 0.2, 1.0]
-    betas = [0.3, 0.4, 0.6, 0.7]
 
     xems_r = [
         xtrap.beta.factory_extrapmodel(
@@ -445,7 +437,6 @@ def test_interpmodel_polynomial():
 
 
 def test_mbar(fixture):
-
     beta0 = [0.05, 0.5]
 
     X = np.array((fixture.x, fixture.xb))
@@ -474,12 +465,10 @@ def test_mbar(fixture):
 from sympy import bell
 
 # Test log
-from thermoextrap.legacy.utilities import buildAvgFuncs
 
 
 class LogAvgExtrapModel(thermoextrap.legacy.ExtrapModel):
     def calcDerivVals(self, refB, x, U):
-
         if x.shape[0] != U.shape[0]:
             print(
                 "First observable dimension (%i) and size of potential energy array (%i) do not match!"
@@ -654,7 +643,6 @@ class ExtrapModelDependent(thermoextrap.legacy.ExtrapModel):
 
 @pytest.mark.slow
 def test_extrapmodel_alphadep_slow(fixture):
-
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -679,7 +667,6 @@ def test_extrapmodel_alphadep_slow(fixture):
 
 
 def test_extrapmodel_alphadep(fixture):
-
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -826,7 +813,6 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
 
 @pytest.mark.slow
 def test_extrapmodel_alphadep_minuslog_slow(fixture):
-
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -873,7 +859,6 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
 
 
 def test_extrapmodel_alphadep_minuslog(fixture):
-
     beta0 = 0.5
     betas = [0.2, 0.7]
 

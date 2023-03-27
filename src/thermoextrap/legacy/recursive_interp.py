@@ -82,7 +82,7 @@ class RecursiveInterp:
             raise RecursionError("Maximum recursion depth reached.")
 
         if verbose:
-            print("\nInterpolating from points %f and %f" % (B1, B2))
+            print(f"\nInterpolating from points {B1:f} and {B2:f}")
             print("Recursion depth on this branch: %i" % recurseDepth)
 
         # Generate data somehow if not provided
@@ -98,7 +98,7 @@ class RecursiveInterp:
         # Train the model and get parameters we want to use for THIS interpolation
         # Have to save parameters because want to use SAME data when bootstrapping
         # So part of saving parameters is updating the data that's used in the model
-        thisParams = self.model.train([B1, B2], xData, uData, saveParams=True)
+        self.model.train([B1, B2], xData, uData, saveParams=True)
 
         # Decide if need more data to extrapolate from
         # Check convergence at grid of values between edges, using worst case to check
@@ -238,7 +238,7 @@ class RecursiveInterp:
             B2 = self.edgeB[i + 1]
 
             if verbose:
-                print("\nInterpolating from points %f and %f" % (B1, B2))
+                print(f"\nInterpolating from points {B1:f} and {B2:f}")
 
             # Generate data somehow if not provided
             try:
@@ -271,7 +271,7 @@ class RecursiveInterp:
             # Train the model and get parameters we want to use for THIS interpolation
             # Have to save parameters because want to use SAME data when bootstrapping
             # So part of saving parameters is updating the data that's used in the model
-            thisParams = self.model.train([B1, B2], xData, uData, saveParams=True)
+            self.model.train([B1, B2], xData, uData, saveParams=True)
 
             if verbose:
                 # Check if need more data to extrapolate from (just report info on this)
@@ -319,20 +319,19 @@ class RecursiveInterp:
         predictVals = np.zeros((len(B), self.model.x.shape[2]))
 
         for i, beta in enumerate(B):
-
             # Check if out of lower bound
             if beta < self.edgeB[0]:
                 print(
-                    "Have provided point %f below interpolation function"
-                    " interval edges (%s)." % (beta, str(self.edgeB))
+                    "Have provided point {:f} below interpolation function"
+                    " interval edges ({}).".format(beta, str(self.edgeB))
                 )
                 raise IndexError("Interpolation point below range")
 
             # Check if out of upper bound
             if beta > self.edgeB[-1]:
                 print(
-                    "Have provided point %f above interpolation function"
-                    " interval edges (%s)." % (beta, str(self.edgeB))
+                    "Have provided point {:f} above interpolation function"
+                    " interval edges ({}).".format(beta, str(self.edgeB))
                 )
                 raise IndexError("Interpolation point above range")
 
@@ -414,7 +413,7 @@ class RecursiveInterp:
             z12 = (reg1Coeffs - reg2Coeffs) / np.sqrt(reg1Err**2 + reg2Err**2)
             # Assuming Gaussian distributions for coefficients
             # This is implicit in returning bootstrap standard deviation as estimate of uncertainty
-            # If DON'T want to assume this, boostrap function should return confidence intervals
+            # If DON'T want to assume this, bootstrap function should return confidence intervals
             # And that will require a good bit of re-coding throughout this whole class
             # p12 = 2.0*norm.cdf(-abs(z12)) #Null hypothesis that coefficients same
             p12 = norm.cdf(abs(z12)) - norm.cdf(
