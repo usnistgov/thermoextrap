@@ -18,7 +18,8 @@ def stack_dataarray(
     stats_dim=None,
     policy="infer",
 ):
-    """Given an xarray.DataArray, stack for gpflow analysis.
+    """
+    Given an xarray.DataArray, stack for gpflow analysis.
 
     Parameters
     ----------
@@ -79,7 +80,7 @@ def stack_dataarray(
 
 
 def wrap_like_dataarray(x, da):
-    """wrap an array x with properties of da."""
+    """Wrap an array x with properties of da."""
     return xr.DataArray(
         x,
         dims=da.dims,
@@ -91,14 +92,15 @@ def wrap_like_dataarray(x, da):
 
 
 def multiindex_to_array(idx):
-    """turn xarray multiindex to numpy array."""
+    """Turn xarray multiindex to numpy array."""
     return np.array(list(idx.values))
 
 
 def apply_reduction(
     da, dim, funcs, concat=True, concat_dim=None, concat_kws=None, **kws
 ):
-    """apply multiple reductions to DataArray.
+    """
+    Apply multiple reductions to DataArray.
 
 
     Parameters
@@ -143,7 +145,8 @@ def apply_reduction(
 
 
 def to_mean_var(da, dim, concat_dim=None, concat_kws=None, **kws):
-    """for a dataarray apply mean/variance along a dimension.
+    """
+    For a dataarray apply mean/variance along a dimension.
 
     Parameters
     ----------
@@ -171,7 +174,8 @@ def to_mean_var(da, dim, concat_dim=None, concat_kws=None, **kws):
 
 
 def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
-    """concatanate [s.derivs(norm=False) for s in states].
+    """
+    Concatanate [s.derivs(norm=False) for s in states].
 
     Parameters
     ----------
@@ -202,7 +206,8 @@ def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
 
 
 class StackedDerivatives:
-    """Data object for gpflow analysis.
+    """
+    Data object for gpflow analysis.
 
     Parameters
     ----------
@@ -258,7 +263,7 @@ class StackedDerivatives:
 
     @property
     def order(self):
-        """maximum order available."""
+        """Maximum order available."""
         return self.da.sizes[self.order_dim] - 1
 
     @property
@@ -288,7 +293,7 @@ class StackedDerivatives:
         return self._stacked(order)
 
     def array_data(self, order=None):
-        """get X and Y data for gpflow analysis."""
+        """Get X and Y data for gpflow analysis."""
         stacked = self.stacked(order=order)
         xdata = multiindex_to_array(stacked.indexes[self.xstack_dim])
 
@@ -297,7 +302,8 @@ class StackedDerivatives:
         return xdata, ydata
 
     def xindexer_from_arrays(self, **kwargs):
-        """create indexer for indexing into gpflow trained object by name.
+        """
+        Create indexer for indexing into gpflow trained object by name.
 
         Parameters
         ----------
@@ -308,7 +314,8 @@ class StackedDerivatives:
         return self.xindexer_from_dataframe(pd.DataFrame(kwargs))
 
     def xindexer_from_dataframe(self, df):
-        """create indexer from frame.
+        """
+        Create indexer from frame.
 
         Example:
         -------
@@ -335,7 +342,7 @@ class StackedDerivatives:
         concat_dim=None,
         concat_kws=None,
     ):
-        """create object from mean and variance."""
+        """Create object from mean and variance."""
 
         if concat_dim is None:
             concat_dim = pd.Index(["mean", "var"], name="stats")
@@ -377,7 +384,8 @@ class StackedDerivatives:
         ystack_dim="ystack",
         policy="infer",
     ):
-        """Create object from DataArray of derivatives.
+        """
+        Create object from DataArray of derivatives.
 
         Parameters
         ----------
@@ -449,7 +457,8 @@ class StackedDerivatives:
         ystack_dim="ystack",
         policy="infer",
     ):
-        """create data object for StateCollection or list of states.
+        """
+        Create data object for StateCollection or list of states.
 
         Parameter
         ---------
@@ -503,7 +512,8 @@ class StackedDerivatives:
 
 
 class GPRData(StateCollection):
-    """Statecollection for GPFlow analysis.
+    """
+    Statecollection for GPFlow analysis.
 
     Parameters
     ----------
@@ -569,7 +579,8 @@ class GPRData(StateCollection):
 
     @gcached(prop=False)
     def _stacked(self, order):
-        """Get stacked data representation.
+        """
+        Get stacked data representation.
 
         Parameters
         ----------
@@ -614,7 +625,7 @@ class GPRData(StateCollection):
         return self._stacked(order)
 
     def array_data(self, order=None):
-        """get X and Y data for gpflow analysis."""
+        """Get X and Y data for gpflow analysis."""
         stacked = self.stacked(order=order)
         xdata = multiindex_to_array(stacked.indexes[self.xstack_dim])
 
@@ -623,7 +634,8 @@ class GPRData(StateCollection):
         return xdata, ydata
 
     def xindexer_from_arrays(self, **kwargs):
-        """create indexer for indexing into gpflow trained object by name.
+        """
+        Create indexer for indexing into gpflow trained object by name.
 
         Parameters
         ----------
@@ -634,7 +646,8 @@ class GPRData(StateCollection):
         return self.xindexer_from_dataframe(pd.DataFrame(kwargs))
 
     def xindexer_from_dataframe(self, df):
-        """create indexer from frame.
+        """
+        Create indexer from frame.
 
         Example:
         -------

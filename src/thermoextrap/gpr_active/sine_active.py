@@ -1,6 +1,7 @@
 # Written by Jacob I. Monroe, NIST employee
 
-"""Generates sine data with controlled uncertainty and other features to test GP
+"""
+Generates sine data with controlled uncertainty and other features to test GP
 models and active learning strategies.
 """
 
@@ -8,7 +9,8 @@ import numpy as np
 
 
 def noise_func(x, s, n):
-    """Function to produce heteroscedastic noise based on given x values
+    """
+    Function to produce heteroscedastic noise based on given x values
     Must also provide a slope and noise base scaling since model is
         noise = scale*(slope*(x - x_min) + cos(x)^2)
     i.e., sum of linear model and periodic function
@@ -34,7 +36,8 @@ def make_data(
     max_order=4,
     rng=np.random.default_rng(42),
 ):
-    """Creates data with heteroscedastic noise around sin(x).
+    """
+    Creates data with heteroscedastic noise around sin(x).
 
     Inputs:
         x_vals - values at which y data should be generated

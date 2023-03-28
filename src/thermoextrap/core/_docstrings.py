@@ -239,7 +239,8 @@ def _factory_get_mapping(
 
 
 def factory_docfiller_shared(names=None, *, dotted=False, shared_docs=None, **kws):
-    """Create a decorator for filling in documentation.
+    """
+    Create a decorator for filling in documentation.
 
     Based on pandas private method. This is not ideal, but going with it for now.
 

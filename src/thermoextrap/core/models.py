@@ -1,4 +1,5 @@
-"""General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
+"""
+General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
 ========================================================================.
 """
 from __future__ import annotations
@@ -53,6 +54,8 @@ __all__ = [
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
 class SympyDerivFuncBase(sp.Function):
+    """Base class to define a sympy function for user defined deriatives."""
+
     @classmethod
     def deriv_args(cls):
         raise NotImplementedError("must specify in sublcass")
@@ -67,7 +70,8 @@ class SympyDerivFuncBase(sp.Function):
 
 @docfiller_shared
 class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
-    """Base class for working with recursive derivatives in expansions.
+    """
+    Base class for working with recursive derivatives in expansions.
 
     Parameters
     ----------
@@ -116,7 +120,8 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
 
 @attrs.define
 class SymSubs:
-    """Class to handle substitution on :class:`SymDerivBase`.
+    """
+    Class to handle substitution on :class:`SymDerivBase`.
 
     Parameters
     ----------
@@ -174,7 +179,8 @@ class SymSubs:
 
 @attrs.define
 class Lambdify:
-    """Create python function from list of expressions.
+    """
+    Create python function from list of expressions.
 
     Parameters
     ----------
@@ -200,14 +206,14 @@ class Lambdify:
 
     @classmethod
     def from_u_xu(cls, exprs, **lambdify_kws):
-        """factory for u/xu args."""
+        """Factory for u/xu args."""
         u, xu = get_default_indexed("u", "xu")
         # args = (u, xu)
         return cls(exprs=exprs, args=(u, xu), lambdify_kws=lambdify_kws)
 
     @classmethod
     def from_du_dxdu(cls, exprs, xalpha=False, **lambdify_kws):
-        """factory for du/dxdu args."""
+        """Factory for du/dxdu args."""
         if xalpha:
             x1 = get_default_indexed("x1")
         else:
@@ -245,7 +251,8 @@ def factory_minus_log():
 
 @attrs.define
 class Derivatives(MyAttrsMixin):
-    """Class to wrap functions calculating derivatives to specified order.
+    """
+    Class to wrap functions calculating derivatives to specified order.
 
 
     Parameters
@@ -278,7 +285,8 @@ class Derivatives(MyAttrsMixin):
         concat_kws=None,
         norm=False,
     ):
-        """Calculate derivatives for orders range(0, order+1).
+        """
+        Calculate derivatives for orders range(0, order+1).
 
         Parameters
         ----------
@@ -337,7 +345,8 @@ class Derivatives(MyAttrsMixin):
     def coefs(
         self, data=None, args=None, order=None, minus_log=False, order_dim="order"
     ):
-        """Alias to `self.derivs(..., norm=True)`.
+        """
+        Alias to `self.derivs(..., norm=True)`.
 
         See Also
         --------
@@ -355,7 +364,8 @@ class Derivatives(MyAttrsMixin):
 
     @classmethod
     def from_sympy(cls, exprs, args):
-        """Create object from list of sympy functions.
+        """
+        Create object from list of sympy functions.
 
         Parameters
         ----------
@@ -445,7 +455,8 @@ class ExtrapModel(MyAttrsMixin):
         dalpha_coords="dalpha",
         alpha0_coords=True,
     ):
-        """Calculate taylor series at values "alpha".
+        """
+        Calculate taylor series at values "alpha".
 
         Parameters
         ----------
@@ -529,7 +540,8 @@ class ExtrapModel(MyAttrsMixin):
 
 @attrs.define
 class StateCollection(MyAttrsMixin):
-    """Sequence of models.
+    """
+    Sequence of models.
 
     Parameters
     ----------
@@ -595,7 +607,8 @@ class StateCollection(MyAttrsMixin):
             )
 
     def map(self, func, *args, **kwargs):
-        """apply a function to elements self.
+        """
+        Apply a function to elements self.
         ``out = [func(s, *args, **kwargs) for s in self]``.
 
         if func is a str, then
@@ -610,7 +623,8 @@ class StateCollection(MyAttrsMixin):
         return out
 
     def map_concat(self, func, concat_dim=None, concat_kws=None, *args, **kwargs):
-        """apply function and concat output.
+        """
+        Apply function and concat output.
 
         defaults to concat with dim=pd.Index(self.alpha0, name=self.alpha_name)
         """
@@ -625,7 +639,8 @@ class StateCollection(MyAttrsMixin):
         return out
 
     def append(self, states, sort=True, key=None, **kws):
-        """create new object with states appended to self.states.
+        """
+        Create new object with states appended to self.states.
 
         Parameters
         ----------
@@ -713,7 +728,8 @@ class PiecewiseMixin:
 
 @attrs.define
 class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
-    """Weighted extrapolation model.
+    """
+    Weighted extrapolation model.
 
     Parameters
     ----------
@@ -734,7 +750,8 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
         method=None,
         bounded=False,
     ):
-        """Parameters
+        """
+        Parameters
         ----------
         method : {None, 'between', 'nearest'}
             method to select which models are chosen to predict value for given
@@ -805,6 +822,8 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
 
 @attrs.define
 class InterpModel(StateCollection):
+    """Interpolation model."""
+
     @gcached(prop=False)
     def coefs(self, order=None, order_dim="porder", minus_log=None):
         if order is None:
@@ -902,7 +921,8 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
         method=None,
         bounded=False,
     ):
-        """Parameters
+        """
+        Parameters
         ----------
         alpha : float or sequence of float
 
@@ -959,6 +979,8 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
 
 @attrs.define
 class PerturbModel(MyAttrsMixin):
+    """Perturbation model."""
+
     alpha0: float = field(converter=float)
     data: AbstractData = field(validator=attv.instance_of(AbstractData))
     alpha_name: str | None = field(

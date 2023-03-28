@@ -18,7 +18,8 @@ def gcached(key=None, prop=True):
 
 
 def cached(key=None):
-    """Decorator to cache a property within a class.
+    """
+    Decorator to cache a property within a class.
 
     Requires the Class to have a cache dict called ``_cache``.
 
@@ -81,7 +82,8 @@ def cached(key=None):
 
 
 def cached_func(key=None):
-    """Decorator to cache a function within a class.
+    """
+    Decorator to cache a function within a class.
 
     Requires the Class to have a cache dict called ``_cache``.
 
@@ -152,7 +154,8 @@ def cached_func(key=None):
 
 
 def cached_clear(*keys):
-    """Decorator to clear self._cache of specified properties.
+    """
+    Decorator to clear self._cache of specified properties.
 
     Parameters
     ----------

@@ -1,4 +1,5 @@
-r"""Inverse temperature expansion of macrostate distribution (:mod:`~thermoextrap.lnpi`)
+r"""
+Inverse temperature expansion of macrostate distribution (:mod:`~thermoextrap.lnpi`)
 ====================================================================================.
 
 This is used to extrapolate, in inverse temperature :math:`\beta = (k_{\rm B} T)^{-1}`, the macrostate distribution function :math:`\ln\Pi` from transition matrix Monte Carlo simulations.
@@ -36,7 +37,8 @@ docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
 # lnPi correction stuff
 ################################################################################
 class lnPi_func_central(sp.Function):
-    """This is a special case of u_func_central.
+    """
+    Special case of u_func_central.
 
     For lnPi, have dlnPi/dbeta = mu * N - <u> + <u - mu * N>_GC.
     We ignore the GC average term, as it does not depend on N
@@ -109,7 +111,8 @@ def factory_derivatives(
     expand=True,
     post_func=None,
 ):
-    """Expansion for ln(Pi/Pi_0) (ignore bad parts of stuff).
+    """
+    Expansion for ln(Pi/Pi_0) (ignore bad parts of stuff).
 
     Parameters
     ----------
@@ -164,7 +167,8 @@ def _is_xr(name, x):
 
 @attrs.define
 class lnPiDataCallback(DataCallbackABC):
-    """Class to handle metadata callbacks for lnPi data.
+    """
+    Class to handle metadata callbacks for lnPi data.
 
     Parameters
     ----------
@@ -368,7 +372,8 @@ def factory_extrapmodel_lnPi(
     post_func=None,
     derivatives_kws=None,
 ):
-    """factory function to create Extrapolation model for beta expansion.
+    """
+    Factory function to create Extrapolation model for beta expansion.
 
     Parameters
     ----------

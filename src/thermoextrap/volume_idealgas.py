@@ -1,4 +1,5 @@
-"""Volume expansion for ideal gas (:mod:`~thermoextrap.volume_idealgas`)
+"""
+Volume expansion for ideal gas (:mod:`~thermoextrap.volume_idealgas`)
 =====================================================================.
 """
 
@@ -12,7 +13,8 @@ docfiller_shared = factory_docfiller_shared(names=("default", "beta", "volume"))
 
 
 class VolumeDerivFuncsIG:
-    """Calculates specific derivative values at refV with data x and W.
+    """
+    Calculates specific derivative values at refV with data x and W.
     Only go to first order for volume extrapolation.
     Here W represents the virial instead of the potential energy.
     """
@@ -58,7 +60,8 @@ class VolumeDerivFuncsIG:
 
 @lru_cache(5)
 def factory_derivatives(refV=1.0):
-    """factory function to provide coefficients of expansion.
+    """
+    Factory function to provide coefficients of expansion.
 
     Parameters
     ----------
@@ -75,7 +78,8 @@ def factory_derivatives(refV=1.0):
 
 
 def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
-    """factory function to create Extrapolation model for volume expansion.
+    """
+    Factory function to create Extrapolation model for volume expansion.
 
     Parameters
     ----------
@@ -115,7 +119,8 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
 
 
 def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
-    """factory function to create Extrapolation model for volume expansion.
+    """
+    Factory function to create Extrapolation model for volume expansion.
 
     Parameters
     ----------

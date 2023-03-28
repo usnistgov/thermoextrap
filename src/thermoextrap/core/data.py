@@ -1,4 +1,5 @@
-"""Data handlers (:mod:`~thermoextrap.data`)
+"""
+Data handlers (:mod:`~thermoextrap.data`)
 =========================================.
 
 The general scheme is to use the following:
@@ -60,7 +61,8 @@ __all__ = [
 
 @docfiller_shared
 def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
-    """Get indexing DataArray.
+    """
+    Get indexing DataArray.
 
     Parameters
     ----------
@@ -92,7 +94,8 @@ def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
 
 @attrs.frozen
 class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_merge")):
-    """Wrap xarray object so can index like ds[i, j].
+    """
+    Wrap xarray object so can index like ds[i, j].
 
     Parameters
     ----------
@@ -124,7 +127,8 @@ class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_m
 
     @classmethod
     def from_defaults(cls, data, dims=None, mom_dim="moment", deriv_dim=None):
-        """Create DataSelector object with default values for dims.
+        """
+        Create DataSelector object with default values for dims.
 
         Parameters
         ----------
@@ -169,7 +173,8 @@ class DataCallbackABC(
     MyAttrsMixin,
     metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True),
 ):
-    """Base class for handling callbacks to adjust data.
+    """
+    Base class for handling callbacks to adjust data.
 
     For some cases, the default Data classes don't quite cut it.
     For example, for volume extrapolation, extrap parameters need to
@@ -186,7 +191,8 @@ class DataCallbackABC(
 
     @abstractmethod
     def derivs_args(self, data, derivs_args):
-        """Adjust derivs args from data class.
+        """
+        Adjust derivs args from data class.
 
         should return a tuple
         """
@@ -195,7 +201,8 @@ class DataCallbackABC(
     # define these to raise error instead
     # of forcing usage.
     def resample(self, data, meta_kws, **kws):
-        """Adjust create new object.
+        """
+        Adjust create new object.
 
         Should return new instance of class or self no change
         """
@@ -213,7 +220,8 @@ class DataCallbackABC(
 
 @attrs.define
 class DataCallback(DataCallbackABC):
-    """Basic version of DataCallbackABC.
+    """
+    Basic version of DataCallbackABC.
 
     Implemented to pass things through unchanged.  Will be used for default construction
     """
@@ -223,14 +231,16 @@ class DataCallback(DataCallbackABC):
         pass
 
     def derivs_args(self, data, derivs_args):
-        """adjust derivs args from data class.
+        """
+        Adjust derivs args from data class.
 
         should return a tuple
         """
         return derivs_args
 
     def resample(self, data, meta_kws, **kws):
-        """adjust create new object.
+        """
+        Adjust create new object.
 
         Should return new instance of class or self no change
         """
@@ -254,6 +264,8 @@ class AbstractData(
     MyAttrsMixin,
     metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True),
 ):
+    """Abstract class for data."""
+
     #: Callback
     meta: DataCallbackABC | None = field(
         kw_only=True,
@@ -289,7 +301,8 @@ class AbstractData(
 
     @property
     def xalpha(self):
-        """Whether X has explicit dependence on `alpha`.
+        """
+        Whether X has explicit dependence on `alpha`.
 
         That is, if `self.deriv_dim` is not `None`
         """
@@ -310,7 +323,8 @@ class AbstractData(
 @attrs.define
 @docfiller_shared
 class DataValuesBase(AbstractData):
-    """Base class to work with data based on values (non-cmomy).
+    """
+    Base class to work with data based on values (non-cmomy).
 
     Parameters
     ----------
@@ -396,7 +410,8 @@ class DataValuesBase(AbstractData):
         meta=None,
         x_is_u=False,
     ):
-        """Constructor from arrays.
+        """
+        Constructor from arrays.
 
         Parameters
         ----------
@@ -461,7 +476,8 @@ class DataValuesBase(AbstractData):
         compute="None",
         meta_kws=None,
     ):
-        """resample object.
+        """
+        Resample object.
 
         Parameters
         ----------
@@ -542,7 +558,8 @@ def build_aves_xu(
     merge=False,
     transpose=False,
 ):
-    """Build averages from values uv, xv up to order `order`.
+    """
+    Build averages from values uv, xv up to order `order`.
 
     Parameters
     ----------
@@ -641,7 +658,8 @@ def build_aves_dxdu(
     merge=False,
     transpose=False,
 ):
-    """Build central moments from values uv, xv up to order `order`.
+    """
+    Build central moments from values uv, xv up to order `order`.
 
     Parameters
     ----------
@@ -730,7 +748,7 @@ def build_aves_dxdu(
 
 
 def _xu_to_u(xu, dim="umom"):
-    """for case where x = u, shift umom and add umom=0."""
+    """For case where x = u, shift umom and add umom=0."""
 
     n = xu.sizes[dim]
 
@@ -808,6 +826,8 @@ class DataValues(DataValuesBase):
 
 @attrs.define
 class DataValuesCentral(DataValuesBase):
+    """Data class using values and central moments."""
+
     _CENTRAL = True
 
     @gcached(prop=False)
@@ -900,7 +920,8 @@ def factory_data_values(
     x_is_u=False,
     **kws,
 ):
-    """Factory function to produce a DataValues object.
+    """
+    Factory function to produce a DataValues object.
 
     Parameters
     ----------
@@ -964,7 +985,8 @@ def factory_data_values(
 @attrs.define
 @docfiller_shared
 class DataCentralMomentsBase(AbstractData):
-    """Data object based on central co-moments array.
+    """
+    Data object based on central co-moments array.
 
     Parameters
     ----------
@@ -1093,7 +1115,8 @@ class DataCentralMomentsBase(AbstractData):
 
     @property
     def derivs_args(self):
-        """Arguments to be passed to derivative function.
+        """
+        Arguments to be passed to derivative function.
 
         For example, ``derivs(*self.derivs_args)``.
         """
@@ -1114,12 +1137,15 @@ class DataCentralMomentsBase(AbstractData):
 
 @attrs.define(slots=True)
 class DataCentralMoments(DataCentralMomentsBase):
+    """Data class using :class:`cmomy.xCentralMoments` to handle central moments."""
+
     def __len__(self):
         return self.values.sizes[self.rec_dim]
 
     @docfiller_shared
     def block(self, block_size, dim=None, axis=None, meta_kws=None, **kwargs):
-        """Block resample along axis.
+        """
+        Block resample along axis.
 
         Parameters
         ----------
@@ -1144,7 +1170,8 @@ class DataCentralMoments(DataCentralMomentsBase):
 
     @docfiller_shared
     def reduce(self, dim=None, axis=None, meta_kws=None, **kwargs):
-        """Reduce along axis.
+        """
+        Reduce along axis.
 
         Parameters
         ----------
@@ -1174,7 +1201,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta_kws=None,
         **kwargs,
     ):
-        """Resample data.
+        """
+        Resample data.
 
         Parameters
         ----------
@@ -1240,7 +1268,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta=None,
         x_is_u=False,
     ):
-        """Convert raw moments to data object.
+        """
+        Convert raw moments to data object.
 
         The raw moments have the form ``raw[..., i, j] = weight`` if ``i = j = 0``.  Otherwise,
         ``raw[..., i, j] = <x ** i * u ** j>``.
@@ -1338,7 +1367,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta=None,
         x_is_u=False,
     ):
-        """Create DataCentralMoments object from individual (unaveraged) samples.
+        """
+        Create DataCentralMoments object from individual (unaveraged) samples.
 
         Parameters
         ----------
@@ -1425,7 +1455,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta=None,
         x_is_u=False,
     ):
-        """Create DataCentralMoments object from data.
+        """
+        Create DataCentralMoments object from data.
 
         data[..., i, j] = weight                          i = j = 0
                         = < x >                           i = 1 and j = 0
@@ -1526,7 +1557,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta_kws=None,
         x_is_u=False,
     ):
-        """Create DataCentralMoments object from unaveraged samples with resampling.
+        """
+        Create DataCentralMoments object from unaveraged samples with resampling.
 
         Parameters
         ----------
@@ -1625,7 +1657,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta=None,
         x_is_u=False,
     ):
-        """create object with <u**n>, <x * u**n> arrays.
+        """
+        Create object with <u**n>, <x * u**n> arrays.
 
         Parameters
         ----------
@@ -1747,7 +1780,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta=None,
         x_is_u=False,
     ):
-        """Constructor from central moments, with reduction along axis.
+        """
+        Constructor from central moments, with reduction along axis.
 
         Parameters
         ----------
@@ -1871,7 +1905,8 @@ class DataCentralMoments(DataCentralMomentsBase):
 @attrs.define
 @docfiller_shared
 class DataCentralMomentsVals(DataCentralMomentsBase):
-    """Parameters
+    """
+    Parameters
     ----------
     uv : xarray.DataArray
         raw values of u (energy)
@@ -1935,7 +1970,8 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         meta=None,
         x_is_u=False,
     ):
-        """Constructor from arrays.
+        """
+        Constructor from arrays.
 
         Parameters
         ----------
@@ -2012,7 +2048,8 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         rep_dim="rep",
         meta_kws=None,
     ):
-        """Resample data.
+        """
+        Resample data.
 
         Parameters
         ----------

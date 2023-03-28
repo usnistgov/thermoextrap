@@ -1,3 +1,4 @@
+"""Classes/routines to fill common documentation."""
 from __future__ import annotations
 
 import inspect
@@ -35,7 +36,8 @@ F = TypeVar("F", bound=FuncType)
 
 
 def doc(*docstrings: str | Callable, **params) -> Callable[[F], F]:
-    """A decorator take docstring templates, concatenate them and perform string
+    """
+    A decorator take docstring templates, concatenate them and perform string
     substitution on it.
 
     This decorator will add a variable "_docstring_components" to the wrapped
@@ -94,7 +96,8 @@ def doc(*docstrings: str | Callable, **params) -> Callable[[F], F]:
 
 # Factory method to create docfiller
 def docfiller(*templates, **params):
-    """To fill common docs.
+    """
+    To fill common docs.
 
     Taken from pandas.utils._decorators
     """
@@ -125,7 +128,8 @@ def _get_nested_values(d, join_string="\n"):
 
 
 class AttributeDict(Mapping):
-    """Dictionary with recursive attribute like access.
+    """
+    Dictionary with recursive attribute like access.
 
     To be used in str.format calls, so can expand on fields like
     `{name.property}` in a nested manner.
@@ -150,6 +154,7 @@ class AttributeDict(Mapping):
     __slots__ = ("_entries", "_recursive", "_allow_missing")
 
     def __init__(self, entries=None, recursive=True, allow_missing=True):
+        """Init."""
         if entries is None:
             entries = {}
         self._entries = entries
@@ -252,7 +257,8 @@ class AttributeDict(Mapping):
 
     @classmethod
     def from_dict(cls, params, max_level=1, recursive=True, level=0):
-        """Create AttributeDict recursively for nested dictionaries.
+        """
+        Create AttributeDict recursively for nested dictionaries.
 
         To be used in cases where need to apply AttibuteDict to parameters
         passed with ``func(**params)``.
@@ -287,7 +293,8 @@ class AttributeDict(Mapping):
 
 
 def _build_param_docstring(name, ptype, desc):
-    """Create multiline documentation of single name, type, desc.
+    """
+    Create multiline documentation of single name, type, desc.
 
     Parameters
     ----------
@@ -331,7 +338,8 @@ def _build_param_docstring(name, ptype, desc):
 
 
 def _params_to_string(params, key_char="|"):
-    """Parse list of Parameters objects to string.
+    """
+    Parse list of Parameters objects to string.
 
     Examples
     --------
@@ -370,7 +378,8 @@ def _params_to_string(params, key_char="|"):
 
 
 def parse_docstring(func_or_doc, key_char="|", expand=True):
-    """Parse numpy style docstring from function or string to dictionary.
+    """
+    Parse numpy style docstring from function or string to dictionary.
 
     Parameters
     ----------
@@ -479,7 +488,8 @@ def _recursive_keys(data):
 
 
 class DocFiller:
-    """Parameters
+    """
+    Parameters
     ----------
     func_or_doc : callable or str
         Docstring to parse.  If callable, extract from function signature.
@@ -488,6 +498,7 @@ class DocFiller:
     """
 
     def __init__(self, params=None):
+        """Init."""
         if params is None:
             params = {}
         self.data = params
@@ -510,7 +521,7 @@ class DocFiller:
         return _recursive_keys(self.data)
 
     def assign_combined_key(self, new_key, keys):
-        """combine multiple keys into single key."""
+        """Combine multiple keys into single key."""
 
         data = self.data.copy()
 
@@ -519,7 +530,8 @@ class DocFiller:
 
     @classmethod
     def concat(cls, *args, **kwargs):
-        """Create new object from multiple DocFiller or dict objects.
+        """
+        Create new object from multiple DocFiller or dict objects.
 
         Parameters
         ----------
@@ -616,7 +628,8 @@ class DocFiller:
         keep_keys=True,
         key_map=None,
     ):
-        """Create a Docfiller instance from a dictionary.
+        """
+        Create a Docfiller instance from a dictionary.
 
         Parameters
         ----------
@@ -686,7 +699,8 @@ class DocFiller:
         keep_keys=True,
         key_map=None,
     ):
-        """create a Docfiller instance from a function or docstring.
+        """
+        Create a Docfiller instance from a function or docstring.
 
         Parameters
         ----------

@@ -1,4 +1,5 @@
-"""Top level API (:mod:`thermoextrap`)
+"""
+Top level API (:mod:`thermoextrap`)
 ===================================.
 """
 

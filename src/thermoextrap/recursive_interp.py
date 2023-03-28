@@ -1,4 +1,5 @@
-"""Holds recursive interpolation class.
+"""
+Holds recursive interpolation class.
 This includes the recursive training algorithm and consistency checks.
 """
 
@@ -35,7 +36,8 @@ def _has_plt():
 
 
 class RecursiveInterp:
-    """Class to perform a recursive interpolation (maybe using weighted extrapolation)
+    """
+    Class to perform a recursive interpolation (maybe using weighted extrapolation)
     and then save the information necessary to predict arbitrary interior points.
     Training performs recursive algorithm to meet desired accuracy.
     Prediction uses the learned piecewise function.
@@ -58,7 +60,8 @@ class RecursiveInterp:
         # i.e. sigma_bootstrap/|interpolated value| <= 0.01
 
     def getData(self, B):
-        """Obtains data at the specified state point.
+        """
+        Obtains data at the specified state point.
         Can modify to run MD or MC simulation, load trajectory or data files, etc.
         MUST return two things, the observable data and the potential energy data
         with the rows being separate configurations/time steps and the columns
@@ -90,7 +93,8 @@ class RecursiveInterp:
         doPlot=False,
         plotCompareFunc=None,
     ):
-        """Recursively trains interpolating models on successively smaller intervals
+        """
+        Recursively trains interpolating models on successively smaller intervals
         until error tolerance is reached. The next state point to subdivide an
         interval is chosen as the point where the bootstrapped error is the largest.
         If Bavail is not None, the closest state point value in this list will be
@@ -227,7 +231,8 @@ class RecursiveInterp:
             return
 
     def sequentialTrain(self, Btrain, verbose=False):
-        """Trains sequentially without recursion. List of state point values is provided and
+        """
+        Trains sequentially without recursion. List of state point values is provided and
         training happens just on those without adding points.
         """
 
@@ -309,7 +314,8 @@ class RecursiveInterp:
         return
 
     def predict(self, B):
-        """Makes a prediction using the trained piecewise model.
+        """
+        Makes a prediction using the trained piecewise model.
         Note that the function will not produce output if asked to extrapolate outside
         the range it was trained on.
         """
@@ -359,7 +365,8 @@ class RecursiveInterp:
         return predictVals
 
     def checkPolynomialConsistency(self, doPlot=False):
-        """If the interpolation model is a polynomial, checks to see if the polynomials
+        """
+        If the interpolation model is a polynomial, checks to see if the polynomials
         are locally consistent. In other words, we want the coefficients between
         neighboring regions to match closely to each other, and to the larger region
         composed of the two neighboring sub-regions. Essentially, this checks to make

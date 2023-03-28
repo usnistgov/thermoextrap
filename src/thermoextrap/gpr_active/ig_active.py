@@ -1,5 +1,6 @@
 # Written by Jacob I. Monroe, NIST employee
-"""GPR for ideal gas (:mod:`~thermoextrap.gpr_active.ig_active`)
+"""
+GPR for ideal gas (:mod:`~thermoextrap.gpr_active.ig_active`)
 -------------------------------------------------------------.
 
 Generates ideal gas (1D in external potential) data to test GP models and active
@@ -51,6 +52,8 @@ def multiOutput_extrap_IG(beta, seed=42):
 
 # To help test active learning, build DataWrapper and SimWrapper objects for ideal gas
 class IG_DataWrapper(DataWrapper):
+    """Data object for gpr with ideal gas."""
+
     def __init__(self, beta, seed=42):
         self.beta = beta
         self.seed = 42
@@ -87,6 +90,8 @@ class IG_DataWrapper(DataWrapper):
 
 
 class SimulateIG:
+    """Simulation object for ideal gas."""
+
     def __init__(self, sim_func=None):
         self.sim_func = sim_func  # Will not perform any simulations
 

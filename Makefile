@@ -68,6 +68,9 @@ pre-commit-run: ## run pre-commit
 pre-commit-run-all: ## run pre-commit on all files
 	pre-commit run --all-files
 
+pre-commit-run-all-ruff: ## run ruff on on all files
+	pre-commit run --all-files ruff
+
 pre-commit-manual: ## run pre-commit manual flags
 	pre-commit run --hook-stage manual
 
