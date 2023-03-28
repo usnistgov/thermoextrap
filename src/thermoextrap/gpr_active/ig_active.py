@@ -10,8 +10,9 @@ learning strategies.
 import numpy as np
 import xarray as xr
 
-from .. import DataCentralMomentsVals, idealgas
 from .. import beta as xpan_beta
+from ..core import idealgas
+from ..core.data import DataCentralMomentsVals
 from .active_utils import DataWrapper
 
 
