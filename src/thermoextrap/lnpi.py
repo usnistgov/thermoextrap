@@ -21,13 +21,15 @@ from attrs import field
 from attrs import validators as attv
 from cmomy import xCentralMoments
 
-from .beta import ExtrapModel, SymDerivBeta, u_func, u_func_central
-from .beta import factory_derivatives as factory_derivatives_beta
+from . import beta as beta_xpan
+
+# from .beta import ExtrapModel, SymDerivBeta, u_func, u_func_central
+# from .beta import factory_derivatives as factory_derivatives_beta
 from .core._attrs_utils import _cache_field, convert_dims_to_tuple
 from .core._docstrings import factory_docfiller_shared
 from .core.cached_decorators import gcached
 from .core.data import DataCallbackABC
-from .core.models import Derivatives, SymSubs
+from .core.models import Derivatives, ExtrapModel, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol
 
 docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
@@ -60,11 +62,11 @@ class lnPi_func_central(sp.Function):
 
     @classmethod
     def deriv_args(cls):
-        return u_func_central.deriv_args() + [cls.lnPi0, cls.mudotN]
+        return beta_xpan.u_func_central.deriv_args() + [cls.lnPi0, cls.mudotN]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
-        return self.mudotN - u_func_central(beta)
+        return self.mudotN - beta_xpan.u_func_central(beta)
 
     @classmethod
     def eval(cls, beta):
@@ -85,11 +87,11 @@ class lnPi_func_raw(sp.Function):
 
     @classmethod
     def deriv_args(cls):
-        return u_func.deriv_args() + [cls.lnPi0, cls.mudotN]
+        return beta_xpan.u_func.deriv_args() + [cls.lnPi0, cls.mudotN]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
-        return self.mudotN - u_func(beta, 1)
+        return self.mudotN - beta_xpan.u_func(beta, 1)
 
     @classmethod
     def eval(cls, beta):
@@ -141,14 +143,14 @@ def factory_derivatives(
             func = lnPi_func_central(beta)
         else:
             func = lnPi_func_raw(beta)
-        derivs = SymDerivBeta(func=func, expand=expand, post_func=post_func)
+        derivs = beta_xpan.SymDerivBeta(func=func, expand=expand, post_func=post_func)
 
         exprs = SymSubs(
             derivs, subs_all={derivs.beta: "None"}, expand=False, simplify=False
         )
         return Derivatives.from_sympy(exprs, args=derivs.args)
     else:
-        return factory_derivatives_beta(
+        return beta_xpan.factory_derivatives(
             name=name,
             n=n,
             d=d,
