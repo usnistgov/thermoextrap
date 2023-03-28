@@ -1,4 +1,5 @@
-"""Holds recursive interpolation class.
+"""
+Holds recursive interpolation class.
 This includes the recursive training algorithm and consistency checks.
 """
 
@@ -11,7 +12,8 @@ from scipy import stats
 
 
 def window(seq, n=2):
-    """Returns a sliding window (of width n) over data from the iterable.
+    """
+    Returns a sliding window (of width n) over data from the iterable.
 
     s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
     """
@@ -101,7 +103,8 @@ def train_iterative(
     callback=None,
     callback_kws=None,
 ):
-    """Add states to satisfy some tolerance.
+    """
+    Add states to satisfy some tolerance.
 
     Each iteration calculates the relative error, then adds a state
     where error is largest.
@@ -236,7 +239,8 @@ def train_recursive(
     callback=None,
     callback_kws=None,
 ):
-    """add states to satisfy some tolerance.
+    """
+    Add states to satisfy some tolerance.
 
     Each iteration calculates the relative error, then adds a state
     where error is largest.
@@ -429,7 +433,8 @@ def check_polynomial_consistency(
     order=None,
     statecollection_kws=None,
 ):
-    """Check polynomial consistency across subsegments.
+    """
+    Check polynomial consistency across subsegments.
 
     Parameters
     ----------
@@ -499,8 +504,9 @@ def factory_state_idealgas(
     seed_from_beta=True,
     nconfig=10_000,
     npart=1_000,
-):
-    """Example factory function to create single state.
+):  # noqa: D417
+    """
+    Example factory function to create single state.
 
     This particular state function returns the a `beta` extrapolation model for the position
     of an ideal gas particle in an external field.
@@ -542,10 +548,11 @@ def factory_state_idealgas(
     )
 
 
-def callback_plot_progress(
+def callback_plot_progress(  # noqa: D417
     model, alphas, info_dict, verbose=True, maxdepth_stop=None, ax=None
 ):
-    """The callback function is called each iteration after model is created.
+    """
+    The callback function is called each iteration after model is created.
 
     Optionally, it can return value `True` to stop iteration
 

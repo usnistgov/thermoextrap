@@ -7,7 +7,7 @@ import numpy as np
 
 
 def attrs_clear_cache(self, attribute, value):
-    """clear out _cache if setting value."""
+    """Clear out _cache if setting value."""
     setattr(self, "_cache", {})
     return value
 
@@ -85,7 +85,8 @@ class MyAttrsMixin:
         return attrs.asdict(self, filter=self._get_smart_filter())
 
     def new_like(self, **kws):
-        """Create a new object with optional parameters.
+        """
+        Create a new object with optional parameters.
 
         Parameters
         ----------
@@ -109,7 +110,8 @@ class MyAttrsMixin:
         return self
 
     def _immutable_setattrs(self, **kws):
-        """Set attributes of frozen attrs class.
+        """
+        Set attributes of frozen attrs class.
 
         This should only be used to set 'derived' attributes on creation.
 
@@ -140,7 +142,8 @@ class MyAttrsMixin:
     def _get_smart_filter(
         self, include=None, exclude=None, exclude_private=True, exclude_no_init=True
     ):
-        """create a filter to include exclude names.
+        """
+        Create a filter to include exclude names.
 
         Parameters
         ----------

@@ -1,4 +1,5 @@
-"""Analytic ideal gas in 1D in an external field.
+"""
+Analytic ideal gas in 1D in an external field.
 The position, x, may vary from 0 to L, with the field acting linearly on x, U(x) = a*x, where for simplicity we let a=1.
 As a result, the potential energy of a system of N particles with positions x_1, x_2, ... x_N is the sum of the positions, U = Sum(x_i), i from 1 to N.
 This is a useful test system with analytical solutions coded alongside the ability to randomly generate data.
@@ -49,7 +50,8 @@ def x_cdf(x, beta, vol=1.0):
 
 
 def x_sample(shape, beta, vol=1.0, r=None):
-    """Samples x in specified shape from the probability density at inverse temperature B with L=vol
+    """
+    Samples x in specified shape from the probability density at inverse temperature B with L=vol
     Does sampling based on inversion of cumulative distribution function.
 
     r may be a specified random number
@@ -62,7 +64,8 @@ def x_sample(shape, beta, vol=1.0, r=None):
 
 
 def u_sample(shape, beta, vol=1.0, r=None):
-    """Samples potential energy values from a system with the first axis in shape being the number of samples and the second being the number of particles.
+    """
+    Samples potential energy values from a system with the first axis in shape being the number of samples and the second being the number of particles.
     Particle positions are randomly sampled with sampleX at the inverse temperature B to generate the configuration of the potential energy.
     """
     return x_sample(shape=shape, beta=beta, vol=vol, r=r).sum(axis=-1)
@@ -70,7 +73,8 @@ def u_sample(shape, beta, vol=1.0, r=None):
 
 @lru_cache(maxsize=100)
 def dbeta_xave(k):
-    """Analytical derivative of order k w.r.t. beta for the average of x
+    """
+    Analytical derivative of order k w.r.t. beta for the average of x
     Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(xave_sym, beta_sym, k)
@@ -79,7 +83,8 @@ def dbeta_xave(k):
 
 @lru_cache(maxsize=100)
 def dbeta_xave_minuslog(k):
-    """Analytical derivative of order k w.r.t. beta for -ln(<x>)
+    """
+    Analytical derivative of order k w.r.t. beta for -ln(<x>)
     Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(-sp.log(xave_sym), beta_sym, k)
@@ -88,7 +93,8 @@ def dbeta_xave_minuslog(k):
 
 @lru_cache(maxsize=100)
 def dbeta_xave_depend(k):
-    """Analytical derivative of order k w.r.t. beta for the average of beta*x
+    """
+    Analytical derivative of order k w.r.t. beta for the average of beta*x
     Returns sympy function with expression for derivative.
 
     Note that this is also the average dimensionless potential energy for a single particle
@@ -100,7 +106,8 @@ def dbeta_xave_depend(k):
 
 @lru_cache(maxsize=100)
 def dbeta_xave_depend_minuslog(k):
-    """Analytical derivative of order k w.r.t. beta for -ln(<beta*x>)
+    """
+    Analytical derivative of order k w.r.t. beta for -ln(<beta*x>)
     Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(-sp.log(beta_sym * xave_sym), beta_sym, k)
@@ -109,7 +116,8 @@ def dbeta_xave_depend_minuslog(k):
 
 @lru_cache(maxsize=100)
 def dvol_xave(k):
-    """Analytical derivative of order k w.r.t. L for average x
+    """
+    Analytical derivative of order k w.r.t. L for average x
     Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(xave_sym, vol_sym, k)
@@ -117,7 +125,8 @@ def dvol_xave(k):
 
 
 def x_beta_extrap(order, beta0, beta, vol=1.0):
-    """Analytical extrapolation and coefficients from beta0 to beta (at L=vol) using derivatives up to order
+    """
+    Analytical extrapolation and coefficients from beta0 to beta (at L=vol) using derivatives up to order
     Returns extrapolation as first output and unnormalized coefficients as second.
     """
     dbeta = beta - beta0
@@ -184,7 +193,8 @@ def x_beta_extrap_depend_minuslog(order, beta0, beta, vol=1.0):
 
 
 def x_vol_extrap(order, vol0, vol, beta=1.0):
-    """Analytical extrapolation coefficients from vol0 to vol (at beta) using derivatives up to order
+    """
+    Analytical extrapolation coefficients from vol0 to vol (at beta) using derivatives up to order
     Returns extrapolation as first output and unnormalized coefficients as second.
     """
     dvol = vol - vol0
@@ -200,7 +210,8 @@ def x_vol_extrap(order, vol0, vol, beta=1.0):
 
 
 def generate_data(shape, beta, vol=1.0, r=None):
-    """Generates data points in specified shape, where the first index is the number of samples and the second is the number of independent IG particles
+    """
+    Generates data points in specified shape, where the first index is the number of samples and the second is the number of independent IG particles
     Sample will be at beta with L=vol
     Returns tuple of the particle positions in each configuration and the potential energy of each sampled configuration.
 

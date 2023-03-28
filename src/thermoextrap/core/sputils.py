@@ -1,3 +1,4 @@
+"""Utilities for sympy."""
 from functools import lru_cache
 
 import sympy as sp

@@ -1,4 +1,5 @@
-"""Volume extrapolation (:mod:`~thermoextrap.volume`)
+"""
+Volume extrapolation (:mod:`~thermoextrap.volume`)
 ==================================================.
 
 Note: This only handles volume expansion to first order.
@@ -38,7 +39,8 @@ docfiller_shared = factory_docfiller_shared(
 
 
 class VolumeDerivFuncs:
-    """Calculates specific derivative values at refV with data x and W.
+    """
+    Calculates specific derivative values at refV with data x and W.
     Only go to first order for volume extrapolation.
     Here W represents the virial instead of the potential energy.
     """
@@ -60,7 +62,8 @@ class VolumeDerivFuncs:
         # Works only because of local scope
         # Even if order is defined somewhere outside of this class, won't affect returned func
         def func(W, xW, dxdq, volume, ndim=1):
-            """dxdq is <sum_{i=1}^N dy/dx_i x_i>.
+            """
+            Calculat function.  dxdq is <sum_{i=1}^N dy/dx_i x_i>.
 
             for ideal gas
             """
@@ -80,7 +83,7 @@ class VolumeDerivFuncs:
 
 @lru_cache(5)
 def factory_derivatives():
-    """factory function to provide coefficients of expansion."""
+    """Factory function to provide coefficients of expansion."""
     deriv_funcs = VolumeDerivFuncs()
     return Derivatives(deriv_funcs)
 
@@ -88,7 +91,8 @@ def factory_derivatives():
 @attrs.define
 @docfiller_shared
 class VolumeDataCallback(DataCallbackABC):
-    """Object to handle callbacks of metadata.
+    """
+    Object to handle callbacks of metadata.
 
     Parameters
     ----------
@@ -143,7 +147,8 @@ def factory_extrapmodel(
     rep_dim="rep",
     **kws,
 ):
-    """Factory function to create Extrapolation model for volume expansion.
+    """
+    Factory function to create Extrapolation model for volume expansion.
 
     Parameters
     ----------

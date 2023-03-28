@@ -1,4 +1,5 @@
-"""Models for Gaussian process regression (:mod:`~thermoextrap.gpr_active.gp_models`)
+"""
+Models for Gaussian process regression (:mod:`~thermoextrap.gpr_active.gp_models`)
 ----------------------------------------------------------------------------------.
 """
 from typing import Any, Optional
@@ -15,7 +16,8 @@ from scipy import optimize
 # First define classes needed for a GPR model
 # A general derivative kernel based on a sympy expression
 class DerivativeKernel(gpflow.kernels.Kernel):
-    """Creates a kernel that can be differentiated based on a sympy expression for
+    """
+    Creates a kernel that can be differentiated based on a sympy expression for
     the kernel. Given observations that are tagged with the order of the
     derivative, builds the appropriate kernel. Be warned that your kernel_expr
     will not be checked to make sure it is positive definite, stationary, etc.
@@ -218,7 +220,8 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
 
 class HetGaussianNoiseGP(gpflow.likelihoods.ScalarLikelihood):
-    """EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!
+    """
+    EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!
 
     Intended to model the noise associated with a GPR model using another GP contained
     within the likelihood. In other words, the likelihood, which usually describes the
@@ -295,7 +298,8 @@ class HetGaussianNoiseGP(gpflow.likelihoods.ScalarLikelihood):
 class FullyHeteroscedasticGPR(
     gpflow.models.GPModel, gpflow.models.InternalDataTrainingLossMixin
 ):
-    """EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!
+    """
+    EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!
 
     Implements a fully heteroscedastic GPR model in which the noise is modeled
     with another Gaussian Process. To accomplish this, the likelihood is set to
@@ -437,7 +441,8 @@ class FullyHeteroscedasticGPR(
 
 
 class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
-    """NOTE MAINTAINED, MAY BE OUT OF DATE AND NOT COMPATIBLE.
+    """
+    NOTE MAINTAINED, MAY BE OUT OF DATE AND NOT COMPATIBLE.
 
     Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise
     variance. Note that the noise variance can be provided as a matrix or a 1D array.
@@ -457,7 +462,8 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
         init_scale=1.0,
         **kwargs: Any,
     ) -> None:
-        """:param cov: The covariance matrix (or its diagonal) for the noise.
+        """
+        :param cov: The covariance matrix (or its diagonal) for the noise.
         :param kwargs: Keyword arguments forwarded to :class:`gpflow.likelihoods.ScalarLikelihood`.
         """
         super().__init__(**kwargs)
@@ -531,7 +537,8 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
 
 
 def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
-    """Follows gpflow.logdensities.multivariate_normal exactly, but changes reducing sums so
+    """
+    Follows gpflow.logdensities.multivariate_normal exactly, but changes reducing sums so
     that multiple outputs with DIFFERENT covariance matrices can be taken into account.
     This still assumes that data in different columns of x are independent, but allows for
     a different Cholesky decomposition for each column or dimension. In the code for GPflow,
@@ -583,7 +590,8 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
 
 
 class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
-    r"""Heteroscedastic Gaussian likelihood with variance provided and no modeling
+    r"""
+    Heteroscedastic Gaussian likelihood with variance provided and no modeling
     of noise variance. Note that the noise variance can be provided as a matrix
     or a 1D array. If a 1D array, it is assumed that the off-diagonal elements
     of the noise covariance matrix are all zeros, otherwise the noise covariance
@@ -690,7 +698,8 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         self.stable_var_min = 1.0e-12
 
     def build_scaled_cov_mat(self):
-        """Creates scaled covariance matrix using noise scale parameters.
+        """
+        Creates scaled covariance matrix using noise scale parameters.
 
         Returns
         -------
@@ -760,7 +769,8 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
 class HeteroscedasticGPR_analytical_scale(
     gpflow.models.GPModel, gpflow.models.InternalDataTrainingLossMixin
 ):
-    """EXPERIMENTAL! NOT INTENDED FOR USE, BUT MAYBE INTERESTING TO CONSIDER IN FUTURE!
+    """
+    EXPERIMENTAL! NOT INTENDED FOR USE, BUT MAYBE INTERESTING TO CONSIDER IN FUTURE!
 
     Implements a GPR model with heteroscedastic input noise, which can be just a vector
     (diagonal noise covariance matrix) or the full noise covariance matrix if noise is
@@ -909,7 +919,8 @@ class HeteroscedasticGPR_analytical_scale(
 class HeteroscedasticGPR(
     gpflow.models.GPModel, gpflow.models.InternalDataTrainingLossMixin
 ):
-    """Implements a GPR model with heteroscedastic input noise, which must be the full noise
+    """
+    Implements a GPR model with heteroscedastic input noise, which must be the full noise
     covariance matrix. This is necessary for derivatives from the same simulation at the
     same input location, which will likely be correlated. If the output is multidimensional,
     a separate covariance matrix may be specified for each dimension of the output - if this
@@ -1112,7 +1123,8 @@ class HeteroscedasticGPR(
 
 
 class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
-    """Constant mean function that takes derivative-augmented X as input.
+    """
+    Constant mean function that takes derivative-augmented X as input.
     Only applies mean function constant to zeroth order derivatives.
     Because added constant, adding mean function does not change variance or derivatives.
 
@@ -1135,7 +1147,8 @@ class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
 
 
 class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
-    """Linear mean function that can be applied to derivative data - in other words,
+    """
+    Linear mean function that can be applied to derivative data - in other words,
     the 0th order derivative is fit with a linear fit, so the 1st derivative also
     has to be modified (by a constant that is the slope). Currently handles y of
     multiple dimensions, but scalar output only (so fits hyperplane). Columns of
@@ -1178,7 +1191,8 @@ class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
 
 
 class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
-    """Mean function based on sympy expression. This way, can take derivatives up
+    """
+    Mean function based on sympy expression. This way, can take derivatives up
     to any order. In the provided expression, the input variable should be 'x'
     or 'X', otherwise this will not work. For consistency with other mean
     functions, only fit based on zero-order data, rather than fitting during
