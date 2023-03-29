@@ -1,4 +1,7 @@
 """
+Recursive interpolation (:mod:`~thermoextrap.recursive_interp`)
+===============================================================
+
 Holds recursive interpolation class.
 This includes the recursive training algorithm and consistency checks.
 """
@@ -13,6 +16,7 @@ from scipy import stats
 # TODO: rework this code to be cleaner
 # from ..legacy.ig import IGmodel
 from .core import idealgas
+from .core._deprecate import deprecate, deprecate_kwarg
 from .core.data import factory_data_values
 from .core.models import ExtrapModel, InterpModel
 
@@ -41,9 +45,24 @@ class RecursiveInterp:
     and then save the information necessary to predict arbitrary interior points.
     Training performs recursive algorithm to meet desired accuracy.
     Prediction uses the learned piecewise function.
+
+    Parameters
+    ----------
+    model_cls : type
+        Class of each model.
+    derivatives : :class:`thermoextrap.models.Derivatives`
+    edge_beta : array-like
+        values of `beta` at edges
+    max_order : int, default=1
+        Maximum order.
+    tol : float, default=0.01
+        Error tolerance.
     """
 
-    def __init__(self, model_cls, derivatives, edgeB, maxOrder=1, errTol=0.01):
+    @deprecate_kwarg("edgeB", "edge_beta")
+    @deprecate_kwarg("maxOrder", "max_order")
+    @deprecate_kwarg("errTol", "tol")
+    def __init__(self, model_cls, derivatives, edge_beta, max_order=1, tol=0.01):
         self.model_cls = (
             model_cls  # The model CLASS used for interpolation, like InterpModel
         )
@@ -51,15 +70,16 @@ class RecursiveInterp:
         self.states = (
             []
         )  # List of ExtrapModel objects sharing same Derivatives but different Data
-        self.edgeB = np.array(
-            edgeB
+        self.edge_beta = np.array(
+            edge_beta
         )  # Values of state points that we interpolate between
         # Start with outer edges, but will add points as needed
-        self.maxOrder = maxOrder  # Maximum order of derivatives to use - default is 1
-        self.tol = errTol  # Default bootstrap absolute relative error tolerance of 1%
+        self.max_order = max_order  # Maximum order of derivatives to use - default is 1
+        self.tol = tol  # Default bootstrap absolute relative error tolerance of 1%
         # i.e. sigma_bootstrap/|interpolated value| <= 0.01
 
-    def getData(self, B):
+    @deprecate_kwarg("B", "beta")
+    def get_data(self, beta):
         """
         Obtains data at the specified state point.
         Can modify to run MD or MC simulation, load trajectory or data files, etc.
@@ -72,54 +92,63 @@ class RecursiveInterp:
         """
 
         npart, nconfig = 1000, 10000
-        xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=B)
+        xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
 
         # datModel = IGmodel(nParticles=1000)
         # xdata, udata = datModel.genData(B, nConfigs=10000)
         # Need to also change data object kwargs based on data when change getData
-        data = factory_data_values(uv=udata, xv=xdata, order=self.maxOrder)
+        data = factory_data_values(uv=udata, xv=xdata, order=self.max_order)
         return data
 
-    def recursiveTrain(
+    getData = deprecate("getData", get_data, "0.2.0")
+
+    @deprecate_kwarg("B1", "beta1")
+    @deprecate_kwarg("B2", "beta2")
+    @deprecate_kwarg("recurseDepth", "recurse_depth")
+    @deprecate_kwarg("recurseMax", "recurse_max")
+    @deprecate_kwarg("Bavail", "beta_avail")
+    @deprecate_kwarg("doPlot", "do_plot")
+    @deprecate_kwarg("plotCompareFunc", "plot_func")
+    def recursive_train(
         self,
-        B1,
-        B2,
+        beta1,
+        beta2,
         data1=None,
         data2=None,
-        recurseDepth=0,
-        recurseMax=10,
-        Bavail=None,
+        recurse_depth=0,
+        recurse_max=10,
+        beta_avail=None,
         verbose=False,
-        doPlot=False,
-        plotCompareFunc=None,
+        do_plot=False,
+        plot_func=None,
     ):
         """
         Recursively trains interpolating models on successively smaller intervals
         until error tolerance is reached. The next state point to subdivide an
         interval is chosen as the point where the bootstrapped error is the largest.
-        If Bavail is not None, the closest state point value in this list will be
+        If beta_avail is not None, the closest state point value in this list will be
         used instead. This is useful when data has already been generated at
         specific state points and you do not wish to generate more.
         """
-        if recurseDepth > recurseMax:
+        if recurse_depth > recurse_max:
             raise RecursionError("Maximum recursion depth reached.")
 
         if verbose:
-            print(f"\nInterpolating from points {B1:f} and {B2:f}")
-            print("Recursion depth on this branch: %i" % recurseDepth)
+            print(f"\nInterpolating from points {beta1:f} and {beta2:f}")
+            print("Recursion depth on this branch: %i" % recurse_depth)
 
         # Generate data somehow if not provided
         if data1 is None:
-            data1 = self.getData(B1)
+            data1 = self.get_data(beta1)
         if data2 is None:
-            data2 = self.getData(B2)
+            data2 = self.get_data(beta2)
 
         # For each set of data, create an ExtrapModel object
         extrap1 = ExtrapModel(
-            alpha0=B1, data=data1, derivatives=self.derivatives, order=self.maxOrder
+            alpha0=beta1, data=data1, derivatives=self.derivatives, order=self.max_order
         )
         extrap2 = ExtrapModel(
-            alpha0=B2, data=data2, derivatives=self.derivatives, order=self.maxOrder
+            alpha0=beta2, data=data2, derivatives=self.derivatives, order=self.max_order
         )
 
         # Now create interpolating model based on state collection of the two
@@ -127,10 +156,12 @@ class RecursiveInterp:
 
         # Decide if need more data to extrapolate from
         # Check convergence at grid of values between edges, using worst case to check
-        Bvals = np.linspace(B1, B2, num=50)
-        predictVals = this_model.predict(Bvals, order=self.maxOrder)
+        Bvals = np.linspace(beta1, beta2, num=50)
+        predictVals = this_model.predict(Bvals, order=self.max_order)
         bootErr = (
-            this_model.resample(nrep=100).predict(Bvals, order=self.maxOrder).std("rep")
+            this_model.resample(nrep=100)
+            .predict(Bvals, order=self.max_order)
+            .std("rep")
         )
 
         relErr = bootErr / abs(predictVals)
@@ -157,10 +188,10 @@ class RecursiveInterp:
         # If not, we want to return the state point with the maximum error
         else:
             # Select closest value of state points in list if provided
-            if Bavail is not None:
-                Bavail = np.array(Bavail)
-                newBInd = np.argmin(abs(Bavail - Bvals[checkInd[0]]))
-                newB = Bavail[newBInd]
+            if beta_avail is not None:
+                beta_avail = np.array(beta_avail)
+                newBInd = np.argmin(abs(beta_avail - Bvals[checkInd[0]]))
+                newB = beta_avail[newBInd]
             else:
                 newB = Bvals[
                     checkInd[0]
@@ -173,7 +204,7 @@ class RecursiveInterp:
                 print("No additional extrapolation points necessary on this interval.")
 
         # Do some plotting just as a visual for how things are going, if desired
-        if doPlot:
+        if do_plot:
             _has_plt()
             if "val" in predictVals.dims:
                 toplot = predictVals.isel(val=0)
@@ -183,8 +214,8 @@ class RecursiveInterp:
             plt.plot(Bvals, toplot)
             if newB is not None:
                 plt.plot([newB, newB], [np.min(toplot), np.max(toplot)], "k:")
-            if plotCompareFunc is not None:
-                plt.plot(Bvals, plotCompareFunc(Bvals), "k--")
+            if plot_func is not None:
+                plt.plot(Bvals, plot_func(Bvals), "k--")
             plt.xlabel(r"$\beta$")
             plt.ylabel(r"Observable, $X$")
             plt.gcf().tight_layout()
@@ -194,64 +225,67 @@ class RecursiveInterp:
 
         if newB is not None:
             # Add the new point to the list of edge points and recurse
-            insertInd = np.where(self.edgeB > newB)[0][0]
-            self.edgeB = np.insert(self.edgeB, insertInd, newB)
-            recurseDepth += 1
-            self.recursiveTrain(
-                B1,
+            insertInd = np.where(self.edge_beta > newB)[0][0]
+            self.edge_beta = np.insert(self.edge_beta, insertInd, newB)
+            recurse_depth += 1
+            self.recursive_train(
+                beta1,
                 newB,
                 data1=data1,
                 data2=None,
-                recurseDepth=recurseDepth,
-                recurseMax=recurseMax,
-                Bavail=Bavail,
+                recurse_depth=recurse_depth,
+                recurse_max=recurse_max,
+                beta_avail=beta_avail,
                 verbose=verbose,
-                doPlot=doPlot,
-                plotCompareFunc=plotCompareFunc,
+                do_plot=do_plot,
+                plot_func=plot_func,
             )
-            self.recursiveTrain(
+            self.recursive_train(
                 newB,
-                B2,
+                beta2,
                 data1=None,
                 data2=data2,
-                recurseDepth=recurseDepth,
-                recurseMax=recurseMax,
-                Bavail=Bavail,
+                recurse_depth=recurse_depth,
+                recurse_max=recurse_max,
+                beta_avail=beta_avail,
                 verbose=verbose,
-                doPlot=doPlot,
-                plotCompareFunc=plotCompareFunc,
+                do_plot=do_plot,
+                plot_func=plot_func,
             )
         else:
             # If we don't need to add extrapolation points, add this region to piecewise function
             # Do this by adding ExtrapModel object in this region, which also saves the data
             # Appending should work because code will always go with lower interval first
             self.states.append(extrap1)
-            if B2 == self.edgeB[-1]:
+            if beta2 == self.edge_beta[-1]:
                 self.states.append(extrap2)
             return
 
-    def sequentialTrain(self, Btrain, verbose=False):
+    recursiveTrain = deprecate("recursiveTrain", recursive_train, "0.2.0")
+
+    @deprecate_kwarg("Btrain", "beta_train")
+    def sequential_train(self, beta_train, verbose=False):
         """
         Trains sequentially without recursion. List of state point values is provided and
         training happens just on those without adding points.
         """
 
-        # Check for overlap in self.edgeB and Btrain and merge as needed
+        # Check for overlap in self.edge_beta and beta_train and merge as needed
         # Fill in None in self.states where we have not yet trained
-        for Bval in Btrain:
-            if Bval not in self.edgeB:
-                self.edgeB = np.hstack((self.edgeB, [Bval]))
+        for Bval in beta_train:
+            if Bval not in self.edge_beta:
+                self.edge_beta = np.hstack((self.edge_beta, [Bval]))
                 self.states = self.states + [
                     None,
                 ]
-        sort_inds = np.argsort(self.edgeB)
+        sort_inds = np.argsort(self.edge_beta)
         self.states = [self.states[i] for i in sort_inds]
-        self.edgeB = np.sort(self.edgeB)
+        self.edge_beta = np.sort(self.edge_beta)
 
         # Loop over pairs of edge points
-        for i in range(len(self.edgeB) - 1):
-            B1 = self.edgeB[i]
-            B2 = self.edgeB[i + 1]
+        for i in range(len(self.edge_beta) - 1):
+            B1 = self.edge_beta[i]
+            B2 = self.edge_beta[i + 1]
 
             if verbose:
                 print(f"\nInterpolating from points {B1:f} and {B2:f}")
@@ -263,7 +297,7 @@ class RecursiveInterp:
                     alpha0=B1,
                     data=data1,
                     derivatives=self.derivatives,
-                    order=self.maxOrder,
+                    order=self.max_order,
                 )
                 self.states[i] = extrap1
             else:
@@ -276,7 +310,7 @@ class RecursiveInterp:
                     alpha0=B2,
                     data=data2,
                     derivatives=self.derivatives,
-                    order=self.maxOrder,
+                    order=self.max_order,
                 )
                 self.states[i + 1] = extrap2
             else:
@@ -288,10 +322,10 @@ class RecursiveInterp:
             if verbose:
                 # Check if need more data to extrapolate from (just report info on this)
                 Bvals = np.linspace(B1, B2, num=50)
-                predictVals = this_model.predict(Bvals, order=self.maxOrder)
+                predictVals = this_model.predict(Bvals, order=self.max_order)
                 bootErr = (
                     this_model.resample(nrep=100)
-                    .predict(Bvals, order=self.maxOrder)
+                    .predict(Bvals, order=self.max_order)
                     .std("rep")
                 )
 
@@ -313,7 +347,10 @@ class RecursiveInterp:
 
         return
 
-    def predict(self, B):
+    sequentialTrain = deprecate("sequentialTrain", sequential_train, "0.2.0")
+
+    @deprecate_kwarg("B", "beta")
+    def predict(self, beta):
         """
         Makes a prediction using the trained piecewise model.
         Note that the function will not produce output if asked to extrapolate outside
@@ -324,47 +361,48 @@ class RecursiveInterp:
             print("First must train the piecewise model!")
             raise ValueError("Must train before predicting")
 
-        # For each state point in B, select a piecewise model to use
+        # For each state point in beta, select a piecewise model to use
         if "val" in self.states[0].data.xv.dims:
-            predictVals = np.zeros((len(B), self.states[0].data.xv["val"].size))
+            predictVals = np.zeros((len(beta), self.states[0].data.xv["val"].size))
         else:
-            predictVals = np.zeros(len(B))
+            predictVals = np.zeros(len(beta))
 
-        for i, beta in enumerate(B):
+        for i, beta in enumerate(beta):
             # Check if out of lower bound
-            if beta < self.edgeB[0]:
+            if beta < self.edge_beta[0]:
                 print(
                     "Have provided point {:f} below interpolation function"
-                    " interval edges ({}).".format(beta, str(self.edgeB))
+                    " interval edges ({}).".format(beta, str(self.edge_beta))
                 )
                 raise IndexError("Interpolation point below range")
 
             # Check if out of upper bound
-            if beta > self.edgeB[-1]:
+            if beta > self.edge_beta[-1]:
                 print(
                     "Have provided point {:f} above interpolation function"
-                    " interval edges ({}).".format(beta, str(self.edgeB))
+                    " interval edges ({}).".format(beta, str(self.edge_beta))
                 )
                 raise IndexError("Interpolation point above range")
 
             # Get indices for bracketing state points
-            lowInd = np.where(self.edgeB <= beta)[0][-1]
+            lowInd = np.where(self.edge_beta <= beta)[0][-1]
             try:
-                hiInd = np.where(self.edgeB > beta)[0][0]
+                hiInd = np.where(self.edge_beta > beta)[0][0]
             except IndexError:
-                # With above logic, must have beta = self.edgeB[-1]
-                # Which would make lowInd = len(self.edgeB)-1
+                # With above logic, must have beta = self.edge_beta[-1]
+                # Which would make lowInd = len(self.edge_beta)-1
                 # Shift interval down
                 lowInd -= 1
-                hiInd = len(self.edgeB) - 1
+                hiInd = len(self.edge_beta) - 1
 
             # Create interpolation object and predict
             this_model = self.model_cls((self.states[lowInd], self.states[hiInd]))
-            predictVals[i] = this_model.predict(beta, order=self.maxOrder)
+            predictVals[i] = this_model.predict(beta, order=self.max_order)
 
         return predictVals
 
-    def checkPolynomialConsistency(self, doPlot=False):
+    @deprecate_kwarg("doPlot", "do_plot")
+    def check_poly_consistency(self, do_plot=False):
         """
         If the interpolation model is a polynomial, checks to see if the polynomials
         are locally consistent. In other words, we want the coefficients between
@@ -393,7 +431,7 @@ class RecursiveInterp:
 
         # Need to subdivide the full interval into pairs of neighboring intervals
         # Easiest way is to take state point edge values in sliding sets of three
-        allInds = np.arange(self.edgeB.shape[0])
+        allInds = np.arange(self.edge_beta.shape[0])
         nrows = allInds.size - 3 + 1
         n = allInds.strides[0]
         edgeSets = np.lib.stride_tricks.as_strided(
@@ -404,7 +442,7 @@ class RecursiveInterp:
         allPvals = []
 
         # Before loop, set up plot if wanted
-        if doPlot:
+        if do_plot:
             _has_plt()
             pColors = plt.cm.cividis(np.linspace(0.0, 1.0, len(edgeSets)))
             pFig, pAx = plt.subplots()
@@ -414,11 +452,15 @@ class RecursiveInterp:
         # Loop over sets of three edges
         for i, aset in enumerate(edgeSets):
             reg1Model = self.model_cls((self.states[aset[0]], self.states[aset[1]]))
-            reg1Coeffs = reg1Model.coefs(order=self.maxOrder)
-            reg1Err = reg1Model.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
+            reg1Coeffs = reg1Model.coefs(order=self.max_order)
+            reg1Err = (
+                reg1Model.resample(nrep=100).coefs(order=self.max_order).std("rep")
+            )
             reg2Model = self.model_cls((self.states[aset[1]], self.states[aset[2]]))
-            reg2Coeffs = reg2Model.coefs(order=self.maxOrder)
-            reg2Err = reg2Model.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
+            reg2Coeffs = reg2Model.coefs(order=self.max_order)
+            reg2Err = (
+                reg2Model.resample(nrep=100).coefs(order=self.max_order).std("rep")
+            )
             z12 = (reg1Coeffs - reg2Coeffs) / np.sqrt(reg1Err**2 + reg2Err**2)
             # Assuming Gaussian distributions for coefficients
             # This is implicit in returning bootstrap standard deviation as estimate of uncertainty
@@ -431,8 +473,10 @@ class RecursiveInterp:
 
             # To check full interval, must retrain model with data
             fullModel = self.model_cls((self.states[aset[0]], self.states[aset[2]]))
-            fullCoeffs = fullModel.coefs(order=self.maxOrder)
-            fullErr = fullModel.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
+            fullCoeffs = fullModel.coefs(order=self.max_order)
+            fullErr = (
+                fullModel.resample(nrep=100).coefs(order=self.max_order).std("rep")
+            )
             z1full = (reg1Coeffs - fullCoeffs) / np.sqrt(reg1Err**2 + fullErr**2)
             # p1full = 2.0*stats.norm.cdf(-abs(z1full))
             p1full = stats.norm.cdf(abs(z1full)) - stats.norm.cdf(-abs(z1full))
@@ -443,7 +487,7 @@ class RecursiveInterp:
             allPvals.append(np.vstack((p12, p1full, p2full)))
             print(
                 "Interval with edges %s (indices %s):"
-                % (str(self.edgeB[aset]), str(aset))
+                % (str(self.edge_beta[aset]), str(aset))
             )
             print("\tP-values between regions:")
             print(p12)
@@ -452,8 +496,10 @@ class RecursiveInterp:
             print("\tP-values for full and 2 :")
             print(p2full)
 
-            if doPlot:
-                plotPoints = np.linspace(self.edgeB[aset[0]], self.edgeB[aset[2]], 50)
+            if do_plot:
+                plotPoints = np.linspace(
+                    self.edge_beta[aset[0]], self.edge_beta[aset[2]], 50
+                )
                 plotFull = np.polynomial.polynomial.polyval(plotPoints, fullCoeffs)
                 plotReg1 = np.polynomial.polynomial.polyval(plotPoints, reg1Coeffs)
                 plotReg2 = np.polynomial.polynomial.polyval(plotPoints, reg2Coeffs)
@@ -466,9 +512,9 @@ class RecursiveInterp:
                 if np.max(allPlotY) > plotYmax:
                     plotYmax = np.max(allPlotY)
 
-        if doPlot:
+        if do_plot:
             _has_plt()
-            for edge in self.edgeB:
+            for edge in self.edge_beta:
                 pAx.plot([edge] * 2, [plotYmin, plotYmax], "k-")
             pAx.set_xlabel(r"$\beta$")
             pAx.set_ylabel(r"$\langle x \rangle$")
@@ -476,3 +522,7 @@ class RecursiveInterp:
             plt.show()
 
         return allPvals
+
+    checkPolynomialConsistency = deprecate(
+        "checkPolynomialConsistency", check_poly_consistency, "0.2.0"
+    )
