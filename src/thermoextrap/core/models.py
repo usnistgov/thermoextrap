@@ -60,7 +60,7 @@ class SymFuncBase(sp.Function):
 
     See Also
     --------
-    :class:`thermoextrap.models.SymDerivBase`
+    :class:`thermoextrap.core.models.SymDerivBase`
 
     """
 
@@ -74,7 +74,7 @@ class SymFuncBase(sp.Function):
         raise NotImplementedError("must specify in sublcass")
 
     def fdiff(self, argindex=1):
-        """Derivative of function.  This will be used by :class:`SymDerivBase`."""
+        """Derivative of function.  This will be used by :class:`thermoextrap.core.models.SymDerivBase`."""
         raise NotImplementedError("must specify in subclass")
 
     @classmethod
@@ -97,7 +97,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
     ----------
     func : symFunction
         Function to differentiate.  This should (most likely) be an instance
-        of :class:`SymFuncBase`
+        of :class:`thermoextrap.core.models.SymFuncBase`
     args : sequence of Symbol
         Arguments to func
     {expand}
@@ -142,7 +142,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
 @attrs.define
 class SymSubs:
     """
-    Class to handle substitution on :class:`SymDerivBase`.
+    Class to handle substitution on :class:`thermoextrap.core.models.SymDerivBase`.
 
     Parameters
     ----------

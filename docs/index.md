@@ -2,22 +2,17 @@
 :end-before: <!-- end-docs -->
 :::
 
+# Navigation
 
 :::{toctree}
-:maxdepth: 3
+:maxdepth: 1
 
 installation
-examples
+examples/index
 reference/index
 license
 contributing
 authors
 history
+navigation
 :::
-
-
-# Indices and tables
-
-- {ref}`genindex`
-- {ref}`modindex`
-- {ref}`search`
