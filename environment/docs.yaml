@@ -1,0 +1,31 @@
+channels:
+- conda-forge
+- wpk-nist
+dependencies:
+- attrs
+- cmomy>=0.1.9
+- custom-inherit
+- ipython
+- matplotlib
+- numpy
+- pip
+- pymbar<4.0
+- python>=3.8
+- scipy
+- setuptools-scm
+- sympy
+- xarray
+- pip:
+  - autodocsumm
+  - ghp-import
+  - gpflow
+  - myst-nb
+  - pyenchant
+  - sphinx
+  - sphinx-autobuild
+  - sphinx-book-theme
+  - sphinx-copybutton
+  - sphinxcontrib-spelling
+  - tensorflow
+  - tensorflow-probability
+name: thermoextrap-env

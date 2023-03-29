@@ -1,6 +1,4 @@
 import numpy as np
-import pytest
-import xarray as xr
 
 import thermoextrap as xtrap
 
@@ -41,7 +39,6 @@ def test_xdata_val(fixture):
 
 
 def test_xdata_from_ave_raw(fixture):
-
     a = fixture.rdata
 
     # base on raw arrays
@@ -85,7 +82,6 @@ def test_xdata_from_ave_central(fixture):
 
 
 def test_resample(fixture):
-
     nrep = 10
     ndat = fixture.x.shape[0]
 

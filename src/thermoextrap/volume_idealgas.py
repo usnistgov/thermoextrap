@@ -1,5 +1,6 @@
 """
-Routines for volume expansion(s) of ideal gas
+Volume expansion for ideal gas (:mod:`~thermoextrap.volume_idealgas`)
+=====================================================================
 """
 
 
@@ -12,7 +13,8 @@ docfiller_shared = factory_docfiller_shared(names=("default", "beta", "volume"))
 
 
 class VolumeDerivFuncsIG:
-    """Calculates specific derivative values at refV with data x and W.
+    """
+    Calculates specific derivative values at refV with data x and W.
     Only go to first order for volume extrapolation.
     Here W represents the virial instead of the potential energy.
     """
@@ -39,7 +41,6 @@ class VolumeDerivFuncsIG:
         # Even if order is defined somewhere outside of this class, won't affect returned func
 
         def func(W, xW):
-
             if order == 0:
                 # Zeroth order derivative
                 deriv_val = xW[0]
@@ -60,15 +61,17 @@ class VolumeDerivFuncsIG:
 @lru_cache(5)
 def factory_derivatives(refV=1.0):
     """
-    factory function to provide coefficients of expansion
+    Factory function to provide coefficients of expansion.
 
     Parameters
     ----------
-    refV : reference volume (default 1 - if already divided by volume no need to set)
+    refV : float
+        reference volume (default 1 - if already divided by volume no need to set)
 
     Returns
     -------
-    derivatives : Coefs object used to calculate moments
+    derivatives : :class:`thermoextrap.models.Derivatives` object
+        Object used to calculate moments
     """
     deriv_funcs = VolumeDerivFuncsIG(refV=refV)
     return Derivatives(deriv_funcs)
@@ -76,7 +79,7 @@ def factory_derivatives(refV=1.0):
 
 def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
     """
-    factory function to create Extrapolation model for volume expansion
+    Factory function to create Extrapolation model for volume expansion.
 
     Parameters
     ----------
@@ -93,7 +96,7 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
 
     Returns
     -------
-    extrapmodel : ExtrapModel object
+    extrapmodel : ExtrapModel
     """
 
     if order != 1:
@@ -117,19 +120,19 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
 
 def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
     """
-    factory function to create Extrapolation model for volume expansion
+    Factory function to create Extrapolation model for volume expansion.
 
     Parameters
     ----------
     volume : float
         reference value of volume
-    data : data object
+    data : object
         Note that this data object should have central=False, deriv_dim=None
     alpha_name, str, default='volume'
         name of expansion parameter
     Returns
     -------
-    extrapmodel : ExtrapModel object
+    extrapmodel : ExtrapModel
     """
 
     if order is None:

@@ -1,11 +1,9 @@
 import glob
 import os
-import sys
 
 import gpflow
 import joblib
 import lnpy
-import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
@@ -19,7 +17,7 @@ N_cutoff = 481  # N value beyond which ln_Pi becomes unreliable, so won't use
 # Change path below to set which data set to use
 # SRS_data was used for the main text, higher_order_LJ_lnPi_data for Fig. S4 in the SI
 SRS_base_dir = os.path.expanduser("~/bin/thermo-extrap/docs/notebooks/gpr/SRS_data")
-#SRS_base_dir = os.path.expanduser("~/bin/thermo-extrap/docs/notebooks/gpr/higher_order_LJ_lnPi_data")
+# SRS_base_dir = os.path.expanduser("~/bin/thermo-extrap/docs/notebooks/gpr/higher_order_LJ_lnPi_data")
 
 
 # Necessary functions
@@ -163,7 +161,6 @@ def tag_phases(list_of_phases):
 
 
 def get_VLE_info(lnPi, ref_activity, beta, vol=512.0, efac=10.0):
-
     # Create lnpy lnPiMasked object based on given lnPi and reference activity
     lnp = lnpy.lnPiMasked.from_data(
         lnz=ref_activity,
@@ -185,7 +182,6 @@ def get_VLE_info(lnPi, ref_activity, beta, vol=512.0, efac=10.0):
 
     # Turn off parallel here
     with lnpy.set_options(joblib_use=False, tqdm_use=False):
-
         # Set range of activities to search
         lnzs = np.linspace(-8, -2, 30)
 
@@ -199,7 +195,6 @@ def get_VLE_info(lnPi, ref_activity, beta, vol=512.0, efac=10.0):
         # Try to find the spinodal and binodal, but may not be able to
         # May get unlucky with particular sample with too many wiggles, etc.
         try:
-
             # Find the spinodal
             spino, spino_info = c.spinodal(
                 phase_ids=2,
@@ -223,7 +218,6 @@ def get_VLE_info(lnPi, ref_activity, beta, vol=512.0, efac=10.0):
             return bino
 
         except:
-
             return None
 
 
@@ -320,10 +314,10 @@ def get_sat_props(lnPi, ref_activity, Tr, lnPi_vars=None, N_boot=100):
 def main():
     # Load data for comparison
     raw_dat = np.loadtxt("%s/SRS_LJ_VLE_data.txt" % SRS_base_dir)
-    raw_beta = 1.0 / raw_dat[::-1, 0]
-    raw_psat = raw_dat[::-1, 5]
-    raw_dens = raw_dat[::-1, [1, 3]]
-    raw_lnz = raw_dat[::-1, -2]
+    1.0 / raw_dat[::-1, 0]
+    raw_dat[::-1, 5]
+    raw_dat[::-1, [1, 3]]
+    raw_dat[::-1, -2]
 
     # Load in data needed to train GP
     ref_T = [0.7, 1.2]
@@ -336,17 +330,17 @@ def main():
     # (Training not stable from default params for higher orders...)
     # (due to p=10.0 being too high...)
     # (higher order moments can be large with high variance, and get bigger when apply p>0)
-    # (leading to overlows)
-    curr_params = [1.0, 1.0, 10.0] #Start with defaults
+    # (leading to overflows)
+    curr_params = [1.0, 1.0, 10.0]  # Start with defaults
     for d_order in range(1, 6):
         lnpi_info = [load_lnPi_info(t, ref_mu=ref_mu) for t in ref_T]
         state_list = [state_from_info_dict(i, d_o=d_order) for i in lnpi_info]
-    
+
         # Create GP model
         gp_model = active_utils.create_GPR(state_list, start_params=curr_params)
-    
+
         gpflow.utilities.print_summary(gp_model)
-    
+
         # Now look at predictions with GP model
         test_T = np.array([0.70, 0.74, 0.85, 1.10, 1.20])
         test_beta = 1.0 / test_T
@@ -364,7 +358,7 @@ def main():
             [gp_pred_mu - 2.0 * gp_pred_std, gp_pred_mu + 2.0 * gp_pred_std]
         )
         N_vals = np.arange(gp_pred_mu.shape[1])
-    
+
         # Save GP model info and predictions
         gp_input_x = gp_model.data[0].numpy()
         gp_input_y = gp_model.data[1].numpy()
@@ -386,7 +380,7 @@ def main():
         )
         gp_params = np.array([p.numpy() for p in gp_model.trainable_parameters])
         np.savez(
-            "gp_model_info_order%i.npz"%d_order,
+            "gp_model_info_order%i.npz" % d_order,
             N=N_vals,
             input_x=gp_input_x,
             input_y=gp_input_y,
@@ -396,10 +390,10 @@ def main():
             pred_conf_int=gp_pred_conf_int,
             params=gp_params,
         )
-        
+
         # Update current parameters to use for next order training
         curr_params = gp_params.tolist()
-    
+
         # For expanded set of temperatures, make predictions of lnPi, then use to predict
         # VLE properties
         extra_T = np.linspace(0.7, 1.2, 1000)
@@ -407,7 +401,7 @@ def main():
         extra_pred = gp_model.predict_f(
             np.vstack([extra_betas, np.zeros_like(extra_betas)]).T
         )
-    
+
         # Collect saturation properties
         gp_sat_props = []
         gp_sat_props_conf_ints = []
@@ -415,17 +409,25 @@ def main():
             print(i, t)
             this_lnPi = extra_pred[0][i, :].numpy()
             this_props, this_prop_conf_int = get_sat_props(
-                this_lnPi, ref_mu / t, t, lnPi_vars=extra_pred[1][i, :].numpy(), N_boot=1000
+                this_lnPi,
+                ref_mu / t,
+                t,
+                lnPi_vars=extra_pred[1][i, :].numpy(),
+                N_boot=1000,
             )
             gp_sat_props.append(this_props)
             gp_sat_props_conf_ints.append(this_prop_conf_int)
-    
+
         # Should be lnz, density_gas, density_liquid, pressure_gas, pressure_liquid
         gp_sat_props = np.array(gp_sat_props)
         gp_sat_props_conf_ints = np.array(gp_sat_props_conf_ints)
-    
+
         # Save saturation property predictions
-        np.savez("sat_props_GPR_order%i.npz"%d_order, props=gp_sat_props, conf_ints=gp_sat_props_conf_ints)
+        np.savez(
+            "sat_props_GPR_order%i.npz" % d_order,
+            props=gp_sat_props,
+            conf_ints=gp_sat_props_conf_ints,
+        )
 
 
 if __name__ == "__main__":

@@ -38,7 +38,6 @@ def main(
     avoid_repeats,
     no_stop,
 ):
-
     lowT = lowT * unit.kelvin
     highT = highT * unit.kelvin
 
@@ -49,19 +48,13 @@ def main(
 
     dat_in = []
     for b in [beta1, beta2]:
-        if os.path.isdir("{}/beta_{:f}".format(output_dir, b)):
-            info_files = sorted(
-                glob.glob("{}/beta_{:f}/polymer_out*.txt".format(output_dir, b))
-            )
-            bias_files = sorted(
-                glob.glob("{}/beta_{:f}/cv_bias_out*.txt".format(output_dir, b))
-            )
+        if os.path.isdir(f"{output_dir}/beta_{b:f}"):
+            info_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/polymer_out*.txt"))
+            bias_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/cv_bias_out*.txt"))
             if obs_type == "Rg":
                 x_files = None
             else:
-                x_files = sorted(
-                    glob.glob("{}/beta_{:f}/U_info*.txt".format(output_dir, b))
-                )
+                x_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/U_info*.txt"))
             dat_in.append(
                 active_utils.DataWrapper(
                     info_files,
@@ -127,7 +120,7 @@ def main(
         metrics.append(active_utils.MaxIter())
     stop_func = active_utils.StopCriteria(metrics, **update_stop_kwargs)
 
-    act_info_out = active_utils.active_learning(
+    active_utils.active_learning(
         dat_in,
         sim_wrap,
         update_func,
