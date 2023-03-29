@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 import xarray as xr
 
 import thermoextrap as xtrap
@@ -54,7 +53,6 @@ class VolumeExtrapModelIG(ExtrapModel):
 
 
 def test_extrapmodel_vol(fixture):
-
     volume = 1.0
     volumes = [0.1, 0.5, 1.5, 2.0]
 

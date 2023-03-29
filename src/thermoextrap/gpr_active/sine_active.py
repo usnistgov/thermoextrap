@@ -14,7 +14,7 @@ def noise_func(x, s, n):
     Must also provide a slope and noise base scaling since model is
         noise = scale*(slope*(x - x_min) + cos(x)^2)
     i.e., sum of linear model and periodic function
-    Note that produces variance for each x location, not sample of noise
+    Note that produces variance for each x location, not sample of noise.
 
     Inputs:
         x - input points
@@ -37,7 +37,7 @@ def make_data(
     rng=np.random.default_rng(42),
 ):
     """
-    Creates data with heteroscedastic noise around sin(x)
+    Creates data with heteroscedastic noise around sin(x).
 
     Inputs:
         x_vals - values at which y data should be generated

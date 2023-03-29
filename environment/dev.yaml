@@ -1,0 +1,27 @@
+channels:
+- conda-forge
+- wpk-nist
+dependencies:
+- attrs
+- cmomy>=0.1.9
+- custom-inherit
+- ipykernel
+- ipython
+- matplotlib
+- nbconvert
+- numpy
+- pip
+- pymbar<4.0
+- pytest
+- pytest-cov
+- pytest-xdist
+- python>=3.8
+- scipy
+- setuptools-scm
+- sympy
+- xarray
+- pip:
+  - gpflow
+  - tensorflow
+  - tensorflow-probability
+name: thermoextrap-env

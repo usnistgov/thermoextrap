@@ -1,4 +1,5 @@
-"""Holds recursive interpolation class.
+"""
+Holds recursive interpolation class.
 This includes the recursive training algorithm and consistency checks.
 """
 
@@ -35,7 +36,8 @@ def _has_plt():
 
 
 class RecursiveInterp:
-    """Class to perform a recursive interpolation (maybe using weighted extrapolation)
+    """
+    Class to perform a recursive interpolation (maybe using weighted extrapolation)
     and then save the information necessary to predict arbitrary interior points.
     Training performs recursive algorithm to meet desired accuracy.
     Prediction uses the learned piecewise function.
@@ -58,7 +60,8 @@ class RecursiveInterp:
         # i.e. sigma_bootstrap/|interpolated value| <= 0.01
 
     def getData(self, B):
-        """Obtains data at the specified state point.
+        """
+        Obtains data at the specified state point.
         Can modify to run MD or MC simulation, load trajectory or data files, etc.
         MUST return two things, the observable data and the potential energy data
         with the rows being separate configurations/time steps and the columns
@@ -90,7 +93,8 @@ class RecursiveInterp:
         doPlot=False,
         plotCompareFunc=None,
     ):
-        """Recursively trains interpolating models on successively smaller intervals
+        """
+        Recursively trains interpolating models on successively smaller intervals
         until error tolerance is reached. The next state point to subdivide an
         interval is chosen as the point where the bootstrapped error is the largest.
         If Bavail is not None, the closest state point value in this list will be
@@ -101,7 +105,7 @@ class RecursiveInterp:
             raise RecursionError("Maximum recursion depth reached.")
 
         if verbose:
-            print("\nInterpolating from points {:f} and {:f}".format(B1, B2))
+            print(f"\nInterpolating from points {B1:f} and {B2:f}")
             print("Recursion depth on this branch: %i" % recurseDepth)
 
         # Generate data somehow if not provided
@@ -227,7 +231,8 @@ class RecursiveInterp:
             return
 
     def sequentialTrain(self, Btrain, verbose=False):
-        """Trains sequentially without recursion. List of state point values is provided and
+        """
+        Trains sequentially without recursion. List of state point values is provided and
         training happens just on those without adding points.
         """
 
@@ -249,7 +254,7 @@ class RecursiveInterp:
             B2 = self.edgeB[i + 1]
 
             if verbose:
-                print("\nInterpolating from points {:f} and {:f}".format(B1, B2))
+                print(f"\nInterpolating from points {B1:f} and {B2:f}")
 
             # Check if already have ExtrapModel with data for B1
             if self.states[i] is None:
@@ -309,7 +314,8 @@ class RecursiveInterp:
         return
 
     def predict(self, B):
-        """Makes a prediction using the trained piecewise model.
+        """
+        Makes a prediction using the trained piecewise model.
         Note that the function will not produce output if asked to extrapolate outside
         the range it was trained on.
         """
@@ -325,20 +331,19 @@ class RecursiveInterp:
             predictVals = np.zeros(len(B))
 
         for i, beta in enumerate(B):
-
             # Check if out of lower bound
             if beta < self.edgeB[0]:
                 print(
-                    "Have provided point %f below interpolation function"
-                    " interval edges (%s)." % (beta, str(self.edgeB))
+                    "Have provided point {:f} below interpolation function"
+                    " interval edges ({}).".format(beta, str(self.edgeB))
                 )
                 raise IndexError("Interpolation point below range")
 
             # Check if out of upper bound
             if beta > self.edgeB[-1]:
                 print(
-                    "Have provided point %f above interpolation function"
-                    " interval edges (%s)." % (beta, str(self.edgeB))
+                    "Have provided point {:f} above interpolation function"
+                    " interval edges ({}).".format(beta, str(self.edgeB))
                 )
                 raise IndexError("Interpolation point above range")
 
@@ -360,7 +365,8 @@ class RecursiveInterp:
         return predictVals
 
     def checkPolynomialConsistency(self, doPlot=False):
-        """If the interpolation model is a polynomial, checks to see if the polynomials
+        """
+        If the interpolation model is a polynomial, checks to see if the polynomials
         are locally consistent. In other words, we want the coefficients between
         neighboring regions to match closely to each other, and to the larger region
         composed of the two neighboring sub-regions. Essentially, this checks to make
@@ -407,7 +413,6 @@ class RecursiveInterp:
 
         # Loop over sets of three edges
         for i, aset in enumerate(edgeSets):
-
             reg1Model = self.model_cls((self.states[aset[0]], self.states[aset[1]]))
             reg1Coeffs = reg1Model.coefs(order=self.maxOrder)
             reg1Err = reg1Model.resample(nrep=100).coefs(order=self.maxOrder).std("rep")
@@ -417,7 +422,7 @@ class RecursiveInterp:
             z12 = (reg1Coeffs - reg2Coeffs) / np.sqrt(reg1Err**2 + reg2Err**2)
             # Assuming Gaussian distributions for coefficients
             # This is implicit in returning bootstrap standard deviation as estimate of uncertainty
-            # If DON'T want to assume this, boostrap function should return confidence intervals
+            # If DON'T want to assume this, bootstrap function should return confidence intervals
             # And that will require a good bit of re-coding throughout this whole class
             # p12 = 2.0*stats.norm.cdf(-abs(z12)) #Null hypothesis that coefficients same
             p12 = stats.norm.cdf(abs(z12)) - stats.norm.cdf(

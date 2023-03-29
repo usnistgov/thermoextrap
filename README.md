@@ -1,11 +1,42 @@
+[![Repo][repo-badge]][repo-link]
+[![Docs][docs-badge]][docs-link]
+[![PyPI license][license-badge]][license-link]
+[![PyPI version][pypi-badge]][pypi-link]
+[![Conda (channel only)][conda-badge]][conda-link]
+[![Code style: black][black-badge]][black-link]
+
+
+[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-link]: https://github.com/ambv/black
+[pypi-badge]: https://img.shields.io/pypi/v/thermoextrap
+<!-- [pypi-badge]: https://badge.fury.io/py/thermo-extrap -->
+[pypi-link]: https://pypi.org/project/thermoextrap
+[docs-badge]: https://img.shields.io/badge/docs-sphinx-informational
+[docs-link]: https://pages.nist.gov/thermo-extrap/
+[repo-badge]: https://img.shields.io/badge/--181717?logo=github&logoColor=ffffff
+[repo-link]: https://github.com/usnistgov/thermo-extrap
+[conda-badge]: https://img.shields.io/conda/v/wpk-nist/thermoextrap
+[conda-link]: https://anaconda.org/wpk-nist/thermoextrap
+<!-- Use total link so works from anywhere -->
+[license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
+[license-link]: https://github.com/usnistgov/thermo-extrap/blob/master/LICENSE
+<!-- For more badges, see https://shields.io/category/other and https://naereen.github.io/badges/ -->
+
+[numpy]: https://numpy.org
+[Numba]: https://numba.pydata.org/
+[xarray]: https://docs.xarray.dev/en/stable/
+[cmomy]: https://github.com/usnistgov/cmomy
+
+
 # `thermoextrap`: Thermodynamic Extrapolation/Interpolation Library
 This repository contains code used and described in:
 
 Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
 
-Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estiamtes and Derivative Information in Gaussian Process Regression for Expediated Data Collection in Molecular Simulations. In preparation.
+Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estimates and Derivative Information in Gaussian Process Regression for Expedited Data Collection in Molecular Simulations. In preparation.
 
-# Overview
+
+## Overview
 
 If you find this code useful in producing published works, please provide an appropriate citation.
 Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
@@ -27,12 +58,16 @@ would be helpful just let us know and we will be happy to work with you to come
 up with a solution.
 
 
-# Status
+## Features
+
+* Fast calculation of derivatives
+
+## Status
 
 This package is actively used by the author.  Please feel free to create a pull request for wanted features and suggestions!
 
 
-# Installation
+## Quick start
 
 `thermoextrap` may be installed with either (recommended)
 ```bash
@@ -48,28 +83,39 @@ If you use pip, then you can include additional dependencies using
 pip install thermoextrap[all]
 ```
 
-If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the verisons on the conda/conda-forge channels are often a bit old.
+If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the versions on the conda/conda-forge channels are often a bit old.
 ```bash
 pip install tensorflow tensorflow-probability gpflow
 ```
 
-# Contact
-Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
+## Example usage
 
+```python
+import thermoextrap
 
-# Documentation
+```
 
-Documentation can be found at
-For a deeper dive, look at the [documentation](https://pages.nist.gov/thermo-extrap/)
+<!-- end-docs -->
 
+## Documentation
+
+See the [documentation][docs-link] for a look at `thermo-extrap` in action.
+
+To have a look at using `thermo-extrap` with Gaussian process regression, look in the [gpr][docs/notebooks/gpr] directory.
 
 ## License
 
-This is free software.  See [LICENSE](LICENSE).
+This is free software.  See [LICENSE][license-link].
+
+## Related wor
 
 ## Related work
 
-This package extensively uses the ``cmomy`` package to handle central comoments.  See [here](https://github.com/usnistgov/cmomy).
+This package extensively uses the [cmomy] package to handle central comoments.
+
+
+# Contact
+Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
 
 
 ## Credits
@@ -79,4 +125,3 @@ This package was created with
 [wpk-nist-gov/cookiecutter-pypackage](https://github.com/wpk-nist-gov/cookiecutter-pypackage)
 Project template forked from
 [audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage).
-

@@ -4,14 +4,13 @@ import pytest
 
 import thermoextrap
 import thermoextrap as xtrap
-from thermoextrap.core.sputils import get_default_indexed, get_default_symbol
+from thermoextrap.core.sputils import get_default_indexed
 
 n_list = [6]
 
 
 @pytest.fixture(params=n_list)
 def data(request):
-
     data = namedtuple("data", ["n", "u", "x1", "du", "dxdu", "xu", "ui" "subs"])
 
     n = request.param
@@ -32,7 +31,6 @@ def data(request):
 
 @pytest.fixture(params=[None, "minus_log"])
 def post_func(request):
-
     return request.param
 
 
@@ -42,7 +40,6 @@ def central(request):
 
 
 def test_x_ave(data, central, post_func):
-
     n, subs = data.n, data.subs[central]
 
     f0 = xtrap.beta.factory_derivatives(
@@ -57,7 +54,6 @@ def test_x_ave(data, central, post_func):
 
 
 def test_central_dx(data):
-
     n, subs = data.n, data.subs[True]
 
     for m in range(1, n):
@@ -69,7 +65,6 @@ def test_central_dx(data):
 
 
 def test_raw_un(data):
-
     n, subs = data.n, data.subs[False]
 
     for m in range(1, n):

@@ -9,7 +9,7 @@ import thermoextrap as xtrap
 # testing routines
 def do_testing(attrs, obj0, obj1, **kwargs):
     for attr in attrs:
-        val0, val1 = [getattr(obj, attr) for obj in (obj0, obj1)]
+        val0, val1 = (getattr(obj, attr) for obj in (obj0, obj1))
         val1 = val1.transpose(*val0.dims)
         np.testing.assert_allclose(val0, val1, **kwargs)
 
@@ -228,7 +228,6 @@ def test_x2_u2(em_x2_out, em_u2_out, central):
 
 
 def test_du2_3(beta, order, data, betas_extrap):
-
     data_u = xtrap.factory_data_values(
         uv=data.u, xv=None, x_is_u=True, order=order, central=True
     )
