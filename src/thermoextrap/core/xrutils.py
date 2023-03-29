@@ -1,3 +1,4 @@
+"""Utilities for working with :mod:`xarray`."""
 import numpy as np
 import xarray as xr
 
@@ -20,15 +21,15 @@ def _check_xr(x, dims, strict=True, name=None):
             dims = dims[x.ndim]
         for d in dims:
             if d not in x.dims:
-                raise ValueError("{} not in dims".format(d))
+                raise ValueError(f"{d} not in dims")
     return x
 
 
 def xrwrap_uv(uv, dims=None, rec_dim="rec", rep_dim="rep", name="u", stict=True):
     """
-    wrap uv (energy values) array
+    Wrap uv (energy values) array.
 
-    assumes uv[rec_dim], or uv[rep_dim, rec_dim] where rec_dim is recored (or time) and rep_dim is replicate
+    assumes uv[rec_dim], or uv[rep_dim, rec_dim] where rec_dim is recorded (or time) and rep_dim is replicate
     """
     if dims is None:
         dims = {1: [rec_dim], 2: [rep_dim, rec_dim]}
@@ -46,7 +47,7 @@ def xrwrap_xv(
     strict=None,
 ):
     """
-    wraps xv (x values) array
+    Wraps xv (x values) array.
 
     if deriv_dim is None, assumes xv[rec_dim], xv[rec_dim, vals], xv[rep_dim, rec_dim, val_dims]
     if deriv_dim is not None, assumes xv[rec_dim, deriv_dim], xv[rec_dim,deriv_dim, val_dims], xv[rep_dim,rec_dim,deriv_dim,val_dims]
@@ -85,9 +86,7 @@ def xrwrap_xv(
 
 
 def xrwrap_alpha(alpha, dims=None, stict=False, name="alpha"):
-    """
-    wrap alpha values
-    """
+    """Wrap alpha values."""
     if isinstance(alpha, xr.DataArray):
         pass
     else:

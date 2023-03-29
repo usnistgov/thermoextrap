@@ -75,7 +75,6 @@ class RBF_covs:
         ) * (1 / self.l**2)
 
     def __call__(self, x1, x2):
-
         cov_mat = [
             [self.cov00, self.cov01, self.cov02],
             [self.cov10, self.cov11, self.cov12],
@@ -263,7 +262,7 @@ def test_linear_mean_func():
 def test_sympy_mean_func():
     import sympy as sp
 
-    # Will work with logistic because relevant derivaties can be computed in terms of 0 order
+    # Will work with logistic because relevant derivatives can be computed in terms of 0 order
     x = sp.symbols("x")
     m = sp.symbols("m")
     b = sp.symbols("b")
@@ -393,7 +392,6 @@ def test_GP_likelihood():
 # Manually parsing and running all methods in class is a pain for testing, though
 @pytest.mark.slow
 def test_GP():
-
     # First create data we can use
     rng = np.random.default_rng(42)
     x_data, y_data, y_var_data = sine_active.make_data(

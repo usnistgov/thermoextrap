@@ -1,6 +1,4 @@
-"""
-A set of routines to stack data for gpflow analysis
-"""
+"""A set of routines to stack data for gpflow analysis."""
 
 
 import numpy as np
@@ -21,7 +19,7 @@ def stack_dataarray(
     policy="infer",
 ):
     """
-    Given an xarray.DataArray, stack for gpflow analysis
+    Given an xarray.DataArray, stack for gpflow analysis.
 
     Parameters
     ----------
@@ -31,7 +29,7 @@ def stack_dataarray(
         dimensions stacked under `xstack_dim`
     y_dims : str or sequance of str, optional
         dimensions stacked under `ystack_dim`.
-        Defaults to all dimenions not specified by `x_dims` or `stats_dim`.
+        Defaults to all dimensions not specified by `x_dims` or `stats_dim`.
     xstack_dim, ystack_dim : str
         name of new stacked dimension from stacking `x_dims`, `y_dims`
     stats_dim : str or tuple of strings, optional
@@ -48,7 +46,7 @@ def stack_dataarray(
     dims = da.dims
     for name in [xstack_dim, ystack_dim]:
         if name in dims:
-            raise ValueError("{} conficts with existing {}".format(xstack_dim, dims))
+            raise ValueError(f"{xstack_dim} conflicts with existing {dims}")
 
     if isinstance(x_dims, str):
         x_dims = (x_dims,)
@@ -69,7 +67,7 @@ def stack_dataarray(
     if policy == "raise":
         for dim in x_dims:
             if dim not in da.coords:
-                raise ValueError("da.coords[{}] not set".format(dim))
+                raise ValueError(f"da.coords[{dim}] not set")
 
     out = da.stack(**stacker)
 
@@ -82,9 +80,7 @@ def stack_dataarray(
 
 
 def wrap_like_dataarray(x, da):
-    """
-    wrap an array x with properties of da
-    """
+    """Wrap an array x with properties of da."""
     return xr.DataArray(
         x,
         dims=da.dims,
@@ -96,9 +92,7 @@ def wrap_like_dataarray(x, da):
 
 
 def multiindex_to_array(idx):
-    """
-    turn xarray multiindex to numpy array
-    """
+    """Turn xarray multiindex to numpy array."""
     return np.array(list(idx.values))
 
 
@@ -106,7 +100,7 @@ def apply_reduction(
     da, dim, funcs, concat=True, concat_dim=None, concat_kws=None, **kws
 ):
     """
-    apply multiple reductions to DataArray
+    Apply multiple reductions to DataArray.
 
 
     Parameters
@@ -117,9 +111,9 @@ def apply_reduction(
     funcs : callable or string or sequence of callables or strings
         If callable, funcs(da, dim=dim, **kws)
         If str, then da.funcs(dim=dim, **kws)
-        If sequence, then performe reductions sequentially
+        If sequence, then perform reductions sequentially
     concat_dim : str, optional
-        if not `None`, and multple funcs, call xr.concat(out, dim=concat_dim, **concat_kws)
+        if not `None`, and multiple funcs, call xr.concat(out, dim=concat_dim, **concat_kws)
     concat_kws : dict, optional
     kws : dict
         optional keyword arguments to func.  Note that this is passed to all reduction functions
@@ -152,7 +146,7 @@ def apply_reduction(
 
 def to_mean_var(da, dim, concat_dim=None, concat_kws=None, **kws):
     """
-    for a dataarray apply mean/variance along a dimension
+    For a dataarray apply mean/variance along a dimension.
 
     Parameters
     ----------
@@ -181,7 +175,7 @@ def to_mean_var(da, dim, concat_dim=None, concat_kws=None, **kws):
 
 def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
     """
-    concatanate [s.derivs(norm=False) for s in states]
+    Concatanate [s.derivs(norm=False) for s in states].
 
     Parameters
     ----------
@@ -213,7 +207,7 @@ def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
 
 class StackedDerivatives:
     """
-    Data object for gpflow analysis
+    Data object for gpflow analysis.
 
     Parameters
     ----------
@@ -227,7 +221,7 @@ class StackedDerivatives:
         x_dims[-1] should be the order of the derivative
         x_dims[0] should be `alpha_name`.  That is, variable taking the derivative of.
     y_dims : str or sequence of str, optional
-        Dimensions making up the "y" part of the data.  Defaults to all dimenions not specified
+        Dimensions making up the "y" part of the data.  Defaults to all dimensions not specified
         by `x_dims` or `stats_dim`
     stats_dim : str, default='stats'
         Name of dimensions with mean and variance.  It is assumed that
@@ -250,7 +244,6 @@ class StackedDerivatives:
         stats_dim="stats",
         policy="infer",
     ):
-
         if isinstance(x_dims, str):
             x_dims = [x_dims]
         if isinstance(y_dims, str):
@@ -270,7 +263,7 @@ class StackedDerivatives:
 
     @property
     def order(self):
-        """maximum order available"""
+        """Maximum order available."""
         return self.da.sizes[self.order_dim] - 1
 
     @property
@@ -279,10 +272,9 @@ class StackedDerivatives:
 
     @gcached(prop=False)
     def _stacked(self, order):
-
         da = self.da
         if order is not None:
-            # select orders upto and including order
+            # select orders up to and including order
             da = da.isel(**{self.order_dim: slice(None, order + 1)})
 
         return stack_dataarray(
@@ -301,9 +293,7 @@ class StackedDerivatives:
         return self._stacked(order)
 
     def array_data(self, order=None):
-        """
-        get X and Y data for gpflow analysis
-        """
+        """Get X and Y data for gpflow analysis."""
         stacked = self.stacked(order=order)
         xdata = multiindex_to_array(stacked.indexes[self.xstack_dim])
 
@@ -313,7 +303,7 @@ class StackedDerivatives:
 
     def xindexer_from_arrays(self, **kwargs):
         """
-        create indexer for indexing into gpflow trained object by name
+        Create indexer for indexing into gpflow trained object by name.
 
         Parameters
         ----------
@@ -325,9 +315,9 @@ class StackedDerivatives:
 
     def xindexer_from_dataframe(self, df):
         """
-        create indexer from frame
+        Create indexer from frame.
 
-        Example
+        Example:
         -------
         x_dims = ['beta', 'order']
 
@@ -352,9 +342,7 @@ class StackedDerivatives:
         concat_dim=None,
         concat_kws=None,
     ):
-        """
-        create object from mean and variance.
-        """
+        """Create object from mean and variance."""
 
         if concat_dim is None:
             concat_dim = pd.Index(["mean", "var"], name="stats")
@@ -397,7 +385,7 @@ class StackedDerivatives:
         policy="infer",
     ):
         """
-        Create object from DataArray of derivatives
+        Create object from DataArray of derivatives.
 
         Parameters
         ----------
@@ -410,7 +398,7 @@ class StackedDerivatives:
             See apply_reduction.
             Defaults to ['mean', 'var']
         concat_dim : str, optional
-            dimension of concatonated results.
+            dimension of concatenated results.
             That is out.isel(**{concat_dim : i}) = reduce_funcs[i](derivs, **reduce_kws)
             Default is pd.Index(['mean','var'], name='stats)
         reduce_kws : dict, optional
@@ -436,7 +424,7 @@ class StackedDerivatives:
             concat=True,
             concat_dim=concat_dim,
             concat_kws=concat_kws,
-            **reduce_kws
+            **reduce_kws,
         )
 
         return cls(
@@ -470,7 +458,7 @@ class StackedDerivatives:
         policy="infer",
     ):
         """
-        create data object for StateCollection or list of states
+        Create data object for StateCollection or list of states.
 
         Parameter
         ---------
@@ -489,7 +477,7 @@ class StackedDerivatives:
             keyword arguments to `states.map_concat`
 
 
-        See also
+        See Also
         --------
         `StackedDerivatives.from_derivs`
         """
@@ -525,7 +513,7 @@ class StackedDerivatives:
 
 class GPRData(StateCollection):
     """
-    Statecollection for GPFlow analysis
+    Statecollection for GPFlow analysis.
 
     Parameters
     ----------
@@ -548,7 +536,7 @@ class GPRData(StateCollection):
         optional arguments to be passed to `collection[i].derivs`
     """
 
-    # reduce_dim -> dimension to reduce alo
+    # reduce_dim -> dimension to reduce along
 
     def __init__(
         self,
@@ -592,7 +580,7 @@ class GPRData(StateCollection):
     @gcached(prop=False)
     def _stacked(self, order):
         """
-        Get stacked data representation
+        Get stacked data representation.
 
         Parameters
         ----------
@@ -637,9 +625,7 @@ class GPRData(StateCollection):
         return self._stacked(order)
 
     def array_data(self, order=None):
-        """
-        get X and Y data for gpflow analysis
-        """
+        """Get X and Y data for gpflow analysis."""
         stacked = self.stacked(order=order)
         xdata = multiindex_to_array(stacked.indexes[self.xstack_dim])
 
@@ -649,7 +635,7 @@ class GPRData(StateCollection):
 
     def xindexer_from_arrays(self, **kwargs):
         """
-        create indexer for indexing into gpflow trained object by name
+        Create indexer for indexing into gpflow trained object by name.
 
         Parameters
         ----------
@@ -661,9 +647,9 @@ class GPRData(StateCollection):
 
     def xindexer_from_dataframe(self, df):
         """
-        create indexer from frame
+        Create indexer from frame.
 
-        Example
+        Example:
         -------
         x_dims = ['beta', 'order']
 

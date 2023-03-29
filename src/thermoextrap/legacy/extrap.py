@@ -151,7 +151,7 @@ class ExtrapModel:
         # If B is not a value but an empty array, set it to None
         if B is not None and len(B) == 0:
             print(
-                "No state points provided to boostrap prediction at - bootstrapping parameters."
+                "No state points provided to bootstrap prediction at - bootstrapping parameters."
             )
             B = None
 
@@ -162,7 +162,7 @@ class ExtrapModel:
             bootStraps = np.zeros((n, B.shape[0], self.x.shape[-1]))
         else:
             bShape = (n,) + self.params.shape
-            bootStraps = np.zeros((bShape))
+            bootStraps = np.zeros(bShape)
 
         # Loop for as many resamples as we want
         for i in range(n):

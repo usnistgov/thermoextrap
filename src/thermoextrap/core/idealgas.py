@@ -17,33 +17,25 @@ xave_sym = (1 / beta_sym) - vol_sym / (sp.exp(beta_sym * vol_sym) - 1)
 
 
 def x_ave(beta, vol=1.0):
-    """
-    Average position x at the inverse temperature beta with L=vol
-    """
+    """Average position x at the inverse temperature beta with L=vol."""
     return 1.0 / beta - vol / (np.exp(beta * vol) - 1.0)
 
 
 def x_var(beta, vol=1.0):
-    """
-    Variance in position, x at the inverse temperature beta with L=vol
-    """
+    """Variance in position, x at the inverse temperature beta with L=vol."""
     return 1.0 / beta**2 - (
         vol**2 * np.exp(beta * vol) / ((np.exp(beta * vol) - 1) ** 2)
     )
 
 
 def x_prob(x, beta, vol=1.0):
-    """
-    Canonical probability of position x for single particle at inverse temperature beta with L=vol
-    """
+    """Canonical probability of position x for single particle at inverse temperature beta with L=vol."""
     return (beta * np.exp(-beta * x)) / (1.0 - np.exp(-beta * vol))
 
 
 # from scipy.stats import norm
 def u_prob(u, npart, beta, vol=1.0):
-    """
-    In the large-N limit, the probability of the potential energy is Normal, so provides that
-    """
+    """In the large-N limit, the probability of the potential energy is Normal, so provides that."""
     u_ave = npart * x_ave(beta, vol)
     u_std = np.sqrt(npart * x_var(beta, vol))
     return np.exp(-0.5 * ((u - u_ave) / u_std) ** 2) / (u_std * np.sqrt(2 * np.pi))
@@ -53,16 +45,14 @@ def u_prob(u, npart, beta, vol=1.0):
 
 
 def x_cdf(x, beta, vol=1.0):
-    """
-    Cumulative probability density for position x for single particle at inverse temperature B and L=vol
-    """
+    """Cumulative probability density for position x for single particle at inverse temperature B and L=vol."""
     return (1.0 - np.exp(-beta * x)) / (1.0 - np.exp(-beta * vol))
 
 
 def x_sample(shape, beta, vol=1.0, r=None):
     """
     Samples x in specified shape from the probability density at inverse temperature B with L=vol
-    Does sampling based on inversion of cumulative distribution function
+    Does sampling based on inversion of cumulative distribution function.
 
     r may be a specified random number
     """
@@ -85,7 +75,7 @@ def u_sample(shape, beta, vol=1.0, r=None):
 def dbeta_xave(k):
     """
     Analytical derivative of order k w.r.t. beta for the average of x
-    Returns sympy function with expression for derivative
+    Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(xave_sym, beta_sym, k)
     return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
@@ -95,7 +85,7 @@ def dbeta_xave(k):
 def dbeta_xave_minuslog(k):
     """
     Analytical derivative of order k w.r.t. beta for -ln(<x>)
-    Returns sympy function with expression for derivative
+    Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(-sp.log(xave_sym), beta_sym, k)
     return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
@@ -105,7 +95,7 @@ def dbeta_xave_minuslog(k):
 def dbeta_xave_depend(k):
     """
     Analytical derivative of order k w.r.t. beta for the average of beta*x
-    Returns sympy function with expression for derivative
+    Returns sympy function with expression for derivative.
 
     Note that this is also the average dimensionless potential energy for a single particle
     And since particles are independent, can just multiply by N for a system of N particles
@@ -118,7 +108,7 @@ def dbeta_xave_depend(k):
 def dbeta_xave_depend_minuslog(k):
     """
     Analytical derivative of order k w.r.t. beta for -ln(<beta*x>)
-    Returns sympy function with expression for derivative
+    Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(-sp.log(beta_sym * xave_sym), beta_sym, k)
     return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
@@ -128,7 +118,7 @@ def dbeta_xave_depend_minuslog(k):
 def dvol_xave(k):
     """
     Analytical derivative of order k w.r.t. L for average x
-    Returns sympy function with expression for derivative
+    Returns sympy function with expression for derivative.
     """
     deriv = sp.diff(xave_sym, vol_sym, k)
     return sp.lambdify([beta_sym, vol_sym], deriv, "numpy")
@@ -137,7 +127,7 @@ def dvol_xave(k):
 def x_beta_extrap(order, beta0, beta, vol=1.0):
     """
     Analytical extrapolation and coefficients from beta0 to beta (at L=vol) using derivatives up to order
-    Returns extrapolation as first output and unnormalized coefficients as second
+    Returns extrapolation as first output and unnormalized coefficients as second.
     """
     dbeta = beta - beta0
 
@@ -151,9 +141,7 @@ def x_beta_extrap(order, beta0, beta, vol=1.0):
 
 
 def x_beta_extrap_minuslog(order, beta0, beta, vol=1.0):
-    """
-    Same as x_beta_extrap but with -ln<x>
-    """
+    """Same as x_beta_extrap but with -ln<x>."""
     dbeta = beta - beta0
 
     out = np.zeros(order + 1)
@@ -166,9 +154,7 @@ def x_beta_extrap_minuslog(order, beta0, beta, vol=1.0):
 
 
 def x_beta_extrap_depend(order, beta0, beta, vol=1.0):
-    """
-    Same as x_beta_extrap but for <beta*x>
-    """
+    """Same as x_beta_extrap but for <beta*x>."""
     dbeta = beta - beta0
 
     out = np.zeros(order + 1)
@@ -186,9 +172,7 @@ def x_beta_extrap_depend(order, beta0, beta, vol=1.0):
 
 
 def x_beta_extrap_depend_minuslog(order, beta0, beta, vol=1.0):
-    """
-    Same as x_beta_extrap but with -ln<beta*x>
-    """
+    """Same as x_beta_extrap but with -ln<beta*x>."""
     dbeta = beta - beta0
 
     out = np.zeros(order + 1)
@@ -211,7 +195,7 @@ def x_beta_extrap_depend_minuslog(order, beta0, beta, vol=1.0):
 def x_vol_extrap(order, vol0, vol, beta=1.0):
     """
     Analytical extrapolation coefficients from vol0 to vol (at beta) using derivatives up to order
-    Returns extrapolation as first output and unnormalized coefficients as second
+    Returns extrapolation as first output and unnormalized coefficients as second.
     """
     dvol = vol - vol0
 
@@ -229,7 +213,7 @@ def generate_data(shape, beta, vol=1.0, r=None):
     """
     Generates data points in specified shape, where the first index is the number of samples and the second is the number of independent IG particles
     Sample will be at beta with L=vol
-    Returns tuple of the particle positions in each configuration and the potential energy of each sampled configuration
+    Returns tuple of the particle positions in each configuration and the potential energy of each sampled configuration.
 
     r may be specified as an array of random numbers instead of shape
 

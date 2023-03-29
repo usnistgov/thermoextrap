@@ -2,7 +2,6 @@
 Routines GPR interpolation models
 """
 
-from __future__ import absolute_import
 
 import gpflow
 import numpy as np
@@ -55,7 +54,6 @@ class DerivativeKernel(gpflow.kernels.Kernel):
     def __init__(
         self, kernel_expr, obs_dims, kernel_params={}, active_dims=None, **kwargs
     ):
-
         if active_dims is not None:
             print("active_dims set to: ", active_dims)
             print("This is not implemented in this kernel, so setting to 'None'")
@@ -170,7 +168,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
                 this_func(
                     tf.gather_nd(expand_x1, this_inds),
                     tf.gather_nd(expand_x2, this_inds),
-                    *[getattr(self, s.name) for s in self.param_syms]
+                    *[getattr(self, s.name) for s in self.param_syms],
                 )
             )
             # Also keep track of indices so can dynamically stitch back together
@@ -203,7 +201,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
                 this_func(
                     tf.gather_nd(x1, this_inds),
                     tf.gather_nd(x1, this_inds),
-                    *[getattr(self, s.name) for s in self.param_syms]
+                    *[getattr(self, s.name) for s in self.param_syms],
                 )
             )
             inds_list.append(this_inds)
@@ -254,7 +252,7 @@ class HeteroscedasticGaussian(gpflow.likelihoods.Likelihood):
         raise NotImplementedError
 
 
-class combined_loss(object):
+class combined_loss:
     """Convenience function for training all output dimension in parallel with sum of losses."""
 
     def __init__(self, loss_list):
@@ -313,7 +311,6 @@ class GPRModel(StateCollection):
     # Hopefully, won't need to re-train many times with changing data
     # However, if do need to and want to keep same model, this allows for that
     def _train_GP(self, x_input, y_input, opt_steps=100, fresh_train=False):
-
         # Want option to continue training with same model, so adding in
         # So default behavior is fresh_train=False, so continues training if model exists
         # Might use to add extra training or if add more data
@@ -359,7 +356,6 @@ class GPRModel(StateCollection):
         # Again not sure why
 
     def __init__(self, states, kernel_expr, kernel_params={}, **kwargs):
-
         super().__init__(states, **kwargs)
 
         # Collect data for training and defining output dimensionality
@@ -383,7 +379,6 @@ class GPRModel(StateCollection):
         self._train_GP(x_in, y_in)
 
     def predict(self, alpha, order=None, order_dim="order", alpha_name=None):
-
         if order is None:
             order = self.order
         elif order != self.order:
@@ -412,7 +407,7 @@ class GPRModel(StateCollection):
 
 def factory_rbf_gprmodel(states, **kws):
     """
-    factory function to create GPR model for beta expanssion
+    factory function to create GPR model for beta expansion
 
     Parameters
     ----------

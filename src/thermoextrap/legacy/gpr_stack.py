@@ -59,7 +59,6 @@ class DerivativeKernel(gpflow.kernels.Kernel):
     def __init__(
         self, kernel_expr, obs_dims, kernel_params={}, active_dims=None, **kwargs
     ):
-
         if active_dims is not None:
             print("active_dims set to: ", active_dims)
             print("This is not implemented in this kernel, so setting to 'None'")
@@ -179,7 +178,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
                 this_func(
                     tf.gather_nd(expand_x1, this_inds),
                     tf.gather_nd(expand_x2, this_inds),
-                    *[getattr(self, s.name) for s in self.param_syms]
+                    *[getattr(self, s.name) for s in self.param_syms],
                 )
             )
             # also keep track of indices so can dynamically stitch back together
@@ -214,7 +213,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
                 this_func(
                     tf.gather_nd(x1, this_inds),
                     tf.gather_nd(x1, this_inds),
-                    *[getattr(self, s.name) for s in self.param_syms]
+                    *[getattr(self, s.name) for s in self.param_syms],
                 )
             )
             inds_list.append(this_inds)
@@ -289,7 +288,7 @@ class combined_loss:
 
 class GPRModel:
     """
-    perfrom gaussian process regression
+    perform gaussian process regression
 
     Parameters
     ----------
@@ -300,7 +299,6 @@ class GPRModel:
     """
 
     def __init__(self, data, kernel_expr, kernel_params={}):
-
         self.data = data
         self.kernel_expr = kernel_expr
         self.kernel_params = kernel_params
@@ -390,7 +388,6 @@ class GPRModel:
         return self
 
     def predict(self, alpha, order=None, unstack=False, drop_order=True):
-
         if order is None:
             order = self.data.order
 
@@ -429,7 +426,7 @@ class GPRModel:
 
 def factory_gprmodel(data, **kws):
     """
-    factory function to create GPR model for beta expanssion
+    factory function to create GPR model for beta expansion
 
     Parameters
     ----------
