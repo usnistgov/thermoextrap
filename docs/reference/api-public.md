@@ -1,6 +1,5 @@
 # Top level API ({mod}`thermoextrap`)
 
-
 :::{eval-rst}
 
 .. automodule:: thermoextrap

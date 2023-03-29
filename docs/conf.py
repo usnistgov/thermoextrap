@@ -147,7 +147,7 @@ napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
 napoleon_use_param = False
-napoleon_use_rtype = True
+napoleon_use_rtype = False
 napoleon_preprocess_types = True
 napoleon_type_aliases = {
     # general terms
@@ -264,7 +264,13 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "**.ipynb_checkpoints",
+    "jupyter_execute",
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -291,7 +297,7 @@ html_theme_options = dict(
     use_repository_button=True,
     use_issues_button=True,
     home_page_in_toc=True,
-    show_toc_level=2,
+    show_toc_level=3,
     show_navbar_depth=0,
 )
 # handle nist css/js from here.

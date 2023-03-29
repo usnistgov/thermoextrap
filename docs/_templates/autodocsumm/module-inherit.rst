@@ -1,6 +1,5 @@
 
 
-
 .. automodule:: {{ fullname }}
    :autosummary:
    :show-inheritance:

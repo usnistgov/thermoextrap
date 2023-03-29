@@ -1,6 +1,6 @@
 """
 General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
-========================================================================.
+========================================================================
 """
 from __future__ import annotations
 
@@ -53,18 +53,38 @@ __all__ = [
 ################################################################################
 # Structure(s) to deal with analytic derivatives, etc
 ################################################################################
-class SympyDerivFuncBase(sp.Function):
-    """Base class to define a sympy function for user defined deriatives."""
+class SymFuncBase(sp.Function):
+    """
+    Base class to define a sympy function for user defined deriatives.
+
+
+    See Also
+    --------
+    :class:`thermoextrap.models.SymDerivBase`
+
+    """
 
     @classmethod
     def deriv_args(cls):
+        """
+        Symbol arguments of function.
+
+        This is used by Data class to create a lambdafied callable function.
+        """
         raise NotImplementedError("must specify in sublcass")
 
     def fdiff(self, argindex=1):
+        """Derivative of function.  This will be used by :class:`SymDerivBase`."""
         raise NotImplementedError("must specify in subclass")
 
     @classmethod
     def eval(cls, beta):
+        """
+        Evaluate function.
+
+        We use the convetion of passing in `beta='None'` to evaluate the
+        function to an indexable variable.
+        """
         raise NotImplementedError("must specify in subclass")
 
 
@@ -76,7 +96,8 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
     Parameters
     ----------
     func : symFunction
-        Function to differentiate
+        Function to differentiate.  This should (most likely) be an instance
+        of :class:`SymFuncBase`
     args : sequence of Symbol
         Arguments to func
     {expand}

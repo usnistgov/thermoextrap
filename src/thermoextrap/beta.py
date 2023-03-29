@@ -1,13 +1,11 @@
 """
 Inverse temperature (beta) extrapolation (:mod:`~thermoextrap.beta`)
-====================================================================.
+====================================================================
 """
 
 
 from functools import lru_cache
 from typing import Literal
-
-import sympy as sp
 
 from .core._docstrings import factory_docfiller_shared
 from .core.models import (
@@ -15,6 +13,7 @@ from .core.models import (
     ExtrapModel,
     PerturbModel,
     SymDerivBase,
+    SymFuncBase,
     SymSubs,
     get_default_indexed,
     get_default_symbol,
@@ -31,7 +30,7 @@ docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
 ####################
 
 
-class du_func(sp.Function):
+class du_func(SymFuncBase):
     r"""
     Sympy function to evaluate energy fluctuations using central moments.
 
@@ -49,7 +48,6 @@ class du_func(sp.Function):
 
     @classmethod
     def deriv_args(cls):
-        """List of arguments to function evaluation."""
         return [cls.du]
 
     def fdiff(self, argindex=1):
@@ -59,7 +57,6 @@ class du_func(sp.Function):
 
     @classmethod
     def eval(cls, beta, n):
-        """Evaluate function."""
         if n == 0:
             out = 1
         elif n == 1:
@@ -71,7 +68,7 @@ class du_func(sp.Function):
         return out
 
 
-class u_func_central(sp.Function):
+class u_func_central(SymFuncBase):
     r"""
     Sympy function to evaluate energy averages using central moments.
 
@@ -92,7 +89,6 @@ class u_func_central(sp.Function):
 
     @classmethod
     def eval(cls, beta):
-        """Evaluate function."""
         if beta is None:
             return cls.u
         else:
@@ -100,7 +96,7 @@ class u_func_central(sp.Function):
         return out
 
 
-class dxdu_func_nobeta(sp.Function):
+class dxdu_func_nobeta(SymFuncBase):
     r"""
     Sympy function to evaluate observable energy fluctuations using central moments.
 
@@ -127,7 +123,6 @@ class dxdu_func_nobeta(sp.Function):
 
     @classmethod
     def eval(cls, beta, n):
-        """Evaluate function."""
         if n == 0:
             out = 0
         elif beta is None:
@@ -137,7 +132,7 @@ class dxdu_func_nobeta(sp.Function):
         return out
 
 
-class dxdu_func_beta(sp.Function):
+class dxdu_func_beta(SymFuncBase):
     r"""
     Sympy function to evaluate derivatives of observable fluctuations using central moments.
 
@@ -164,7 +159,6 @@ class dxdu_func_beta(sp.Function):
 
     @classmethod
     def eval(cls, beta, n, deriv):
-        """Evaluate function."""
         if n == 0:
             out = 0
         elif beta is None:
@@ -174,7 +168,7 @@ class dxdu_func_beta(sp.Function):
         return out
 
 
-class x_func_central_nobeta(sp.Function):
+class x_func_central_nobeta(SymFuncBase):
     r"""Sympy functionn to evaluate derivatives of observable :math:`\langle x \rangle` using central moments."""
 
     nargs = 1
@@ -190,7 +184,6 @@ class x_func_central_nobeta(sp.Function):
 
     @classmethod
     def eval(cls, beta):
-        """Evaluate function."""
         if beta is None:
             out = cls.x1_symbol
         else:
@@ -198,7 +191,7 @@ class x_func_central_nobeta(sp.Function):
         return out
 
 
-class x_func_central_beta(sp.Function):
+class x_func_central_beta(SymFuncBase):
     r"""Sympy function to evaluate derivatives of observable :math:`\langle x(\beta) \rangle` using central moments."""
 
     nargs = 2
@@ -216,7 +209,6 @@ class x_func_central_beta(sp.Function):
 
     @classmethod
     def eval(cls, beta, deriv):
-        """Evaluate function."""
         if beta is None:
             out = cls.x1_indexed[deriv]
         else:
@@ -227,7 +219,7 @@ class x_func_central_beta(sp.Function):
 ####################
 # raw moments
 ####################
-class u_func(sp.Function):
+class u_func(SymFuncBase):
     r"""Sympy function to evaluate derivatives of energy :math:`\langle u \rangle` using raw moments."""
 
     nargs = 2
@@ -243,7 +235,6 @@ class u_func(sp.Function):
 
     @classmethod
     def eval(cls, beta, n):
-        """Evaluate function."""
         if n == 0:
             out = 1
         elif beta is None:
@@ -253,7 +244,7 @@ class u_func(sp.Function):
         return out
 
 
-class xu_func(sp.Function):
+class xu_func(SymFuncBase):
     r"""
     Sympy function to evaluate derivatives of :math:`\langle x u^n \rangle`.
 
@@ -284,7 +275,6 @@ class xu_func(sp.Function):
 
     @classmethod
     def eval(cls, beta, n, deriv=None):
-        """Evaluate function."""
         if beta is None:
             if deriv is None:
                 out = cls.xu[n]

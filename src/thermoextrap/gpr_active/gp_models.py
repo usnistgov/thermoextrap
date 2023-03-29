@@ -1,6 +1,6 @@
 """
 Models for Gaussian process regression (:mod:`~thermoextrap.gpr_active.gp_models`)
-----------------------------------------------------------------------------------.
+----------------------------------------------------------------------------------
 """
 from typing import Any, Optional
 

@@ -1,6 +1,6 @@
 r"""
 Inverse temperature expansion of macrostate distribution (:mod:`~thermoextrap.lnpi`)
-====================================================================================.
+====================================================================================
 
 This is used to extrapolate, in inverse temperature :math:`\beta = (k_{\rm B} T)^{-1}`, the macrostate distribution function :math:`\ln\Pi` from transition matrix Monte Carlo simulations.
 """
@@ -13,7 +13,6 @@ from typing import Hashable, Sequence
 
 import attrs
 import numpy as np
-import sympy as sp
 import xarray as xr
 
 # from attrs import converters as attc
@@ -29,7 +28,7 @@ from .core._attrs_utils import _cache_field, convert_dims_to_tuple
 from .core._docstrings import factory_docfiller_shared
 from .core.cached_decorators import gcached
 from .core.data import DataCallbackABC
-from .core.models import Derivatives, ExtrapModel, SymSubs
+from .core.models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol
 
 docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
@@ -38,21 +37,38 @@ docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
 ################################################################################
 # lnPi correction stuff
 ################################################################################
-class lnPi_func_central(sp.Function):
-    """
+class lnPi_func_central(SymFuncBase):
+    r"""
     Special case of u_func_central.
 
-    For lnPi, have dlnPi/dbeta = mu * N - <u> + <u - mu * N>_GC.
-    We ignore the GC average term, as it does not depend on N
-    So, the first derivative of this function is u_func_central.
-    We consider only a correction of the form
-    lnPi_energy = lnPi - beta * mu * N = lnQ - ln XI, where Q, XI are the canonical
-    and GC partition functions.
+    For lnPi, have:
 
-    Then,
-    Y' = -U
-    Y'' = -U'
-    etc
+    .. math::
+
+        \newcommand{\ave}[1]{\langle #1 \rangle}
+
+        (\ln \Pi)' = \frac{d \ln \Pi}{d \beta} = \mu N - \ave{u} + \ave{u - \mu N}_{\rm GC}
+
+    where :math:`\ave{}` and :math:`\ave{}_{\rm GC}` are the canonical and grand canonical (GC) ensemble averages.
+    We ignore the GC average term, as it does not depend on N.  Note that this is not
+    necessarily the case for molecular sysmtes.
+    So, the first derivative of this function is :func:`thermoextrap.beta.u_func_central`.
+    We consider only a correction of the form:
+
+    .. math::
+
+        (\ln\Pi)_{\text{energy}} = \ln\Pi - \beta \mu N = \ln Q - \ln \Xi
+
+    where :math:`Q\text{ and }\Xi` are the canonical and GC partition functions, respectively. thus,
+
+    .. math::
+
+        \begin{align*}
+          (\ln\Pi)_{\text{energy}}'  &= - U \\
+          (\ln\Pi)_{\text{energy}}'' &=  -U' \\
+              &\,\,\vdots
+        \end{align*}
+
     """
 
     nargs = 1
@@ -77,7 +93,7 @@ class lnPi_func_central(sp.Function):
         return out
 
 
-class lnPi_func_raw(sp.Function):
+class lnPi_func_raw(SymFuncBase):
     """Raw moments version."""
 
     nargs = 1
