@@ -51,7 +51,7 @@ class lnPi_func_central(SymFuncBase):
 
     where :math:`\ave{}` and :math:`\ave{}_{\rm GC}` are the canonical and grand canonical (GC) ensemble averages.
     We ignore the GC average term, as it does not depend on N.  Note that this is not
-    necessarily the case for molecular sysmtes.
+    necessarily the case for molecular systems.
     So, the first derivative of this function is :func:`thermoextrap.beta.u_func_central`.
     We consider only a correction of the form:
 
