@@ -1,0 +1,43 @@
+{
+  "template": "https://github.com/wpk-nist-gov/cookiecutter-pypackage.git",
+  "commit": "54f802e17db2a2f922595fc6a9401288c18ed509",
+  "checkout": "feature/markdown",
+  "skip": [
+    "src/thermoextrap/__init__.py",
+      "environment.yaml",
+      "HISTORY.md",
+      "AUTHORS.md",
+      "MANIFEST.in",
+      "docs/spelling_wordlist.txt",
+      "environment/",
+  ],
+  "context": {
+    "cookiecutter": {
+      "full_name": "William P. Krekelberg",
+      "email": "wpk@nist.gov",
+      "github_username": "usnistgov",
+      "pypi_username": "wpk-nist",
+      "conda_channel": "wpk-nist",
+      "project_name": "thermo-extrap",
+      "project_slug": "thermoextrap",
+      "_copy_without_render": [
+        "*.html",
+        "docs/_templates/*.rst",
+        "docs/_templates/autosummary/*.rst",
+        "docs/_templates/autodocsumm/*.rst"
+      ],
+      "project_short_description": "Thermodynamic extrapolation",
+      "version": "0.0.1",
+      "use_pytest": "y",
+      "use_pypi_deployment_with_travis": "n",
+      "command_line_interface": "No command-line interface",
+      "create_author_file": "y",
+      "open_source_license": "NIST license",
+      "sphinx_auto": "autosummary",
+      "sphinx_use_autodocsumm": "y",
+      "sphinx_theme": "sphinx_book_theme",
+      "_template": "https://github.com/wpk-nist-gov/cookiecutter-pypackage.git"
+    }
+  },
+  "directory": null
+}

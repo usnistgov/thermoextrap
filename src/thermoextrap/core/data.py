@@ -1,5 +1,6 @@
 """
-Routines and classes to process input data to expected average format.
+Data handlers (:mod:`~thermoextrap.data`)
+=========================================
 
 The general scheme is to use the following:
 
@@ -46,11 +47,22 @@ docfiller_shared = factory_docfiller_shared(
     names=("default",),
 )
 
+__all__ = [
+    "DataCentralMoments",
+    "DataCentralMomentsVals",
+    "DataValues",
+    "DataValuesCentral",
+    "DataCallbackABC",
+    "AbstractData",
+    "factory_data_values",
+    "resample_indices",
+]
+
 
 @docfiller_shared
 def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
     """
-    Get indexing DataArray
+    Get indexing DataArray.
 
     Parameters
     ----------
@@ -82,7 +94,8 @@ def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
 
 @attrs.frozen
 class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_merge")):
-    """Wrap xarray object so can index like ds[i, j].
+    """
+    Wrap xarray object so can index like ds[i, j].
 
     Parameters
     ----------
@@ -147,7 +160,7 @@ class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_m
         if not isinstance(idx, tuple):
             idx = (idx,)
         if len(idx) != len(self.dims):
-            raise ValueError("bad idx {}, vs dims {}".format(idx, self.dims))
+            raise ValueError(f"bad idx {idx}, vs dims {self.dims}")
         selector = dict(zip(self.dims, idx))
         return self.data.isel(**selector, drop=True)
 
@@ -173,12 +186,13 @@ class DataCallbackABC(
 
     @abstractmethod
     def check(self, data):
-        """Perform any consistency checks between self and data"""
+        """Perform any consistency checks between self and data."""
         pass
 
     @abstractmethod
     def derivs_args(self, data, derivs_args):
-        """Adjust derivs args from data class
+        """
+        Adjust derivs args from data class.
 
         should return a tuple
         """
@@ -187,7 +201,8 @@ class DataCallbackABC(
     # define these to raise error instead
     # of forcing usage.
     def resample(self, data, meta_kws, **kws):
-        """Adjust create new object
+        """
+        Adjust create new object.
 
         Should return new instance of class or self no change
         """
@@ -212,18 +227,20 @@ class DataCallback(DataCallbackABC):
     """
 
     def check(self, data):
-        """Perform any consistency checks between self and data"""
+        """Perform any consistency checks between self and data."""
         pass
 
     def derivs_args(self, data, derivs_args):
-        """adjust derivs args from data class
+        """
+        Adjust derivs args from data class.
 
         should return a tuple
         """
         return derivs_args
 
     def resample(self, data, meta_kws, **kws):
-        """adjust create new object
+        """
+        Adjust create new object.
 
         Should return new instance of class or self no change
         """
@@ -247,6 +264,8 @@ class AbstractData(
     MyAttrsMixin,
     metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True),
 ):
+    """Abstract class for data."""
+
     #: Callback
     meta: DataCallbackABC | None = field(
         kw_only=True,
@@ -282,7 +301,8 @@ class AbstractData(
 
     @property
     def xalpha(self):
-        """Whether X has explicit dependence on `alpha`
+        """
+        Whether X has explicit dependence on `alpha`.
 
         That is, if `self.deriv_dim` is not `None`
         """
@@ -304,7 +324,7 @@ class AbstractData(
 @docfiller_shared
 class DataValuesBase(AbstractData):
     """
-    Base class to work with data based on values (non-cmomy)
+    Base class to work with data based on values (non-cmomy).
 
     Parameters
     ----------
@@ -391,7 +411,7 @@ class DataValuesBase(AbstractData):
         x_is_u=False,
     ):
         """
-        Constructor from arrays
+        Constructor from arrays.
 
         Parameters
         ----------
@@ -457,7 +477,7 @@ class DataValuesBase(AbstractData):
         meta_kws=None,
     ):
         """
-        resample object
+        Resample object.
 
         Parameters
         ----------
@@ -539,7 +559,7 @@ def build_aves_xu(
     transpose=False,
 ):
     """
-    Build averages from values uv, xv up to order `order`
+    Build averages from values uv, xv up to order `order`.
 
     Parameters
     ----------
@@ -569,10 +589,6 @@ def build_aves_xu(
     assert isinstance(uv, xr.DataArray)
     assert isinstance(xv, (xr.DataArray, xr.Dataset))
 
-    # do averageing
-
-    # this is faster is some cases then the
-    # simplier
     u = []
     xu = []
 
@@ -643,7 +659,7 @@ def build_aves_dxdu(
     transpose=False,
 ):
     """
-    Build central moments from values uv, xv up to order `order`
+    Build central moments from values uv, xv up to order `order`.
 
     Parameters
     ----------
@@ -732,9 +748,7 @@ def build_aves_dxdu(
 
 
 def _xu_to_u(xu, dim="umom"):
-    """
-    for case where x = u, shift umom and add umom=0
-    """
+    """For case where x = u, shift umom and add umom=0."""
 
     n = xu.sizes[dim]
 
@@ -747,9 +761,7 @@ def _xu_to_u(xu, dim="umom"):
 
 @attrs.define
 class DataValues(DataValuesBase):
-    """
-    Class to hold uv/xv data
-    """
+    """Class to hold uv/xv data."""
 
     _CENTRAL = False
 
@@ -771,7 +783,7 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def xu(self):
-        """Average of `x * u ** n`"""
+        """Average of `x * u ** n`."""
         out = self._mean()[1]
         if self.compute:
             out = out.compute()
@@ -779,7 +791,7 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def u(self):
-        """Average of `u ** n`"""
+        """Average of `u ** n`."""
         if self.x_isnot_u:
             out = self._mean()[0]
             if self.compute:
@@ -791,14 +803,14 @@ class DataValues(DataValuesBase):
 
     @gcached()
     def u_selector(self):
-        """Indexer for `self.u`"""
+        """Indexer for `self.u`."""
         return DatasetSelector.from_defaults(
             self.u, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @gcached()
     def xu_selector(self):
-        """Indexer for `self.xu`"""
+        """Indexer for `self.xu`."""
         return DatasetSelector.from_defaults(
             self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
@@ -814,6 +826,7 @@ class DataValues(DataValuesBase):
 
 @attrs.define
 class DataValuesCentral(DataValuesBase):
+    """Data class using values and central moments."""
 
     _CENTRAL = True
 
@@ -835,7 +848,7 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def xave(self):
-        """Averages of `x`"""
+        """Averages of `x`."""
         out = self._mean()[0]
         if self.compute:
             out = out.compute()
@@ -843,7 +856,7 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def dxdu(self):
-        """Averages of `dx * du ** n`"""
+        """Averages of `dx * du ** n`."""
         out = self._mean()[2]
         if self.compute:
             out = out.compute()
@@ -851,7 +864,7 @@ class DataValuesCentral(DataValuesBase):
 
     @gcached()
     def du(self):
-        """Averages of `du ** n`"""
+        """Averages of `du ** n`."""
         if self.x_isnot_u:
             out = self._mean()[1]
             if self.compute:
@@ -908,7 +921,7 @@ def factory_data_values(
     **kws,
 ):
     """
-    Factory function to produce a DataValues object
+    Factory function to produce a DataValues object.
 
     Parameters
     ----------
@@ -973,7 +986,7 @@ def factory_data_values(
 @docfiller_shared
 class DataCentralMomentsBase(AbstractData):
     """
-    Data object based on central co-moments array
+    Data object based on central co-moments array.
 
     Parameters
     ----------
@@ -1005,33 +1018,27 @@ class DataCentralMomentsBase(AbstractData):
 
     @property
     def order(self):
-        """Order of expansion"""
+        """Order of expansion."""
         return self.dxduave.sizes[self.umom_dim] - 1
 
     @property
     def values(self):
-        """Data underlying :attr:`dxduave`"""
+        """Data underlying :attr:`dxduave`."""
         return self.dxduave.values
 
     @gcached(prop=False)
     def rmom(self):
-        """
-        Raw co-moments
-        """
+        """Raw co-moments."""
         return self.dxduave.rmom()
 
     @gcached(prop=False)
     def cmom(self):
-        """
-        Central co-moments
-        """
+        """Central co-moments."""
         return self.dxduave.cmom()
 
     @gcached()
     def xu(self):
-        """
-        Averages of form ``x * u ** n``.
-        """
+        """Averages of form ``x * u ** n``."""
         return self.rmom().sel(**{self.xmom_dim: 1}, drop=True)
 
     @gcached()
@@ -1055,12 +1062,12 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def dxdu(self):
-        """Averages of form ``dx * dx ** n``"""
+        """Averages of form ``dx * dx ** n``."""
         return self.cmom().sel(**{self.xmom_dim: 1}, drop=True)
 
     @gcached()
     def du(self):
-        """Averages of ``du ** n``"""
+        """Averages of ``du ** n``."""
         if self.x_isnot_u:
             out = self.cmom().sel(**{self.xmom_dim: 0}, drop=True)
             if self.xalpha:
@@ -1072,21 +1079,21 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def u_selector(self):
-        """Indexer for ``u_selector[n] = u ** n``"""
+        """Indexer for ``u_selector[n] = u ** n``."""
         return DatasetSelector.from_defaults(
             self.u, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @gcached()
     def xu_selector(self):
-        """Indexer for ``xu_select[n] = x * u ** n``"""
+        """Indexer for ``xu_select[n] = x * u ** n``."""
         return DatasetSelector.from_defaults(
             self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
     @gcached()
     def xave_selector(self):
-        """Selector for ``xave``"""
+        """Selector for ``xave``."""
         if self.deriv_dim is None:
             return self.xave
         else:
@@ -1094,14 +1101,14 @@ class DataCentralMomentsBase(AbstractData):
 
     @gcached()
     def du_selector(self):
-        """Selector for ``du_selector[n] = du ** n``"""
+        """Selector for ``du_selector[n] = du ** n``."""
         return DatasetSelector.from_defaults(
             self.du, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @gcached()
     def dxdu_selector(self):
-        """Selector for ``dxdu_selector[n] = dx * du ** n``"""
+        """Selector for ``dxdu_selector[n] = dx * du ** n``."""
         return DatasetSelector.from_defaults(
             self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
@@ -1130,13 +1137,15 @@ class DataCentralMomentsBase(AbstractData):
 
 @attrs.define(slots=True)
 class DataCentralMoments(DataCentralMomentsBase):
+    """Data class using :class:`cmomy.xCentralMoments` to handle central moments."""
+
     def __len__(self):
         return self.values.sizes[self.rec_dim]
 
     @docfiller_shared
     def block(self, block_size, dim=None, axis=None, meta_kws=None, **kwargs):
         """
-        Block resample along axis
+        Block resample along axis.
 
         Parameters
         ----------
@@ -1162,7 +1171,7 @@ class DataCentralMoments(DataCentralMomentsBase):
     @docfiller_shared
     def reduce(self, dim=None, axis=None, meta_kws=None, **kwargs):
         """
-        Reduce along axis
+        Reduce along axis.
 
         Parameters
         ----------
@@ -1193,7 +1202,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         **kwargs,
     ):
         """
-        Resample data
+        Resample data.
 
         Parameters
         ----------
@@ -1359,7 +1368,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        Create DataCentralMoments object from individual (unaveraged) samples
+        Create DataCentralMoments object from individual (unaveraged) samples.
 
         Parameters
         ----------
@@ -1447,7 +1456,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        Create DataCentralMoments object from data
+        Create DataCentralMoments object from data.
 
         data[..., i, j] = weight                          i = j = 0
                         = < x >                           i = 1 and j = 0
@@ -1549,7 +1558,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        Create DataCentralMoments object from unaveraged samples with resampling
+        Create DataCentralMoments object from unaveraged samples with resampling.
 
         Parameters
         ----------
@@ -1649,7 +1658,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        create object with <u**n>, <x * u**n> arrays
+        Create object with <u**n>, <x * u**n> arrays.
 
         Parameters
         ----------
@@ -1685,7 +1694,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         """
 
         if xu is None or x_is_u:
-
             raw = u
 
             if w is not None:
@@ -1773,7 +1781,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        Constructor from central moments, with reduction along axis
+        Constructor from central moments, with reduction along axis.
 
         Parameters
         ----------
@@ -1963,7 +1971,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         x_is_u=False,
     ):
         """
-        Constructor from arrays
+        Constructor from arrays.
 
         Parameters
         ----------
@@ -2041,7 +2049,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         meta_kws=None,
     ):
         """
-        Resample data
+        Resample data.
 
         Parameters
         ----------

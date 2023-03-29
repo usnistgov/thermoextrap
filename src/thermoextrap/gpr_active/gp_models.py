@@ -1,3 +1,7 @@
+"""
+Models for Gaussian process regression (:mod:`~thermoextrap.gpr_active.gp_models`)
+----------------------------------------------------------------------------------
+"""
 from typing import Any, Optional
 
 import gpflow
@@ -29,7 +33,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
     Parameters
     ----------
-    kernel_expr : sympy expression
+    kernel_expr : Expr
         Expression for the kernel that can be differentiated - must have at
         least 2 symbols (symbol names should be 'x1' and 'x2', case insensitive,
         if have only 2)
@@ -49,7 +53,6 @@ class DerivativeKernel(gpflow.kernels.Kernel):
     def __init__(
         self, kernel_expr, obs_dims, kernel_params={}, active_dims=None, **kwargs
     ):
-
         #         if active_dims is not None:
         #             print("active_dims set to: ", active_dims)
         #             print("This is not implemented in this kernel, so setting to 'None'")
@@ -107,9 +110,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
     # Define ARD behavior (if ever want multiple dimensions with different lengthscales)
     @property
     def ard(self) -> bool:
-        """
-        Whether ARD behavior is active, following gpflow.kernels.Stationary
-        """
+        """Whether ARD behavior is active, following gpflow.kernels.Stationary."""
         return self.lengthscales.shape.ndims > 0
 
     def K(self, X, X2=None):
@@ -212,7 +213,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         return k_diag
 
     def _split_x_into_locs_and_deriv_info(self, x):
-        """Splits input into actual observable input and derivative labels"""
+        """Splits input into actual observable input and derivative labels."""
         locs = x[:, : self.obs_dims]
         grad_info = x[:, -self.obs_dims :]
         return locs, grad_info
@@ -375,6 +376,7 @@ class FullyHeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
         X_data, Y_data = self.data
         n = Y_data[:, -1]
         Y_data = Y_data[:, :1]
@@ -402,6 +404,7 @@ class FullyHeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
         if full_cov or full_output_cov:
             # See https://github.com/GPflow/GPflow/issues/1461
             raise NotImplementedError(
@@ -439,7 +442,7 @@ class FullyHeteroscedasticGPR(
 
 class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
     """
-    NOTE MAINTAINED, MAY BE OUT OF DATE AND NOT COMPATIBLE
+    NOTE MAINTAINED, MAY BE OUT OF DATE AND NOT COMPATIBLE.
 
     Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise
     variance. Note that the noise variance can be provided as a matrix or a 1D array.
@@ -461,7 +464,7 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
     ) -> None:
         """
         :param cov: The covariance matrix (or its diagonal) for the noise.
-        :param kwargs: Keyword arguments forwarded to :class:`ScalarLikelihood`.
+        :param kwargs: Keyword arguments forwarded to :class:`gpflow.likelihoods.ScalarLikelihood`.
         """
         super().__init__(**kwargs)
 
@@ -481,9 +484,7 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
         )
 
     def build_scaled_cov_mat(self):
-        """
-        Creates scaled covariance matrix using noise scale parameters
-        """
+        """Creates scaled covariance matrix using noise scale parameters."""
         return self.scale_noise * self.cov
 
     def _scalar_log_prob(
@@ -561,7 +562,7 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
     Returns
     -------
     p : array
-        Shape of length `D`. Vector of log probabilites for each dimension
+        Shape of length `D`. Vector of log probabilities for each dimension
         (summed over input locations) Since covariance matrices independent
         across dimensions but convey covariances across locations, makes sense
         to sum over locations as would for multivariate Gaussian over each
@@ -589,7 +590,8 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
 
 
 class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
-    r"""Heteroscedastic Gaussian likelihood with variance provided and no modeling
+    r"""
+    Heteroscedastic Gaussian likelihood with variance provided and no modeling
     of noise variance. Note that the noise variance can be provided as a matrix
     or a 1D array. If a 1D array, it is assumed that the off-diagonal elements
     of the noise covariance matrix are all zeros, otherwise the noise covariance
@@ -645,19 +647,19 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     p : float, default=10.0
         scaling of the covariance matrix dependent on derivative order
     s : float, default=0.0
-        scaling of the covariance matrix indepedent of derivative order
-    transform_p : object, default=gpflow.utilities.positive()
-      transformation of p during training of the GP model; the default is to
-      require it be positive
+        scaling of the covariance matrix independent of derivative order
+    transform_p : object, optional
+        Defaults to ``gpflow.utilities.positive()`` transformation of p during
+        training of the GP model; the default is to require it be positive
     transform_s : object, optional
         transformation of s during GP model training
     constrain_p : bool, default=False
         whether or not p should be constrained and not altered during GP model
         training
     constrain_s : bool, default=True
-        whether or not to contrain s during GP model training
+        whether or not to constrain s during GP model training
     **kwargs
-        Extra keyword arguments passed to :class:`ScalarLikelihood`
+        Extra keyword arguments passed to :class:`gpflow.likelihoods.ScalarLikelihood`
     """
 
     def __init__(
@@ -697,11 +699,12 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
 
     def build_scaled_cov_mat(self):
         """
-        Creates scaled covariance matrix using noise scale parameters
+        Creates scaled covariance matrix using noise scale parameters.
 
         Returns
         -------
-        tf.Tensor of the scaled covariance matrix
+        :class:`tensorflow.Tensor`
+            Tensor of the scaled covariance matrix
         """
         # First step is determining scaling based on exponential function
         # Add 1 so even zeroth order can be scaled
@@ -860,6 +863,8 @@ class HeteroscedasticGPR_analytical_scale(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
+
         X_data, Y_data = self.data
         err = Y_data - (self.mean_function(X_data) / self.scale_fac)
 
@@ -895,6 +900,7 @@ class HeteroscedasticGPR_analytical_scale(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
         raise NotImplementedError(
             "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
         )
@@ -935,7 +941,7 @@ class HeteroscedasticGPR(
     data : list of tuple
         A list or tuple of the input locations, output data, and noise
         covariance matrix, in that order
-    kernel : DerivativeKernel object
+    kernel : :class:`DerivativeKernel` object
         The kernel to use; must be DerivativeKernel or compatible subclass
         expecting derivative information provided in extra columns of the input
         locations
@@ -962,7 +968,6 @@ class HeteroscedasticGPR(
         x_scale_fac: Optional[float] = 1.0,
         likelihood_kwargs: Optional[dict] = {},
     ):
-
         X_data, Y_data, noise_cov = data
         self.out_dim = Y_data.shape[-1]
 
@@ -1031,6 +1036,7 @@ class HeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
         X_data, Y_data = self.data
 
         # Account for scaling in x for new inputs
@@ -1100,6 +1106,7 @@ class HeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
+        """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
         raise NotImplementedError(
             "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
         )
@@ -1194,7 +1201,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
 
     Parameters
     ----------
-    expr : sympy expression
+    expr : Expr
         Representing the functional form of the mean function.
     x_data : array-like
         the input locations of the data
@@ -1276,9 +1283,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
             setattr(self, s.name, opt.x[i])
 
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
-        """
-        Closely follows K_diag from DerivativeKernel
-        """
+        """Closely follows K_diag from DerivativeKernel."""
         x_vals = X[:, :1]
         d_vals = X[:, 1:]
         unique_d = tf.unique(tf.reshape(d_vals, (-1,)))[0]

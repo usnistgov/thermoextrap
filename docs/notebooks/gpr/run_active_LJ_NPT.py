@@ -1,6 +1,5 @@
 import argparse
 import glob
-import os
 import sys
 
 import numpy as np
@@ -137,9 +136,7 @@ class DensityGPModel:
         var = []
         for k in range(dens_info.shape[1]):
             this_g = timeseries.statisticalInefficiency(dens_info[:, k])
-            this_inds = timeseries.subsampleCorrelatedData(
-                np.arange(dens_info.shape[0]), this_g
-            )
+            timeseries.subsampleCorrelatedData(np.arange(dens_info.shape[0]), this_g)
             # Take logarithm to ensure density cannot go negative
             # Note that default transformation function handles this, modeling log(dens)
             # and transforming back to density for prediction
@@ -261,7 +258,6 @@ def find_phase_boundary(lnPi, pad=20):
 
 
 def main(inp_files, output_dir, mcf_file, ff_file, pdb_file, no_stop):
-
     T_lo = 0.7
     T_hi = 1.2
     beta_lo = 1 / T_lo
@@ -278,7 +274,6 @@ def main(inp_files, output_dir, mcf_file, ff_file, pdb_file, no_stop):
     box_vol = 512.0  # And box volume
 
     for b, act in zip([beta_lo, beta_hi], [act_sim_lo, act_sim_hi]):
-
         # Loading data
         file_prefix = "beta_{:f}/lj.t{}.n12m6.v512.rc3.b.r".format(
             b,
@@ -453,7 +448,7 @@ def main(inp_files, output_dir, mcf_file, ff_file, pdb_file, no_stop):
     for b in [beta_lo, beta_hi]:
         info_files = None
         bias_files = None
-        x_files = sorted(glob.glob("{}/beta_{:f}/vle_info*.txt".format(output_dir, b)))
+        x_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/vle_info*.txt"))
         dat_in.append(
             DataWrapPsat(
                 info_files,
@@ -497,7 +492,7 @@ def main(inp_files, output_dir, mcf_file, ff_file, pdb_file, no_stop):
         metrics.append(active_utils.MaxIter())
     stop_func = active_utils.StopCriteria(metrics, **update_stop_kwargs)
 
-    act_info_out = active_utils.active_learning(
+    active_utils.active_learning(
         dat_in,
         sim_wrap,
         update_func,

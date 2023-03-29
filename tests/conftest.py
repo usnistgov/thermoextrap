@@ -139,7 +139,7 @@ class FixtureData:
         """extrapolation model fixture"""
 
         em = thermoextrap.legacy.ExtrapModel(maxOrder=self.order)
-        params = em.train(self.beta0, xData=self.x, uData=self.u, saveParams=True)
+        em.train(self.beta0, xData=self.x, uData=self.u, saveParams=True)
 
         return em
 

@@ -7,17 +7,13 @@ import numpy as np
 
 
 def attrs_clear_cache(self, attribute, value):
-    """
-    clear out _cache if setting value
-    """
+    """Clear out _cache if setting value."""
     setattr(self, "_cache", {})
     return value
 
 
 def optional_converter(converter):
-    """
-    Create a converter which can pass through None
-    """
+    """Create a converter which can pass through None."""
 
     def wrapped(value):
         if value is None or attrs.NOTHING:
@@ -39,7 +35,7 @@ def field_formatter(fmt: str = "{:.5g}"):
 
 
 def field_array_formatter(threshold=3, **kws):
-    """Formatter for numpy array field"""
+    """Formatter for numpy array field."""
 
     @optional_converter
     def wrapped(value):
@@ -50,19 +46,15 @@ def field_array_formatter(threshold=3, **kws):
 
 
 def private_field(init=False, repr=False, **kws):
-    """
-    Create a private attrs field.
-    """
+    """Create a private attrs field."""
     return attrs.field(init=init, repr=repr, **kws)
 
 
 def kw_only_field(kw_only=True, **kws):
-
     return attrs.field(kw_only=kw_only, **kws)
 
 
 def convert_dims_to_tuple(dims):
-
     if dims is None or isinstance(dims, tuple):
         pass
     if isinstance(dims, str):
@@ -86,16 +78,15 @@ def _cache_field(init=False, repr=False, factory=dict, **kws):
 
 @attrs.define
 class MyAttrsMixin:
-    """
-    Baseclass for adding some sugar to attrs.derived classes.
-    """
+    """Baseclass for adding some sugar to attrs.derived classes."""
 
     def asdict(self) -> dict:
-        """Convert object to dictionary"""
+        """Convert object to dictionary."""
         return attrs.asdict(self, filter=self._get_smart_filter())
 
     def new_like(self, **kws):
-        """Create a new object with optional parameters
+        """
+        Create a new object with optional parameters.
 
         Parameters
         ----------
@@ -105,13 +96,11 @@ class MyAttrsMixin:
         return attrs.evolve(self, **kws)
 
     def assign(self, **kws):
-        """Alias to :meth:`new_like`"""
+        """Alias to :meth:`new_like`."""
         return self.new_like(**kws)
 
     def set_params(self, **kws):
-        """
-        Set parameters of self, and retun self (for chaining)
-        """
+        """Set parameters of self, and return self (for chaining)."""
 
         for name in kws.keys():
             assert hasattr(self, name)
@@ -140,6 +129,7 @@ class MyAttrsMixin:
         ...
         ...     def __attrs_post_init__(self):
         ...         self._immutable_setattrs(_derived=self.r_min + 10)
+        ...
 
         >>> x = Derived(r_min=5)
         >>> x._derived
@@ -153,7 +143,7 @@ class MyAttrsMixin:
         self, include=None, exclude=None, exclude_private=True, exclude_no_init=True
     ):
         """
-        create a filter to include exclude names
+        Create a filter to include exclude names.
 
         Parameters
         ----------
@@ -168,7 +158,7 @@ class MyAttrsMixin:
 
         Notes
         -----
-        Precidence is in order
+        Precedence is in order
         `include, exclude, exclude_private exclude_no_init`.
         That is, if a name is in include and exclude and is private/no_init,
         it will be included
@@ -187,7 +177,6 @@ class MyAttrsMixin:
 
         includes = []
         for f in fields:
-
             if f.name in include:
                 includes.append(f)
 

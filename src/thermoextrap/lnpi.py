@@ -1,5 +1,8 @@
-"""
-Routinese to temperature expand lnPi
+r"""
+Inverse temperature expansion of macrostate distribution (:mod:`~thermoextrap.lnpi`)
+====================================================================================
+
+This is used to extrapolate, in inverse temperature :math:`\beta = (k_{\rm B} T)^{-1}`, the macrostate distribution function :math:`\ln\Pi` from transition matrix Monte Carlo simulations.
 """
 
 from __future__ import annotations
@@ -10,7 +13,6 @@ from typing import Hashable, Sequence
 
 import attrs
 import numpy as np
-import sympy as sp
 import xarray as xr
 
 # from attrs import converters as attc
@@ -18,19 +20,15 @@ from attrs import field
 from attrs import validators as attv
 from cmomy import xCentralMoments
 
-from .beta import ExtrapModel, SymDerivBeta
-from .beta import factory_derivatives as factory_derivatives_beta
-from .beta import u_func, u_func_central
-from .core._attrs_utils import (  # MyAttrsMixin,; kw_only_field,
-    _cache_field,
-    convert_dims_to_tuple,
-)
+from . import beta as beta_xpan
+
+# from .beta import ExtrapModel, SymDerivBeta, u_func, u_func_central
+# from .beta import factory_derivatives as factory_derivatives_beta
+from .core._attrs_utils import _cache_field, convert_dims_to_tuple
 from .core._docstrings import factory_docfiller_shared
 from .core.cached_decorators import gcached
-from .core.data import (  # DataCentralMome nts,; DataCentralMomentsVals,; DataValues,; DataValuesCentral,
-    DataCallbackABC,
-)
-from .core.models import Derivatives, SymSubs
+from .core.data import DataCallbackABC
+from .core.models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol
 
 docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
@@ -39,21 +37,38 @@ docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
 ################################################################################
 # lnPi correction stuff
 ################################################################################
-class lnPi_func_central(sp.Function):
-    """
-    This is a special case of u_func_central.
+class lnPi_func_central(SymFuncBase):
+    r"""
+    Special case of u_func_central.
 
-    For lnPi, have dlnPi/dbeta = mu * N - <u> + <u - mu * N>_GC.
-    We ignore the GC average term, as it does not depend on N
-    So, the first derivative of this function is u_func_central.
-    We consider only a correction of the form
-    lnPi_energy = lnPi - beta * mu * N = lnQ - ln XI, where Q, XI are the canonical
-    and GC partition functions.
+    For lnPi, have:
 
-    Then,
-    Y' = -U
-    Y'' = -U'
-    etc
+    .. math::
+
+        \newcommand{\ave}[1]{\langle #1 \rangle}
+
+        (\ln \Pi)' = \frac{d \ln \Pi}{d \beta} = \mu N - \ave{u} + \ave{u - \mu N}_{\rm GC}
+
+    where :math:`\ave{}` and :math:`\ave{}_{\rm GC}` are the canonical and grand canonical (GC) ensemble averages.
+    We ignore the GC average term, as it does not depend on N.  Note that this is not
+    necessarily the case for molecular systems.
+    So, the first derivative of this function is :func:`thermoextrap.beta.u_func_central`.
+    We consider only a correction of the form:
+
+    .. math::
+
+        (\ln\Pi)_{\text{energy}} = \ln\Pi - \beta \mu N = \ln Q - \ln \Xi
+
+    where :math:`Q\text{ and }\Xi` are the canonical and GC partition functions, respectively. thus,
+
+    .. math::
+
+        \begin{align*}
+          (\ln\Pi)_{\text{energy}}'  &= - U \\
+          (\ln\Pi)_{\text{energy}}'' &=  -U' \\
+              &\,\,\vdots
+        \end{align*}
+
     """
 
     nargs = 1
@@ -63,11 +78,11 @@ class lnPi_func_central(sp.Function):
 
     @classmethod
     def deriv_args(cls):
-        return u_func_central.deriv_args() + [cls.lnPi0, cls.mudotN]
+        return beta_xpan.u_func_central.deriv_args() + [cls.lnPi0, cls.mudotN]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
-        return self.mudotN - u_func_central(beta)
+        return self.mudotN - beta_xpan.u_func_central(beta)
 
     @classmethod
     def eval(cls, beta):
@@ -78,10 +93,8 @@ class lnPi_func_central(sp.Function):
         return out
 
 
-class lnPi_func_raw(sp.Function):
-    """
-    Raw moments version.
-    """
+class lnPi_func_raw(SymFuncBase):
+    """Raw moments version."""
 
     nargs = 1
     u = get_default_indexed("u")
@@ -90,11 +103,11 @@ class lnPi_func_raw(sp.Function):
 
     @classmethod
     def deriv_args(cls):
-        return u_func.deriv_args() + [cls.lnPi0, cls.mudotN]
+        return beta_xpan.u_func.deriv_args() + [cls.lnPi0, cls.mudotN]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
-        return self.mudotN - u_func(beta, 1)
+        return self.mudotN - beta_xpan.u_func(beta, 1)
 
     @classmethod
     def eval(cls, beta):
@@ -117,7 +130,7 @@ def factory_derivatives(
     post_func=None,
 ):
     """
-    Expansion for ln(Pi/Pi_0) (ignore bad parts of stuff)
+    Expansion for ln(Pi/Pi_0) (ignore bad parts of stuff).
 
     Parameters
     ----------
@@ -133,7 +146,7 @@ def factory_derivatives(
 
     Returns
     -------
-    ~thermoextrap.Derivatives
+    ~thermoextrap.models.Derivatives
 
     See Also
     --------
@@ -146,14 +159,14 @@ def factory_derivatives(
             func = lnPi_func_central(beta)
         else:
             func = lnPi_func_raw(beta)
-        derivs = SymDerivBeta(func=func, expand=expand, post_func=post_func)
+        derivs = beta_xpan.SymDerivBeta(func=func, expand=expand, post_func=post_func)
 
         exprs = SymSubs(
             derivs, subs_all={derivs.beta: "None"}, expand=False, simplify=False
         )
         return Derivatives.from_sympy(exprs, args=derivs.args)
     else:
-        return factory_derivatives_beta(
+        return beta_xpan.factory_derivatives(
             name=name,
             n=n,
             d=d,
@@ -247,14 +260,11 @@ class lnPiDataCallback(DataCallbackABC):
 
     @gcached()
     def mudotN(self):
-        """Dot product of `self.mu` and `self.ncoords`, reduces along `self.dims_comp`"""
+        """Dot product of `self.mu` and `self.ncoords`, reduces along `self.dims_comp`."""
         return xr.dot(self.mu, self.ncoords, dims=self.dims_comp)
 
     def resample(self, data, meta_kws=None, **kws):
-        """
-        Resample lnPi0 data.
-
-        """
+        """Resample lnPi0 data."""
 
         if not self.allow_resample:
             raise ValueError(
@@ -381,7 +391,7 @@ def factory_extrapmodel_lnPi(
     derivatives_kws=None,
 ):
     """
-    factory function to create Extrapolation model for beta expansion
+    Factory function to create Extrapolation model for beta expansion.
 
     Parameters
     ----------
@@ -395,19 +405,19 @@ def factory_extrapmodel_lnPi(
     {central}
     {post_func}
     {alpha_name}
-    derivatives : :class:`thermoextrap.Derivatives`, optional
+    derivatives : :class:`thermoextrap.models.Derivatives`, optional
         Derivates object.  If not passed, construct derivatives using :func:`thermoextrap.lnpi.factory_derivatives`.
     derivates_kws : mapping, optional
         Optional parameters to :func:`thermoextrap.lnpi.factory_derivatives`.
 
     Returns
     -------
-    extrapmodel : :class:`~thermoextrap.ExtrapModel`
+    extrapmodel : :class:`~thermoextrap.models.ExtrapModel`
 
     See Also
     --------
     thermoextrap.lnpi.factory_derivatives
-    ~thermoextrap.ExtrapModel
+    ~thermoextrap.models.ExtrapModel
     """
 
     if central is None:

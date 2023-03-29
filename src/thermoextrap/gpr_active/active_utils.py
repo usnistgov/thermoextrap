@@ -1,3 +1,7 @@
+"""
+GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
+------------------------------------------------------------
+"""
 import glob
 import multiprocessing
 import os
@@ -47,7 +51,8 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
 
     Parameters
     ----------
-    state : an ExtrapModel object containing derivative information
+    state : ExtrapModel
+      object containing derivative information
     n_rep : int, default=100
         Number of bootstrap draws of data to perform to compute variances
     log_scale : bool, default=False
@@ -55,14 +60,14 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
         (i.e., compute derivatives of dy/dlog(x) instead of dy/dx)
 
     Returns
-    ----------
-    x_data
+    -------
+    x_data : object
         input locations, likely state points (e.g., temperature, pressure, etc.),
         augmented with derivative order of each observation, as required for GP
         models
-    y_data
+    y_data : object
         Output data, which includes both function values and derivative information
-    cov_data
+    cov_data : object
         covariance matrix between function observations, including derivative
         observations; note that this will be block-diagonal since it is expected
         that the state objects at different conditions are based on information
@@ -123,7 +128,8 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
 
 
 class DataWrapper:
-    """Class to keep track of metadata around the data. Data will not be stored here, but
+    """
+    Class to keep track of metadata around the data. Data will not be stored here, but
     this class will define how data is loaded and processed. If want to change the
     column indices, simply have to call get_data, then build_state in two separate
     steps rather than just calling build_state. Handles multiple files, but only
@@ -146,7 +152,7 @@ class DataWrapper:
         the reciprocal temperature (1/(kB*T)) of the simulations in this data set
     x_files : list of str, optional
         the files containing the quantity of interest for the active
-        learning procedure; default is to asssume this is the CV in cv_bias_files
+        learning procedure; default is to assume this is the CV in cv_bias_files
         and that these are not necessary
     n_frames : int, default=10000
         number of frames from the END of simulation(s), or the files read in, to
@@ -196,7 +202,8 @@ class DataWrapper:
         return U
 
     def load_CV_info(self):
-        """Loads data from a file specifying CV coordinate and added bias at each frame.
+        """
+        Loads data from a file specifying CV coordinate and added bias at each frame.
         Assumes that the first value in col_ind is the index of the CV coordinate column and the
         second is the index for the bias.
         """
@@ -219,7 +226,8 @@ class DataWrapper:
         return x
 
     def get_data(self):
-        """Loads data from files needed to generate data classes for thermoextrap.
+        """
+        Loads data from files needed to generate data classes for thermoextrap.
         Will change significantly if using MBAR on trajectories with different biases.
         """
         tot_pot = self.load_U_info()
@@ -260,7 +268,8 @@ class DataWrapper:
         return pot, x, w
 
     def build_state(self, all_data=None, max_order=6):
-        """Builds a thermoextrap data object for the data described by this wrapper class.
+        """
+        Builds a thermoextrap data object for the data described by this wrapper class.
         If all_data is provided, should be list or tuple of (potential energies, X) to
         be used, where X should be appropriately weighted if the simulation is biased.
         """
@@ -277,7 +286,8 @@ class DataWrapper:
 
 
 class SimWrapper:
-    """Wrapper around simulations to spawn similar simulations easily and keep
+    """
+    Wrapper around simulations to spawn similar simulations easily and keep
     track of all parameter values.
 
     Parameters
@@ -294,8 +304,8 @@ class SimWrapper:
         name of file with CV values and bias for simulation to produce
     kw_inputs : dict, optional
         additional keyword inputs to the simulation
-    data_class : DataWrapper like object
-        class to use for wrapping simulation output data;
+    data_class : object
+        class (e.g., :class:`DataWrapper`) to use for wrapping simulation output data;
         data will be wrapped before returned to the active learning algorithm
     post_process_func : callable, optional
         Function for post-processing simulation outputs but before
@@ -351,7 +361,8 @@ class SimWrapper:
         self.pre_func = pre_process_func  # Pre-processing function (predict extra args)
 
     def run_sim(self, sim_dir, alpha, n_repeats=1, **extra_kwargs):
-        """Runs simulation(s) and returns an object of type self.data_class pointing to
+        """
+        Runs simulation(s) and returns an object of type self.data_class pointing to
         right files. By default only one, but will run n_repeats in parallel if specified.
         """
         # Create directory if does not exist
@@ -403,7 +414,7 @@ class SimWrapper:
                     sim_dir,
                     self.pp_out_name,
                     sim_num=curr_sim_num + i,
-                    **self.pp_kw_inputs
+                    **self.pp_kw_inputs,
                 )
             sim_x_files = sorted(
                 glob.glob(os.path.join(sim_dir, self.pp_out_name + "*"))
@@ -419,7 +430,7 @@ class SimWrapper:
             sim_bias_files,
             alpha,
             x_files=sim_x_files,
-            **self.data_kw_inputs
+            **self.data_kw_inputs,
         )
 
         # If have pre-processing function provide sim info to update it
@@ -438,7 +449,7 @@ class SimWrapper:
 
 def make_matern_expr(p):
     """
-    Creates a sympy expression for the Matern kernel of order p
+    Creates a sympy expression for the Matern kernel of order p.
 
     Parameters
     ----------
@@ -447,7 +458,7 @@ def make_matern_expr(p):
 
     Returns
     -------
-    expr : sympy expression
+    expr : Expr
     kern_params : dict
         parameters matching naming in sympy expression
     """
@@ -475,11 +486,11 @@ def make_matern_expr(p):
 
 def make_rbf_expr():
     """
-    Creates a sympy expression for an RBF kernel
+    Creates a sympy expression for an RBF kernel.
 
     Returns
     -------
-    expr : sympy expression
+    expr : Expr
     kern_params : dict
         parameters matching naming in sympy expression
     """
@@ -497,7 +508,7 @@ def make_rbf_expr():
 
 def make_poly_expr(p):
     """
-    Creates a sympy expression for a polynomial kernel
+    Creates a sympy expression for a polynomial kernel.
 
     Parameters
     ----------
@@ -506,7 +517,7 @@ def make_poly_expr(p):
 
     Returns
     -------
-    expr : sympy expression
+    expr : Expr
     kern_params : dict
         parameters matching naming in sympy expression
     """
@@ -575,7 +586,6 @@ class ChangeInnerOuterRBFDerivKernel(DerivativeKernel):
     """
 
     def __init__(self, c1=-7.0, c2=-2.0, **kwargs):
-
         x1 = sp.symbols("x1", real=True)
         x2 = sp.symbols("x2", real=True)
 
@@ -650,7 +660,7 @@ def create_base_GP_model(
         MEANINGFUL MEAN FUNCTION IN THAT CASE (JUST ZEROS)
     shared_kernel : bool, default=True
         whether or not the kernel will be shared across output dimensions
-    kernel : kernel object.
+    kernel : object
         Defaults to RBFDerivKernel.  Kernel to use in GP model.
     mean_func : callable, optional
         mean function to use for GP model
@@ -658,8 +668,8 @@ def create_base_GP_model(
         keyword arguments to pass to the likelihood model
 
     Returns
-    ---------
-    gpr: HeteroscedasticGPR object
+    -------
+    gpr: :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Note, that this is an untrained model.
     """
     # Will be helpful to know where have zero-order derivatives in data
@@ -764,7 +774,6 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 
     # If provided with starting parameters, also do optimization starting with them
     if start_params is not None:
-
         # Record optimized parameters with default starting values
         optim_params = [tpar.numpy() for tpar in gpr.trainable_parameters]
 
@@ -815,7 +824,7 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
 
     Parameters
     ----------
-    state_list : list of ExtrapModel objects
+    state_list : list of ExtrapModel
         Each at different conditions.
     log_scale : bool, default=False
         whether or not to compute derivatives with respect to x or the logarithm
@@ -826,8 +835,8 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
         Additional dictionary of keyword arguments to pass to create_base_GP_model
 
     Returns
-    ----------
-    gpr : HeteroscedasticGPR object
+    -------
+    gpr : :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Trained model.
     """
 
@@ -898,7 +907,7 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
 # Then it should return the median of the transformed distribution, an uncertainty estimate,
 # which for a Gaussian should be the std, but for other distributions could be std or some
 # confidence width, and finally upper and lower bounds of a confidence interval
-# (preferrably around 95%)
+# (preferably around 95%)
 # Here only implement the simplest (and default) transformation, the identity transform
 # (which also computes std given variance and upper and lower confidence interval values)
 def identityTransform(x, y, y_var):
@@ -978,9 +987,7 @@ class UpdateStopABC:
         return alpha_grid, alpha_select
 
     def get_transformed_GP_output(self, gpr, x_vals):
-        """
-        Returns output of GP and transforms it, evaluating GP using predict_f at alpha values.
-        """
+        """Returns output of GP and transforms it, evaluating GP using predict_f at alpha values."""
         # Could use predict_y instead
         # But cannot unless have model for noise at new points, so just work with predict_f
         # If do have reason to work with predict_y, inherit this class and modify this method
@@ -1029,7 +1036,7 @@ class UpdateFuncBase(UpdateStopABC):
         save_plot=False,
         save_dir="./",
         compare_func=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
 
@@ -1043,7 +1050,7 @@ class UpdateFuncBase(UpdateStopABC):
     def do_plotting(self, x, y, err, alpha_list):
         """
         Plots output used to select new update point.
-        err is expected to be length 2 list with upper and lower confidence intervals
+        err is expected to be length 2 list with upper and lower confidence intervals.
         """
 
         import matplotlib.pyplot as plt
@@ -1107,7 +1114,6 @@ class UpdateFuncBase(UpdateStopABC):
 
 
 class UpdateALMbrute(UpdateFuncBase):
-
     """
     Performs active learning with a GPR to select new location for performing simulation.
     This is called "Active Learning Mackay" in the book by Grammacy (Surrogates, 2022).
@@ -1175,7 +1181,6 @@ class UpdateALMbrute(UpdateFuncBase):
 
 
 class UpdateRandom(UpdateFuncBase):
-
     """
     Select point randomly along a grid based on previously sampled points.
     This does not require training a GP model, but one is trained anyway for plotting, etc.
@@ -1206,7 +1211,6 @@ class UpdateRandom(UpdateFuncBase):
 
 
 class UpdateSpaceFill(UpdateFuncBase):
-
     """
     Select point as far as possible from previously sampled points.
     This will just be halfway between for two points. For situations where
@@ -1253,7 +1257,6 @@ class UpdateSpaceFill(UpdateFuncBase):
 
 
 class UpdateAdaptiveIntegrate(UpdateFuncBase):
-
     """
     Select point as far as possible from previously sampled points, but within
     specified error tolerance based on model relative uncertainty predictions.
@@ -1471,8 +1474,8 @@ class MetricBase:
     def __init__(self, name, tol):
         """
         Inputs:
-            name - name of metric
-            tol - tolerance to define stopping criteria
+        name - name of metric
+        tol - tolerance to define stopping criteria.
         """
         super().__init__()
         self.name = name
@@ -1495,9 +1498,7 @@ class MetricBase:
 
 
 class MaxVar(MetricBase):
-    """
-    Metric based on maximum variance of GP output.
-    """
+    """Metric based on maximum variance of GP output."""
 
     def __init__(self, tol, name="MaxVar", **kwargs):
         super().__init__(tol=tol, name=name, **kwargs)
@@ -1940,7 +1941,7 @@ class StopCriteria(UpdateStopABC):
     def __init__(self, metric_funcs, **kwargs):
         """
         Inputs:
-            metric_funcs - dictionary of (name, function) pairs; just nice to have names
+        metric_funcs - dictionary of (name, function) pairs; just nice to have names.
         """
         # Make sure avoid repeats is False for reproducibility
         kwargs["avoid_repeats"] = False
@@ -2022,16 +2023,19 @@ def active_learning(
     save_history=False,
     use_predictions=False,
 ):
-    """Continues adding new points with active learning by running simulations until the
+    """
+    Continues adding new points with active learning by running simulations until the
     specified tolerance is reached or the maximum number of iterations is achieved.
 
     Parameters
     ----------
-    init_states : list of initial DataWrapper objects
-    sim_wrapper : SimWrapper object for running simulations
+    init_states : list of :class:`DataWrapper`
+    sim_wrapper : :class:`SimWrapper`
+        Object for running simulations.
     update_func : callable
         For selecting the next state point.
-    base_dir : string (file path)
+    base_dir : string
+        File path.
         based directory in which active learning run performed and outputs generated
     stop_criteria : callable, optional
         callable taking GP to determine if should stop
@@ -2060,9 +2064,9 @@ def active_learning(
 
     Returns
     -------
-    data_list : list of DataWrapper objects
+    data_list : list of :class:`DataWrapper`
         List of DataWrapper objects describing how to load data (can be used to build states and create_GPR to generate GP model)
-    train_history - dict
+    train_history : dict
         Dictionary of information about results at each training
         iteration, like GP predictions, losses, parameters, etc.
     """
@@ -2090,7 +2094,7 @@ def active_learning(
             # Run simulation and return DataWrapper object for this state
             # Multiple simulation repeats will be performed in parallel
             data_list[i] = sim_wrapper.run_sim(
-                "{}/{}_{:f}".format(base_dir, alpha_name, state),
+                f"{base_dir}/{alpha_name}_{state:f}",
                 state,
                 n_repeats=num_state_repeats,
             )
@@ -2112,7 +2116,6 @@ def active_learning(
     # Loop over iterations, breaking if reach stopping criteria
     # Go to max_iter+1 so that have final model and its predictions
     for i in range(max_iter + 1):
-
         # Create GP model with current information, first building ExtrapModel objects
         state_list = [dat.build_state(max_order=max_order) for dat in data_list]
         if i == 0:
@@ -2164,10 +2167,10 @@ def active_learning(
 
         # Run simulations for current data
         this_data = sim_wrapper.run_sim(
-            "{}/{}_{:f}".format(base_dir, alpha_name, new_alpha),
+            f"{base_dir}/{alpha_name}_{new_alpha:f}",
             new_alpha,
             n_repeats=num_state_repeats,
-            **new_model_info
+            **new_model_info,
         )
 
         # If we're adding data to a previously sampled state, need to replace in data_list
@@ -2191,7 +2194,7 @@ def active_learning(
             pred_mu=stop_criteria.history[0],
             pred_std=stop_criteria.history[1],
             alpha=np.array(alpha_list),
-            **train_history
+            **train_history,
         )
 
     return data_list, train_history

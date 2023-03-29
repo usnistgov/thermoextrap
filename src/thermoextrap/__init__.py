@@ -1,9 +1,7 @@
-"""
-To access data/models/etc use thermoextrap.core.data....
-"""
+"""Classes/routines to deal with thermodynamic extrapolation."""
 
 from . import beta, lnpi, volume, volume_idealgas
-from .core import idealgas
+from .core import data, idealgas, models
 from .core.data import (
     DataCentralMoments,
     DataCentralMomentsVals,
@@ -60,6 +58,8 @@ __all__ = [
     "xrwrap_uv",
     "xrwrap_alpha",
     "idealgas",
+    "data",
+    "models",
     "beta",
     "lnpi",
     "volume",
