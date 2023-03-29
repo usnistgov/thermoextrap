@@ -1,6 +1,6 @@
 """
 Volume extrapolation (:mod:`~thermoextrap.volume`)
-==================================================.
+==================================================
 
 Note: This only handles volume expansion to first order.
 Also, Only DataValues like objects are supported.

@@ -1,6 +1,6 @@
 """
 Data handlers (:mod:`~thermoextrap.data`)
-=========================================.
+=========================================
 
 The general scheme is to use the following:
 

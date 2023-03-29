@@ -142,7 +142,7 @@ select = [
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 # fixable = ["A", "B", "C", "D", "E", "F", "..."]
-unfixable = []
+unfixable = ["D"]
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -190,8 +190,11 @@ ignore = [
     "D202",
     "D105",
     "D205",
+    # this leads to errors with placing titles in module
+    # docstrings
     "D400",
     "D401",
+    "D415",
     "D102",
     "D103",
     # these are useful, but too many errors
@@ -204,6 +207,8 @@ ignore = [
 ]
 
 per-file-ignores = {}
+
+
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"

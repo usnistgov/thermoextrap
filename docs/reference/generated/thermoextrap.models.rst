@@ -1,6 +1,5 @@
 ﻿
 
-
 .. automodule:: thermoextrap.models
    :autosummary:
    :show-inheritance:

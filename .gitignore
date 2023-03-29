@@ -110,3 +110,5 @@ pyrightconfig.json
 /docs/generated/
 /monkeytype.sqlite3
 /dist-conda/
+/cruft.patch
+/docs/jupyter_execute/

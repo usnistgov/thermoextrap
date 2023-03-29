@@ -1,7 +1,4 @@
-"""
-Top level API (:mod:`thermoextrap`)
-===================================.
-"""
+"""Classes/routines to deal with thermodynamic extrapolation."""
 
 from . import beta, lnpi, volume, volume_idealgas
 from .core import data, idealgas, models

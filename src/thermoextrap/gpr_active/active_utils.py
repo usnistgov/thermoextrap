@@ -1,6 +1,6 @@
 """
 GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
-------------------------------------------------------------.
+------------------------------------------------------------
 """
 import glob
 import multiprocessing

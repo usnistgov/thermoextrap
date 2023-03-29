@@ -298,7 +298,6 @@ def _build_param_docstring(name, ptype, desc):
 
     Parameters
     ----------
-    ==========
     name : str
         Parameter Name
     ptype : str
