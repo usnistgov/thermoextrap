@@ -82,7 +82,7 @@ class SymFuncBase(sp.Function):
         """
         Evaluate function.
 
-        We use the convetion of passing in `beta='None'` to evaluate the
+        We use the convention of passing in `beta='None'` to evaluate the
         function to an indexable variable.
         """
         raise NotImplementedError("must specify in subclass")
