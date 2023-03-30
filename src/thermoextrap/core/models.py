@@ -73,8 +73,7 @@ class SymFuncBase(sp.Function):
 
         See Also
         --------
-        sympy.lambdify
-
+        sympy.utilities.lambdify.lambdify
         """
         raise NotImplementedError("must specify in sublcass")
 
@@ -211,11 +210,15 @@ class Lambdify:
     Parameters
     ----------
     exprs : sequence of symFunction
-        array of sympy expressions to :func:`~sympy.utilities.lambdify`
+        array of sympy expressions to ``lambdify``
     args : sequence of Symbol
         array of symbols which will be in args of the resulting function
     lambdify_kws : dict
-        extra arguments to :func:`~sympy.utilities.lambdify`
+        extra arguments to ``lambdify``
+
+    See Also
+    --------
+    sympy.utilities.lambdify.lambdify
     """
 
     exprs: Sequence[sp.Function] = field()

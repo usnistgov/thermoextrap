@@ -152,7 +152,7 @@ def train_iterative(
     alpha_tol : float, default=0.01
         new states must have `abs(alpha_new - alpha) > alpha_tol` for all existing states.
     callback : callable
-        stop = callback(model, alphas, info_dict, **callback_kws).
+        `stop = callback(model, alphas, info_dict, **callback_kws)`.
         If callback returns something that evaluates True, then the iteration stops.
         * model : current model.
         * alphas : sequence of alphas
@@ -291,7 +291,7 @@ def train_recursive(
     alpha_tol : float, default=0.01
         new states must have `abs(alpha_new - alpha) > alpha_tol` for all existing states.
     callback : callable
-        stop = callback(model, alphas, info_dict, **callback_kws).
+        `stop = callback(model, alphas, info_dict, **callback_kws)`.
         If callback returns something that evaluates True, then the iteration stops.
         `model` is the current model.
         `alphas` is the sequence of alphas
