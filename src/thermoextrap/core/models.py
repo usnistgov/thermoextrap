@@ -69,7 +69,12 @@ class SymFuncBase(sp.Function):
         """
         Symbol arguments of function.
 
-        This is used by Data class to create a lambdafied callable function.
+        This is used by Data class to create a 'lambdfied' callable function.
+
+        See Also
+        --------
+        sympy.lambdify
+
         """
         raise NotImplementedError("must specify in sublcass")
 
@@ -83,7 +88,7 @@ class SymFuncBase(sp.Function):
         Evaluate function.
 
         We use the convention of passing in `beta='None'` to evaluate the
-        function to an indexable variable.
+        function to an indexed variable.
         """
         raise NotImplementedError("must specify in subclass")
 

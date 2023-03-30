@@ -3,6 +3,8 @@ Inverse temperature expansion of macrostate distribution (:mod:`~thermoextrap.ln
 ====================================================================================
 
 This is used to extrapolate, in inverse temperature :math:`\beta = (k_{\rm B} T)^{-1}`, the macrostate distribution function :math:`\ln\Pi` from transition matrix Monte Carlo simulations.
+
+See :ref:`notebooks/macrostate_dist_extrap:macrostate distribution extrapolation` for example usage.
 """
 
 from __future__ import annotations
@@ -398,7 +400,7 @@ def factory_extrapmodel_lnPi(
     {beta}
     data : object
         Data object.
-        Should include lnPiDataCallback object as well
+        Should include :class:`lnPiDataCallback` object as well
     order : int, optional
         maximum order.
         If not specified, default to `data.order + 1`
@@ -406,7 +408,7 @@ def factory_extrapmodel_lnPi(
     {post_func}
     {alpha_name}
     derivatives : :class:`thermoextrap.models.Derivatives`, optional
-        Derivates object.  If not passed, construct derivatives using :func:`thermoextrap.lnpi.factory_derivatives`.
+        Derivatives object.  If not passed, construct derivatives using :func:`thermoextrap.lnpi.factory_derivatives`.
     derivates_kws : mapping, optional
         Optional parameters to :func:`thermoextrap.lnpi.factory_derivatives`.
 

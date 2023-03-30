@@ -1,6 +1,12 @@
 """
+Adaptive interpolation (:mod:`~thermoextrap.adaptive_interp`)
+=============================================================
+
 Holds recursive interpolation class.
 This includes the recursive training algorithm and consistency checks.
+
+See :ref:`notebooks/temperature_interp:adaptive interpolation` for example usage.
+
 """
 
 
@@ -13,9 +19,9 @@ from scipy import stats
 
 def window(seq, n=2):
     """
-    Returns a sliding window (of width n) over data from the iterable.
+    Returns a sliding window (of width n) over data from `seq`.
 
-    s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
+    ``s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...``
     """
     it = iter(seq)
     result = tuple(islice(it, n))
@@ -109,9 +115,9 @@ def train_iterative(
     Each iteration calculates the relative error, then adds a state
     where error is largest.
 
-    NOTE:  The big difference between this and the recursive interopolation
+    NOTE:  The big difference between this and the recursive interpolation
     is that a single set of alphas is passed, and always considered.  That is, each
-    iteration considers the whole range of alphas.  If this is undeirable, we go back to
+    iteration considers the whole range of alphas.  If this is undesirable, we go back to
     a recursive?
 
 
@@ -126,7 +132,7 @@ def train_iterative(
     factory_statecollection : callable
         state collection factory.
         `model = factory_statecollection(states)`
-    states : list of states, optional
+    states : list of object, optional
         initial states list.  If not passed, first guess at states is
         `[factory_state(alphas[0]), factory_state(alphas[-1])]`
     reduce_dim : str
@@ -161,7 +167,7 @@ def train_iterative(
 
     Returns
     -------
-    model : statecollection
+    model : :class:`thermoextrap.models.StateCollection` instance
         final output of `factory_statecollection`
     info : list of dict
         Information from each iteration
@@ -245,9 +251,9 @@ def train_recursive(
     Each iteration calculates the relative error, then adds a state
     where error is largest.
 
-    NOTE:  The big difference between this and the recursive interopolation
+    NOTE:  The big difference between this and the recursive interpolation
     is that a single set of alphas is passed, and always considered.  That is, each
-    iteration considers the whole range of alphas.  If this is undeirable, we go back to
+    iteration considers the whole range of alphas.  If this is undesirable, we go back to
     a recursive?
 
 
@@ -262,10 +268,10 @@ def train_recursive(
     factory_statecollection : callable
         state collection factory.
         `model = factory_statecollection(states)`
-    state0, state1 : states
+    state0, state1 : object
         states to be used for building model.
         defaults to building states at `alphas[0]` and `alphas[-1]`
-    states : list of states, optional
+    states : list of object, optional
         initial states list.  If not passed, first guess at states is
         `[factory_state(alphas[0]), factory_state(alphas[-1])]`
     reduce_dim : str
@@ -304,7 +310,7 @@ def train_recursive(
 
     Returns
     -------
-    states : list of states
+    states : list of object
         list of states
     info : list of dict
         Information from each iteration
@@ -438,7 +444,7 @@ def check_polynomial_consistency(
 
     Parameters
     ----------
-    states : sequence
+    states : sequence of object
         sequence of states
     factory_statecollection : callable
         `model = factory_statecollection(states, **statecollection_kws)`
@@ -520,13 +526,13 @@ def factory_state_idealgas(
     Parameters
     ----------
     seed_from_beta : bool, default=True
-        If `True`, then set np.random.seed based on beta value.
+        If `True`, then set `np.random.seed` based on beta value.
         For testing purposes
 
     See Also
     --------
     thermoextrap.idealgas
-    thermoextrap.xpan_beta.factory_extrapmodel
+    thermoextrap.beta.factory_extrapmodel
     """
 
     from . import beta as xpan_beta
@@ -563,7 +569,7 @@ def callback_plot_progress(  # noqa: D417
     maxdepth_stop : int, optional
         Note that this is redundant with `maxdepth`, but for demonstration
         purposes
-    ax : matplotlib axes, optional
+    ax : :class:`matplotlib.axes.Axes`, optional
     """
 
     import matplotlib.pyplot as plt
@@ -601,6 +607,7 @@ def callback_plot_progress(  # noqa: D417
 
 
 def plot_polynomial_consistency(alphas, states, factory_statecollection):
+    """Plotter for polynomial consistency."""
     import matplotlib.pyplot as plt
 
     P, models_dict = check_polynomial_consistency(states, factory_statecollection)
