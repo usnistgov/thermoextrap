@@ -9,7 +9,10 @@
     :toctree: generated/
     :template: autodocsumm/module.rst
 
+    thermoextrap.idealgas
     thermoextrap.beta
     thermoextrap.volume
     thermoextrap.volume_idealgas
+    thermoextrap.recursive_interp
+    thermoextrap.adaptive_interp
     thermoextrap.lnpi

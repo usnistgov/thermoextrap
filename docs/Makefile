@@ -28,7 +28,7 @@ allclean: clean
 	rm -rf generated/*
 	rm -rf reference/generated/*
 
-.PHONY: help Makefile
+.PHONY: help Makefile allclean
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
@@ -40,14 +40,7 @@ allclean: clean
 livehtml:
 	$(SPHINXAUTOBUILD) "$(SOURCEDIR)" "$(BUILDDIR)/html" $(ALLSPHINXAUTOOPTS) $(O)
 
-# livehtml:
-# 	$(SPHINXAUTOBUILD) $(ALLSPHINXAUTOOPTS) "$(SOURCEDIR)" "$(BUILDDIR)/html"
 
-
-# livehtml2:
-# 	sphinx-autobuild 	\
-# 		--ignore '_build/*' \
-# 		--ignore 'reference/generated/*' \
-# 		--ignore 'jupyter_execute/*' \
-# 		--ignore 'notebooks/.ipynb_checkpoints/*' \
-# 		. _build/html
+.PHONY: showlinks
+showlinks:
+	python -m sphinx.ext.intersphinx $(BUILDDIR)/html/objects.inv
