@@ -44,20 +44,13 @@ The sources for thermodynamic-extrapolation can be downloaded from the [Github r
 You can either clone the public repository:
 
 ```console
-$ git clone git://github.com/wpk-nist-gov/thermoextrap
-```
-
-Or download the [tarball]:
-
-```console
-$ curl -OJL https://github.com/wpk-nist-gov/thermoextrap/tarball/master
+$ git clone git://github.com/usnistgov/thermo-extrap.git
 ```
 
 Once you have a copy of the source, you can install it with:
 
 ```console
-$ python setup.py install
+$ pip install .
 ```
 
-[github repo]: https://github.com/wpk-nist-gov/thermoextrap
-[tarball]: https://github.com/wpk-nist-gov/thermoextrap/tarball/master
+[github repo]: https://github.com/usnistgov/thermo-extrap
