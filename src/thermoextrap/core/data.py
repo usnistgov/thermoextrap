@@ -1023,7 +1023,14 @@ class DataCentralMomentsBase(AbstractData):
 
     @property
     def values(self):
-        """Data underlying :attr:`dxduave`."""
+        """
+        Data underlying :attr:`dxduave`.
+
+        See Also
+        --------
+        cmomy.xCentralMoments.values
+
+        """
         return self.dxduave.values
 
     @gcached(prop=False)
@@ -1917,15 +1924,21 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     {dxduave}
     """
 
+    #: Stored energy values
     uv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    #: Stored observable values
     xv: xr.DataArray | None = field(
         validator=attv.optional(attv.instance_of(xr.DataArray))
     )
+    #: Expansion order
     order: int | None = kw_only_field(
         default=None, validator=attv.optional(attv.instance_of(int))
     )
+    #: Stored weights
     w: Sequence | None = kw_only_field(default=None)
+    #: Optional parameteres to :meth:`cmomy.xCentralMoments.from_vals`
     from_vals_kws: Mapping | None = kw_only_field(default=None)
+    #: :class:`cmomy.xCentralMoments` object
     dxduave: xCentralMoments | None = kw_only_field(
         default=None,
         validator=attv.optional(attv.instance_of(xCentralMoments)),

@@ -69,7 +69,11 @@ class SymFuncBase(sp.Function):
         """
         Symbol arguments of function.
 
-        This is used by Data class to create a lambdafied callable function.
+        This is used by Data class to create a 'lambdfied' callable function.
+
+        See Also
+        --------
+        sympy.utilities.lambdify.lambdify
         """
         raise NotImplementedError("must specify in sublcass")
 
@@ -83,7 +87,7 @@ class SymFuncBase(sp.Function):
         Evaluate function.
 
         We use the convention of passing in `beta='None'` to evaluate the
-        function to an indexable variable.
+        function to an indexed variable.
         """
         raise NotImplementedError("must specify in subclass")
 
@@ -206,11 +210,15 @@ class Lambdify:
     Parameters
     ----------
     exprs : sequence of symFunction
-        array of sympy expressions to :func:`~sympy.utilities.lambdify`
+        array of sympy expressions to ``lambdify``
     args : sequence of Symbol
         array of symbols which will be in args of the resulting function
     lambdify_kws : dict
-        extra arguments to :func:`~sympy.utilities.lambdify`
+        extra arguments to ``lambdify``
+
+    See Also
+    --------
+    sympy.utilities.lambdify.lambdify
     """
 
     exprs: Sequence[sp.Function] = field()
