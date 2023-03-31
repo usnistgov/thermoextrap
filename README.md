@@ -26,21 +26,25 @@
 [Numba]: https://numba.pydata.org/
 [xarray]: https://docs.xarray.dev/en/stable/
 [cmomy]: https://github.com/usnistgov/cmomy
+[gpr-link]: https://github.com/usnistgov/thermo-extrap/tree/master/docs/notebooks/gpr
+[notebook-link]: https://github.com/usnistgov/thermo-extrap/tree/master/docs/notebooks
+
 
 
 # `thermoextrap`: Thermodynamic Extrapolation/Interpolation Library
-This repository contains code used and described in:
 
-Monroe, J. I.; Hatch, H. W.; Mahynski, N. A.; Shell, M. S.; Shen, V. K. Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density. J. Chem. Phys. 2020, 153 (14), 144101. https://doi.org/10.1063/5.0014282.
+This repository contains code used and described in references [^fn1] [^fn2].
 
-Monroe, J. I.; Krekelberg, W. P.; McDannald, A.; Shen, V. K. Leveraging Uncertainty Estimates and Derivative Information in Gaussian Process Regression for Expedited Data Collection in Molecular Simulations. In preparation.
+[^fn1]: [Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density](https://doi.org/10.1063/5.0014282)
+
+[^fn2]: Leveraging Uncertainty Estimates and Derivative Information in Gaussian Process Regression for Expedited Data Collection in Molecular Simulations. In preparation.
 
 
 ## Overview
 
 If you find this code useful in producing published works, please provide an appropriate citation.
 Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
-For now, the GPR code, along with more information, may be found under docs/notebooks/gpr.
+For now, the GPR code, along with more information, may be found under [here][gpr-link].
 In a future release, we expect this to be fully integrated into the code base rather than a standalone module.
 
 Code included here can be used to perform thermodynamic extrapolation and
@@ -48,7 +52,7 @@ interpolation of observables calculated from molecular simulations. This allows
 for more efficient use of simulation data for calculating how observables change
 with simulation conditions, including temperature, density, pressure, chemical
 potential, or force field parameters. Users are highly encourage to work through
-the Jupyter Notebook tutorial (Ideal_Gas_Example.ipynb) presenting examples for
+the [Jupyter Notebooks][notebook-link] presenting examples for
 a variety of different observable functional forms. We only guarantee that this
 code is functional for the test cases we present here or for which it has
 previously been applied Additionally, the code may be in continuous development
