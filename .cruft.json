@@ -9,7 +9,7 @@
       "AUTHORS.md",
       "MANIFEST.in",
       "docs/spelling_wordlist.txt",
-      "environment/",
+      "environment/"
   ],
   "context": {
     "cookiecutter": {
