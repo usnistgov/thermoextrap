@@ -20,6 +20,7 @@ dependencies:
   - ghp-import
   - gpflow
   - myst-nb
+  - pydata-sphinx-theme==0.13.1
   - pyenchant
   - sphinx
   - sphinx-autobuild
