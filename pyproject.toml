@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "setuptools>=61.2",
-    "setuptools_scm[toml]>=3.4",
+    "setuptools_scm[toml]>=7.0",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -71,13 +71,15 @@ test = [
 ## Will transition when everything works (grayskull in particular)
 ## and will remove setup.py
 # [tool.setuptools]
-# zip-safe = true
+# zip-safe = true # if using mypy, must be False
 # include-package-data = true
 # license-files = ["LICENSE"]
 
 # [tool.setuptools.packages.find]
 # namespaces = true
 # where = ["src"]
+## include = []
+## exclude = []
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md", "HISTORY.md", "LICENSE"], content-type = "text/markdown"}
@@ -114,7 +116,7 @@ select = [
   # pyupgrade
   "UP",
   # pydocstyle
-  "D"
+  "D",
   # # flake8-2020
   # "YTT",
   # # flake8-bugbear
@@ -136,7 +138,7 @@ select = [
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 # fixable = ["A", "B", "C", "D", "E", "F", "..."]
-unfixable = ["D"]
+unfixable = []
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -197,12 +199,9 @@ ignore = [
     "D107",
     "D203",
     "D212",
-
 ]
 
 per-file-ignores = {}
-
-
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"

@@ -91,10 +91,10 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
 2. Clone your fork locally:
 
     ```bash
-    git clone git@github.com:your_name_here/thermoextrap.git
+    git clone git@github.com:your_name_here/thermo-extrap.git
     ```
 
-3. Create development environment.  Using the makefile will install a development version using mamba.
+3. Create development environment.  Using the `make` will install a development version using mamba.
 
     ```bash
     make mamba-dev
@@ -151,7 +151,7 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
     tox
     ```
 
-    or using the makefile:
+    or using the `make`:
 
     ```bash
     make test-all
