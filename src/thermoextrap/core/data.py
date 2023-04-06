@@ -1936,7 +1936,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     )
     #: Stored weights
     w: Sequence | None = kw_only_field(default=None)
-    #: Optional parameteres to :meth:`cmomy.xCentralMoments.from_vals`
+    #: Optional parameters to :meth:`cmomy.xCentralMoments.from_vals`
     from_vals_kws: Mapping | None = kw_only_field(default=None)
     #: :class:`cmomy.xCentralMoments` object
     dxduave: xCentralMoments | None = kw_only_field(

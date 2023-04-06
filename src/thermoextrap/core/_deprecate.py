@@ -9,13 +9,7 @@ import inspect
 import warnings
 from functools import wraps
 from textwrap import dedent
-from typing import (
-    Any,
-    Callable,
-    Mapping,
-    TypeVar,
-    cast,
-)
+from typing import Any, Callable, Mapping, TypeVar, cast
 
 # to maintain type information across generic functions and parametrization
 T = TypeVar("T")
