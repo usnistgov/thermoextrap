@@ -2,5 +2,4 @@ dependencies:
     - setuptools
     - setuptools-scm
     - twine
-    - setuptools_scm_git_archive
     - build
