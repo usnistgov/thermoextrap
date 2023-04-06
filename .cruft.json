@@ -10,7 +10,7 @@
     "MANIFEST.in",
       "README.md",
     "docs/spelling_wordlist.txt",
-    "environment/"
+      "environment/*-extras.yaml"
   ],
   "context": {
     "cookiecutter": {
