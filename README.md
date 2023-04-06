@@ -111,8 +111,6 @@ To have a look at using `thermo-extrap` with Gaussian process regression, look i
 
 This is free software.  See [LICENSE][license-link].
 
-## Related wor
-
 ## Related work
 
 This package extensively uses the [cmomy] package to handle central comoments.
