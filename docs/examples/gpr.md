@@ -10,9 +10,7 @@ For all of the code an analysis necessary to reproduce the paper associated with
 ```{toctree}
 :maxdepth: 1
 
-<!-- ../notebooks/gpr/README.md -->
-
-../notebooks/gpr/Ideal_Gas
-../notebooks/gpr/LJ_lnPi
-../notebooks/gpr/SWF_Adsorption
+notebooks/gpr/Ideal_Gas
+notebooks/gpr/LJ_lnPi
+notebooks/gpr/SWF_Adsorption
 ```
