@@ -17,5 +17,5 @@ dependencies:
   - pip:
       - tensorflow
       - tensorflow-probability
-      - gpflow
+      - gpflow<2.6.0
 # prefix: /Users/wpk/miniforge3/envs/gpflow_test

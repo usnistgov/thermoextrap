@@ -11,7 +11,7 @@ The notebooks associated with this section can be found [here](https://github.co
 
 ../notebooks/gpr/README.md
 
-../notebooks/gpr/IdealGas
+../notebooks/gpr/Ideal_Gas
 ../notebooks/gpr/analysis_LJ_GEMC
 ../notebooks/gpr/analysis_LJ_NPT
 ../notebooks/gpr/analysis_LJ_lnPi
