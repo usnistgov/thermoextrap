@@ -5,7 +5,7 @@ Recursive interpolation (:mod:`~thermoextrap.recursive_interp`)
 Holds recursive interpolation class.
 This includes the recursive training algorithm and consistency checks.
 
-See :ref:`notebooks/temperature_interp:recursive interpolation` for example usage.
+See :ref:`examples/notebooks/temperature_interp:recursive interpolation` for example usage.
 """
 
 
