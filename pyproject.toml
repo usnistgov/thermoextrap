@@ -166,8 +166,7 @@ exclude = [
     "src/thermoextrap/tests",
     "tests/",
     "src/thermoextrap/legacy/",
-    "docs/notebooks/gpr/",
-
+    "examples/gpr_active_learning/",
 ]
 
 

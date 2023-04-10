@@ -1,12 +1,15 @@
 # User Guide
 
+This uses the links created in `create-symlinks.sh`
+
+
 
 :::{toctree}
 :maxdepth: 2
 
-notebooks/Test_System_Ideal_Gas
-notebooks/Data_Organization
+usage/basic/Test_System_Ideal_Gas
+usage/basic/Data_Organization
 thermo-extrap
-notebooks/Customized_Derivatives
+usage/basic/Customized_Derivatives
 gpr
 :::
