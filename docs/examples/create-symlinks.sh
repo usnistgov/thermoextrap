@@ -1,10 +1,12 @@
+# this creates symlinks to files in thermoextrap/examples directory.
+
 exts=(ipynb md)
 
 
-rm -rf notebooks/*
-for path in $(cat *.md | grep '^notebooks/'); do
+rm -rf usage
+for path in $(cat *.md | grep '^usage/'); do
 
-    target="../../"${path}
+    target="../../examples/"${path}
     name=$(basename $target)
 
     if [ -f $target ]; then
@@ -27,15 +29,17 @@ for path in $(cat *.md | grep '^notebooks/'); do
 
 
     new_dir=$(dirname $path)
+    mkdir -p $new_dir
+
     total_target=$(realpath --relative-to=${new_dir} $target)
 
-    echo "target $target"
-    echo "base  $base"
-    echo "ext  $ext"
-    echo "total_target $total_target"
+    # echo "target $target"
+    # echo "base  $base"
+    # echo "ext  $ext"
+    echo "target $total_target"
     echo "new_dir $new_dir"
+    echo ""
 
-    mkdir -p $new_dir
 
     ln -s $total_target $new_dir
 

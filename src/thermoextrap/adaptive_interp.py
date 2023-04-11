@@ -5,7 +5,7 @@ Adaptive interpolation (:mod:`~thermoextrap.adaptive_interp`)
 Holds recursive interpolation class.
 This includes the recursive training algorithm and consistency checks.
 
-See :ref:`examples/notebooks/temperature_interp:adaptive interpolation` for example usage.
+See :ref:`examples/usage/basic/temperature_interp:adaptive interpolation` for example usage.
 
 """
 
