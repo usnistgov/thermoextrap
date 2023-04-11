@@ -16,8 +16,8 @@ N_cutoff = 481  # N value beyond which ln_Pi becomes unreliable, so won't use
 
 # Change path below to set which data set to use
 # SRS_data was used for the main text, higher_order_LJ_lnPi_data for Fig. S4 in the SI
-SRS_base_dir = os.path.expanduser("~/bin/thermo-extrap/docs/notebooks/gpr/SRS_data")
-# SRS_base_dir = os.path.expanduser("~/bin/thermo-extrap/docs/notebooks/gpr/higher_order_LJ_lnPi_data")
+SRS_base_dir = os.path.expanduser("~/bin/thermoextrap/docs/notebooks/gpr/SRS_data")
+# SRS_base_dir = os.path.expanduser("~/bin/thermoextrap/docs/notebooks/gpr/higher_order_LJ_lnPi_data")
 
 
 # Necessary functions

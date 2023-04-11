@@ -123,7 +123,7 @@ github_username = "usnistgov"
 
 html_context = {
     "github_user": "usnistgov",
-    "github_repo": "thermo-extrap",
+    "github_repo": "thermoextrap",
     "github_version": "master",
     "doc_path": "docs",
 }
@@ -231,7 +231,7 @@ source_suffix = {
 master_doc = "index"
 
 # General information about the project.
-project = "thermo-extrap"
+project = "thermoextrap"
 copyright = "2021, William P. Krekelberg"
 author = "William P. Krekelberg"
 
@@ -292,7 +292,7 @@ html_theme = "sphinx_book_theme"
 html_theme_options = dict(
     # analytics_id=''  this is configured in rtfd.io
     # canonical_url="",
-    repository_url=f"https://github.com/{github_username}/thermo-extrap",
+    repository_url=f"https://github.com/{github_username}/thermoextrap",
     repository_branch=html_context["github_version"],
     path_to_docs=html_context["doc_path"],
     # use_edit_page_button=True,
@@ -374,7 +374,7 @@ latex_documents = [
     (
         master_doc,
         "thermoextrap.tex",
-        "thermo-extrap Documentation",
+        "thermoextrap Documentation",
         "William P. Krekelberg",
         "manual",
     ),
@@ -389,7 +389,7 @@ man_pages = [
     (
         master_doc,
         "thermoextrap",
-        "thermo-extrap Documentation",
+        "thermoextrap Documentation",
         [author],
         1,
     ),
@@ -405,7 +405,7 @@ texinfo_documents = [
     (
         master_doc,
         "thermoextrap",
-        "thermo-extrap Documentation",
+        "thermoextrap Documentation",
         author,
         "thermoextrap",
         "One line description of project.",
@@ -482,7 +482,7 @@ def linkcode_resolve(domain, info):
 
     fn = os.path.relpath(fn, start=os.path.dirname(thermoextrap.__file__))
 
-    return f"https://github.com/{github_username}/thermo-extrap/blob/{html_context['github_version']}/src/thermoextrap/{fn}{linespec}"
+    return f"https://github.com/{github_username}/thermoextrap/blob/{html_context['github_version']}/src/thermoextrap/{fn}{linespec}"
 
 
 # only set spelling stuff if installed:

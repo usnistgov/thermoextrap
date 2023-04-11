@@ -9,7 +9,7 @@ This uses the links created in `create-symlinks.sh`
 
 usage/basic/Test_System_Ideal_Gas
 usage/basic/Data_Organization
-thermo-extrap
+thermoextrap
 usage/basic/Customized_Derivatives
 gpr
 :::

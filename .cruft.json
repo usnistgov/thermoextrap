@@ -24,7 +24,7 @@
             "github_username": "usnistgov",
             "pypi_username": "wpk-nist",
             "conda_channel": "wpk-nist",
-            "project_name": "thermo-extrap",
+            "project_name": "thermoextrap",
             "project_slug": "thermoextrap",
             "_copy_without_render": [
                 "*.html",

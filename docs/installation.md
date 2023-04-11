@@ -44,7 +44,7 @@ The sources for thermodynamic-extrapolation can be downloaded from the [Github r
 You can either clone the public repository:
 
 ```console
-$ git clone git://github.com/usnistgov/thermo-extrap.git
+$ git clone git://github.com/usnistgov/thermoextrap.git
 ```
 
 Once you have a copy of the source, you can install it with:
@@ -53,4 +53,4 @@ Once you have a copy of the source, you can install it with:
 $ pip install .
 ```
 
-[github repo]: https://github.com/usnistgov/thermo-extrap
+[github repo]: https://github.com/usnistgov/thermoextrap

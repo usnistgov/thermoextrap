@@ -13,7 +13,7 @@ license = {text = '"NIST license https://www.nist.gov/director/licensing"'}
 description = "Thermodynamic extrapolation"
 # if using markdown
 # long_description_content_type = text/markdown
-keywords = ["thermo-extrap"]
+keywords = ["thermoextrap"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "License :: Public Domain",
@@ -40,8 +40,8 @@ dependencies = [
 
 
 [project.urls]
-homepage = "https://github.com/usnistgov/thermo-extrap"
-documentation = "https://pages.nist.gov/thermo-extrap/"
+homepage = "https://github.com/usnistgov/thermoextrap"
+documentation = "https://pages.nist.gov/thermoextrap/"
 
 [project.optional-dependencies]
 accel = ["bottleneck"]

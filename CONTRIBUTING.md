@@ -9,7 +9,7 @@ You can contribute in many ways:
 
 ### Report Bugs
 
-Report bugs at <https://github.com/usnistgov/thermo-extrap/issues>.
+Report bugs at <https://github.com/usnistgov/thermoextrap/issues>.
 
 If you are reporting a bug, please include:
 
@@ -29,13 +29,13 @@ and "help wanted" is open to whoever wants to implement it.
 
 ### Write Documentation
 
-`thermo-extrap` could always use more documentation, whether as part of the
-official `thermo-extrap` docs, in docstrings, or even on the web in blog posts,
+`thermoextrap` could always use more documentation, whether as part of the
+official `thermoextrap` docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at <https://github.com/usnistgov/thermo-extrap/issues>.
+The best way to send feedback is to file an issue at <https://github.com/usnistgov/thermoextrap/issues>.
 
 If you are proposing a feature:
 
@@ -91,7 +91,7 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
 2. Clone your fork locally:
 
     ```bash
-    git clone git@github.com:your_name_here/thermo-extrap.git
+    git clone git@github.com:your_name_here/thermoextrap.git
     ```
 
     The example notebooks require the `examples/data` submodule to be loaded.
