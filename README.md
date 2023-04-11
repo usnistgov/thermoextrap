@@ -19,15 +19,15 @@
 [conda-link]: https://anaconda.org/wpk-nist/thermoextrap
 <!-- Use total link so works from anywhere -->
 [license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
-[license-link]: https://github.com/usnistgov/thermoextrap/blob/master/LICENSE
+[license-link]: https://github.com/usnistgov/thermoextrap/blob/main/LICENSE
 <!-- For more badges, see https://shields.io/category/other and https://naereen.github.io/badges/ -->
 
 [numpy]: https://numpy.org
 [Numba]: https://numba.pydata.org/
 [xarray]: https://docs.xarray.dev/en/stable/
 [cmomy]: https://github.com/usnistgov/cmomy
-[gpr-link]: https://github.com/usnistgov/thermoextrap/tree/master/examples/gpr_active_learning
-[notebook-link]: https://github.com/usnistgov/thermoextrap/tree/master/examples/usage
+[gpr-link]: https://github.com/usnistgov/thermoextrap/tree/main/examples/gpr_active_learning
+[notebook-link]: https://github.com/usnistgov/thermoextrap/tree/main/examples/usage
 
 
 

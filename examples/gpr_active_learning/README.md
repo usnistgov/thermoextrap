@@ -86,4 +86,4 @@ situations.
 [OpenMM]: https://openmm.org/
 [FEASST]: https://pages.nist.gov/feasst/
 [CASSANDRA]: https://cassandra.nd.edu/
-[environment-link]: https://github.com/usnistgov/thermoextrap/blob/master/docs/notebooks/gpr/environment_active.yml
+[environment-link]: https://github.com/usnistgov/thermoextrap/blob/main/examples/gpr_active_learning/environment_active.yml
