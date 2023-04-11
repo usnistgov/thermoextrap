@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Active learning: adsorption of a square-well fluid in a pore &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+    <title>Active learning: adsorption of a square-well fluid in a pore &#8212; thermoextrap 0.2.3 documentation</title>
   
   
   
@@ -132,7 +132,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+    <p class="title logo__title">thermoextrap 0.2.3 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -150,8 +150,17 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../thermoextrap.html">Temperature Extrapolation/interpolation</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../basic/Temperature_Extrap_Case1.html">Temperature indepent average observable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic/Temperature_Extrap_Case2.html">Temperature dependent average observable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic/Temperature_Extrap_Case3.html">Temperature independent negative logarithm of average observable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic/Temperature_Extrap_Case4.html">Temperature dependent negative logarithm of average observable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic/Temperature_Interp.html">Temperature interpolation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic/Macrostate_Dist_Extrap.html">Macrostate distribution extrapolation</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../basic/Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="Ideal_Gas.html">Ideal Gas</a></li>
 <li class="toctree-l3"><a class="reference internal" href="LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">Active learning: adsorption of a square-well fluid in a pore</a></li>
@@ -159,7 +168,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
 
@@ -239,7 +248,7 @@
 
 
 
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
 
 
@@ -298,7 +307,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
 </ul>
@@ -533,7 +542,7 @@ document.write(`
 </div>
 <section id="preliminaries">
 <h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this heading">#</a></h2>
-<p>Define some constants related to the square-well fluid. Note that these are also defined in example_projects/gpr_active_learning/run_active_adsorption.py.</p>
+<p>Define some constants related to the square-well fluid. Note that these are also defined in <a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/examples/gpr_active_learning/run_active_adsorption.py">run_active_adsorption.py</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kBT_over_eps</span> <span class="o">=</span> <span class="mf">0.12500e01</span>
@@ -733,7 +742,7 @@ document.write(`
 </section>
 <section id="active-learning">
 <h2>Active learning<a class="headerlink" href="#active-learning" title="Permalink to this heading">#</a></h2>
-<p>At this point, we are ready to perform active learning. This is a pedogogical reproduction of the function <code class="docutils literal notranslate"><span class="pre">run_active</span></code> in <a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/example_projects/gpr_active_learning/run_active_adsorption.py"><code class="docutils literal notranslate"><span class="pre">run_active_adsorption.py</span></code></a>.</p>
+<p>At this point, we are ready to perform active learning. This is a pedogogical reproduction of the function <code class="docutils literal notranslate"><span class="pre">run_active</span></code> in <a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/examples/gpr_active_learning/run_active_adsorption.py"><code class="docutils literal notranslate"><span class="pre">run_active_adsorption.py</span></code></a>.</p>
 <p>First we need to define how the update will be performed. Here we will use maximum variance updates, though other possibilities are random or space-filling. This can be modified by changing the update function, with a number of options in <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#module-thermoextrap.gpr_active.active_utils" title="thermoextrap.gpr_active.active_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
