@@ -124,7 +124,7 @@ github_username = "usnistgov"
 html_context = {
     "github_user": "usnistgov",
     "github_repo": "thermoextrap",
-    "github_version": "master",
+    "github_version": "main",
     "doc_path": "docs",
 }
 
