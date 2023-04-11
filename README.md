@@ -9,25 +9,25 @@
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/ambv/black
 [pypi-badge]: https://img.shields.io/pypi/v/thermoextrap
-<!-- [pypi-badge]: https://badge.fury.io/py/thermo-extrap -->
+<!-- [pypi-badge]: https://badge.fury.io/py/thermoextrap -->
 [pypi-link]: https://pypi.org/project/thermoextrap
 [docs-badge]: https://img.shields.io/badge/docs-sphinx-informational
-[docs-link]: https://pages.nist.gov/thermo-extrap/
+[docs-link]: https://pages.nist.gov/thermoextrap/
 [repo-badge]: https://img.shields.io/badge/--181717?logo=github&logoColor=ffffff
-[repo-link]: https://github.com/usnistgov/thermo-extrap
+[repo-link]: https://github.com/usnistgov/thermoextrap
 [conda-badge]: https://img.shields.io/conda/v/wpk-nist/thermoextrap
 [conda-link]: https://anaconda.org/wpk-nist/thermoextrap
 <!-- Use total link so works from anywhere -->
 [license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
-[license-link]: https://github.com/usnistgov/thermo-extrap/blob/master/LICENSE
+[license-link]: https://github.com/usnistgov/thermoextrap/blob/master/LICENSE
 <!-- For more badges, see https://shields.io/category/other and https://naereen.github.io/badges/ -->
 
 [numpy]: https://numpy.org
 [Numba]: https://numba.pydata.org/
 [xarray]: https://docs.xarray.dev/en/stable/
 [cmomy]: https://github.com/usnistgov/cmomy
-[gpr-link]: https://github.com/usnistgov/thermo-extrap/tree/master/docs/notebooks/gpr
-[notebook-link]: https://github.com/usnistgov/thermo-extrap/tree/master/docs/notebooks
+[gpr-link]: https://github.com/usnistgov/thermoextrap/tree/master/examples/gpr_active_learning
+[notebook-link]: https://github.com/usnistgov/thermoextrap/tree/master/examples/usage
 
 
 
@@ -92,6 +92,19 @@ If you install `thermoextrap` with conda, there are additional optional dependen
 pip install tensorflow tensorflow-probability gpflow
 ```
 
+To install from source do the following:
+```bash
+git clone git@github.com:usnistgov/thermoextrap.git
+cd thermoextrap
+pip install . [-e]
+```
+
+To (optionally) include the example data do the following:
+```bash
+git submodule update --init  --recursive
+```
+
+
 ## Example usage
 
 ```python
@@ -103,15 +116,13 @@ import thermoextrap
 
 ## Documentation
 
-See the [documentation][docs-link] for a look at `thermo-extrap` in action.
+See the [documentation][docs-link] for a look at `thermoextrap` in action.
 
-To have a look at using `thermo-extrap` with Gaussian process regression, look in the [gpr][docs/notebooks/gpr] directory.
+To have a look at using `thermoextrap` with Gaussian process regression, look in the [gpr][docs/notebooks/gpr] directory.
 
 ## License
 
 This is free software.  See [LICENSE][license-link].
-
-## Related wor
 
 ## Related work
 

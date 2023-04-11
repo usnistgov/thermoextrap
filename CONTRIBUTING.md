@@ -9,7 +9,7 @@ You can contribute in many ways:
 
 ### Report Bugs
 
-Report bugs at <https://github.com/usnistgov/thermo-extrap/issues>.
+Report bugs at <https://github.com/usnistgov/thermoextrap/issues>.
 
 If you are reporting a bug, please include:
 
@@ -29,13 +29,13 @@ and "help wanted" is open to whoever wants to implement it.
 
 ### Write Documentation
 
-`thermo-extrap` could always use more documentation, whether as part of the
-official `thermo-extrap` docs, in docstrings, or even on the web in blog posts,
+`thermoextrap` could always use more documentation, whether as part of the
+official `thermoextrap` docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at <https://github.com/usnistgov/thermo-extrap/issues>.
+The best way to send feedback is to file an issue at <https://github.com/usnistgov/thermoextrap/issues>.
 
 If you are proposing a feature:
 
@@ -94,7 +94,13 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
     git clone git@github.com:your_name_here/thermoextrap.git
     ```
 
-3. Create development environment.  Using the makefile will install a development version using mamba.
+    The example notebooks require the `examples/data` submodule to be loaded.
+
+    ```bash
+    git submodule update --init --recursive
+    ```
+
+3. Create development environment.  Using the `make` will install a development version using mamba.
 
     ```bash
     make mamba-dev
@@ -151,7 +157,7 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
     tox
     ```
 
-    or using the makefile:
+    or using the `make`:
 
     ```bash
     make test-all

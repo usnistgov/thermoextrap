@@ -1,20 +1,16 @@
-<!-- :::{include} ../notebooks/gpr/README.md -->
-<!-- ::: -->
+# GP Models Utilizing Derivative Information and Active Learning
 
-# Gaussian process regression
+The notebooks contained here provide a set of tutorials for using the Gaussian Process Regression (GPR) modeling capabilities found in the {mod}`thermoextrap.gpr_active` module.
+For all of the code an analysis necessary to reproduce the paper associated with the development of this module, please see the [example_projects](https://github.com/usnistgov/thermoextrap/tree/master/examples/gpr_active_learning) directory.
 
-The notebooks associated with this section can be found [here](https://github.com/usnistgov/thermo-extrap/tree/master/docs/notebooks/gpr)
-
+:::{include} ../../examples/gpr_active_learning/README.md
+:start-after: <!-- start-docs-readme -->
+:::
 
 ```{toctree}
 :maxdepth: 1
 
-../notebooks/gpr/README.md
-
-../notebooks/gpr/IdealGas
-../notebooks/gpr/analysis_LJ_GEMC
-../notebooks/gpr/analysis_LJ_NPT
-../notebooks/gpr/analysis_LJ_lnPi
-../notebooks/gpr/analysis_adsorption
-../notebooks/gpr/analysis_polymer
+usage/gpr/Ideal_Gas
+usage/gpr/LJ_lnPi
+usage/gpr/SWF_Adsorption
 ```

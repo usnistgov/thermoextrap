@@ -112,3 +112,4 @@ pyrightconfig.json
 /dist-conda/
 /cruft.patch
 /docs/jupyter_execute/
+/docs/reference/generated/

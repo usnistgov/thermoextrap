@@ -18,7 +18,7 @@ dependencies:
 - pip:
   - autodocsumm
   - ghp-import
-  - gpflow
+  - gpflow<2.6.0
   - myst-nb
   - pydata-sphinx-theme==0.13.1
   - pyenchant

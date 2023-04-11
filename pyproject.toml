@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "setuptools>=61.2",
-    "setuptools_scm[toml]>=3.4",
+    "setuptools_scm[toml]>=7.0",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -13,7 +13,7 @@ license = {text = '"NIST license https://www.nist.gov/director/licensing"'}
 description = "Thermodynamic extrapolation"
 # if using markdown
 # long_description_content_type = text/markdown
-keywords = ["thermo-extrap"]
+keywords = ["thermoextrap"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "License :: Public Domain",
@@ -40,8 +40,8 @@ dependencies = [
 
 
 [project.urls]
-homepage = "https://github.com/usnistgov/thermo-extrap"
-documentation = "https://pages.nist.gov/thermo-extrap/"
+homepage = "https://github.com/usnistgov/thermoextrap"
+documentation = "https://pages.nist.gov/thermoextrap/"
 
 [project.optional-dependencies]
 accel = ["bottleneck"]
@@ -71,13 +71,15 @@ test = [
 ## Will transition when everything works (grayskull in particular)
 ## and will remove setup.py
 # [tool.setuptools]
-# zip-safe = true
+# zip-safe = true # if using mypy, must be False
 # include-package-data = true
 # license-files = ["LICENSE"]
 
 # [tool.setuptools.packages.find]
 # namespaces = true
 # where = ["src"]
+## include = []
+## exclude = []
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md", "HISTORY.md", "LICENSE"], content-type = "text/markdown"}
@@ -114,7 +116,7 @@ select = [
   # pyupgrade
   "UP",
   # pydocstyle
-  "D"
+  "D",
   # # flake8-2020
   # "YTT",
   # # flake8-bugbear
@@ -136,7 +138,7 @@ select = [
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 # fixable = ["A", "B", "C", "D", "E", "F", "..."]
-unfixable = ["D"]
+unfixable = []
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -164,8 +166,7 @@ exclude = [
     "src/thermoextrap/tests",
     "tests/",
     "src/thermoextrap/legacy/",
-    "docs/notebooks/gpr/",
-
+    "examples/gpr_active_learning/",
 ]
 
 
@@ -197,12 +198,9 @@ ignore = [
     "D107",
     "D203",
     "D212",
-
 ]
 
 per-file-ignores = {}
-
-
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"

@@ -1,0 +1,33 @@
+name: gpr-active
+channels:
+  - conda-forge
+  - wpk-nist
+dependencies:
+  - python=3.8
+  - swig=3.0.12
+  - cmake=3.12.2
+  - setuptools
+  - sympy
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
+  - xarray
+  - openmm
+  - cmomy
+  - pymbar<4.0
+  - netcdf4
+  - parmed
+  - mdtraj
+  - ipython
+  - ipykernel
+  - nglview
+  - cassandra
+  - tmmc-lnpy
+  - pip
+  - pip:
+      - tensorflow
+      - tensorflow-probability
+      - gpflow<2.6.0
+#To install, install this environment with conda, then install thermoextrap with pip
+#Finally, install feasst based on directions online

@@ -1,0 +1,13 @@
+T*              ln_z
+0.70             -6.25
+0.77             -5.80
+0.85             -4.80
+0.95             -4.10
+1.10             -3.38
+1.20             -3.00
+
+
+
+
+
+N_max should be set to 480 when analyzing data.

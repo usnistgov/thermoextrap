@@ -4,7 +4,7 @@ Inverse temperature expansion of macrostate distribution (:mod:`~thermoextrap.ln
 
 This is used to extrapolate, in inverse temperature :math:`\beta = (k_{\rm B} T)^{-1}`, the macrostate distribution function :math:`\ln\Pi` from transition matrix Monte Carlo simulations.
 
-See :ref:`notebooks/macrostate_dist_extrap:macrostate distribution extrapolation` for example usage.
+See :ref:`examples/usage/basic/macrostate_dist_extrap:macrostate distribution extrapolation` for example usage.
 """
 
 from __future__ import annotations

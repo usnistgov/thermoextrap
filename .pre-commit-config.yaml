@@ -65,7 +65,7 @@ repos:
       - id: flake8
         stages: [manual]
         additional_dependencies: [flake8-docstrings]
-        exclude: ^tests/|docs/notebooks/gpr/|src/thermoextrap/legacy/|^docs/conf.py|^setup.py
+        exclude: ^tests/|examples/gpr_active_learning/|src/thermoextrap/legacy/|^docs/conf.py|^setup.py
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.1.1
     hooks:
