@@ -452,11 +452,28 @@ def linkcode_resolve(domain, info):
     modname = info["module"]
     fullname = info["fullname"]
 
-    submod = sys.modules.get(modname)
-    if submod is None:
+    # submod = sys.modules.get(modname)
+    # if obj is None:
+    #     return None
+    # obj = submod
+
+    # resolve submodule a little differently
+    # sys.modules.get doesn't play nice with importing submules in main
+    # (e.g., from thermoextrap.core import idealgas )
+    parts = modname.split(".")
+    obj = sys.modules.get(parts[0])
+
+    if obj is None:
         return None
 
-    obj = submod
+    for part in parts[1:]:
+        try:
+            obj = getattr(obj, part)
+        except Attribute:
+            return None
+
+    # print("link submod", obj, type(obj))
+
     for part in fullname.split("."):
         try:
             obj = getattr(obj, part)
