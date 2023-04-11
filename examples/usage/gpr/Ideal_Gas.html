@@ -1,0 +1,1477 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Ideal Gas &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../../_static/js/leave_notice.js"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/usage/gpr/Ideal_Gas';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Lennard-Jones macrostate distribution" href="LJ_lnPi.html" />
+    <link rel="prev" title="GP Models Utilizing Derivative Information and Active Learning" href="../../gpr.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    thermoextrap: Thermodynamic Extrapolation/Interpolation Library
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Ideal Gas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SWF_Adsorption.html">Active learning: adsorption of a square-well fluid in a pore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-baseclasses.html">Base classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap/issues/new?title=Issue%20on%20page%20%2Fexamples/usage/gpr/Ideal_Gas.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/examples/usage/gpr/Ideal_Gas.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Ideal Gas</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-gp-model">Creating a GP model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compare-kernels-and-polynomial-interpolation">Compare kernels and polynomial interpolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demonstration-of-active-learning">Demonstration of active learning</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alm-maximum-variance">ALM (Maximum variance)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#space-filling">Space-filling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="ideal-gas">
+<h1>Ideal Gas<a class="headerlink" href="#ideal-gas" title="Permalink to this heading">#</a></h1>
+<p>In this notebook, we create a GP model for the temperature-dependence of the average position of a 1D ideal gas in an external field. The system is described in <a class="reference external" href="https://doi.org/10.1063/5.0014282">this paper</a>, and is available as a helpful test module in <a class="reference internal" href="../../../reference/api-public.html#module-thermoextrap" title="thermoextrap"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code></a> with GP and active-learning specific features defined in <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html#module-thermoextrap.gpr_active.ig_active" title="thermoextrap.gpr_active.ig_active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap.gpr_active.ig_active</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
+
+<span class="kn">import</span> <span class="nn">thermoextrap</span>
+<span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">idealgas</span>
+
+<span class="kn">import</span> <span class="nn">gpflow</span>
+
+<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">ig_active</span>
+<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">active_utils</span>
+<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">gp_models</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MaxNLocator</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gpflow</span><span class="o">.</span><span class="n">__version__</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;2.5.2&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<section id="creating-a-gp-model">
+<h2>Creating a GP model<a class="headerlink" href="#creating-a-gp-model" title="Permalink to this heading">#</a></h2>
+<p>To start, we need to create some data. We will create data for this analytically tractable system at <span class="math notranslate nohighlight">\(\beta = \frac{1}{k_\mathrm{B}T}\)</span> values of 0.1 (high temperature) and 9.6 (low temperature). We do this in two steps: first, we create <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html#thermoextrap.gpr_active.ig_active.IG_DataWrapper" title="thermoextrap.gpr_active.ig_active.IG_DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">IG_DataWrapper</span></code></a> class objects, then we use the associated <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html#thermoextrap.gpr_active.ig_active.IG_DataWrapper.get_data" title="thermoextrap.gpr_active.ig_active.IG_DataWrapper.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ig_active.IG_DataWrapper.get_data()</span></code></a> function of these objects to generate data. All <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a> objects must be able to generate new data to be useful for active learning. Since we will be comparing to methods like interpolation, and want all models to use the same data, it is important to have the separate data list here.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define beta values</span>
+<span class="n">beta_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">]</span>
+
+<span class="c1"># Create DataWrapper objects that can also be used to build states</span>
+<span class="n">wrap_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ig_active</span><span class="o">.</span><span class="n">IG_DataWrapper</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">beta_list</span><span class="p">]</span>
+
+<span class="c1"># Create actual data so consistent when build states with different orders</span>
+<span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">wrap</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span> <span class="k">for</span> <span class="n">wrap</span> <span class="ow">in</span> <span class="n">wrap_list</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we will require <code class="docutils literal notranslate"><span class="pre">State</span></code> objects for creating our GP model. We make sure that each <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html#thermoextrap.gpr_active.ig_active.IG_DataWrapper" title="thermoextrap.gpr_active.ig_active.IG_DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">IG_DataWrapper</span></code></a> object uses the previously generated data when creating a state rather than using new data, and we set the maximum derivative order to 3.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">state_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">wrap</span><span class="o">.</span><span class="n">build_state</span><span class="p">(</span><span class="n">all_data</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">max_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">wrap</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">wrap_list</span><span class="p">,</span> <span class="n">data_list</span><span class="p">)</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The quickest and easiest way to create a GP model from a list of states is to call <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.create_GPR" title="thermoextrap.gpr_active.active_utils.create_GPR"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.create_GPR()</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gp_model</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">create_GPR</span><span class="p">(</span><span class="n">state_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>OMP: Info #276: omp_set_nested routine deprecated, please use omp_set_max_active_levels instead.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Metal device set to: Apple M2
+</pre></div>
+</div>
+</div>
+</div>
+<p>The above creates a GPR model using the default RBF kernel and other default settings, then trains it, again with the default initial values, etc. To get a better sense of what is happening, we will break down the specific information needed to train a GP model and show how to change some default values. As a convenience, most of these can be changed through keyword arguments to <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.create_GPR" title="thermoextrap.gpr_active.active_utils.create_GPR"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.create_GPR()</span></code></a>, in particular the <code class="docutils literal notranslate"><span class="pre">base_kwargs</span></code> argument is a dictionary of arguments passed on to the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.create_base_GP_model" title="thermoextrap.gpr_active.active_utils.create_base_GP_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.create_base_GP_model()</span></code></a> function we will discuss below.</p>
+<p>Essential to a GP model are the input locations, here <span class="math notranslate nohighlight">\(\beta\)</span> values, output values (average ideal gas particle positions and derivatives of this with respect to <span class="math notranslate nohighlight">\(\beta\)</span>), and the noise covariance matrix (covariance matrix at each <span class="math notranslate nohighlight">\(\beta\)</span> for values and derivatives). The function <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.input_GP_from_state" title="thermoextrap.gpr_active.active_utils.input_GP_from_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.input_GP_from_state()</span></code></a> is helpful for generating this data from a given <code class="docutils literal notranslate"><span class="pre">State</span></code> object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">y_data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">cov_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">state_list</span><span class="p">:</span>
+    <span class="n">this_x_data</span><span class="p">,</span> <span class="n">this_y_data</span><span class="p">,</span> <span class="n">this_cov_data</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">input_GP_from_state</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">x_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_x_data</span><span class="p">)</span>
+    <span class="n">y_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_y_data</span><span class="p">)</span>
+    <span class="n">cov_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_cov_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Some manipulation is required to properly format this data, in particular making sure that the covariance matrix is block diagonal. In other words, we expect that the calculated values and derivatives at different temperatures are from indpependent simulations and therefore should have zero covariance - at least from the associated noise. We will, of course, employ a kernel with adjustable parameters that learns covariances between different temperatures as part of our GP model. At the same temperature, however, average values and derivatives will clearly have some noise covariance associated with the specific random sample drawn.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+<span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+<span class="n">noise_cov_mat</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">cov_data</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can see that the location data (<code class="docutils literal notranslate"><span class="pre">x_data</span></code>) includes the <span class="math notranslate nohighlight">\(\beta\)</span> values, but also the associated derivative order.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[0.1 0. ]
+ [0.1 1. ]
+ [9.6 0. ]
+ [9.6 1. ]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>The output data (<code class="docutils literal notranslate"><span class="pre">y_data</span></code>) includes the average particle position or derivative at each temperature. So from the <code class="docutils literal notranslate"><span class="pre">x_data</span></code>, we an see that the 3rd entry in the <code class="docutils literal notranslate"><span class="pre">y_data</span></code> list is the 2nd derivative at <span class="math notranslate nohighlight">\(\beta=0.1\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.49158797]
+ [-0.08323265]
+ [ 0.10408915]
+ [-0.01060673]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>As mentioned earlier, the covariance matrix is block-diagonal in structure with the <span class="math notranslate nohighlight">\(i^\mathrm{th}\)</span> entry in <code class="docutils literal notranslate"><span class="pre">x_data</span></code> corresponding to the <span class="math notranslate nohighlight">\(i\mathrm{th}\)</span> row or column in <code class="docutils literal notranslate"><span class="pre">noise_cov_mat</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">noise_cov_mat</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 8.37603984e-09 -2.19201971e-08  0.00000000e+00  0.00000000e+00]
+ [-2.19201971e-08  1.28356006e-06  0.00000000e+00  0.00000000e+00]
+ [ 0.00000000e+00  0.00000000e+00  9.95237242e-10 -7.64728604e-10]
+ [ 0.00000000e+00  0.00000000e+00 -7.64728604e-10  2.31726047e-08]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>These these inputs, as a tuple or list, are the required input to <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.create_base_GP_model" title="thermoextrap.gpr_active.active_utils.create_base_GP_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.create_base_GP_model()</span></code></a>. A number of keyword arguments allow adjustment of the model further.</p>
+<p>A specific kernel satisfying the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a> class can be specified, with the default being the RBF kernel.</p>
+<p>A mean function can be provided, which should be a callable that takes input locations and produces mean function values. By default, a constant mean function set to the average of the zeroth-order output is used if there are two data points, while more data points are fit to a linear mean function, again fit to the zeroth-order data.</p>
+<p>Keyword arguments to the likelihood model can also be specified. The likelihood model used by the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeteroscedasticGPR</span></code></a> class, which is the output of <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.create_base_GP_model" title="thermoextrap.gpr_active.active_utils.create_base_GP_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.create_base_GP_model()</span></code></a>, is described in detail in the manuscript. Briefly, we model the logarithm of each entry in the covariance matrix as <span class="math notranslate nohighlight">\(\ln \Sigma_{\mathrm{n}, i, j} = \ln \Sigma_{\mathrm{n, raw}, i, j} + p (d_i + d_j + 2) + s\)</span>, where <span class="math notranslate nohighlight">\(\Sigma_\mathrm{n, raw}\)</span> is the raw input noise covariance matrix, <span class="math notranslate nohighlight">\(d_i\)</span> is the derivative order of data point <span class="math notranslate nohighlight">\(i\)</span>, and <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(s\)</span> are tunable parameters. Allow the noise do be scaled by a constant or scaled according to the derivative order to account for inaccurate uncertainty estimates. This is most useful in the case that some derivative orders are much more uncertain than others, with the accuracy of the uncertainty estimates changing in a correlated fashion. This is typical with increasing derivative order for molecular simulation data, so by default <span class="math notranslate nohighlight">\(p&gt;0\)</span> but able to be optimized and <span class="math notranslate nohighlight">\(s=0\)</span>. In what is below, however, we also constrain <span class="math notranslate nohighlight">\(p\)</span> to be zero to only look at the behavior of the kernel without considering the likelihood model, which allows better comparisons of different kernels and makes GPR more comparable to polynomial interpolation (we will do these things shortly).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">this_gp</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">create_base_GP_model</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">noise_cov_mat</span><span class="p">),</span>
+    <span class="n">kernel</span><span class="o">=</span><span class="n">active_utils</span><span class="o">.</span><span class="n">RBFDerivKernel</span><span class="p">,</span>
+    <span class="n">mean_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">likelihood_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;transform_p&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;constrain_p&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can take a look at our GP model taking advantage of automated printing in a Jupyter notebook:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">this_gp</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">&lt;thermoextrap.gpr_active.gp_models.HeteroscedasticGPR object at 0x29fa3eb60&gt;
+<table>
+<thead>
+<tr><th>name                                     </th><th>class    </th><th>transform  </th><th>prior  </th><th>trainable  </th><th>shape  </th><th>dtype  </th><th style="text-align: right;">  value</th></tr>
+</thead>
+<tbody>
+<tr><td>HeteroscedasticGPR.kernel.kernel.var     </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">      1</td></tr>
+<tr><td>HeteroscedasticGPR.kernel.kernel.l       </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">      1</td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_scale</td><td>Parameter</td><td>Identity   </td><td>       </td><td>False      </td><td>()     </td><td>float64</td><td style="text-align: right;">      0</td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_add  </td><td>Parameter</td><td>Identity   </td><td>       </td><td>False      </td><td>()     </td><td>float64</td><td style="text-align: right;">      0</td></tr>
+</tbody>
+</table></div></div>
+</div>
+<p>Two parameters are adjustable (the kernel variance and length scale) and start with default values of 1, while the other two parameters (<span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(s\)</span>) are set to zero and not trainable. Note that no training has yet taken place. We now must train the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">active_utils</span><span class="o">.</span><span class="n">train_GPR</span><span class="p">(</span><span class="n">this_gp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And we can examine the model now that it’s trained:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">this_gp</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">&lt;thermoextrap.gpr_active.gp_models.HeteroscedasticGPR object at 0x29fa3eb60&gt;
+<table>
+<thead>
+<tr><th>name                                     </th><th>class    </th><th>transform  </th><th>prior  </th><th>trainable  </th><th>shape  </th><th>dtype  </th><th style="text-align: right;">  value</th></tr>
+</thead>
+<tbody>
+<tr><td>HeteroscedasticGPR.kernel.kernel.var     </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">1.48656</td></tr>
+<tr><td>HeteroscedasticGPR.kernel.kernel.l       </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">4.59991</td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_scale</td><td>Parameter</td><td>Identity   </td><td>       </td><td>False      </td><td>()     </td><td>float64</td><td style="text-align: right;">0      </td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_add  </td><td>Parameter</td><td>Identity   </td><td>       </td><td>False      </td><td>()     </td><td>float64</td><td style="text-align: right;">0      </td></tr>
+</tbody>
+</table></div></div>
+</div>
+<p>By specifying some <span class="math notranslate nohighlight">\(\beta\)</span> values to make predictions at, we can look at the behavior of the GP model. Note that we are making predictions for the zeroth-order derivatives, or the values of the average particle location. We accomplish this by appending a column of zeros to our <span class="math notranslate nohighlight">\(\beta\)</span> values, though any derivative order could be predicted, even those not used for training, by appending a different value, or set of values, in this column.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">beta_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">beta_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># Make predictions using predict_f (see GPflow)</span>
+<span class="n">gp_mu</span><span class="p">,</span> <span class="n">gp_var</span> <span class="o">=</span> <span class="n">this_gp</span><span class="o">.</span><span class="n">predict_f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">test_betas</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>All predictions will be Tensorflow <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> objects, so it’s a bit easier for plotting to convert to numpy arrays. Further, we want to plot 95% confidence intervals.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gp_mu</span> <span class="o">=</span> <span class="n">gp_mu</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">gp_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gp_var</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="n">gp_qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">gp_mu</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gp_std</span><span class="p">,</span> <span class="n">gp_mu</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gp_std</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">gp_mu</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;GPR, RBF&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">gp_qs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">gp_qs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">(</span><span class="n">test_betas</span><span class="p">),</span> <span class="s2">&quot;k--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">prune</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\langle x \rangle$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/f17b4e86648a79c80eaf99c2d956dbcf51b1f009b0a9a5edc03aa5bc55afe386.png" src="../../../_images/f17b4e86648a79c80eaf99c2d956dbcf51b1f009b0a9a5edc03aa5bc55afe386.png" />
+</div>
+</div>
+</section>
+<section id="compare-kernels-and-polynomial-interpolation">
+<h2>Compare kernels and polynomial interpolation<a class="headerlink" href="#compare-kernels-and-polynomial-interpolation" title="Permalink to this heading">#</a></h2>
+<p>There are two key differences to take not of when comparing GPR to polynomial interpolation:</p>
+<ol class="arabic simple">
+<li><p>No specific functional form is assumed. With polynomial interpolation, you assume (at first derivative order) that a 3rd order polynomial is the exactly correct functional form and compute uncertainty within that assumption. A GP model with an RBF kernel is a universal function approximator, so no specific form is assumed, other than the idea that the function should be smooth on an inferred lengthscale. This leads to greater uncertainty with lower order derivatives because the model is not restricted to any specific order polynomial at any order.</p></li>
+<li><p>Uncertainties are taken into account when fitting the model. Polynomial interpolation does not weight input data, such as different orders of derivatives, by their uncertainty when using that data for model fitting. GP models can be used for polynomial interpolation and weight information by its uncertainty by using a polynomial kernel. Using an RBF kernel, however, takes us a step further and saves us from needing to select a specific polynomial order, and is infinitely differentiable. Due to its weighting of provided training information by uncertainty, a GP can utilize much higher derivative order information, even becoming more certain in its model fit with high derivative order data.</p></li>
+</ol>
+<p>To examine these differences, we plot, as in Figure 1 of the paper, the results for GPR and polynomial interpolation using only zeroth, first, and third order derivative information. The code here is long because we want to use the same <code class="docutils literal notranslate"><span class="pre">State</span></code> objects, and thus the exact same data, for all models at every order.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the results of making predictions with each model</span>
+<span class="c1"># Idea is to go to higher order and look at effects</span>
+<span class="n">d_orders</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="n">test_betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">beta_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">beta_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">d_orders</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.37</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d_o</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d_orders</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">d_o</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">m_order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">m_order</span> <span class="o">=</span> <span class="n">d_o</span>
+
+    <span class="c1"># And create states (ExtrapModel objects), using up to max_order derivative orders</span>
+    <span class="c1"># Order will define what order is used in GP models as well</span>
+    <span class="n">this_states</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">wrap</span><span class="o">.</span><span class="n">build_state</span><span class="p">(</span><span class="n">all_data</span><span class="o">=</span><span class="n">dat</span><span class="p">,</span> <span class="n">max_order</span><span class="o">=</span><span class="n">m_order</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">wrap</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">wrap_list</span><span class="p">,</span> <span class="n">data_list</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Create interpolating model</span>
+    <span class="n">this_interp</span> <span class="o">=</span> <span class="n">thermoextrap</span><span class="o">.</span><span class="n">InterpModel</span><span class="p">(</span><span class="n">this_states</span><span class="p">)</span>
+
+    <span class="c1"># Will create two different types of GP models, with different kernel for each</span>
+    <span class="n">x_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cov_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">this_states</span><span class="p">:</span>
+        <span class="n">this_x_data</span><span class="p">,</span> <span class="n">this_y_data</span><span class="p">,</span> <span class="n">this_cov_data</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">input_GP_from_state</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">x_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_x_data</span><span class="p">)</span>
+        <span class="n">y_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_y_data</span><span class="p">)</span>
+        <span class="n">cov_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_cov_data</span><span class="p">)</span>
+
+    <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+    <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+    <span class="n">noise_cov_mat</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">dat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">cov_data</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">d_o</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x_data</span> <span class="o">=</span> <span class="n">x_data</span><span class="p">[::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">y_data</span> <span class="o">=</span> <span class="n">y_data</span><span class="p">[::</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">noise_cov_mat</span> <span class="o">=</span> <span class="n">noise_cov_mat</span><span class="p">[::</span><span class="mi">2</span><span class="p">,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">data_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">noise_cov_mat</span><span class="p">)</span>
+
+    <span class="c1"># For purposes of comparing models and comparing to interpolation, best to fix likelihood behavior</span>
+    <span class="c1"># In other words, don&#39;t want to scale variances based on derivative order here</span>
+    <span class="c1"># Essentially saying that here we trust our uncertainty estimates, so no learning of likelihood params</span>
+    <span class="c1"># And no modification of covariance matrix</span>
+    <span class="n">like_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;transform_p&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;constrain_p&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+    <span class="c1"># Create GP model with default RBF kernel</span>
+    <span class="n">this_gp</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">create_base_GP_model</span><span class="p">(</span>
+        <span class="n">data_input</span><span class="p">,</span>
+        <span class="n">likelihood_kwargs</span><span class="o">=</span><span class="n">like_kws</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">train_GPR</span><span class="p">(</span><span class="n">this_gp</span><span class="p">)</span>
+
+    <span class="c1"># And a GP model with a polynomial kernel of order high enough for current derivative order usage</span>
+    <span class="c1"># Will match order used by interpolation, but will weight uncertainties in Bayesian framework</span>
+    <span class="n">poly_kern_info</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">make_poly_expr</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d_o</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">poly_kern</span> <span class="o">=</span> <span class="n">gp_models</span><span class="o">.</span><span class="n">DerivativeKernel</span><span class="p">(</span>
+        <span class="n">poly_kern_info</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kernel_params</span><span class="o">=</span><span class="n">poly_kern_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">this_gp_poly</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">create_base_GP_model</span><span class="p">(</span>
+        <span class="n">data_input</span><span class="p">,</span>
+        <span class="n">kernel</span><span class="o">=</span><span class="n">poly_kern</span><span class="p">,</span>
+        <span class="n">likelihood_kwargs</span><span class="o">=</span><span class="n">like_kws</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">train_GPR</span><span class="p">(</span><span class="n">this_gp_poly</span><span class="p">)</span>
+
+    <span class="n">interp_mu</span> <span class="o">=</span> <span class="n">this_interp</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_betas</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">interp_resamples</span> <span class="o">=</span> <span class="n">this_interp</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">nrep</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_betas</span><span class="p">)</span>
+    <span class="n">interp_qs</span> <span class="o">=</span> <span class="n">interp_resamples</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;rep&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="n">gp_mu</span><span class="p">,</span> <span class="n">gp_var</span> <span class="o">=</span> <span class="n">this_gp</span><span class="o">.</span><span class="n">predict_f</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">test_betas</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
+    <span class="p">)</span>
+    <span class="n">gp_mu</span> <span class="o">=</span> <span class="n">gp_mu</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">gp_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gp_var</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+    <span class="n">gp_qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">gp_mu</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gp_std</span><span class="p">,</span> <span class="n">gp_mu</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gp_std</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">gppoly_mu</span><span class="p">,</span> <span class="n">gppoly_var</span> <span class="o">=</span> <span class="n">this_gp_poly</span><span class="o">.</span><span class="n">predict_f</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">test_betas</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
+    <span class="p">)</span>
+    <span class="n">gppoly_mu</span> <span class="o">=</span> <span class="n">gppoly_mu</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">gppoly_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gppoly_var</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+    <span class="n">gppoly_qs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">gppoly_mu</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gppoly_std</span><span class="p">,</span> <span class="n">gppoly_mu</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gppoly_std</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">gppoly_mu</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;GPR, Poly&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">gppoly_qs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">gppoly_qs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">gp_mu</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;GPR, RBF&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">gp_qs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">gp_qs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">d_o</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">interp_mu</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Interp&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+            <span class="n">test_betas</span><span class="p">,</span> <span class="n">interp_qs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">interp_qs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span>
+        <span class="p">)</span>
+
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_betas</span><span class="p">,</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">(</span><span class="n">test_betas</span><span class="p">),</span> <span class="s2">&quot;k--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;order </span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">d_o</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">prune</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\langle x \rangle$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handlelength</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">labelspacing</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/30414fbbc6ff08d8d886fd0208aa5284715b5c60dfabff3cb5b57b142498a190.png" src="../../../_images/30414fbbc6ff08d8d886fd0208aa5284715b5c60dfabff3cb5b57b142498a190.png" />
+</div>
+</div>
+</section>
+<section id="demonstration-of-active-learning">
+<h2>Demonstration of active learning<a class="headerlink" href="#demonstration-of-active-learning" title="Permalink to this heading">#</a></h2>
+<p>A brief demonstration of active learning is now shown, with two different active learning strategies. In both, we will two separate stopping criteria that must both satisfy their respective tolerances simultaneously. These will be the maximum relative variance predicted by the GP model (<span class="math notranslate nohighlight">\(\mathrm{max}(\mathbf{\sigma}_{rel})\)</span> in the paper and <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.MaxRelGlobalVar" title="thermoextrap.gpr_active.active_utils.MaxRelGlobalVar"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaxRelGlobalVar</span></code></a> in the code) and the maximum relative deviation since the last update (<span class="math notranslate nohighlight">\(\mathrm{max}(\mathbf{\delta}_{iter})\)</span> in the paper and <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation" title="thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaxAbsRelGlobalDeviation</span></code></a> in the code). You need both because the first can become very small if the model becomes prematurely certain of itself - you’ll see a jump on the next iteration if this is the case. The second only becomes small when adding new points stops modifiying the function, but you also need the maximum relative variance criteria so that the uncertainty is ensured to reach a specified target. Otherwise, you could have the GP model not changing while the uncertainty remains high.</p>
+<section id="alm-maximum-variance">
+<h3>ALM (Maximum variance)<a class="headerlink" href="#alm-maximum-variance" title="Permalink to this heading">#</a></h3>
+<p>We start with updates that select new points based on where the GP model predicts the highest variance. The below code sets up and executes an active learning run. As we go, plots of the progress will be shown and compared to the, in this case known, ground truth.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define beta values to start and find function between</span>
+<span class="n">beta_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">]</span>
+
+<span class="c1"># Set up active learning protocol</span>
+<span class="n">deriv_order</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sim_protocol</span> <span class="o">=</span> <span class="n">ig_active</span><span class="o">.</span><span class="n">SimulateIG</span><span class="p">()</span>
+
+<span class="c1"># Update by selecting point with maximum variance (uncertainty) predicted by model</span>
+<span class="n">update_func</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">UpdateALMbrute</span><span class="p">(</span>
+    <span class="n">show_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">compare_func</span><span class="o">=</span><span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Metrics for stopping criteria with tolerances of 0.01</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxRelGlobalVar</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxAbsRelGlobalDeviation</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># Define stopping criteria (will have to satisfy all metrics reaching tolerances)</span>
+<span class="n">stop_func</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">StopCriteria</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+<span class="c1"># Run active learning</span>
+<span class="n">active_list</span><span class="p">,</span> <span class="n">train_history</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">active_learning</span><span class="p">(</span>
+    <span class="n">beta_list</span><span class="p">,</span>
+    <span class="n">sim_protocol</span><span class="p">,</span>
+    <span class="n">update_func</span><span class="p">,</span>
+    <span class="n">stop_criteria</span><span class="o">=</span><span class="n">stop_func</span><span class="p">,</span>
+    <span class="n">max_order</span><span class="o">=</span><span class="n">deriv_order</span><span class="p">,</span>
+    <span class="n">alpha_name</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial beta values:  [0.1, 9.6]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │      value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.48641    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 4.59952    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.00113597 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0          │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧════════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.4371759046250532, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 4.411052897156387, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/62456accc8aa0b67b2810171278106088fd789a14921c5a479a1c739ab462733.png" src="../../../_images/62456accc8aa0b67b2810171278106088fd789a14921c5a479a1c739ab462733.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 1 updates, beta values are: 
+[0.1, 9.6, 4.845245245245246]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │       value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 6.85509     │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 4.91396     │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 2.82589e-06 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0           │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.008402339332781852, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.18938427673320804, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/49242752fd6f4cee67415fc0a10a3c9420461fe82ed4b616fef97fa77d89d3d8.png" src="../../../_images/49242752fd6f4cee67415fc0a10a3c9420461fe82ed4b616fef97fa77d89d3d8.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 2 updates, beta values are: 
+[0.1, 9.6, 4.845245245245246, 2.0684684684684687]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │       value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 3.55717     │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 3.80006     │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 2.62155e-07 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0           │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.011398021909848623, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.027179965607974112, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/9400956ba3ab356e3e76bf85ded10cd32cfc7d992c9415b7e0d832cef588a052.png" src="../../../_images/9400956ba3ab356e3e76bf85ded10cd32cfc7d992c9415b7e0d832cef588a052.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 3 updates, beta values are: 
+[0.1, 9.6, 4.845245245245246, 2.0684684684684687, 7.251151151151151]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤══════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │    value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪══════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 8.55103  │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 4.80266  │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.367004 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0        │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧══════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.003343668958617897, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.022727068293967773, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/23a26652a3e06b6a1fe8e44f2c9d6fd408ccdf249b85523236e984b6146683ac.png" src="../../../_images/23a26652a3e06b6a1fe8e44f2c9d6fd408ccdf249b85523236e984b6146683ac.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 4 updates, beta values are: 
+[0.1, 9.6, 4.845245245245246, 2.0684684684684687, 7.251151151151151, 0.8702702702702703]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤══════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │    value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪══════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 9.47951  │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 4.84643  │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.136959 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0        │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧══════════╛
+
+Stopping criteria satisfied with stopping metrics of: 
+{&#39;MaxRelGlobalVar&#39;: 0.001268546362125952, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.001201886949586077, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+</div>
+</div>
+<p>To plot or examine the results aftwards, we can note that the returned <code class="docutils literal notranslate"><span class="pre">train_history</span></code> dictionary contains quite a bit of pertinent information, especially if we set <code class="docutils literal notranslate"><span class="pre">save_history=True</span></code>, though that will save a .npz file of this dictionary so we do not do it here.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_history</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;loss&#39;: [3.2507510705764253,
+  4.91000328731043,
+  1.399727354179742,
+  -2.4915684880846456,
+  -8.328047824694043],
+ &#39;params&#39;: [[array(4.59952118), array(1.48640622), array(0.00113597)],
+  [array(4.91395956), array(6.85508863), array(2.82589304e-06)],
+  [array(3.80006472), array(3.55717488), array(2.62155079e-07)],
+  [array(4.80265527), array(8.55102948), array(0.36700411)],
+  [array(4.84643139), array(9.4795095), array(0.13695855)]],
+ &#39;MaxRelGlobalVar&#39;: [0.4371759046250532,
+  0.008402339332781852,
+  0.011398021909848623,
+  0.003343668958617897,
+  0.001268546362125952],
+ &#39;MaxAbsRelGlobalDeviation&#39;: [4.411052897156387,
+  0.18938427673320804,
+  0.027179965607974112,
+  0.022727068293967773,
+  0.001201886949586077]}
+</pre></div>
+</div>
+</div>
+</div>
+<p>The “loss” is the value of the GPR loss function at each iteration, “params” are the optimal GP parameters (only the trainable ones, so here <span class="math notranslate nohighlight">\(p\)</span>, <span class="math notranslate nohighlight">\(l_\mathrm{K}\)</span>, and <span class="math notranslate nohighlight">\(\sigma_\mathrm{K}\)</span>) at each iteration, then the stopping criteria metrics by name.</p>
+<p>Based on this, it is easy to plot our metrics as a function of iterations, for instance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">train_history</span><span class="p">[</span><span class="s2">&quot;MaxRelGlobalVar&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">train_history</span><span class="p">[</span><span class="s2">&quot;MaxAbsRelGlobalDeviation&quot;</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">metrics</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Stopping Metrics&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/6a492570e56eadc4f57cbb454024b0a3acef006514077359d33557efd8e25523.png" src="../../../_images/6a492570e56eadc4f57cbb454024b0a3acef006514077359d33557efd8e25523.png" />
+</div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">save_history=True</span></code>, the GP mean and standard deviation predictions will also be returned. If this is not returned, we can still access these at each iteration through the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.StopCriteria" title="thermoextrap.gpr_active.active_utils.StopCriteria"><code class="xref py py-class docutils literal notranslate"><span class="pre">active_utils.StopCriteria</span></code></a> class, which saves a history of these. To plot the function itself, with indications of where we sampled our data from, we can do the following, making use of the fact that the update classes also have a built-in plotting function:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">update_func</span><span class="o">.</span><span class="n">do_plotting</span><span class="p">(</span>
+    <span class="n">stop_func</span><span class="o">.</span><span class="n">create_alpha_grid</span><span class="p">(</span><span class="n">beta_list</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">stop_func</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="p">[</span>
+        <span class="n">stop_func</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">stop_func</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">stop_func</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">stop_func</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="p">],</span>
+    <span class="p">[</span><span class="n">dat</span><span class="o">.</span><span class="n">beta</span> <span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">active_list</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/b19a16db3e223cf4ad947301a727be4613c168b1c522ea9e6047a49705fd02ab.png" src="../../../_images/b19a16db3e223cf4ad947301a727be4613c168b1c522ea9e6047a49705fd02ab.png" />
+</div>
+</div>
+</section>
+<section id="space-filling">
+<h3>Space-filling<a class="headerlink" href="#space-filling" title="Permalink to this heading">#</a></h3>
+<p>Next, we can also follow an active learning protocol where we select the next point as the point furthest away from any other points already chosen.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define beta values to start and find function between</span>
+<span class="n">beta_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">9.6</span><span class="p">]</span>
+
+<span class="c1"># Set up active learning protocol</span>
+<span class="n">deriv_order</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sim_protocol</span> <span class="o">=</span> <span class="n">ig_active</span><span class="o">.</span><span class="n">SimulateIG</span><span class="p">()</span>
+<span class="c1"># Update by selecting point with maximum variance (uncertainty) predicted by model</span>
+<span class="n">update_func_space</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">UpdateSpaceFill</span><span class="p">(</span>
+    <span class="n">show_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">compare_func</span><span class="o">=</span><span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxRelGlobalVar</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxAbsRelGlobalDeviation</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="n">stop_func_space</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">StopCriteria</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+<span class="n">active_list_space</span><span class="p">,</span> <span class="n">train_history_space</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">active_learning</span><span class="p">(</span>
+    <span class="n">beta_list</span><span class="p">,</span>
+    <span class="n">sim_protocol</span><span class="p">,</span>
+    <span class="n">update_func_space</span><span class="p">,</span>
+    <span class="n">stop_criteria</span><span class="o">=</span><span class="n">stop_func_space</span><span class="p">,</span>
+    <span class="n">max_order</span><span class="o">=</span><span class="n">deriv_order</span><span class="p">,</span>
+    <span class="n">alpha_name</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial beta values:  [0.1, 9.6]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │      value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.48756    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 4.60242    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.00128764 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0          │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧════════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.4364408549860364, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 4.4108036125354975, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/a0c7949fde87c007740a13ead71af68b342786c90eb4cf760df0e668dc5ac5a5.png" src="../../../_images/a0c7949fde87c007740a13ead71af68b342786c90eb4cf760df0e668dc5ac5a5.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 1 updates, beta values are: 
+[0.1, 9.6, 4.85]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │       value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 6.85836     │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 4.91423     │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 9.65745e-08 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0           │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.008245426925784718, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.18894267674171195, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/4548f3427d12b06c2b46ab3deedc244ec5c1f06d169074d5618f21653170947a.png" src="../../../_images/4548f3427d12b06c2b46ab3deedc244ec5c1f06d169074d5618f21653170947a.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 2 updates, beta values are: 
+[0.1, 9.6, 4.85, 2.475]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │      value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 3.39015    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 3.83338    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 8.4969e-08 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0          │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧════════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.010579574558828677, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.02674250072026747, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/1ad5db826aa7dc9a0d648850912058afc4de610a0c3c66000b5738de15afa116.png" src="../../../_images/1ad5db826aa7dc9a0d648850912058afc4de610a0c3c66000b5738de15afa116.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 3 updates, beta values are: 
+[0.1, 9.6, 4.85, 2.475, 7.225]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤══════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │    value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪══════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 8.1504   │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 4.83504  │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.300765 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0        │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧══════════╛
+
+Current stopping metrics: 
+{&#39;MaxRelGlobalVar&#39;: 0.003984179385637088, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.022187640111361196, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+<img alt="../../../_images/a5907adc996debaca3a23139b018432c7374beacc8d2633bf392487cca1e0d99.png" src="../../../_images/a5907adc996debaca3a23139b018432c7374beacc8d2633bf392487cca1e0d99.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 4 updates, beta values are: 
+[0.1, 9.6, 4.85, 2.475, 7.225, 3.6624999999999996]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═══════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │     value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═══════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 9.84103   │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼───────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 5.17591   │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼───────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.0586081 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼───────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0         │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═══════════╛
+
+Stopping criteria satisfied with stopping metrics of: 
+{&#39;MaxRelGlobalVar&#39;: 0.002120754273169207, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.004120014396690739, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="comparison">
+<h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this heading">#</a></h3>
+<p>In this simple system, the maximum-variance and space-filling updates yield nearly the same results. Note, though, that the chosen points are slightly different and that the uncertainties are more uniform for the maximum-variance strategy.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Or want to plot series of updates to provide sense of how active learning is working</span>
+<span class="n">plot_betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">beta_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">beta_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">update_inds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+    <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">update_inds</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.37</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span>
+<span class="p">)</span>
+
+<span class="n">update_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#3f90da&quot;</span><span class="p">,</span> <span class="s2">&quot;#ffa90e&quot;</span><span class="p">]</span>
+<span class="n">update_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MaxVar&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">active_info</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+    <span class="nb">zip</span><span class="p">([</span><span class="n">stop_func</span><span class="p">,</span> <span class="n">stop_func_space</span><span class="p">],</span> <span class="p">[</span><span class="n">active_list</span><span class="p">,</span> <span class="n">active_list_space</span><span class="p">])</span>
+<span class="p">):</span>
+    <span class="n">this_mu</span><span class="p">,</span> <span class="n">this_std</span> <span class="o">=</span> <span class="n">active_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">history</span>
+    <span class="n">this_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">this_mu</span><span class="p">)</span>
+    <span class="n">this_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">this_std</span><span class="p">)</span>
+    <span class="n">this_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dat</span><span class="o">.</span><span class="n">beta</span> <span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="n">active_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">update_inds</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">plot_betas</span><span class="p">,</span> <span class="n">this_mu</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="n">update_colors</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">update_labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+            <span class="n">plot_betas</span><span class="p">,</span>
+            <span class="n">this_mu</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">this_std</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:],</span>
+            <span class="n">this_mu</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">this_std</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:],</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">update_colors</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">plot_betas</span><span class="p">,</span> <span class="n">this_std</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="n">update_colors</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">update_labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">end_ind</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end_ind</span> <span class="o">=</span> <span class="n">ind</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">this_alpha</span><span class="p">[:</span><span class="n">end_ind</span><span class="p">],</span>
+            <span class="p">(</span><span class="n">j</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">this_alpha</span><span class="p">[:</span><span class="n">end_ind</span><span class="p">]),</span>
+            <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;^&quot;</span><span class="p">,</span>
+            <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">update_colors</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+            <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">prune</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;GPR $\mu_{\langle x \rangle}$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;GPR $\sigma_{\langle x \rangle}$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/edaa51edb219767cfb7d106839e396fe16f3c272b285ff6faf25fac4a9cd184e.png" src="../../../_images/edaa51edb219767cfb7d106839e396fe16f3c272b285ff6faf25fac4a9cd184e.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../../gpr.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">GP Models Utilizing Derivative Information and Active Learning</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LJ_lnPi.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Lennard-Jones macrostate distribution</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-gp-model">Creating a GP model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compare-kernels-and-polynomial-interpolation">Compare kernels and polynomial interpolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demonstration-of-active-learning">Demonstration of active learning</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alm-maximum-variance">ALM (Maximum variance)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#space-filling">Space-filling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By William P. Krekelberg
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, William P. Krekelberg.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2023-04-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

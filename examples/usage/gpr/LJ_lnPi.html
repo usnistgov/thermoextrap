@@ -1,0 +1,1091 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Lennard-Jones macrostate distribution &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../../_static/js/leave_notice.js"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/usage/gpr/LJ_lnPi';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Active learning: adsorption of a square-well fluid in a pore" href="SWF_Adsorption.html" />
+    <link rel="prev" title="Ideal Gas" href="Ideal_Gas.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    thermoextrap: Thermodynamic Extrapolation/Interpolation Library
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Ideal_Gas.html">Ideal Gas</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Lennard-Jones macrostate distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SWF_Adsorption.html">Active learning: adsorption of a square-well fluid in a pore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-baseclasses.html">Base classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap/issues/new?title=Issue%20on%20page%20%2Fexamples/usage/gpr/LJ_lnPi.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/examples/usage/gpr/LJ_lnPi.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lennard-Jones macrostate distribution</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gpr-model-of-ln-pi-variations-with-temperature">GPR model of <span class="math notranslate nohighlight">\(\ln \Pi\)</span> variations with temperature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saturation-properties">Saturation properties</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="lennard-jones-macrostate-distribution">
+<h1>Lennard-Jones macrostate distribution<a class="headerlink" href="#lennard-jones-macrostate-distribution" title="Permalink to this heading">#</a></h1>
+<p>In this notebook, we will demonstrate how to build a GPR model for the temperature dependence of a macrostate distribution <span class="math notranslate nohighlight">\(\ln \Pi\)</span>, or the free energy as a function of the number of particles for a Lennard-Jones (LJ) fluid. All data will be drawn from the <a class="reference external" href="https://www.nist.gov/mml/csd/chemical-informatics-group/sat-tmmc-liquid-vapor-coexistence-properties-linear-force-2">Standard Reference Simulation Database</a>, which for convenience is found within the directory “SRS_data.”</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">thermoextrap</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">active_utils</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this heading">#</a></h2>
+<p>We start by defining the data directory, also pulling saturation properties from the SRS database.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base_dir</span> <span class="o">=</span> <span class="s2">&quot;SRS_data&quot;</span>
+<span class="n">raw_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;SRS_data/SRS_LJ_VLE_data.txt&quot;</span><span class="p">)</span>
+<span class="n">raw_beta</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">raw_dat</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">raw_psat</span> <span class="o">=</span> <span class="n">raw_dat</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">raw_dens</span> <span class="o">=</span> <span class="n">raw_dat</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+<span class="n">raw_lnz</span> <span class="o">=</span> <span class="n">raw_dat</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>It will be useful to have a function to load <span class="math notranslate nohighlight">\(\ln \Pi\)</span> data (i.e., the free energy along <span class="math notranslate nohighlight">\(N\)</span>, the number of particles) from a file. This is reproduced from the function <code class="docutils literal notranslate"><span class="pre">load_lnPi_info</span></code> in <code class="docutils literal notranslate"><span class="pre">run_LJ_lnPi.py</span></code>. Specifically, provided a temperature and a reference chemical potential, the macrostate distribution and energy moments are returned in a dictionary.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define activities for simulations (could also easily do with dictionary, but whatever works)</span>
+<span class="k">def</span> <span class="nf">get_sim_activity</span><span class="p">(</span><span class="n">Tr</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">0.700</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">6.250</span>
+    <span class="k">elif</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">0.730</span> <span class="ow">or</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">0.740</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">5.500</span>
+    <span class="k">elif</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">0.770</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">5.800</span>
+    <span class="k">elif</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">0.850</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">4.800</span>
+    <span class="k">elif</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">0.950</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">4.100</span>
+    <span class="k">elif</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">1.100</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">3.380</span>
+    <span class="k">elif</span> <span class="n">Tr</span> <span class="o">==</span> <span class="mf">1.200</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">3.000</span>
+
+
+<span class="k">def</span> <span class="nf">load_lnPi_info</span><span class="p">(</span><span class="n">Tr</span><span class="p">,</span> <span class="n">ref_mu</span><span class="o">=-</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">run_num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">N_cutoff</span><span class="o">=</span><span class="mi">481</span><span class="p">):</span>
+    <span class="n">file_prefix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/lj.t</span><span class="si">{}</span><span class="s2">.n12m6.v512.rc3.b.r&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">base_dir</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%1.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">Tr</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">U_moms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">f</span><span class="p">)[:</span><span class="n">N_cutoff</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">*.energy.dat&quot;</span> <span class="o">%</span> <span class="n">file_prefix</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># For first column of U information (which is currently N), set to ones, which is zeroth moment</span>
+    <span class="n">U_moms</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">U_moms</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">lnPis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">f</span><span class="p">)[:</span><span class="n">N_cutoff</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">*.lnpi.dat&quot;</span> <span class="o">%</span> <span class="n">file_prefix</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">N_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">f</span><span class="p">)[:</span><span class="n">N_cutoff</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">*.lnpi.dat&quot;</span> <span class="o">%</span> <span class="n">file_prefix</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">Tr</span> <span class="o">*</span> <span class="n">get_sim_activity</span><span class="p">(</span>
+        <span class="n">Tr</span>
+    <span class="p">)</span>  <span class="c1"># Tr is kB*T/eps, activity is mu/kB*T, so getting mu/eps</span>
+
+    <span class="c1"># Convert to x_arrays with proper labeling</span>
+    <span class="n">U_moms</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">U_moms</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rec&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;umom&quot;</span><span class="p">])</span>
+    <span class="c1"># For lnPi, adjust to a reference mu value</span>
+    <span class="c1"># And subtract off N=0 bin</span>
+    <span class="n">lnPis</span> <span class="o">=</span> <span class="n">lnPis</span> <span class="o">+</span> <span class="p">(</span>
+        <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">Tr</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ref_mu</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_vals</span>
+    <span class="p">)</span>  <span class="c1"># Multiply by 1/Tr since want beta*mu</span>
+    <span class="n">lnPis</span> <span class="o">=</span> <span class="n">lnPis</span> <span class="o">-</span> <span class="n">lnPis</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">lnPis</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">lnPis</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rec&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">])</span>
+    <span class="c1"># For mu need to add extra axis called comp</span>
+    <span class="n">ref_mu</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">ref_mu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">U_moms</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rec&quot;</span><span class="p">,</span> <span class="s2">&quot;comp&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="n">U_moms</span><span class="p">,</span>
+        <span class="s2">&quot;lnPi&quot;</span><span class="p">:</span> <span class="n">lnPis</span><span class="p">,</span>
+        <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">ref_mu</span><span class="p">,</span>
+        <span class="s2">&quot;mu_sim&quot;</span><span class="p">:</span> <span class="n">mu</span><span class="p">,</span>
+        <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">Tr</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="gpr-model-of-ln-pi-variations-with-temperature">
+<h2>GPR model of <span class="math notranslate nohighlight">\(\ln \Pi\)</span> variations with temperature<a class="headerlink" href="#gpr-model-of-ln-pi-variations-with-temperature" title="Permalink to this heading">#</a></h2>
+<p>Creating a GPR model for a macrostate distribution is only slightly more difficult than creating a model for any vector-valued observable. For any GPR model, it is typically enough to have a list of <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> objects representing observables at a given thermodynamic state. The <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.create_GPR" title="thermoextrap.gpr_active.active_utils.create_GPR"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.create_GPR()</span></code></a> function will automatically handle scalar or vector observables, which includes macrostate distributions.</p>
+<p>The difficulty with macrostate distributions is that it is only meaningful to extrapolate their relative values in reference to one bin. This is because simulations to calculate them typically only produce relative free energies with the absolute value of any bin unknown due to lack of knowledge of the probability normalization constant, or the partition function. Typically, the reference used is the <span class="math notranslate nohighlight">\(N=0\)</span> particle number bin. The <span class="math notranslate nohighlight">\(N=0\)</span> value of <span class="math notranslate nohighlight">\(\ln \Pi\)</span> will be a constant and is typically set to zero, serving as a reference for the rest of the distribution. This means that even across multiple independent simulations, or temperatures, the <span class="math notranslate nohighlight">\(N=0\)</span> bin will remain zero. Such constant values cause numerical problems for a GPR model since for this specific bin the variance in the data will be zero, which upon whitening (dividing by the standard deviation) yields infinity. To avoid this, we can simply model all other bins with the GPR model, keeping the <span class="math notranslate nohighlight">\(N=0\)</span> bin at zero. However, this means that we need to slightly modify the <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> object associated with an <span class="math notranslate nohighlight">\(\ln \Pi\)</span> distribution.</p>
+<p>To do this, we note that the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.create_GPR" title="thermoextrap.gpr_active.active_utils.create_GPR"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.create_GPR()</span></code></a> function accepts either a list of <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> objects representing states, or a list of callables that reutnr the information needed for training a GPR model: the input locations (reciprocal temperatures and derivative orders), output data to train on (<span class="math notranslate nohighlight">\(\ln \Pi\)</span> values), and the noise covariance matrix associated with the output data. As described in our paper, the noise covariance matrix treats each bin independently, meaning that it is more compact to represent each bin and temperature as having its own covariance matrix between derivative data.</p>
+<p>All of this is a fair amount of work, which is why there is a utility function <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.input_GP_from_state" title="thermoextrap.gpr_active.active_utils.input_GP_from_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">active_utils.input_GP_from_state()</span></code></a> that takes an <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.models.ExtrapModel</span></code></a> object and extracts the necessary inputs to train a GPR. Since we have a unique case here, we will need to effectively re-do most of what happens in this function, but exclude the <span class="math notranslate nohighlight">\(N=0\)</span> bin.</p>
+<p>First, we create a special class, the only purpose of which is to provide a callable that returns the necessary data at a given temperature.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">StatelnPi</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cov</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">cov</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we need to define our reference temperatures, the simulation activities at those temperatures, and load in the data. For our reference chemical potential, which is arbitrary but must be the same as we change temperature, we will choose the average between the most extreme simulations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ref_T</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">]</span>  <span class="c1"># reduced temperatures</span>
+<span class="n">ref_activities</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">get_sim_activity</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ref_T</span>
+<span class="p">]</span>  <span class="c1"># From SRS database - see function above</span>
+<span class="n">ref_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">([</span><span class="n">a</span> <span class="o">*</span> <span class="n">t</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ref_T</span><span class="p">,</span> <span class="n">ref_activities</span><span class="p">)])</span>
+<span class="n">lnpi_info</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_lnPi_info</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ref_mu</span><span class="o">=</span><span class="n">ref_mu</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ref_T</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For each temperature, we need to create an <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> object. This will involve creating a specific metadata callback for <span class="math notranslate nohighlight">\(\ln \Pi\)</span>, as well as a data object (see <a class="reference internal" href="../../../reference/generated/thermoextrap.data.html#module-thermoextrap.data" title="thermoextrap.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code></a>) based on the information collected in lnpi_info.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lnpi_extrap_objects</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">lnpi_info</span><span class="p">:</span>
+    <span class="n">meta_lnpi</span> <span class="o">=</span> <span class="n">thermoextrap</span><span class="o">.</span><span class="n">lnpi</span><span class="o">.</span><span class="n">lnPiDataCallback</span><span class="p">(</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;lnPi&quot;</span><span class="p">],</span>
+        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;mu&quot;</span><span class="p">],</span>
+        <span class="n">dims_n</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">],</span>
+        <span class="n">dims_comp</span><span class="o">=</span><span class="s2">&quot;comp&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">data_lnpi</span> <span class="o">=</span> <span class="n">thermoextrap</span><span class="o">.</span><span class="n">DataCentralMoments</span><span class="o">.</span><span class="n">from_ave_raw</span><span class="p">(</span>
+        <span class="n">u</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">],</span>
+        <span class="n">xu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">x_is_u</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">central</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">meta</span><span class="o">=</span><span class="n">meta_lnpi</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">lnpi_extrap_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">thermoextrap</span><span class="o">.</span><span class="n">lnpi</span><span class="o">.</span><span class="n">factory_extrapmodel_lnPi</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">],</span> <span class="n">data</span><span class="o">=</span><span class="n">data_lnpi</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next we need to extract only the information we want to pass to the GPR model for training. This involves accessing temperatures, derivatives, and covariances from our <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> objects. Note that statistics on derivatives, like covariances, will be computed over multiple independent simulation runs, each generating an estimate of the full <span class="math notranslate nohighlight">\(\ln \Pi\)</span> distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lnpi_states</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lnpi_extrap_objects</span><span class="p">):</span>
+    <span class="c1"># Get maximum derivative order</span>
+    <span class="n">d_o</span> <span class="o">=</span> <span class="n">lnpi_info</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;umom&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="c1"># Find reciprocal temperature for this state, pairing with derivative orders</span>
+    <span class="n">alphas</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">alpha0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">d_o</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">alphas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">d_o</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Get derivatives, both the means across independent simulations, and all independent results</span>
+    <span class="n">derivs</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">derivs</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">d_o</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s2">&quot;rec&quot;</span><span class="p">)</span>
+    <span class="n">derivs</span> <span class="o">=</span> <span class="n">derivs</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">resamp_derivs</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">derivs</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">d_o</span><span class="p">)</span>
+    <span class="n">resamp_derivs</span> <span class="o">=</span> <span class="n">resamp_derivs</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">y_data</span> <span class="o">=</span> <span class="n">derivs</span>
+
+    <span class="c1"># Compute the covariance matrix between derivatives</span>
+    <span class="n">cov_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">resamp_derivs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">cov_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">resamp_derivs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">k</span><span class="p">]))</span>
+    <span class="n">cov_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cov_data</span><span class="p">)</span>
+
+    <span class="c1"># Create a StatelnPi object storing the GPR input information</span>
+    <span class="n">lnpi_states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">StatelnPi</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">cov_data</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can now create our GPR model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gp_model</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">create_GPR</span><span class="p">(</span><span class="n">lnpi_states</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Metal device set to: Apple M2
+</pre></div>
+</div>
+</div>
+</div>
+<p>Looking at the results of the optimization over parameters…</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gp_model</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">&lt;thermoextrap.gpr_active.gp_models.HeteroscedasticGPR object at 0x147eddf60&gt;
+<table>
+<thead>
+<tr><th>name                                     </th><th>class    </th><th>transform  </th><th>prior  </th><th>trainable  </th><th>shape  </th><th>dtype  </th><th style="text-align: right;">   value</th></tr>
+</thead>
+<tbody>
+<tr><td>HeteroscedasticGPR.kernel.kernel.var     </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">5.54628 </td></tr>
+<tr><td>HeteroscedasticGPR.kernel.kernel.l       </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">0.496656</td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_scale</td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">3.40188 </td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_add  </td><td>Parameter</td><td>Identity   </td><td>       </td><td>False      </td><td>()     </td><td>float64</td><td style="text-align: right;">0       </td></tr>
+</tbody>
+</table></div></div>
+</div>
+<p>Finally, we can plot the results, testing a number of temperatures that we have data for from the SRS database. The result should be Figure 9 from the paper.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up array of temperatures for which we have data and can compare to our model</span>
+<span class="n">test_T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.70</span><span class="p">,</span> <span class="mf">0.74</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.10</span><span class="p">,</span> <span class="mf">1.20</span><span class="p">])</span>
+<span class="n">test_beta</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">test_T</span>
+
+<span class="c1"># Make predictions using the model</span>
+<span class="n">gp_mu</span><span class="p">,</span> <span class="n">gp_var</span> <span class="o">=</span> <span class="n">gp_model</span><span class="o">.</span><span class="n">predict_f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">test_beta</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">test_beta</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">gp_mu</span> <span class="o">=</span> <span class="n">gp_mu</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">gp_var</span> <span class="o">=</span> <span class="n">gp_var</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">gp_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gp_var</span><span class="p">)</span>
+
+<span class="c1"># Add N=0 bin back in, setting it to zero</span>
+<span class="n">gp_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gp_mu</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">gp_mu</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gp_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gp_var</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">gp_var</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gp_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gp_std</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">gp_std</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">N_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">gp_mu</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">tColors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">coolwarm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_T</span><span class="p">)))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.37</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_T</span><span class="p">)):</span>
+    <span class="c1"># Plot predictions at each temperature, both mean and 95% confidence intervals</span>
+    <span class="n">this_pred</span> <span class="o">=</span> <span class="n">gp_mu</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+        <span class="n">N_vals</span><span class="p">,</span>
+        <span class="n">this_pred</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gp_std</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span>
+        <span class="n">this_pred</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">gp_std</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">tColors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">N_vals</span><span class="p">,</span>
+        <span class="n">this_pred</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">tColors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$\hat</span><span class="si">{T}</span><span class="s2">$=</span><span class="si">%1.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">test_T</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Plot the reference data at this temperature, adjusting to the same chemical potential</span>
+    <span class="n">this_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">load_lnPi_info</span><span class="p">(</span><span class="n">test_T</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ref_mu</span><span class="o">=</span><span class="n">ref_mu</span><span class="p">)[</span><span class="s2">&quot;lnPi&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">20</span><span class="p">],</span> <span class="n">this_true</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">20</span><span class="p">],</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">tColors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ms</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+
+<span class="c1"># Below loop plots a subset of the data points actually used for training to indicate those temperatures</span>
+<span class="n">max_order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">gp_model</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref_T</span><span class="p">)):</span>
+    <span class="n">this_ref</span> <span class="o">=</span> <span class="n">gp_model</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">gp_model</span><span class="o">.</span><span class="n">scale_fac</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">20</span><span class="p">],</span> <span class="n">this_ref</span><span class="p">[::</span><span class="mi">20</span><span class="p">],</span> <span class="s2">&quot;dw&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$N$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\ln \Pi (N) - \ln \Pi (0)$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/98d10923fac03c2eba94eb097afcf9171826f7a3332ee741c795449efb54a838.png" src="../../../_images/98d10923fac03c2eba94eb097afcf9171826f7a3332ee741c795449efb54a838.png" />
+</div>
+</div>
+</section>
+<section id="saturation-properties">
+<h2>Saturation properties<a class="headerlink" href="#saturation-properties" title="Permalink to this heading">#</a></h2>
+<p>Saturation properties are more difficult to determine based on the macrostate distributions predicted by the GPR model. The reason lies in the assumption that each particle number bin can be treated as independent, only affecting each other in that the same kernel and likelihood model are used and hence the optimal parameters are determined by considering all bins simultaneously. Otherwise, though, the produced probability distribution for <span class="math notranslate nohighlight">\(\ln \Pi\)</span> at a new temperature is a produce of independent Gaussians, one for each bin. It turns out this works quite well to capture the temperature dependence, but does not work well when sampling new values. For instance, let’s just try sampling two draws from the GPR-predicted distribution at <span class="math notranslate nohighlight">\(T_\mathrm{r} = 0.85\)</span> and look at what we get for the macrostate distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="n">rand_draw</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">gp_mu</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">scale</span><span class="o">=</span><span class="n">gp_std</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">gp_mu</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N_vals</span><span class="p">,</span> <span class="n">rand_draw</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$N$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\ln \Pi (N) - \ln \Pi (0)$&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/33302157a26f3fa03fc7776e0381a567e439b62b4333acb89bc8ff980a5c49e9.png" src="../../../_images/33302157a26f3fa03fc7776e0381a567e439b62b4333acb89bc8ff980a5c49e9.png" />
+</div>
+</div>
+<p>The problem is that there are clearly correlations between the particle number bins that are not captured when sampling from this distribution. In other words, we’ve just sampled with a diagonal covariance matrix, effectively, and we would really like to sample with covariances, or non-zero off-diagonal terms. The further we are from reference temperatures used for training, the more noisy the draws will become due to larger uncertainties associated with those GPR predictions.</p>
+<p>To remedy this, we can <em>learn</em> the correlations in <span class="math notranslate nohighlight">\(N\)</span> using a new GP model. Such a model will be simple and easy to train because the prediction from the GPR over temperature exactly specifies the means (output values) and our uncertainty in them (their variances, which will compose a diagonal noise covariance matrix). All we need to learn are the kernel parameters and a we can use a simple likelihood with no optimizable parameters.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create data for GP model over N dimension</span>
+<span class="c1"># No derivatives here, so zeros for second column</span>
+<span class="n">x_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">N_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">y_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">gp_mu</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span>
+<span class="n">cov_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">gp_var</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:])[</span><span class="mi">1</span><span class="p">:])</span>
+<span class="c1"># Note that ignoring modeling of N=0 bin... will be zero no matter what, with std of 0</span>
+<span class="c1"># That can throw off matrix, so ignore for modeling and sampling purposes</span>
+
+<span class="c1"># Create model, but make sure to set power scale to zero and constrain it</span>
+<span class="c1"># Don&#39;t want to modify/learn anything about covariance matrix here</span>
+<span class="n">particle_bin_gp</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">create_base_GP_model</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">x_input</span><span class="p">,</span> <span class="n">y_input</span><span class="p">,</span> <span class="n">cov_input</span><span class="p">),</span>
+    <span class="n">likelihood_kwargs</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;transform_p&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;constrain_p&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># Train it</span>
+<span class="n">active_utils</span><span class="o">.</span><span class="n">train_GPR</span><span class="p">(</span><span class="n">particle_bin_gp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And we can take a look at this model…</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">particle_bin_gp</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">&lt;thermoextrap.gpr_active.gp_models.HeteroscedasticGPR object at 0x150b6c580&gt;
+<table>
+<thead>
+<tr><th>name                                     </th><th>class    </th><th>transform  </th><th>prior  </th><th>trainable  </th><th>shape  </th><th>dtype  </th><th style="text-align: right;">    value</th></tr>
+</thead>
+<tbody>
+<tr><td>HeteroscedasticGPR.kernel.kernel.var     </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;"> 0.732302</td></tr>
+<tr><td>HeteroscedasticGPR.kernel.kernel.l       </td><td>Parameter</td><td>Softplus   </td><td>       </td><td>True       </td><td>()     </td><td>float64</td><td style="text-align: right;">15.515   </td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_scale</td><td>Parameter</td><td>Identity   </td><td>       </td><td>False      </td><td>()     </td><td>float64</td><td style="text-align: right;"> 0       </td></tr>
+<tr><td>HeteroscedasticGPR.likelihood.power_add  </td><td>Parameter</td><td>Identity   </td><td>       </td><td>False      </td><td>()     </td><td>float64</td><td style="text-align: right;"> 0       </td></tr>
+</tbody>
+</table></div></div>
+</div>
+<p>Now we can plot the model over the particle number bins with two new draws from it without added noise covariances, seeing that effectively it is smoothly any predictions, adding in correlations between the particle number bins. It turns out, however, that due to the large uncertainty in any of the predicted mean values from the GPR model in temperature, the noise still dominates. This is shown as adding the noise covariance back to the covariance output by the model associated with just the kernel and the correlations over the particle number bins.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Want the distribution of functions given the provided inputs</span>
+<span class="c1"># Evaluating at the input locations, so x=x* and want full covariance</span>
+<span class="n">particle_bin_pred</span> <span class="o">=</span> <span class="n">particle_bin_gp</span><span class="o">.</span><span class="n">predict_f</span><span class="p">(</span><span class="n">particle_bin_gp</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">full_cov</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">particle_bin_mean</span> <span class="o">=</span> <span class="n">particle_bin_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="c1"># And want uncertainty in model plus noise, so add noise covariance to output</span>
+<span class="n">particle_bin_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">particle_bin_pred</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">cov_input</span>
+<span class="c1"># But also check what it looks like without noise added back in</span>
+<span class="n">particle_bin_cov_no_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">particle_bin_pred</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Draw random samples from multivariate normal based on GP output</span>
+<span class="n">particle_bin_draw</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+    <span class="n">mean</span><span class="o">=</span><span class="n">particle_bin_mean</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">particle_bin_cov</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+<span class="n">particle_bin_draw_no_noise</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+    <span class="n">mean</span><span class="o">=</span><span class="n">particle_bin_mean</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">particle_bin_cov_no_noise</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+
+<span class="c1"># Add N=0 bin back in</span>
+<span class="n">particle_bin_draw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">particle_bin_draw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">particle_bin_draw_no_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">particle_bin_draw_no_noise</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
+<span class="p">)</span>
+
+<span class="c1"># And plot!</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:orange&quot;</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N_vals</span><span class="p">,</span> <span class="n">particle_bin_draw</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N_vals</span><span class="p">,</span> <span class="n">particle_bin_draw_no_noise</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">particle_bin_mean</span><span class="p">,</span> <span class="s2">&quot;k--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N_vals</span><span class="p">[::</span><span class="mi">20</span><span class="p">],</span> <span class="n">gp_mu</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">::</span><span class="mi">20</span><span class="p">],</span> <span class="s2">&quot;ko&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$N$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\ln \Pi (N) - \ln \Pi (0)$&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/357ecf71e864b7fed7266d4b6785ef742ddc44fbcc2030e5863ba522fc027aa1.png" src="../../../_images/357ecf71e864b7fed7266d4b6785ef742ddc44fbcc2030e5863ba522fc027aa1.png" />
+</div>
+</div>
+<p>Though the noise dominates for this temperature, this will not always be the case and in many cases the learned correlations will in fact be helpful for predicting random changes in a macrostate distribution. At the very least, it is a better probabilistic model for a macrostate distribution, adding in correlations that would not be present in the original prediction from the GPR trained to predict changes with temperature.</p>
+<p>Code may be found in <code class="docutils literal notranslate"><span class="pre">run_LJ_lnPi.py</span></code> (within the example_projects directory) that performs the model fitting above for each new temperature, takes a large number of random draws, and uses each of those stochastically drawn distributions to compute saturation properties with the tmmc-lnpy package. This creates bootstrapped distributions of saturation properties that can be plotted. The results of this procedure, which may be found as code in the example_projects directory, are saved in the file “sat_props_GPR.npz” found in the “SRS_data” directory. To actually run the <code class="docutils literal notranslate"><span class="pre">run_LJ_lnPi.py</span></code> script found in example_projects used to generate those files, you will also have to install the tmmc-lnpy package via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">tmmc-lnpy</span></code> in addition to the <code class="docutils literal notranslate"><span class="pre">thermoextrap</span></code> environment.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load saturation properties</span>
+<span class="c1"># Should be lnz, density_gas, density_liquid, pressure_gas, pressure_liquid</span>
+<span class="n">sat_props</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;SRS_data/sat_props_GPR.npz&quot;</span><span class="p">))</span>
+<span class="n">gp_sat_props</span> <span class="o">=</span> <span class="n">sat_props</span><span class="p">[</span><span class="s2">&quot;props&quot;</span><span class="p">]</span>
+<span class="n">gp_sat_props_conf_ints</span> <span class="o">=</span> <span class="n">sat_props</span><span class="p">[</span><span class="s2">&quot;conf_ints&quot;</span><span class="p">]</span>
+
+<span class="c1"># Plot true values versus predicted properties</span>
+<span class="n">prop_betas</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+    <span class="n">gp_sat_props</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.37</span><span class="p">,</span> <span class="mf">3.37</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">raw_lnz</span><span class="p">,</span> <span class="n">raw_dens</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">raw_dens</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">raw_psat</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prop_betas</span><span class="p">,</span> <span class="n">gp_sat_props</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+        <span class="n">prop_betas</span><span class="p">,</span>
+        <span class="n">gp_sat_props_conf_ints</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">gp_sat_props_conf_ints</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">raw_beta</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="s2">&quot;k--&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\hat{\beta}$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta \mu_\mathrm</span><span class="si">{sat}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\hat{\rho}_v$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\hat{\rho}_l$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\hat</span><span class="si">{P}</span><span class="s2">_\mathrm</span><span class="si">{sat}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/ecdaa4d833fffdcd0b00b288d7256aa632100249851af6c385e88216db009573.png" src="../../../_images/ecdaa4d833fffdcd0b00b288d7256aa632100249851af6c385e88216db009573.png" />
+</div>
+</div>
+<p>This is Figure 10 from our paper.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Ideal_Gas.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Ideal Gas</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="SWF_Adsorption.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Active learning: adsorption of a square-well fluid in a pore</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gpr-model-of-ln-pi-variations-with-temperature">GPR model of <span class="math notranslate nohighlight">\(\ln \Pi\)</span> variations with temperature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saturation-properties">Saturation properties</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By William P. Krekelberg
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, William P. Krekelberg.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2023-04-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

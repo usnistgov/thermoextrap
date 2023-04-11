@@ -1,0 +1,1633 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>GPR utilities (active_utils) &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../_static/js/leave_notice.js"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/generated/thermoextrap.gpr_active.active_utils';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="GPR for ideal gas (ig_active)" href="thermoextrap.gpr_active.ig_active.html" />
+    <link rel="prev" title="Models for Gaussian process regression (gp_models)" href="thermoextrap.gpr_active.gp_models.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    thermoextrap: Thermodynamic Extrapolation/Interpolation Library
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/gpr/Ideal_Gas.html">Ideal Gas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/gpr/LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/gpr/SWF_Adsorption.html">Active learning: adsorption of a square-well fluid in a pore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-baseclasses.html">Base classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../py-modindex.html">Module Index</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap/issues/new?title=Issue%20on%20page%20%2Freference/generated/thermoextrap.gpr_active.active_utils.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/reference/generated/thermoextrap.gpr_active.active_utils.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>GPR utilities (active_utils)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.get_logweights"><code class="docutils literal notranslate"><span class="pre">get_logweights()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.input_GP_from_state"><code class="docutils literal notranslate"><span class="pre">input_GP_from_state()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper"><code class="docutils literal notranslate"><span class="pre">DataWrapper</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_U_info"><code class="docutils literal notranslate"><span class="pre">DataWrapper.load_U_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_CV_info"><code class="docutils literal notranslate"><span class="pre">DataWrapper.load_CV_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_x_info"><code class="docutils literal notranslate"><span class="pre">DataWrapper.load_x_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.get_data"><code class="docutils literal notranslate"><span class="pre">DataWrapper.get_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.build_state"><code class="docutils literal notranslate"><span class="pre">DataWrapper.build_state()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.SimWrapper"><code class="docutils literal notranslate"><span class="pre">SimWrapper</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.SimWrapper.run_sim"><code class="docutils literal notranslate"><span class="pre">SimWrapper.run_sim()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.make_matern_expr"><code class="docutils literal notranslate"><span class="pre">make_matern_expr()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.make_rbf_expr"><code class="docutils literal notranslate"><span class="pre">make_rbf_expr()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.make_poly_expr"><code class="docutils literal notranslate"><span class="pre">make_poly_expr()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.RBFDerivKernel"><code class="docutils literal notranslate"><span class="pre">RBFDerivKernel</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.ChangeInnerOuterRBFDerivKernel"><code class="docutils literal notranslate"><span class="pre">ChangeInnerOuterRBFDerivKernel</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.create_base_GP_model"><code class="docutils literal notranslate"><span class="pre">create_base_GP_model()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.train_GPR"><code class="docutils literal notranslate"><span class="pre">train_GPR()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.create_GPR"><code class="docutils literal notranslate"><span class="pre">create_GPR()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.create_alpha_grid"><code class="docutils literal notranslate"><span class="pre">UpdateStopABC.create_alpha_grid()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.get_transformed_GP_output"><code class="docutils literal notranslate"><span class="pre">UpdateStopABC.get_transformed_GP_output()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.do_plotting"><code class="docutils literal notranslate"><span class="pre">UpdateFuncBase.do_plotting()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.__call__"><code class="docutils literal notranslate"><span class="pre">UpdateFuncBase.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateALMbrute"><code class="docutils literal notranslate"><span class="pre">UpdateALMbrute</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateRandom"><code class="docutils literal notranslate"><span class="pre">UpdateRandom</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateSpaceFill"><code class="docutils literal notranslate"><span class="pre">UpdateSpaceFill</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateAdaptiveIntegrate"><code class="docutils literal notranslate"><span class="pre">UpdateAdaptiveIntegrate</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateALCbrute"><code class="docutils literal notranslate"><span class="pre">UpdateALCbrute</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MetricBase"><code class="docutils literal notranslate"><span class="pre">MetricBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MetricBase.__call__"><code class="docutils literal notranslate"><span class="pre">MetricBase.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxVar"><code class="docutils literal notranslate"><span class="pre">MaxVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.AvgVar"><code class="docutils literal notranslate"><span class="pre">AvgVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxRelVar"><code class="docutils literal notranslate"><span class="pre">MaxRelVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxRelGlobalVar"><code class="docutils literal notranslate"><span class="pre">MaxRelGlobalVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.AvgRelVar"><code class="docutils literal notranslate"><span class="pre">AvgRelVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MSD"><code class="docutils literal notranslate"><span class="pre">MSD</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelDeviation"><code class="docutils literal notranslate"><span class="pre">MaxAbsRelDeviation</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation"><code class="docutils literal notranslate"><span class="pre">MaxAbsRelGlobalDeviation</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.AvgAbsRelDeviation"><code class="docutils literal notranslate"><span class="pre">AvgAbsRelDeviation</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.ErrorStability"><code class="docutils literal notranslate"><span class="pre">ErrorStability</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxIter"><code class="docutils literal notranslate"><span class="pre">MaxIter</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.StopCriteria"><code class="docutils literal notranslate"><span class="pre">StopCriteria</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.StopCriteria.compute_metrics"><code class="docutils literal notranslate"><span class="pre">StopCriteria.compute_metrics()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.StopCriteria.__call__"><code class="docutils literal notranslate"><span class="pre">StopCriteria.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.active_learning"><code class="docutils literal notranslate"><span class="pre">active_learning()</span></code></a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <span class="target" id="module-thermoextrap.gpr_active.active_utils"></span><section id="gpr-utilities-active-utils">
+<h1>GPR utilities (<a class="reference internal" href="#module-thermoextrap.gpr_active.active_utils" title="thermoextrap.gpr_active.active_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code></a>)<a class="headerlink" href="#gpr-utilities-active-utils" title="Permalink to this heading">#</a></h1>
+</section>
+<p><strong>Functions:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.get_logweights" title="thermoextrap.gpr_active.active_utils.get_logweights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_logweights</span></code></a>(bias)</p></td>
+<td><p>Given values of the biasing potential for each configuration, calculates the weights for averaging over those configurations for the biased ensemble so that the average represents the unbiased ensemble.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.input_GP_from_state" title="thermoextrap.gpr_active.active_utils.input_GP_from_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">input_GP_from_state</span></code></a>(state[, n_rep, log_scale])</p></td>
+<td><p>Builds input for GP model up to specified order from ExtrapModel object of thermoextrap.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.make_matern_expr" title="thermoextrap.gpr_active.active_utils.make_matern_expr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_matern_expr</span></code></a>(p)</p></td>
+<td><p>Creates a sympy expression for the Matern kernel of order p.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.make_rbf_expr" title="thermoextrap.gpr_active.active_utils.make_rbf_expr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_rbf_expr</span></code></a>()</p></td>
+<td><p>Creates a sympy expression for an RBF kernel.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.make_poly_expr" title="thermoextrap.gpr_active.active_utils.make_poly_expr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_poly_expr</span></code></a>(p)</p></td>
+<td><p>Creates a sympy expression for a polynomial kernel.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.create_base_GP_model" title="thermoextrap.gpr_active.active_utils.create_base_GP_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_base_GP_model</span></code></a>(gpr_data[, ...])</p></td>
+<td><p>Creates just the base GP model without any training,just sets up sympy and GPflow.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.train_GPR" title="thermoextrap.gpr_active.active_utils.train_GPR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_GPR</span></code></a>(gpr[, record_loss, start_params])</p></td>
+<td><p>Trains a given gpr model for n_opt steps.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.create_GPR" title="thermoextrap.gpr_active.active_utils.create_GPR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_GPR</span></code></a>(state_list[, log_scale, ...])</p></td>
+<td><p>Generates and trains a GPR model based on a list of ExtrapModel objects or a StateCollection object from thermoextrap.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.active_learning" title="thermoextrap.gpr_active.active_utils.active_learning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">active_learning</span></code></a>(init_states, sim_wrapper, ...)</p></td>
+<td><p>Continues adding new points with active learning by running simulations until the specified tolerance is reached or the maximum number of iterations is achieved.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Classes:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataWrapper</span></code></a>(sim_info_files, cv_bias_files, beta)</p></td>
+<td><p>Class to keep track of metadata around the data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.SimWrapper" title="thermoextrap.gpr_active.active_utils.SimWrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimWrapper</span></code></a>(sim_func, struc_name, sys_name, ...)</p></td>
+<td><p>Wrapper around simulations to spawn similar simulations easily and keep track of all parameter values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.RBFDerivKernel" title="thermoextrap.gpr_active.active_utils.RBFDerivKernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBFDerivKernel</span></code></a>(**kwargs)</p></td>
+<td><p>For convenience, create a derivative kernel specific to RBF function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.ChangeInnerOuterRBFDerivKernel" title="thermoextrap.gpr_active.active_utils.ChangeInnerOuterRBFDerivKernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChangeInnerOuterRBFDerivKernel</span></code></a>([c1, c2])</p></td>
+<td><p>Implements a change-points kernel via logistic switching functions (as in GPflow's ChangePoints kernel), but only for two points, where two instead of three kernels are utilized: one for the outer region and one for the inner.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC" title="thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a>([d_order_pred, ...])</p></td>
+<td><p>Class that forms basis for both update and stopping criteria classes, which both need to define transformation functions and create grids of alpha values.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a>([show_plot, save_plot, ...])</p></td>
+<td><p>Base update function class defining structure and implementing basic methods.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateALMbrute" title="thermoextrap.gpr_active.active_utils.UpdateALMbrute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UpdateALMbrute</span></code></a>(**kwargs)</p></td>
+<td><p>Performs active learning with a GPR to select new location for performing simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateRandom" title="thermoextrap.gpr_active.active_utils.UpdateRandom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UpdateRandom</span></code></a>(**kwargs)</p></td>
+<td><p>Select point randomly along a grid based on previously sampled points.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateSpaceFill" title="thermoextrap.gpr_active.active_utils.UpdateSpaceFill"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UpdateSpaceFill</span></code></a>(**kwargs)</p></td>
+<td><p>Select point as far as possible from previously sampled points.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateAdaptiveIntegrate" title="thermoextrap.gpr_active.active_utils.UpdateAdaptiveIntegrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UpdateAdaptiveIntegrate</span></code></a>([tol])</p></td>
+<td><p>Select point as far as possible from previously sampled points, but within specified error tolerance based on model relative uncertainty predictions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateALCbrute" title="thermoextrap.gpr_active.active_utils.UpdateALCbrute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UpdateALCbrute</span></code></a>(**kwargs)</p></td>
+<td><p>EXPERIMENTAL! MAY BE USEFUL IN FUTURE WORK, BUT NOT NOW!</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetricBase</span></code></a>(name, tol)</p></td>
+<td><p>Base class for structure of metrics used for stopping criteria.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MaxVar" title="thermoextrap.gpr_active.active_utils.MaxVar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxVar</span></code></a>(tol[, name])</p></td>
+<td><p>Metric based on maximum variance of GP output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.AvgVar" title="thermoextrap.gpr_active.active_utils.AvgVar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AvgVar</span></code></a>(tol[, name])</p></td>
+<td><p>Metric based on average variance of GP output.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MaxRelVar" title="thermoextrap.gpr_active.active_utils.MaxRelVar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxRelVar</span></code></a>(tol[, threshold, name])</p></td>
+<td><p>Metric based on maximum relative variance of GP output (actually std).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MaxRelGlobalVar" title="thermoextrap.gpr_active.active_utils.MaxRelGlobalVar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxRelGlobalVar</span></code></a>(tol[, name])</p></td>
+<td><p>Metric based on maximum ratio of GP output variance to variance of data input to the GP (actually ratio of std devs).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.AvgRelVar" title="thermoextrap.gpr_active.active_utils.AvgRelVar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AvgRelVar</span></code></a>(tol[, threshold, name])</p></td>
+<td><p>Metric based on average relative variance of GP output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MSD" title="thermoextrap.gpr_active.active_utils.MSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MSD</span></code></a>(tol[, name])</p></td>
+<td><p>Metric based on mean squared deviation between GP model outputs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelDeviation" title="thermoextrap.gpr_active.active_utils.MaxAbsRelDeviation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxAbsRelDeviation</span></code></a>(tol[, threshold, name])</p></td>
+<td><p>Metric based on maximum absolute relative deviation between GP model outputs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation" title="thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxAbsRelGlobalDeviation</span></code></a>(tol[, name])</p></td>
+<td><p>Metric based on maximum absolute deviation between GP model outputs divided by the std of the data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.AvgAbsRelDeviation" title="thermoextrap.gpr_active.active_utils.AvgAbsRelDeviation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AvgAbsRelDeviation</span></code></a>(tol[, threshold, name])</p></td>
+<td><p>Metric based on average absolute relative deviation between GP model outputs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.ErrorStability" title="thermoextrap.gpr_active.active_utils.ErrorStability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ErrorStability</span></code></a>(tol[, name])</p></td>
+<td><p>Implements the stopping metric introduced by Ishibashi and Hino (2021).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MaxIter" title="thermoextrap.gpr_active.active_utils.MaxIter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaxIter</span></code></a>([name])</p></td>
+<td><p>Metric that always returns False so that will reach maximum number of iterations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.StopCriteria" title="thermoextrap.gpr_active.active_utils.StopCriteria"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StopCriteria</span></code></a>(metric_funcs, **kwargs)</p></td>
+<td><p>Class that calculates metrics used to determine stopping criteria for active learning.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.get_logweights">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">get_logweights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bias</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L31-L44"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.get_logweights" title="Permalink to this definition">#</a></dt>
+<dd><p>Given values of the biasing potential for each configuration, calculates the weights
+for averaging over those configurations for the biased ensemble so that the
+average represents the unbiased ensemble.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.input_GP_from_state">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">input_GP_from_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L47-L127"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.input_GP_from_state" title="Permalink to this definition">#</a></dt>
+<dd><p>Builds input for GP model up to specified order from ExtrapModel object of thermoextrap.
+If log_scale, adjust x inputs and derivatives to reflect taking the logarithm of x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<a class="reference internal" href="thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a>) – object containing derivative information</p></li>
+<li><p><strong>n_rep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">100</span></code>) – Number of bootstrap draws of data to perform to compute variances</p></li>
+<li><p><strong>log_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Whether or not to apply a log scale in the input locations
+(i.e., compute derivatives of dy/dlog(x) instead of dy/dx)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – input locations, likely state points (e.g., temperature, pressure, etc.),
+augmented with derivative order of each observation, as required for GP
+models</p></li>
+<li><p><strong>y_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – Output data, which includes both function values and derivative information</p></li>
+<li><p><strong>cov_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – covariance matrix between function observations, including derivative
+observations; note that this will be block-diagonal since it is expected
+that the state objects at different conditions are based on information
+from independent simulations, while the observations at different derivative
+orders from a single simulation are correlated</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.DataWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">DataWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_info_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_bias_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1,</span> <span class="pre">2]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1]</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L130-L285"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.DataWrapper" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to keep track of metadata around the data. Data will not be stored here, but
+this class will define how data is loaded and processed. If want to change the
+column indices, simply have to call get_data, then build_state in two separate
+steps rather than just calling build_state. Handles multiple files, but only
+under the assumption that all biases are fixed after the initial simulation.
+If the biases change, then need to use MBAR to reweight everything. This is
+feasible, but difficult if trying to provide all samples to GPR so it can
+bootstrap. When to point where can provide all derivatives and uncertainties
+directly, can switch over to using MBAR and computeExpectations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sim_info_files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – list of files containing simulation information, such as potential
+energy timeseries</p></li>
+<li><p><strong>cv_bias_files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – list of files containing the collective variable, or quantity of interest
+for the active learning procedure; a bias along this quantity or
+another CV may also be included for a simulation with enhanced sampling</p></li>
+<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – the reciprocal temperature (1/(kB*T)) of the simulations in this data set</p></li>
+<li><p><strong>x_files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>optional</em>) – the files containing the quantity of interest for the active
+learning procedure; default is to assume this is the CV in cv_bias_files
+and that these are not necessary</p></li>
+<li><p><strong>n_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10000</span></code>) – number of frames from the END of simulation(s), or the files read in, to
+use for computations; allows exclusion of equilibration periods</p></li>
+<li><p><strong>u_col</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">2</span></code>) – column of sim_info_files in which potential energy is found</p></li>
+<li><p><strong>cv_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>, <em>default</em> <cite>[1,2]</cite>) – columns of cv_bias_files in which the CV and bias are found</p></li>
+<li><p><strong>x_col</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>, <em>default</em> <cite>[1]</cite>) – list of columns from x_files to pull out; can be multiple if
+the are multiple outputs of interest</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_U_info" title="thermoextrap.gpr_active.active_utils.DataWrapper.load_U_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_U_info</span></code></a>()</p></td>
+<td><p>Loads potential energies from a list of files.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_CV_info" title="thermoextrap.gpr_active.active_utils.DataWrapper.load_CV_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_CV_info</span></code></a>()</p></td>
+<td><p>Loads data from a file specifying CV coordinate and added bias at each frame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_x_info" title="thermoextrap.gpr_active.active_utils.DataWrapper.load_x_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_x_info</span></code></a>()</p></td>
+<td><p>Loads observable data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper.get_data" title="thermoextrap.gpr_active.active_utils.DataWrapper.get_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data</span></code></a>()</p></td>
+<td><p>Loads data from files needed to generate data classes for thermoextrap.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper.build_state" title="thermoextrap.gpr_active.active_utils.DataWrapper.build_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_state</span></code></a>([all_data, max_order])</p></td>
+<td><p>Builds a thermoextrap data object for the data described by this wrapper class.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.DataWrapper.load_U_info">
+<span class="sig-name descname"><span class="pre">load_U_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L195-L202"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_U_info" title="Permalink to this definition">#</a></dt>
+<dd><p>Loads potential energies from a list of files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.DataWrapper.load_CV_info">
+<span class="sig-name descname"><span class="pre">load_CV_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L204-L218"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_CV_info" title="Permalink to this definition">#</a></dt>
+<dd><p>Loads data from a file specifying CV coordinate and added bias at each frame.
+Assumes that the first value in col_ind is the index of the CV coordinate column and the
+second is the index for the bias.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.DataWrapper.load_x_info">
+<span class="sig-name descname"><span class="pre">load_x_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L220-L226"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_x_info" title="Permalink to this definition">#</a></dt>
+<dd><p>Loads observable data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.DataWrapper.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L228-L268"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.DataWrapper.get_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Loads data from files needed to generate data classes for thermoextrap.
+Will change significantly if using MBAR on trajectories with different biases.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.DataWrapper.build_state">
+<span class="sig-name descname"><span class="pre">build_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L270-L285"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.DataWrapper.build_state" title="Permalink to this definition">#</a></dt>
+<dd><p>Builds a thermoextrap data object for the data described by this wrapper class.
+If all_data is provided, should be list or tuple of (potential energies, X) to
+be used, where X should be appropriately weighted if the simulation is biased.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.SimWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">SimWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struc_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sys_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_inputs={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_kw_inputs={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_class=&lt;class</span> <span class="pre">'thermoextrap.gpr_active.active_utils.DataWrapper'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_process_func=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_process_out_name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_process_kw_inputs={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_process_func=None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L288-L444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.SimWrapper" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Wrapper around simulations to spawn similar simulations easily and keep
+track of all parameter values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sim_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – function that runs a new simulation</p></li>
+<li><p><strong>struc_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of structure file inputs to simulation</p></li>
+<li><p><strong>sys_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of system or topological file inputs to simulation</p></li>
+<li><p><strong>info_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of information file for simulation to produce</p></li>
+<li><p><strong>bias_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of file with CV values and bias for simulation to produce</p></li>
+<li><p><strong>kw_inputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – additional keyword inputs to the simulation</p></li>
+<li><p><strong>data_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – class (e.g., <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a>) to use for wrapping simulation output data;
+data will be wrapped before returned to the active learning algorithm</p></li>
+<li><p><strong>post_process_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>, <em>optional</em>) – Function for post-processing simulation outputs but before
+wrapping in data_class</p></li>
+<li><p><strong>post_process_out_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>optional</em>) – name of output files produced by post_process_func</p></li>
+<li><p><strong>post_process_kw_inputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – additional dictionary of arguments for the
+post_process_func</p></li>
+<li><p><strong>pre_process_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>, <em>optional</em>) – function to apply before a simulation run in order to produce extra
+keyword arguments for the simulation run; useful if have an extra model
+that predicts info needed by or helpful for the simulation</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.SimWrapper.run_sim" title="thermoextrap.gpr_active.active_utils.SimWrapper.run_sim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_sim</span></code></a>(sim_dir, alpha[, n_repeats])</p></td>
+<td><p>Runs simulation(s) and returns an object of type self.data_class pointing to right files.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.SimWrapper.run_sim">
+<span class="sig-name descname"><span class="pre">run_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L363-L444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.SimWrapper.run_sim" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs simulation(s) and returns an object of type self.data_class pointing to
+right files. By default only one, but will run n_repeats in parallel if specified.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.make_matern_expr">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">make_matern_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L450-L484"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.make_matern_expr" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a sympy expression for the Matern kernel of order p.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – order of Matern kernel</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>expr</strong> (<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code></a>)</p></li>
+<li><p><strong>kern_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – parameters matching naming in sympy expression</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.make_rbf_expr">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">make_rbf_expr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L487-L506"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.make_rbf_expr" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a sympy expression for an RBF kernel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>expr</strong> (<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code></a>)</p></li>
+<li><p><strong>kern_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – parameters matching naming in sympy expression</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.make_poly_expr">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">make_poly_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L509-L533"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.make_poly_expr" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a sympy expression for a polynomial kernel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – order of polynomial</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>expr</strong> (<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code></a>)</p></li>
+<li><p><strong>kern_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – parameters matching naming in sympy expression</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.RBFDerivKernel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">RBFDerivKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L552-L560"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.RBFDerivKernel" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a></p>
+<p>For convenience, create a derivative kernel specific to RBF function.
+Use it most often, so convenient to have.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.ChangeInnerOuterRBFDerivKernel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">ChangeInnerOuterRBFDerivKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-7.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-2.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L563-L626"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.ChangeInnerOuterRBFDerivKernel" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a></p>
+<p>Implements a change-points kernel via logistic switching functions (as in GPflow’s
+ChangePoints kernel), but only for two points, where two instead of three kernels
+are utilized: one for the outer region and one for the inner. Both kernels are
+RBF kernels with a shared variance parameter. The resulting kernel is differentiable,
+inheriting DerivativeKernel. Two points where the kernel changes may be specified,
+c1 and c2, meaning that the outer kernel is used for x &lt;= c1 and x &gt;= c2, while the
+inner kernel is used for c1 &lt; x &lt; c2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – first change point</p></li>
+<li><p><strong>c2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – second change point</p></li>
+<li><p><strong>**kwargs</strong> – Extra Arguments to <a class="reference internal" href="thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.create_base_GP_model">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">create_base_GP_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gpr_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_order_ref=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_kernel=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel=&lt;class</span> <span class="pre">'thermoextrap.gpr_active.active_utils.RBFDerivKernel'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_func=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihood_kwargs={}</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L629-L746"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.create_base_GP_model" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates just the base GP model without any training,just sets up sympy and
+GPflow. kernel can either be a kernel object, in which case it is assumed
+you know what you’re doing and shared_kernel will be ignored (will not wrap
+in SharedIndependent or SeparateIndependent and thus if the kernel is not a
+subclass of MultioutputKernel, HeteroscedasticGPR will wrap it in a
+SharedIndependent kernel). If shared_kernel is False and a kernel object is
+provided, only a warning will be printed, so beware. If only a class is
+provided for kernel, then shared_kernel is respected - a class is necessary
+so that if the kernel is not to be shared, separate instances can be
+created. Note that if a class is provided for kernel, it must be initiated
+without any passed parameters - this is easy to set up with a wrapper class
+as for RBFDerivKernel, the default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gpr_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>) – a tuple of input locations, output data, and the noise covariance matrix</p></li>
+<li><p><strong>d_order_ref</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">0</span></code>) – derivative order to treat as the reference for constructing mean
+functions; PROBABLY BEST TO REMOVE THIS OPTION UNTIL HAVE MORE
+SOPHISTICATED MEAN FUNCTIONS - DEFAULT BEHAVIOR DEFENDS AGAINST
+SITUATION WITH NO ZEROTH ORDER DERIVATIVES, BUT DOES NOT CREATE
+MEANINGFUL MEAN FUNCTION IN THAT CASE (JUST ZEROS)</p></li>
+<li><p><strong>shared_kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>) – whether or not the kernel will be shared across output dimensions</p></li>
+<li><p><strong>kernel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – Defaults to RBFDerivKernel.  Kernel to use in GP model.</p></li>
+<li><p><strong>mean_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>, <em>optional</em>) – mean function to use for GP model</p></li>
+<li><p><strong>likelihood_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – keyword arguments to pass to the likelihood model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>gpr</strong> (<a class="reference internal" href="thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.gpr_active.gp_models.HeteroscedasticGPR</span></code></a>) – Note, that this is an untrained model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.train_GPR">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">train_GPR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gpr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L749-L815"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.train_GPR" title="Permalink to this definition">#</a></dt>
+<dd><p>Trains a given gpr model for n_opt steps.
+Actually uses scipy wrapper in gpflow, which seems faster.
+If starting parameter values are provided in start_params, should be
+iterable with numpy array or float values (e.g., in tuple or list).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gpr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – The GPR model to train</p></li>
+<li><p><strong>record_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Whether or not to record the output of the optimizer and return it</p></li>
+<li><p><strong>start_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – Parameters to also try as starting points for the optimization; if these
+are provided as a list or numpy array, two optimizations are performed,
+one from the current GPR model parameters, and one with the GPR model
+parameters set to start_params; the optimization result with the lowest
+loss function value is selected and the GPR parameters are set to those
+values</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.create_GPR">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">create_GPR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L818-L902"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.create_GPR" title="Permalink to this definition">#</a></dt>
+<dd><p>Generates and trains a GPR model based on a list of ExtrapModel objects or a
+StateCollection object from thermoextrap. If a list of another type of
+object, such as a custom state function, will simply call it and expect to
+return GPR input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a>) – Each at different conditions.</p></li>
+<li><p><strong>log_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – whether or not to compute derivatives with respect to x or the logarithm
+of x, where x is the input location</p></li>
+<li><p><strong>start_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – Starting parameter values to consider during optimization</p></li>
+<li><p><strong>base_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – Additional dictionary of keyword arguments to pass to create_base_GP_model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>gpr</strong> (<a class="reference internal" href="thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.gpr_active.gp_models.HeteroscedasticGPR</span></code></a>) – Trained model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateStopABC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">UpdateStopABC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_order_pred=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_func=&lt;function</span> <span class="pre">identityTransform&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avoid_repeats=False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L921-L1010"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class that forms basis for both update and stopping criteria classes, which both need to
+define transformation functions and create grids of alpha values.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.create_alpha_grid" title="thermoextrap.gpr_active.active_utils.UpdateStopABC.create_alpha_grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_alpha_grid</span></code></a>(alpha_list)</p></td>
+<td><p>Given a list of alpha values used in the GP model, creates a grid of values to evaluate the GP model at.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.get_transformed_GP_output" title="thermoextrap.gpr_active.active_utils.UpdateStopABC.get_transformed_GP_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_transformed_GP_output</span></code></a>(gpr, x_vals)</p></td>
+<td><p>Returns output of GP and transforms it, evaluating GP using predict_f at alpha values.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateStopABC.create_alpha_grid">
+<span class="sig-name descname"><span class="pre">create_alpha_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_list</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L957-L987"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.create_alpha_grid" title="Permalink to this definition">#</a></dt>
+<dd><p>Given a list of alpha values used in the GP model, creates a grid of values
+to evaluate the GP model at. This grid, alpha_grid is returned along with values
+of possible points to select to add to the GP model, alpha_select. Depending
+on the update strategy, these may be different points (e.g., if using integrated
+uncertainty, point to add may be different than grid used to evaluate integrated
+variance).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateStopABC.get_transformed_GP_output">
+<span class="sig-name descname"><span class="pre">get_transformed_GP_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gpr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_vals</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L989-L1010"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.get_transformed_GP_output" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns output of GP and transforms it, evaluating GP using predict_f at alpha values.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateFuncBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">UpdateFuncBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1013-L1110"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC" title="thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a></p>
+<p>Base update function class defining structure and implementing basic methods.
+This class will be callable and will use the do_update() function to perform updates,
+which means that for new classes inheriting from this do_update() must be implemented.
+The update function should typically take two arguments: the GP model and the list of
+alpha (or x) input values that the model is based on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Whether or not to show a plot after each update</p></li>
+<li><p><strong>save_plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Whether or not to save a plot after each update</p></li>
+<li><p><strong>save_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-path-like-object" title="(in Python v3.11)"><span class="xref std std-term">path-like</span></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'./'</span></code>) – Directory to save figures.</p></li>
+<li><p><strong>compare_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>, <em>optional</em>) – Function to compare to for plotting, like ground truth if it is known.</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.do_plotting" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase.do_plotting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_plotting</span></code></a>(x, y, err, alpha_list)</p></td>
+<td><p>Plots output used to select new update point.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.__call__" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(gpr, alpha_list)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateFuncBase.do_plotting">
+<span class="sig-name descname"><span class="pre">do_plotting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_list</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1050-L1097"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.do_plotting" title="Permalink to this definition">#</a></dt>
+<dd><p>Plots output used to select new update point.
+err is expected to be length 2 list with upper and lower confidence intervals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateFuncBase.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gpr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_list</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1104-L1110"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.__call__" title="Permalink to this definition">#</a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateALMbrute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">UpdateALMbrute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1116-L1180"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateALMbrute" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a></p>
+<p>Performs active learning with a GPR to select new location for performing simulation.
+This is called “Active Learning Mackay” in the book by Grammacy (Surrogates, 2022).
+Selection is based on maximizing uncertainty over the interval, which is done with brute
+force evaluation on a grid of points (this is cheap compared to running simulations or
+training the GP model). It is possible to select a point that has already been run and
+add more data there, but will not move outside the range of data already collected.  A
+function for transforming the GPR prediction may also be provided, taking the inputs
+and prediction as arguments, in that order. This will not affect the GPR model, but
+will change the active learning outcomes, as will changing the derivative order of the
+outcome. Note that the transform should only involve addition or scaling (linear
+operations) such that the uncertainty can also be adjusted in the same way.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateRandom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">UpdateRandom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1183-L1210"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateRandom" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a></p>
+<p>Select point randomly along a grid based on previously sampled points.
+This does not require training a GP model, but one is trained anyway for plotting, etc.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateSpaceFill">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">UpdateSpaceFill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1213-L1256"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateSpaceFill" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a></p>
+<p>Select point as far as possible from previously sampled points.
+This will just be halfway between for two points. For situations where
+multiple locations work equally well, locations are chosen randomly.
+This does not require training a GP model, but one is trained anyway for plotting, etc.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateAdaptiveIntegrate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">UpdateAdaptiveIntegrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1259-L1359"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateAdaptiveIntegrate" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a></p>
+<p>Select point as far as possible from previously sampled points, but within
+specified error tolerance based on model relative uncertainty predictions.
+If all values in the interval satisfy the tolerance, the furthest point from
+all others will be chosen, as in a space-filling update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">0.005</span></code>) – tolerance threshold to stay under when finding next point; this is
+defined as the relative uncertainty, or the GPR-predicted standard
+deviation divided by the absolute value of the GPR-predicted mean</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.UpdateALCbrute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">UpdateALCbrute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1362-L1453"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.UpdateALCbrute" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase" title="thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a></p>
+<p>EXPERIMENTAL! MAY BE USEFUL IN FUTURE WORK, BUT NOT NOW!</p>
+<p>Performs active learning with a GPR to select new location for performing simulation.
+This is called “Active Learning Cohn” in the book by Grammacy (Surrogates, 2022).
+Selection is based on maximizing INTEGRATED uncertainty, which is done with brute
+force evaluation on a grid of points (this is cheap compared to running simulations or
+training the GP model). It is possible to select a point that has already been run and add
+more data there, but will not move outside the range of data already collected. The
+provided data should be a list of DataWrapper objects. A function for transforming the
+GPR prediction may also be provided, taking the inputs and prediction as arguments, in
+that order. This will not affect the GPR model, but will change the active learning
+outcomes.</p>
+<p>ONLY EXPECTED TO WORK WITH A FULLY HETEROSCEDASTIC GP MODEL WHERE THERE IS A MODEL,
+PERHAPS A SEPARATE GP PROCESS, FOR THE BEHAVIOR OF THE NOISE ACROSS INPUT LOCATIONS.</p>
+<p>(the trivial case is that the noise does not vary with input location, in which case
+this will also work, but if providing heteroscedastic noise but no model to predict
+new noise, this will not work)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MetricBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MetricBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1456-L1497"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for structure of metrics used for stopping criteria.
+To create a metric, write the calc_metric method.
+Inputs can be history, x_vals, and gp. See below for definition of history.
+x_vals are the values at which the means and variances were evaluated, and
+gp is the actual Gaussian process model. If possible, should avoid using the GP
+in metric functions since will make them slow, but in some cases it is necessary,
+so pass it in for flexibility.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase.__call__" title="thermoextrap.gpr_active.active_utils.MetricBase.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(history, x_vals, gp)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MetricBase.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1495-L1497"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MetricBase.__call__" title="Permalink to this definition">#</a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MaxVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MaxVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MaxVar'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1500-L1509"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MaxVar" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric based on maximum variance of GP output.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.AvgVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">AvgVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AvgVar'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1512-L1532"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.AvgVar" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric based on average variance of GP output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'AvgVar'</span></code>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+<li><p><strong>**kwargs</strong> – Extrap arguments to <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MaxRelVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MaxRelVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MaxRelVar'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1535-L1564"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MaxRelVar" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric based on maximum relative variance of GP output (actually std).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'MaxRelVar'</span></code>) – Name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1e-12</span></code>) – checks to make sure GPR-predicted means have absolute value larger than
+this value so that do not divide by zero; if below this value, those
+points are ignored for purposes of calculating metric (set to zero)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MaxRelGlobalVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MaxRelGlobalVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MaxRelGlobalVar'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1567-L1592"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MaxRelGlobalVar" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a>, <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC" title="thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a></p>
+<p>Metric based on maximum ratio of GP output variance to variance of data input to the
+GP (actually ratio of std devs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'MaxRelGlobalVar'</span></code>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.AvgRelVar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">AvgRelVar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AvgRelVar'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1595-L1623"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.AvgRelVar" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric based on average relative variance of GP output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'AvgRelVar'</span></code>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1e-12</span></code>) – checks to make sure GPR-predicted means have absolute value larger than
+this value so that do not divide by zero; if below this value, those
+points are ignored for purposes of calculating metric (set to zero)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MSD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MSD'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1626-L1648"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MSD" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric based on mean squared deviation between GP model outputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'MSD'</span></code>) – Name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MaxAbsRelDeviation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MaxAbsRelDeviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MaxAbsRelDev'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1651-L1685"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelDeviation" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric based on maximum absolute relative deviation between GP model outputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'MaxAbsRelDev'</span></code>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1e-12</span></code>) – checks to make sure GPR-predicted means have absolute value larger than
+this value so that do not divide by zero; if below this value, those
+points are ignored for purposes of calculating metric (set to zero)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MaxAbsRelGlobalDeviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MaxAbsRelGlobalDeviation'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1688-L1718"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a>, <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC" title="thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a></p>
+<p>Metric based on maximum absolute deviation between GP model outputs divided by the
+std of the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'MaxAbsRelGlobalDeviation'</span></code>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.AvgAbsRelDeviation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">AvgAbsRelDeviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AvgAbsRelDev'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1721-L1751"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.AvgAbsRelDeviation" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric based on average absolute relative deviation between GP model outputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'AvgAbsRelDev'</span></code>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.ErrorStability">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">ErrorStability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ErrorStability'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1754-L1898"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.ErrorStability" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a>, <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC" title="thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a></p>
+<p>Implements the stopping metric introduced by Ishibashi and Hino (2021).
+Note that for this metric, also inherits UpdateStopABC, so has its own
+parameters for log_scale, d_order_pred, and transform_func, that are
+separate from the StopCriteria it’s used in.
+Note that tol should be between 0 and 1, likely at 0.1 or below.
+And not that implementation here, transform_func can only be a
+linear transformation (scale and/or shift) of the GPR output (even though
+generally the transform_func can be more complicated).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of this metric</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – tolerance threshold for defining stopping</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.MaxIter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">MaxIter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MaxIter'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1901-L1918"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.MaxIter" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.MetricBase" title="thermoextrap.gpr_active.active_utils.MetricBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricBase</span></code></a></p>
+<p>Metric that always returns False so that will reach maximum number of iterations.
+This can be used with or without other metrics to reach maximum iterations since
+all metrics must be True to reach stopping criteria. Note that do not need to (and
+should not) set the tolerance here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of this metric</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.StopCriteria">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">StopCriteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric_funcs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1921-L2008"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.StopCriteria" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC" title="thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a></p>
+<p>Class that calculates metrics used to determine stopping criteria for active learning.
+The key component of this class is a list of metric functions which have names and define
+tolerances. All of the metrics must be less than the tolerance to trigger stopping.</p>
+<p>To perform calculations of metrics, this class keeps track of the history of the GPR
+predictions (necessary for metrics based on deviations since past iterations). This
+history object is stored as a list of array objects, specifically the GPR mean (list
+index 0) and GPR standard deviations (list index 1) with rows in each array being
+different iterations. So GPR prediction of a mean at iteration 3 would be
+history[0][3, …].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metric_funcs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – A dictionary {name: function} of metric names and associated functions;
+this will be looped over with metrics calculated to determine stopping</p>
+</dd>
+</dl>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.StopCriteria.compute_metrics" title="thermoextrap.gpr_active.active_utils.StopCriteria.compute_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_metrics</span></code></a>(alpha_grid[, history, gpr])</p></td>
+<td><p>Uses current history (default) or one provided to compute all metrics.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.active_utils.StopCriteria.__call__" title="thermoextrap.gpr_active.active_utils.StopCriteria.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(gpr, alpha_list)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.StopCriteria.compute_metrics">
+<span class="sig-name descname"><span class="pre">compute_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1966-L1982"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.StopCriteria.compute_metrics" title="Permalink to this definition">#</a></dt>
+<dd><p>Uses current history (default) or one provided to compute all metrics.
+Must provide grid of alpha values as well to input to metrics.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.StopCriteria.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gpr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_list</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L1984-L2008"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.StopCriteria.__call__" title="Permalink to this definition">#</a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.gpr_active.active_utils.active_learning">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.active_utils.</span></span><span class="sig-name descname"><span class="pre">active_learning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_wrapper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_criteria</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'alpha'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gp_base_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_state_repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_predictions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/gpr_active/active_utils.py#L2011-L2200"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.active_utils.active_learning" title="Permalink to this definition">#</a></dt>
+<dd><p>Continues adding new points with active learning by running simulations until the
+specified tolerance is reached or the maximum number of iterations is achieved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>init_states</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a>)</p></li>
+<li><p><strong>sim_wrapper</strong> (<a class="reference internal" href="#thermoextrap.gpr_active.active_utils.SimWrapper" title="thermoextrap.gpr_active.active_utils.SimWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimWrapper</span></code></a>) – Object for running simulations.</p></li>
+<li><p><strong>update_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – For selecting the next state point.</p></li>
+<li><p><strong>base_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">string</span></code></a>) – File path.
+based directory in which active learning run performed and outputs generated</p></li>
+<li><p><strong>stop_criteria</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>, <em>optional</em>) – callable taking GP to determine if should stop</p></li>
+<li><p><strong>max_iter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10</span></code>) – maximum number of iterations to run (new points to add)</p></li>
+<li><p><strong>alpha_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'alpha'</span></code>) – the changed parameter; MUST match input name for sim_inputs</p></li>
+<li><p><strong>log_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – whether or not to use a log scale for alpha</p></li>
+<li><p><strong>max_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">4</span></code>) – Maximum order to use for derivative observations</p></li>
+<li><p><strong>gp_base_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – dictionary of keyword arguments for create_base_GP_model
+(allows for more advanced specification of GP model)</p></li>
+<li><p><strong>num_state_repeats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1</span></code>) – Number of simulations to run for each state
+(can help to estimate uncertainty as long as independent)</p></li>
+<li><p><strong>save_history</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – If stop_criteria is not None, saves it’s history (all
+predictions at each step of active learning protocol).</p></li>
+<li><p><strong>use_predictions</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Whether or not sim_wrapper needs predictions from
+the GP model or not; if True, passes keyword arguments of
+model_pred and model_std (model predicted mu and std) to
+sim_wrapper</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a>) – List of DataWrapper objects describing how to load data (can be used to build states and create_GPR to generate GP model)</p></li>
+<li><p><strong>train_history</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – Dictionary of information about results at each training
+iteration, like GP predictions, losses, parameters, etc.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="thermoextrap.gpr_active.gp_models.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="thermoextrap.gpr_active.ig_active.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.get_logweights"><code class="docutils literal notranslate"><span class="pre">get_logweights()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.input_GP_from_state"><code class="docutils literal notranslate"><span class="pre">input_GP_from_state()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper"><code class="docutils literal notranslate"><span class="pre">DataWrapper</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_U_info"><code class="docutils literal notranslate"><span class="pre">DataWrapper.load_U_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_CV_info"><code class="docutils literal notranslate"><span class="pre">DataWrapper.load_CV_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.load_x_info"><code class="docutils literal notranslate"><span class="pre">DataWrapper.load_x_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.get_data"><code class="docutils literal notranslate"><span class="pre">DataWrapper.get_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.DataWrapper.build_state"><code class="docutils literal notranslate"><span class="pre">DataWrapper.build_state()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.SimWrapper"><code class="docutils literal notranslate"><span class="pre">SimWrapper</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.SimWrapper.run_sim"><code class="docutils literal notranslate"><span class="pre">SimWrapper.run_sim()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.make_matern_expr"><code class="docutils literal notranslate"><span class="pre">make_matern_expr()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.make_rbf_expr"><code class="docutils literal notranslate"><span class="pre">make_rbf_expr()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.make_poly_expr"><code class="docutils literal notranslate"><span class="pre">make_poly_expr()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.RBFDerivKernel"><code class="docutils literal notranslate"><span class="pre">RBFDerivKernel</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.ChangeInnerOuterRBFDerivKernel"><code class="docutils literal notranslate"><span class="pre">ChangeInnerOuterRBFDerivKernel</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.create_base_GP_model"><code class="docutils literal notranslate"><span class="pre">create_base_GP_model()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.train_GPR"><code class="docutils literal notranslate"><span class="pre">train_GPR()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.create_GPR"><code class="docutils literal notranslate"><span class="pre">create_GPR()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC"><code class="docutils literal notranslate"><span class="pre">UpdateStopABC</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.create_alpha_grid"><code class="docutils literal notranslate"><span class="pre">UpdateStopABC.create_alpha_grid()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateStopABC.get_transformed_GP_output"><code class="docutils literal notranslate"><span class="pre">UpdateStopABC.get_transformed_GP_output()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase"><code class="docutils literal notranslate"><span class="pre">UpdateFuncBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.do_plotting"><code class="docutils literal notranslate"><span class="pre">UpdateFuncBase.do_plotting()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateFuncBase.__call__"><code class="docutils literal notranslate"><span class="pre">UpdateFuncBase.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateALMbrute"><code class="docutils literal notranslate"><span class="pre">UpdateALMbrute</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateRandom"><code class="docutils literal notranslate"><span class="pre">UpdateRandom</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateSpaceFill"><code class="docutils literal notranslate"><span class="pre">UpdateSpaceFill</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateAdaptiveIntegrate"><code class="docutils literal notranslate"><span class="pre">UpdateAdaptiveIntegrate</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.UpdateALCbrute"><code class="docutils literal notranslate"><span class="pre">UpdateALCbrute</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MetricBase"><code class="docutils literal notranslate"><span class="pre">MetricBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MetricBase.__call__"><code class="docutils literal notranslate"><span class="pre">MetricBase.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxVar"><code class="docutils literal notranslate"><span class="pre">MaxVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.AvgVar"><code class="docutils literal notranslate"><span class="pre">AvgVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxRelVar"><code class="docutils literal notranslate"><span class="pre">MaxRelVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxRelGlobalVar"><code class="docutils literal notranslate"><span class="pre">MaxRelGlobalVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.AvgRelVar"><code class="docutils literal notranslate"><span class="pre">AvgRelVar</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MSD"><code class="docutils literal notranslate"><span class="pre">MSD</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelDeviation"><code class="docutils literal notranslate"><span class="pre">MaxAbsRelDeviation</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxAbsRelGlobalDeviation"><code class="docutils literal notranslate"><span class="pre">MaxAbsRelGlobalDeviation</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.AvgAbsRelDeviation"><code class="docutils literal notranslate"><span class="pre">AvgAbsRelDeviation</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.ErrorStability"><code class="docutils literal notranslate"><span class="pre">ErrorStability</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.MaxIter"><code class="docutils literal notranslate"><span class="pre">MaxIter</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.StopCriteria"><code class="docutils literal notranslate"><span class="pre">StopCriteria</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.StopCriteria.compute_metrics"><code class="docutils literal notranslate"><span class="pre">StopCriteria.compute_metrics()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.StopCriteria.__call__"><code class="docutils literal notranslate"><span class="pre">StopCriteria.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.active_utils.active_learning"><code class="docutils literal notranslate"><span class="pre">active_learning()</span></code></a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By William P. Krekelberg
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, William P. Krekelberg.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2023-04-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1477 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Inverse temperature (beta) extrapolation (beta) &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../_static/js/leave_notice.js"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/generated/thermoextrap.beta';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Volume extrapolation (volume)" href="thermoextrap.volume.html" />
+    <link rel="prev" title="Ideal gas reference (idealgas)" href="thermoextrap.idealgas.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    thermoextrap: Thermodynamic Extrapolation/Interpolation Library
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/gpr/Ideal_Gas.html">Ideal Gas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/gpr/LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/gpr/SWF_Adsorption.html">Active learning: adsorption of a square-well fluid in a pore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api-baseclasses.html">Base classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../py-modindex.html">Module Index</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap/issues/new?title=Issue%20on%20page%20%2Freference/generated/thermoextrap.beta.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/reference/generated/thermoextrap.beta.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Inverse temperature (beta) extrapolation (beta)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func"><code class="docutils literal notranslate"><span class="pre">du_func</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func.deriv_args"><code class="docutils literal notranslate"><span class="pre">du_func.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func.fdiff"><code class="docutils literal notranslate"><span class="pre">du_func.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func.eval"><code class="docutils literal notranslate"><span class="pre">du_func.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central"><code class="docutils literal notranslate"><span class="pre">u_func_central</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central.deriv_args"><code class="docutils literal notranslate"><span class="pre">u_func_central.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central.fdiff"><code class="docutils literal notranslate"><span class="pre">u_func_central.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central.eval"><code class="docutils literal notranslate"><span class="pre">u_func_central.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta.deriv_args"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta.fdiff"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta.eval"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta.deriv_args"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta.fdiff"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta.eval"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta.deriv_args"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta.fdiff"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta.eval"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta.deriv_args"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta.fdiff"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta.eval"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func"><code class="docutils literal notranslate"><span class="pre">u_func</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func.deriv_args"><code class="docutils literal notranslate"><span class="pre">u_func.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func.fdiff"><code class="docutils literal notranslate"><span class="pre">u_func.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func.eval"><code class="docutils literal notranslate"><span class="pre">u_func.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func"><code class="docutils literal notranslate"><span class="pre">xu_func</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func.deriv_args"><code class="docutils literal notranslate"><span class="pre">xu_func.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func.fdiff"><code class="docutils literal notranslate"><span class="pre">xu_func.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func.eval"><code class="docutils literal notranslate"><span class="pre">xu_func.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.x_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.x_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.u_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.u_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.dun_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.dun_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.dxdun_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.dxdun_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.un_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.un_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.xun_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.xun_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.from_name"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.from_name()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.factory_derivatives"><code class="docutils literal notranslate"><span class="pre">factory_derivatives()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.factory_extrapmodel"><code class="docutils literal notranslate"><span class="pre">factory_extrapmodel()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.factory_perturbmodel"><code class="docutils literal notranslate"><span class="pre">factory_perturbmodel()</span></code></a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <span class="target" id="module-thermoextrap.beta"></span><section id="inverse-temperature-beta-extrapolation-beta">
+<h1>Inverse temperature (beta) extrapolation (<a class="reference internal" href="#module-thermoextrap.beta" title="thermoextrap.beta"><code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code></a>)<a class="headerlink" href="#inverse-temperature-beta-extrapolation-beta" title="Permalink to this heading">#</a></h1>
+</section>
+<p><strong>Classes:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.du_func" title="thermoextrap.beta.du_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">du_func</span></code></a>(beta, n)</p></td>
+<td><p>Sympy function to evaluate energy fluctuations using central moments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func_central" title="thermoextrap.beta.u_func_central"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u_func_central</span></code></a>(beta)</p></td>
+<td><p>Sympy function to evaluate energy averages using central moments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_nobeta" title="thermoextrap.beta.dxdu_func_nobeta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dxdu_func_nobeta</span></code></a>(beta, n)</p></td>
+<td><p>Sympy function to evaluate observable energy fluctuations using central moments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_beta" title="thermoextrap.beta.dxdu_func_beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dxdu_func_beta</span></code></a>(beta, n, deriv)</p></td>
+<td><p>Sympy function to evaluate derivatives of observable fluctuations using central moments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_nobeta" title="thermoextrap.beta.x_func_central_nobeta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_func_central_nobeta</span></code></a>(beta)</p></td>
+<td><p>Sympy functionn to evaluate derivatives of observable <span class="math notranslate nohighlight">\(\langle x \rangle\)</span> using central moments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_beta" title="thermoextrap.beta.x_func_central_beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_func_central_beta</span></code></a>(beta, deriv)</p></td>
+<td><p>Sympy function to evaluate derivatives of observable <span class="math notranslate nohighlight">\(\langle x(\beta) \rangle\)</span> using central moments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func" title="thermoextrap.beta.u_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u_func</span></code></a>(beta, n)</p></td>
+<td><p>Sympy function to evaluate derivatives of energy <span class="math notranslate nohighlight">\(\langle u \rangle\)</span> using raw moments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.xu_func" title="thermoextrap.beta.xu_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xu_func</span></code></a>(beta, n[, deriv])</p></td>
+<td><p>Sympy function to evaluate derivatives of <span class="math notranslate nohighlight">\(\langle x u^n \rangle\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta" title="thermoextrap.beta.SymDerivBeta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SymDerivBeta</span></code></a>(func[, args, expand, post_func])</p></td>
+<td><p>Provide symbolic expressions for <span class="math notranslate nohighlight">\(d^n \langle x \rangle /d\beta^n\)</span>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.factory_derivatives" title="thermoextrap.beta.factory_derivatives"><code class="xref py py-obj docutils literal notranslate"><span class="pre">factory_derivatives</span></code></a>([name, n, d, xalpha, ...])</p></td>
+<td><p>Factory function to provide derivative function for expansion.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.factory_extrapmodel" title="thermoextrap.beta.factory_extrapmodel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">factory_extrapmodel</span></code></a>(beta, data, *[, name, ...])</p></td>
+<td><p>Factory function to create Extrapolation model for beta expansion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.factory_perturbmodel" title="thermoextrap.beta.factory_perturbmodel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">factory_perturbmodel</span></code></a>(beta, uv, xv[, alpha_name])</p></td>
+<td><p>Factory function to create PerturbModel for beta expansion.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.du_func">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">du_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L33-L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.du_func" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy function to evaluate energy fluctuations using central moments.</p>
+<p><span class="math notranslate nohighlight">\(\text{du_func}(\beta, n) = \langle (u(\beta) - \langle u(\beta) \rangle)^n \rangle\)</span></p>
+<p class="rubric">Notes</p>
+<p>sub in <code class="docutils literal notranslate"><span class="pre">{'beta':</span> <span class="pre">'None'}</span></code> to convert to indexed objects
+Have to use <code class="docutils literal notranslate"><span class="pre">'None'</span></code> instead of <code class="docutils literal notranslate"><span class="pre">None</span></code> as sympy does some magic to
+the input arguments.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.du_func.deriv_args" title="thermoextrap.beta.du_func.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.du_func.fdiff" title="thermoextrap.beta.du_func.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.du_func.eval" title="thermoextrap.beta.du_func.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta, n)</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.du_func.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L49-L51"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.du_func.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.du_func.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L53-L56"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.du_func.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.du_func.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L58-L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.du_func.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func_central">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">u_func_central</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L71-L96"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func_central" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy function to evaluate energy averages using central moments.</p>
+<p><span class="math notranslate nohighlight">\(\text{u_func_central}(beta, n) = \langle u(\beta)^n \rangle\)</span></p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func_central.deriv_args" title="thermoextrap.beta.u_func_central.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func_central.fdiff" title="thermoextrap.beta.u_func_central.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func_central.eval" title="thermoextrap.beta.u_func_central.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta)</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func_central.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L81-L83"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func_central.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func_central.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L85-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func_central.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func_central.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L90-L96"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func_central.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_nobeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">dxdu_func_nobeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L99-L132"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_nobeta" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy function to evaluate observable energy fluctuations using central moments.</p>
+<p><span class="math notranslate nohighlight">\(\text{dxdu_func_nobeta}(\beta, n) = \langle \delta x (\delta u)^n \rangle\)</span></p>
+<p>for use when x is not a function of beta.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_nobeta.deriv_args" title="thermoextrap.beta.dxdu_func_nobeta.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_nobeta.fdiff" title="thermoextrap.beta.dxdu_func_nobeta.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_nobeta.eval" title="thermoextrap.beta.dxdu_func_nobeta.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta, n)</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_nobeta.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L111-L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_nobeta.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_nobeta.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L115-L122"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_nobeta.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_nobeta.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L124-L132"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_nobeta.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_beta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">dxdu_func_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L135-L168"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_beta" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy function to evaluate derivatives of observable fluctuations using central moments.</p>
+<p><span class="math notranslate nohighlight">\(\text{dxdu_func_beta}(\beta, n, d) = \langle \delta  x^{(d)}(\beta)(\delta u)^n \rangle\)</span>, where <span class="math notranslate nohighlight">\(x^{(k)} = d^k x / d\beta^k\)</span>.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_beta.deriv_args" title="thermoextrap.beta.dxdu_func_beta.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_beta.fdiff" title="thermoextrap.beta.dxdu_func_beta.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.dxdu_func_beta.eval" title="thermoextrap.beta.dxdu_func_beta.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta, n, deriv)</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_beta.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L146-L148"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_beta.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_beta.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L150-L158"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_beta.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.dxdu_func_beta.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L160-L168"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.dxdu_func_beta.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_nobeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">x_func_central_nobeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L171-L191"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_nobeta" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy functionn to evaluate derivatives of observable <span class="math notranslate nohighlight">\(\langle x \rangle\)</span> using central moments.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_nobeta.deriv_args" title="thermoextrap.beta.x_func_central_nobeta.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_nobeta.fdiff" title="thermoextrap.beta.x_func_central_nobeta.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_nobeta.eval" title="thermoextrap.beta.x_func_central_nobeta.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta)</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_nobeta.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L177-L179"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_nobeta.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_nobeta.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L181-L183"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_nobeta.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_nobeta.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L185-L191"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_nobeta.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_beta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">x_func_central_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L194-L216"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_beta" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy function to evaluate derivatives of observable <span class="math notranslate nohighlight">\(\langle x(\beta) \rangle\)</span> using central moments.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_beta.deriv_args" title="thermoextrap.beta.x_func_central_beta.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_beta.fdiff" title="thermoextrap.beta.x_func_central_beta.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.x_func_central_beta.eval" title="thermoextrap.beta.x_func_central_beta.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta, deriv)</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_beta.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L200-L202"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_beta.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_beta.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L204-L208"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_beta.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.x_func_central_beta.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L210-L216"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.x_func_central_beta.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">u_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L222-L244"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy function to evaluate derivatives of energy <span class="math notranslate nohighlight">\(\langle u \rangle\)</span> using raw moments.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func.deriv_args" title="thermoextrap.beta.u_func.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func.fdiff" title="thermoextrap.beta.u_func.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.u_func.eval" title="thermoextrap.beta.u_func.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta, n)</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L228-L230"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L232-L234"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.u_func.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L236-L244"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.u_func.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.xu_func">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">xu_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L247-L285"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.xu_func" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a></p>
+<p>Sympy function to evaluate derivatives of <span class="math notranslate nohighlight">\(\langle x u^n \rangle\)</span>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">x</span></code> is a function of <code class="docutils literal notranslate"><span class="pre">beta</span></code>, then <span class="math notranslate nohighlight">\(\text{xu_func}(\beta, n, d) = \langle x^{(d)} u^n \rangle\)</span>.
+If <code class="docutils literal notranslate"><span class="pre">x</span></code> is not a function of <code class="docutils literal notranslate"><span class="pre">beta</span></code>, drop argument <code class="docutils literal notranslate"><span class="pre">d</span></code>.</p>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.xu_func.deriv_args" title="thermoextrap.beta.xu_func.deriv_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deriv_args</span></code></a>()</p></td>
+<td><p>Symbol arguments of function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.xu_func.fdiff" title="thermoextrap.beta.xu_func.fdiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fdiff</span></code></a>([argindex])</p></td>
+<td><p>Derivative of function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.xu_func.eval" title="thermoextrap.beta.xu_func.eval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code></a>(beta, n[, deriv])</p></td>
+<td><p>Evaluate function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.xu_func.deriv_args">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L258-L260"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.xu_func.deriv_args" title="Permalink to this definition">#</a></dt>
+<dd><p>Symbol arguments of function.</p>
+<p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sympy.org/latest/modules/utilities/lambdify.html#sympy.utilities.lambdify.lambdify" title="(in SymPy v1.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sympy.utilities.lambdify.lambdify</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.xu_func.fdiff">
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L262-L274"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.xu_func.fdiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Derivative of function.  This will be used by <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymDerivBase</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.xu_func.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L276-L285"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.xu_func.eval" title="Permalink to this definition">#</a></dt>
+<dd><p>Evaluate function.</p>
+<p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
+function to an indexed variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">SymDerivBeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L288-L536"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymDerivBase" title="thermoextrap.core.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymDerivBase</span></code></a></p>
+<p>Provide symbolic expressions for <span class="math notranslate nohighlight">\(d^n \langle x \rangle /d\beta^n\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.function.Function" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a>) – Function to differentiate.  This should (most likely) be an instance
+of <a class="reference internal" href="../api-baseclasses.html#thermoextrap.core.models.SymFuncBase" title="thermoextrap.core.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.core.models.SymFuncBase</span></code></a></p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Symbol</span></code></a>) – Arguments to func</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+<p><strong>Methods:</strong></p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta.x_ave" title="thermoextrap.beta.SymDerivBeta.x_ave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_ave</span></code></a>([xalpha, central, expand, post_func])</p></td>
+<td><p>General method to find derivatives of <span class="math notranslate nohighlight">\(\langle x \rangle\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta.u_ave" title="thermoextrap.beta.SymDerivBeta.u_ave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u_ave</span></code></a>([central, expand, post_func])</p></td>
+<td><p>General constructor for symbolic derivatives of <span class="math notranslate nohighlight">\(\langle u \rangle\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta.dun_ave" title="thermoextrap.beta.SymDerivBeta.dun_ave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dun_ave</span></code></a>(n[, expand, post_func, central])</p></td>
+<td><p>Constructor for derivatives of <span class="math notranslate nohighlight">\(\langle (\delta u)^n\rangle\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta.dxdun_ave" title="thermoextrap.beta.SymDerivBeta.dxdun_ave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dxdun_ave</span></code></a>(n[, xalpha, expand, post_func, d, ...])</p></td>
+<td><p>Constructor for derivatives of <span class="math notranslate nohighlight">\(\langle \delta x \delta u^n\rangle\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta.un_ave" title="thermoextrap.beta.SymDerivBeta.un_ave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">un_ave</span></code></a>(n[, expand, post_func, central])</p></td>
+<td><p>Constructor for derivatives of <span class="math notranslate nohighlight">\(\langle u^n\rangle\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta.xun_ave" title="thermoextrap.beta.SymDerivBeta.xun_ave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xun_ave</span></code></a>(n[, d, xalpha, expand, post_func, ...])</p></td>
+<td><p>Constructor for deriatives of <span class="math notranslate nohighlight">\(\langle x^{(d)} u^n\rangle\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.beta.SymDerivBeta.from_name" title="thermoextrap.beta.SymDerivBeta.from_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_name</span></code></a>(name[, xalpha, central, expand, ...])</p></td>
+<td><p>Create a derivative expressions indexer by name.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta.x_ave">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x_ave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xalpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L293-L324"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta.x_ave" title="Permalink to this definition">#</a></dt>
+<dd><p>General method to find derivatives of <span class="math notranslate nohighlight">\(\langle x \rangle\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xalpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Flag whether <cite>u</cite> depends on variable <cite>alpha</cite>.</p></li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta.u_ave">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_ave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L326-L347"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta.u_ave" title="Permalink to this definition">#</a></dt>
+<dd><p>General constructor for symbolic derivatives of <span class="math notranslate nohighlight">\(\langle u \rangle\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta.dun_ave">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dun_ave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L349-L378"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta.dun_ave" title="Permalink to this definition">#</a></dt>
+<dd><p>Constructor for derivatives of <span class="math notranslate nohighlight">\(\langle (\delta u)^n\rangle\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of moment.</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta.dxdun_ave">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dxdun_ave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xalpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L380-L422"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta.dxdun_ave" title="Permalink to this definition">#</a></dt>
+<dd><p>Constructor for derivatives of <span class="math notranslate nohighlight">\(\langle \delta x \delta u^n\rangle\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of moment.</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>xalpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Flag whether <cite>u</cite> depends on variable <cite>alpha</cite>.</p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of derivative of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If xalpha is True, must also specify d.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta.un_ave">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">un_ave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L424-L443"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta.un_ave" title="Permalink to this definition">#</a></dt>
+<dd><p>Constructor for derivatives of <span class="math notranslate nohighlight">\(\langle u^n\rangle\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of moment.</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta.xun_ave">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xun_ave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xalpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L445-L474"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta.xun_ave" title="Permalink to this definition">#</a></dt>
+<dd><p>Constructor for deriatives of <span class="math notranslate nohighlight">\(\langle x^{(d)} u^n\rangle\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of moment.</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of derivative of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+<li><p><strong>xalpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Flag whether <cite>u</cite> depends on variable <cite>alpha</cite>.</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermoextrap.beta.SymDerivBeta.from_name">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xalpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L476-L536"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.SymDerivBeta.from_name" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a derivative expressions indexer by name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="docutils literal notranslate"><span class="pre">{'xave',</span> <span class="pre">'uave',</span> <span class="pre">'dun_ave',</span> <span class="pre">'un_ave'}</span></code>)</p></li>
+<li><p><strong>All properties use post_func and expand parameters.</strong> –</p>
+<ul>
+<li><p>x_ave: general average of &lt;x&gt;(central, xalpha)</p></li>
+<li><p>u_ave: &lt;u&gt;(central)</p></li>
+<li><p>dun_ave: derivative of &lt;(u - &lt;u&gt;)**n&gt;(central, n)</p></li>
+<li><p>dxdun_ave: derivatives of &lt;dx^(d) * du**n&gt;(xalpha, n, d)</p></li>
+<li><p>un_ave: derivative of &lt;u**n&gt;(n)</p></li>
+<li><p>xun_ave: derivative of &lt;x^(d) * u**n&gt;(xalpha, n, [d])</p></li>
+<li><p>lnPi_correction: derivatives of &lt;lnPi - beta * mu * N&gt;(central)</p></li>
+</ul>
+</li>
+<li><p><strong>xalpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Whether property depends on alpha (beta)</p></li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Whether central moments expansion should be used</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>) – Whether expressions should be expanded</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – n parameter used for dun_ave or un_ave</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – d parameter for dxdun_ave</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.beta.factory_derivatives">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">factory_derivatives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x_ave'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xalpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L544-L586"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.factory_derivatives" title="Permalink to this definition">#</a></dt>
+<dd><p>Factory function to provide derivative function for expansion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="docutils literal notranslate"><span class="pre">{x_ave,</span> <span class="pre">u_ave,</span> <span class="pre">dxdun_ave,</span> <span class="pre">dun_ave,</span> <span class="pre">un_ave,</span> <span class="pre">xun_ave}</span></code>)</p></li>
+<li><p><strong>xalpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Flag whether <cite>u</cite> depends on variable <cite>alpha</cite>.</p></li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>derivatives</strong> (<a class="reference internal" href="thermoextrap.models.html#thermoextrap.models.Derivatives" title="thermoextrap.models.Derivatives"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.models.Derivatives</span></code></a> instance) – Object used to calculate taylor series coefficients</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.beta.factory_extrapmodel">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">factory_extrapmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x_ave'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xalpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'beta'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivatives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivatives_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L589-L670"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.factory_extrapmodel" title="Permalink to this definition">#</a></dt>
+<dd><p>Factory function to create Extrapolation model for beta expansion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – reference value of inverse temperature</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – Instance of data object, e.g. <a class="reference internal" href="thermoextrap.data.html#thermoextrap.data.DataCentralMoments" title="thermoextrap.data.DataCentralMoments"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.data.DataCentralMoments</span></code></a></p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of moment.</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order of derivative of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
+<li><p><strong>xalpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Flag whether <cite>u</cite> depends on variable <cite>alpha</cite>.</p></li>
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
+If a string, then apply the following standard functions</p>
+<ul>
+<li><p>minus_log : post_func = -sympy.log</p></li>
+<li><p>pow_i : post_func = lambda f: pow(f, i).  E.g., <cite>pow_2</cite> =&gt; pow(f, 2)</p></li>
+</ul>
+</li>
+<li><p><strong>alpha_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'beta'</span></code>) – name of expansion parameter</p></li>
+<li><p><strong>kws</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – extra arguments to <cite>factory_data_values</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>extrapmodel</strong> (<a class="reference internal" href="thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a>)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Note that default values for parameters <code class="docutils literal notranslate"><span class="pre">order</span></code>, <code class="docutils literal notranslate"><span class="pre">xalpha</span></code>, and <code class="docutils literal notranslate"><span class="pre">central</span></code>
+are inferred from corresponding attributes of <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thermoextrap.beta.factory_perturbmodel">
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.beta.</span></span><span class="sig-name descname"><span class="pre">factory_perturbmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'beta'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/beta.py#L673-L698"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.beta.factory_perturbmodel" title="Permalink to this definition">#</a></dt>
+<dd><p>Factory function to create PerturbModel for beta expansion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – reference value of inverse temperature</p></li>
+<li><p><strong>uv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span class="xref std std-term">array-like</span></a>) – raw values of u (energy)
+if not DataArray, wrap with <cite>xrwrap_uv</cite></p></li>
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.3.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
+if not DataArray, wrap with <cite>xrwrap_xv</cite></p></li>
+<li><p><strong>alpha_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'beta'</span></code>) – name of expansion parameter</p></li>
+<li><p><strong>kws</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – extra arguments to data object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>perturbmodel</strong> (<a class="reference internal" href="thermoextrap.models.html#thermoextrap.models.PerturbModel" title="thermoextrap.models.PerturbModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.models.PerturbModel</span></code></a>)</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="thermoextrap.models.html#thermoextrap.models.PerturbModel" title="thermoextrap.models.PerturbModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PerturbModel</span></code></a></p>
+</div>
+</dd></dl>
+
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="thermoextrap.idealgas.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="thermoextrap.volume.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func"><code class="docutils literal notranslate"><span class="pre">du_func</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func.deriv_args"><code class="docutils literal notranslate"><span class="pre">du_func.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func.fdiff"><code class="docutils literal notranslate"><span class="pre">du_func.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.du_func.eval"><code class="docutils literal notranslate"><span class="pre">du_func.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central"><code class="docutils literal notranslate"><span class="pre">u_func_central</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central.deriv_args"><code class="docutils literal notranslate"><span class="pre">u_func_central.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central.fdiff"><code class="docutils literal notranslate"><span class="pre">u_func_central.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func_central.eval"><code class="docutils literal notranslate"><span class="pre">u_func_central.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta.deriv_args"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta.fdiff"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_nobeta.eval"><code class="docutils literal notranslate"><span class="pre">dxdu_func_nobeta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta.deriv_args"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta.fdiff"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.dxdu_func_beta.eval"><code class="docutils literal notranslate"><span class="pre">dxdu_func_beta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta.deriv_args"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta.fdiff"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_nobeta.eval"><code class="docutils literal notranslate"><span class="pre">x_func_central_nobeta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta.deriv_args"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta.fdiff"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.x_func_central_beta.eval"><code class="docutils literal notranslate"><span class="pre">x_func_central_beta.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func"><code class="docutils literal notranslate"><span class="pre">u_func</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func.deriv_args"><code class="docutils literal notranslate"><span class="pre">u_func.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func.fdiff"><code class="docutils literal notranslate"><span class="pre">u_func.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.u_func.eval"><code class="docutils literal notranslate"><span class="pre">u_func.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func"><code class="docutils literal notranslate"><span class="pre">xu_func</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func.deriv_args"><code class="docutils literal notranslate"><span class="pre">xu_func.deriv_args()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func.fdiff"><code class="docutils literal notranslate"><span class="pre">xu_func.fdiff()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.xu_func.eval"><code class="docutils literal notranslate"><span class="pre">xu_func.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.x_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.x_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.u_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.u_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.dun_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.dun_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.dxdun_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.dxdun_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.un_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.un_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.xun_ave"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.xun_ave()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.SymDerivBeta.from_name"><code class="docutils literal notranslate"><span class="pre">SymDerivBeta.from_name()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.factory_derivatives"><code class="docutils literal notranslate"><span class="pre">factory_derivatives()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.factory_extrapmodel"><code class="docutils literal notranslate"><span class="pre">factory_extrapmodel()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.beta.factory_perturbmodel"><code class="docutils literal notranslate"><span class="pre">factory_perturbmodel()</span></code></a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By William P. Krekelberg
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, William P. Krekelberg.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2023-04-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

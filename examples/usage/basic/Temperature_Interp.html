@@ -1,0 +1,979 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Temperature interpolation &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../../_static/js/leave_notice.js"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/usage/basic/Temperature_Interp';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    thermoextrap: Thermodynamic Extrapolation/Interpolation Library
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../gpr/Ideal_Gas.html">Ideal Gas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gpr/LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gpr/SWF_Adsorption.html">Active learning: adsorption of a square-well fluid in a pore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-baseclasses.html">Base classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap/issues/new?title=Issue%20on%20page%20%2Fexamples/usage/basic/Temperature_Interp.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/examples/usage/basic/Temperature_Interp.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Temperature interpolation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes-used-for-interpolation">Classes used for interpolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recursive-interpolation">Recursive interpolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adaptive-interpolation">Adaptive interpolation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="temperature-interpolation">
+<h1>Temperature interpolation<a class="headerlink" href="#temperature-interpolation" title="Permalink to this heading">#</a></h1>
+<section id="classes-used-for-interpolation">
+<h2>Classes used for interpolation<a class="headerlink" href="#classes-used-for-interpolation" title="Permalink to this heading">#</a></h2>
+<p>Instead of performing extrapolation, we can also perform interpolation. Classes already exist for this, namely <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapWeightedModel" title="thermoextrap.models.ExtrapWeightedModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapWeightedModel</span></code></a>, <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModel" title="thermoextrap.models.InterpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModel</span></code></a>, and <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.MBARModel" title="thermoextrap.models.MBARModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">MBARModel</span></code></a>. The first implements extrapolation from two points weighted with a <a class="reference external" href="https://en.wikipedia.org/wiki/Minkowski_distance">Minkowski-like</a> distance, the second polynomial interpolation from any number of points, and the last uses reweighting with MBAR from multiple points.</p>
+<p>Demonstrations of creating and using <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModel" title="thermoextrap.models.InterpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModel</span></code></a> and <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.MBARModel" title="thermoextrap.models.MBARModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">MBARModel</span></code></a> classes are shown below.</p>
+<p>The <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModel" title="thermoextrap.models.InterpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModel</span></code></a> will essentially just stitch together multiple <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> objects generated at multiple <span class="math notranslate nohighlight">\(\beta\)</span> values by <a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html#thermoextrap.beta.factory_extrapmodel" title="thermoextrap.beta.factory_extrapmodel"><code class="xref py py-class docutils literal notranslate"><span class="pre">factory_extrapmodel</span></code></a>. The <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModel" title="thermoextrap.models.InterpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModel</span></code></a> class is actually based on a very general and helpful class called <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.StateCollection" title="thermoextrap.models.StateCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateCollection</span></code></a>, which just holds a list of <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> objects. <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModel" title="thermoextrap.models.InterpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModel</span></code></a> just uses this list of objects in a specific way to implement piecewise polynomial interpolation.</p>
+<p>The functions below conveniently pull a specified number of <span class="math notranslate nohighlight">\(\beta\)</span> values out of a range and create <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.ExtrapModel" title="thermoextrap.models.ExtrapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExtrapModel</span></code></a> objects for each <span class="math notranslate nohighlight">\(\beta\)</span> value in a provided list. These will be very convenient as we generate data and models at different states.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+
+<span class="n">s</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="c1"># Import idealgas module</span>
+<span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">idealgas</span>
+<span class="kn">import</span> <span class="nn">thermoextrap</span> <span class="k">as</span> <span class="nn">xtrap</span>
+
+<span class="c1"># Set random seed</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_betas</span><span class="p">(</span><span class="n">nbeta</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">betamin</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">betamax</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+    <span class="n">dbeta</span> <span class="o">=</span> <span class="p">(</span><span class="n">betamax</span> <span class="o">-</span> <span class="n">betamin</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nbeta</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">betamin</span> <span class="o">+</span> <span class="n">dbeta</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbeta</span><span class="p">)])</span>
+
+
+<span class="k">def</span> <span class="nf">get_xems</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">nconfig</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">npart</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">xems</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">beta</span> <span class="ow">in</span> <span class="n">betas</span><span class="p">:</span>
+        <span class="n">xdata</span><span class="p">,</span> <span class="n">udata</span> <span class="o">=</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">generate_data</span><span class="p">((</span><span class="n">nconfig</span><span class="p">,</span> <span class="n">npart</span><span class="p">),</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="n">vol</span><span class="p">)</span>
+        <span class="n">xem</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">factory_extrapmodel</span><span class="p">(</span>
+            <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">xtrap</span><span class="o">.</span><span class="n">DataCentralMomentsVals</span><span class="o">.</span><span class="n">from_vals</span><span class="p">(</span>
+                <span class="n">xv</span><span class="o">=</span><span class="n">xdata</span><span class="p">,</span> <span class="n">uv</span><span class="o">=</span><span class="n">udata</span><span class="p">,</span> <span class="n">central</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">xems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xem</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">xems</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a range of beta values to test predictions at</span>
+<span class="n">betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Grab betas from either end, as well as data and ExtrapModel objects at reference betas</span>
+<span class="n">beta_samp</span> <span class="o">=</span> <span class="n">get_betas</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">xems</span> <span class="o">=</span> <span class="n">get_xems</span><span class="p">(</span><span class="n">beta_samp</span><span class="p">)</span>
+
+<span class="c1"># Create models</span>
+<span class="n">xemi</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">InterpModel</span><span class="p">(</span><span class="n">xems</span><span class="p">)</span>
+<span class="n">xmbar</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">MBARModel</span><span class="p">(</span><span class="n">xems</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make rpedictions with each type of interpolative model</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="n">xemi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">err</span> <span class="o">=</span> <span class="n">xemi</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">nrep</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s2">&quot;rep&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">err</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;interp poly&quot;</span><span class="p">)</span>
+
+<span class="n">xmbar</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;mbar&quot;</span><span class="p">)</span>
+
+<span class="c1"># And plot the true values</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">(</span><span class="n">betas</span><span class="p">),</span> <span class="s2">&quot;k--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\langle x \rangle$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>OMP: Info #276: omp_set_nested routine deprecated, please use omp_set_max_active_levels instead.
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x1ab468b50&gt;
+</pre></div>
+</div>
+<img alt="../../../_images/8c789bfaa9ee419293a200877c82486ba86530347e6eed3add6597cc09c99b2d.png" src="../../../_images/8c789bfaa9ee419293a200877c82486ba86530347e6eed3add6597cc09c99b2d.png" />
+</div>
+</div>
+<p>The above compares polynomial interpolation and MBAR (really just BAR because using only 2 points). Both methods are used to interpolate between the two extreme values of beta. In both cases, the same data from the two edge points is used, making use of only derivatives up to 1st order for interpolation. The error bars are one standard deviation from bootstrap resampling of the predictions of each model. True values are represented by the black dashed line.</p>
+<p>We don’t really expect MBAR to do any better than perturbation because it is using the MBAR weights between states to reweight the perturbation theory estimates. As such, we can see that it is “sticky” in that it tries to keep using a single point until it suddenly jumps to the next one. This is a symptom of the fact that the perturbation theory estimates themselves plateau. Such plateaus represent poor overlap, resulting in large free energy differences and MBAR weights that essentially act as step functions (i.e. you just pick whichever point has lower free energy over the entire interval). Extrapolation is almost always better, but note that it’s predictions vary more with sampling, especially if you go to higher order.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adding an additional reference beta value</span>
+<span class="n">betas_samp</span> <span class="o">=</span> <span class="n">get_betas</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">xems</span> <span class="o">=</span> <span class="n">get_xems</span><span class="p">(</span><span class="n">betas_samp</span><span class="p">)</span>
+
+<span class="n">xemi</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">InterpModel</span><span class="p">(</span><span class="n">xems</span><span class="p">)</span>
+<span class="n">xemi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="n">xemw</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">ExtrapWeightedModel</span><span class="p">(</span><span class="n">xems</span><span class="p">)</span>
+<span class="n">xemw</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">(</span><span class="n">betas</span><span class="p">),</span> <span class="s2">&quot;k--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x1ab6654b0&gt;]
+</pre></div>
+</div>
+<img alt="../../../_images/c2d7c3bb9a4aba0b04d4064030e3916ba99867c952d88cade14257ff5de9ea65.png" src="../../../_images/c2d7c3bb9a4aba0b04d4064030e3916ba99867c952d88cade14257ff5de9ea65.png" />
+</div>
+</div>
+</section>
+<section id="recursive-interpolation">
+<h2>Recursive interpolation<a class="headerlink" href="#recursive-interpolation" title="Permalink to this heading">#</a></h2>
+<p>Also included in the library is a function to perform recursive interpolation to achieve estimates over an interval to a specified error tolerance. The model class that does this is called <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp" title="thermoextrap.recursive_interp.RecursiveInterp"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecursiveInterp</span></code></a> in the <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#module-thermoextrap.recursive_interp" title="thermoextrap.recursive_interp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code></a> module. One of the inputs to this class is an interpolation class object (trained or not), such as <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModel" title="thermoextrap.models.InterpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModel</span></code></a>. This function continues picking new points and dividing the original interval until all points satisfy the error tolerance, which is represented as a relative error. Details of the algorithm are provided below.</p>
+<p>A key feature of <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp" title="thermoextrap.recursive_interp.RecursiveInterp"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecursiveInterp</span></code></a> is a method called <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.get_data" title="thermoextrap.recursive_interp.RecursiveInterp.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_data()</span></code></a>. Simply put, this obtains data if provided a value of the variable over which we’re extrapolating. By default, this method is just set up to return data at a specified <span class="math notranslate nohighlight">\(\beta\)</span> for the 1D ideal gas model, so we don’t need to touch it. However, in the paper we modify this method to load in data from an MD simulation of water closest to the specified state point. If you want to generate new MD or MC data on the fly, you will need to create a new class that inherits from <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp" title="thermoextrap.recursive_interp.RecursiveInterp"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecursiveInterp</span></code></a> and just change the <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.get_data" title="thermoextrap.recursive_interp.RecursiveInterp.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_data()</span></code></a> method to run the appropriate simulation and load in the data you need.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">recursive_interp</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="c1"># Generate coefficients</span>
+<span class="n">derivs</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">factory_derivatives</span><span class="p">()</span>
+
+<span class="c1"># Create the recursive model</span>
+<span class="n">intPpiecewise</span> <span class="o">=</span> <span class="n">recursive_interp</span><span class="o">.</span><span class="n">RecursiveInterp</span><span class="p">(</span>
+    <span class="n">xtrap</span><span class="o">.</span><span class="n">InterpModel</span><span class="p">,</span> <span class="n">derivs</span><span class="p">,</span> <span class="p">[</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">betas</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">max_order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.003</span>
+<span class="p">)</span>
+
+<span class="c1"># Train it recursively until error tolerance reached</span>
+<span class="c1"># Turn off verbose or doPlot if don&#39;t want to see progress of algorithm</span>
+<span class="c1"># plotCompareFunc provides the true values to compare to in the figure</span>
+<span class="n">intPpiecewise</span><span class="o">.</span><span class="n">recursive_train</span><span class="p">(</span>
+    <span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">betas</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot_func</span><span class="o">=</span><span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span>
+<span class="p">)</span>
+
+<span class="c1"># Obtain predictions from our model, which will be based on piecewise interpolating polynomials</span>
+<span class="n">intPpredict</span> <span class="o">=</span> <span class="n">intPpiecewise</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">)</span>
+
+<span class="c1"># Plot to compare against true average versus beta for ideal gas model</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+<span class="n">interpFig</span><span class="p">,</span> <span class="n">interpAx</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">interpAx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">intPpredict</span><span class="p">)</span>
+<span class="n">interpAx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">(</span><span class="n">betas</span><span class="p">),</span> <span class="s2">&quot;k--&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">interpAx</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\langle x \rangle$&quot;</span><span class="p">)</span>
+<span class="n">interpAx</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">)</span>
+
+<span class="n">interpFig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Interpolating from points 0.100000 and 9.600000
+Recursion depth on this branch: 0
+Maximum bootstrapped error within interval: 0.006693
+Selected new extrapolation point: 4.753061
+</pre></div>
+</div>
+<img alt="../../../_images/070c16aa17b0a9ba32ff0c43a66179790a8cf1055297c323d1cfe3ac6cfe6239.png" src="../../../_images/070c16aa17b0a9ba32ff0c43a66179790a8cf1055297c323d1cfe3ac6cfe6239.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Interpolating from points 0.100000 and 4.753061
+Recursion depth on this branch: 1
+Maximum bootstrapped error within interval: 0.002329
+No additional extrapolation points necessary on this interval.
+</pre></div>
+</div>
+<img alt="../../../_images/49975d07952abd7b59d0bc68f0a0524079a30738b36cf5d5cda6f7f0418f9358.png" src="../../../_images/49975d07952abd7b59d0bc68f0a0524079a30738b36cf5d5cda6f7f0418f9358.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Interpolating from points 4.753061 and 9.600000
+Recursion depth on this branch: 1
+Maximum bootstrapped error within interval: 0.002455
+No additional extrapolation points necessary on this interval.
+</pre></div>
+</div>
+<img alt="../../../_images/c351d02918e0e2a170fdd5b768c8713f232391608bcff95c53b2eabf6d716267.png" src="../../../_images/c351d02918e0e2a170fdd5b768c8713f232391608bcff95c53b2eabf6d716267.png" />
+<img alt="../../../_images/15df21180fcef0c8266188b53bbd691c441160d87eede3a102a77dd88007fc3e.png" src="../../../_images/15df21180fcef0c8266188b53bbd691c441160d87eede3a102a77dd88007fc3e.png" />
+</div>
+</div>
+<p>The above cell runs an automated algorithm for performing interpolation recursively. In the above example, polynomial interpolation is used. This is recommended, but the algorithm may also use weighted extrapolation or MBAR. In the figure, the true observable is shown as the dashed black line. The blue line is final result of the recursive algorithm. Note that there is no bootstrap method for <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp" title="thermoextrap.recursive_interp.RecursiveInterp"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecursiveInterp</span></code></a> since the algorithm guarantees the uncertainty to be within the tolerance.</p>
+<p>A sketch of the recursive algorithm is as follows:</p>
+<ol class="arabic simple">
+<li><p>Perform interpolation between edge points</p>
+<ul class="simple">
+<li><p>Only uses up to maximum desired order of derivative information. In the simple ideal gas model, it requires prohibitive amounts of sampling to get good accuracy of derivatives above order 2. If using polynomial interpolation, second derivatives will give us order 5 polynomials. In practice, this probably is not necessary, so settling for the much more accurate third order interpolating polynomials, which only make use of 1st derivatives.</p></li>
+<li><p>Needs input data at each edge point or must modify the <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.get_data" title="thermoextrap.recursive_interp.RecursiveInterp.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RecursiveInterp.get_data()</span></code></a> method in the RecursiveInterp class to read in data or perform simulations. As a default, this class just uses the toy ideal gas model to generate data.</p></li>
+</ul>
+</li>
+<li><p>Calculate bootstrapped uncertainty over whole interval</p>
+<ul class="simple">
+<li><p>The region between the edge points is gridded up with the interpolation model used to predict the value at each point. This procedure is bootstrapped by resampling the data to get the standard deviation of each predicted value at each grid point. The absolute relative error is defined as <span class="math notranslate nohighlight">\(\frac{\sigma_x}{|x|}\)</span>. The maximum relative error over all grid points and observable elements (if the observable is a vector) is found and compared to the desired tolerance.</p></li>
+</ul>
+</li>
+<li><p>Check if maximum uncertainty is within tolerance</p>
+<ul class="simple">
+<li><p>If the maximum absolute relative error within the region is lower than the tolerance, then no new simulations are needed. If it is larger than the tolerance, a new state-point is selected where the absolute relative error is a maximum.</p></li>
+</ul>
+</li>
+<li><p>Add state point if necessary and recurse</p>
+<ul class="simple">
+<li><p>If the tolerance is not met, a state point is added as described above. The algorithm returns to step one for each subinterval created, with new data only generated at the new point.</p></li>
+</ul>
+</li>
+</ol>
+<p>Though the algorithm has met the specified tolerance, you may still want to manually add more points. This is easy with the <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.sequential_train" title="thermoextrap.recursive_interp.RecursiveInterp.sequential_train"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RecursiveInterp.sequential_train()</span></code></a> method.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intPpiecewise</span><span class="o">.</span><span class="n">sequential_train</span><span class="p">([</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Interpolating from points 0.100000 and 2.500000
+Maximum bootstrapped error within interval: 0.001327
+At point: 1.226531
+
+Interpolating from points 2.500000 and 4.753061
+Maximum bootstrapped error within interval: 0.001192
+At point: 3.465598
+
+Interpolating from points 4.753061 and 7.500000
+Maximum bootstrapped error within interval: 0.001198
+At point: 5.818201
+
+Interpolating from points 7.500000 and 9.600000
+Maximum bootstrapped error within interval: 0.000743
+At point: 8.271429
+</pre></div>
+</div>
+</div>
+</div>
+<p>It is a good idea when using the recursive algorithm to visually check for consistency.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Can also check for consistency of local curvature</span>
+<span class="c1"># Not implemented as an &quot;optimization&quot; rule in the recursive interpolation procedure</span>
+<span class="c1"># But do have function to do statistical and visual check</span>
+
+<span class="c1"># Using the model we just trained above, so must run cell above before this one</span>
+<span class="n">checkPvals</span> <span class="o">=</span> <span class="n">intPpiecewise</span><span class="o">.</span><span class="n">check_poly_consistency</span><span class="p">(</span><span class="n">do_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Interval with edges [0.1        2.5        4.75306122] (indices [0 1 2]):
+	P-values between regions:
+[0.97815004 0.99912347 0.99999696 0.99999949]
+	P-values for full and 1 :
+[0.10478364 0.23584459 0.98666895 0.99789896]
+	P-values for full and 2 :
+[0.97798213 0.99884283 0.99977689 0.99988461]
+Interval with edges [2.5        4.75306122 7.5       ] (indices [1 2 3]):
+	P-values between regions:
+[0.42124077 0.46604576 0.46663537 0.43213635]
+	P-values for full and 1 :
+[0.19432064 0.23325633 0.27401564 0.29287354]
+	P-values for full and 2 :
+[0.35180394 0.38705523 0.40365648 0.40977722]
+Interval with edges [4.75306122 7.5        9.6       ] (indices [2 3 4]):
+	P-values between regions:
+[0.99188544 0.99340539 0.99306412 0.98997907]
+	P-values for full and 1 :
+[0.47856638 0.52984691 0.57622379 0.60104052]
+	P-values for full and 2 :
+[0.98732006 0.98953777 0.99059023 0.99093618]
+</pre></div>
+</div>
+<img alt="../../../_images/512a74bc1b516ea0f1a69d6d0e010c235365997a7b5516b04e3e70f909d5e69b.png" src="../../../_images/512a74bc1b516ea0f1a69d6d0e010c235365997a7b5516b04e3e70f909d5e69b.png" />
+</div>
+</div>
+<p>In the above plot, interpolating polynomials are shown for sliding windows of three state points used in the recursive interpolation model. Colors change for each window. Within a window (same color) the interpolating polynomial for the lower subregion is shown with a dotted line, that for the upper subregion with a dashed line, and the whole window region using the two outermost edge points with a solid line. Outside of the region they were fitted over, the polynomials show large deviations from the true values. For interpolation, however, the polynomials all overlap quite well. By construction, the piecewise function created by the recursive procedure is continuous in both its value and first derivative at all points in the entire interval. Using higher order derivative information would result in continuity in even higher derivatives, but likely even more divergent behavior outside of the interpolated range.</p>
+<p>The point of the above consistency check is to see if the local polynomials agree within each sliding window. If they do, then that means the local curvature is the same over that region and is captured by the order of polynomial that is fit there. To this end, the polynomial coefficients are also bootstrapped and, assuming Normal distributions, p-values are computed for the null hypothesis that the coefficients for each set of sub-regions and the full region within a window are the same. Since we want the polynomials to be the same, we don’t want small p-values, so the test is of limited usefulness as larger p-values don’t necessarily imply greater similarity. A better statistical test is thus needed. However, the visualization provides a quick visual check/rule of thumb to gauge the consistency of the local curvature and thus convergence of the algorithm. This is similar to the idea of generating overlapping distributions for umbrella sampling.</p>
+</section>
+<section id="adaptive-interpolation">
+<h2>Adaptive interpolation<a class="headerlink" href="#adaptive-interpolation" title="Permalink to this heading">#</a></h2>
+<p>While named differently, this is essentially a different implementation of the algorithm described above in <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#module-thermoextrap.adaptive_interp" title="thermoextrap.adaptive_interp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code></a>. It is more modular, extensible, and has more flexible features, but has not been tested or used as extensively. Specifically, there is no longer a class to keep track of the interpolation (that gets provided as the <code class="docutils literal notranslate"><span class="pre">factory_statecollection</span></code> argument to each method called in <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#module-thermoextrap.adaptive_interp" title="thermoextrap.adaptive_interp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code></a>) and there is a customizable callback structure that handles tolerance checking, plotting, and outputting incremental results. Further, the <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.get_data" title="thermoextrap.recursive_interp.RecursiveInterp.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">thermoextrap.recursive_interp.RecursiveInterp.get_data()</span></code></a> is replaced by passing a function <code class="docutils literal notranslate"><span class="pre">factory_state</span></code> as an argument to all of the methods in <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#module-thermoextrap.adaptive_interp" title="thermoextrap.adaptive_interp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code></a>. For an example <code class="docutils literal notranslate"><span class="pre">factory_state</span></code> method, see <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#thermoextrap.adaptive_interp.factory_state_idealgas" title="thermoextrap.adaptive_interp.factory_state_idealgas"><code class="xref py py-func docutils literal notranslate"><span class="pre">factory_state_idealgas()</span></code></a>, where an example callback for plotting may also be found.</p>
+<p>The major technical difference is that, instead of automatically creating a fine grid of new alpha values to select a new point based on maximum uncertainty, the grid is passed as an argument. The minimum and maximum values are treated as the initial state points to use. This gives the user finer control over how the search is performed. Another measure of control is provided by the <code class="docutils literal notranslate"><span class="pre">alpha_tol</span></code> argument, which specifies the minimum distance of a new point from previous alpha values.</p>
+<p>Like with <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.recursive_train" title="thermoextrap.recursive_interp.RecursiveInterp.recursive_train"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recursive_train()</span></code></a> and <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.sequential_train" title="thermoextrap.recursive_interp.RecursiveInterp.sequential_train"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sequential_train()</span></code></a>, there are two training modes. The first is identical to the recursive algorithm described previously and is called <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#thermoextrap.adaptive_interp.train_recursive" title="thermoextrap.adaptive_interp.train_recursive"><code class="xref py py-func docutils literal notranslate"><span class="pre">train_recursive()</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">thermoextrap.adaptive_interp</span> <span class="k">as</span> <span class="nn">adaptive_interp</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a fine grid of points to select from (happens automatically without user control in RecursiveInterp class)</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">betas</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># Define keyword arguments to be passed to the factory_state method for creating new state information</span>
+<span class="c1"># (formerly would be arguments to get_data)</span>
+<span class="n">state_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;nrep&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;rep_dim&quot;</span><span class="p">:</span> <span class="s2">&quot;rep&quot;</span><span class="p">}</span>
+
+<span class="n">states_recurse</span><span class="p">,</span> <span class="n">info_recurse</span> <span class="o">=</span> <span class="n">adaptive_interp</span><span class="o">.</span><span class="n">train_recursive</span><span class="p">(</span>
+    <span class="n">alphas</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span>
+    <span class="n">factory_state</span><span class="o">=</span><span class="n">adaptive_interp</span><span class="o">.</span><span class="n">factory_state_idealgas</span><span class="p">,</span>
+    <span class="n">factory_statecollection</span><span class="o">=</span><span class="n">xtrap</span><span class="o">.</span><span class="n">InterpModel</span><span class="p">,</span>
+    <span class="n">state_kws</span><span class="o">=</span><span class="n">state_kws</span><span class="p">,</span>
+    <span class="n">predict_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="n">reduce_dim</span><span class="o">=</span><span class="s2">&quot;rep&quot;</span><span class="p">,</span>
+    <span class="n">alpha_tol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">tol</span><span class="o">=</span><span class="mf">0.003</span><span class="p">,</span>
+    <span class="n">callback</span><span class="o">=</span><span class="n">adaptive_interp</span><span class="o">.</span><span class="n">callback_plot_progress</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 0
+alphas: [0.1, 9.6]
+alpha_new: 4.6
+</pre></div>
+</div>
+<img alt="../../../_images/eacded6809ba038224ecb738eba2345cacdcde1688c7a948d75446b5a3cfb334.png" src="../../../_images/eacded6809ba038224ecb738eba2345cacdcde1688c7a948d75446b5a3cfb334.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 1
+alphas: [0.1, 4.6]
+</pre></div>
+</div>
+<img alt="../../../_images/612de1c76f8743f1139c8a30922003115727baf449a53dbfd540fac2982cc3a2.png" src="../../../_images/612de1c76f8743f1139c8a30922003115727baf449a53dbfd540fac2982cc3a2.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 1
+alphas: [4.6, 9.6]
+</pre></div>
+</div>
+<img alt="../../../_images/b92fec311b5fdca9d93a50001a55f7ff029ed5e9f27eb12bae680aa190cc28ec.png" src="../../../_images/b92fec311b5fdca9d93a50001a55f7ff029ed5e9f27eb12bae680aa190cc28ec.png" />
+</div>
+</div>
+<p>The other training option, <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#thermoextrap.adaptive_interp.train_iterative" title="thermoextrap.adaptive_interp.train_iterative"><code class="xref py py-func docutils literal notranslate"><span class="pre">train_iterative()</span></code></a>, also adds states as long as the relative error is greater than <code class="docutils literal notranslate"><span class="pre">tol</span></code>, but selects new states based on a different rule. A new state is also inserted at an alpha value from <code class="docutils literal notranslate"><span class="pre">alphas</span></code> that is at least <code class="docutils literal notranslate"><span class="pre">alpha_tol</span></code> away from existing states and has a maximum uncertainty. The difference from the recursive strategy is that the point is chosen globally from all alphas rather than choosing a new point for each interval between current points.</p>
+<p>Note that if you want similar behavior as above (and you probably do), then should pass a piecewise model, like <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModelPiecewise" title="thermoextrap.models.InterpModelPiecewise"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModelPiecewise</span></code></a>. Otherwise, the <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.InterpModel" title="thermoextrap.models.InterpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">InterpModel</span></code></a> class will build a model using all points and derivatives to fit a single polynomial rather than a piecewise one. With the recursive strategy, piecewise polynomials are naturally used as a result of considering each interval separately.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_iter</span><span class="p">,</span> <span class="n">info_iter</span> <span class="o">=</span> <span class="n">adaptive_interp</span><span class="o">.</span><span class="n">train_iterative</span><span class="p">(</span>
+    <span class="n">alphas</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span>
+    <span class="n">factory_state</span><span class="o">=</span><span class="n">adaptive_interp</span><span class="o">.</span><span class="n">factory_state_idealgas</span><span class="p">,</span>
+    <span class="c1"># Note: for things to be similar between this and</span>
+    <span class="c1"># recursive with InterpModel, must use InterpModelPiecewise</span>
+    <span class="n">factory_statecollection</span><span class="o">=</span><span class="n">xtrap</span><span class="o">.</span><span class="n">InterpModelPiecewise</span><span class="p">,</span>
+    <span class="n">state_kws</span><span class="o">=</span><span class="n">state_kws</span><span class="p">,</span>
+    <span class="n">predict_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="n">reduce_dim</span><span class="o">=</span><span class="s2">&quot;rep&quot;</span><span class="p">,</span>
+    <span class="n">alpha_tol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">tol</span><span class="o">=</span><span class="mf">0.003</span><span class="p">,</span>
+    <span class="n">callback</span><span class="o">=</span><span class="n">adaptive_interp</span><span class="o">.</span><span class="n">callback_plot_progress</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 0
+alphas: [0.1, 9.6]
+alpha_new: 4.6
+</pre></div>
+</div>
+<img alt="../../../_images/eacded6809ba038224ecb738eba2345cacdcde1688c7a948d75446b5a3cfb334.png" src="../../../_images/eacded6809ba038224ecb738eba2345cacdcde1688c7a948d75446b5a3cfb334.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 1
+alphas: [0.1, 4.6, 9.6]
+</pre></div>
+</div>
+<img alt="../../../_images/2f97d56c96a1d8ba4267702d75ff39eb646271871aa8fd0f1057047bfa14d9f0.png" src="../../../_images/2f97d56c96a1d8ba4267702d75ff39eb646271871aa8fd0f1057047bfa14d9f0.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes-used-for-interpolation">Classes used for interpolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recursive-interpolation">Recursive interpolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adaptive-interpolation">Adaptive interpolation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By William P. Krekelberg
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, William P. Krekelberg.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2023-04-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

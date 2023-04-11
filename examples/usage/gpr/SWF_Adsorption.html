@@ -1,0 +1,1335 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Active learning: adsorption of a square-well fluid in a pore &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../../_static/js/leave_notice.js"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/usage/gpr/SWF_Adsorption';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="API Reference" href="../../../reference/index.html" />
+    <link rel="prev" title="Lennard-Jones macrostate distribution" href="LJ_lnPi.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    thermoextrap: Thermodynamic Extrapolation/Interpolation Library
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Ideal_Gas.html">Ideal Gas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Active learning: adsorption of a square-well fluid in a pore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-baseclasses.html">Base classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap/issues/new?title=Issue%20on%20page%20%2Fexamples/usage/gpr/SWF_Adsorption.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/examples/usage/gpr/SWF_Adsorption.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Active learning: adsorption of a square-well fluid in a pore</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#active-learning">Active learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-of-active-learning-strategies">Comparison of active learning strategies</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="active-learning-adsorption-of-a-square-well-fluid-in-a-pore">
+<h1>Active learning: adsorption of a square-well fluid in a pore<a class="headerlink" href="#active-learning-adsorption-of-a-square-well-fluid-in-a-pore" title="Permalink to this heading">#</a></h1>
+<p>In this notebook, we will demonstrate how to perform active learning to map out the adsorption curve of a square-well fluid in a pore. Data from many such active learning runs will be collected and used to compare various active learning strategies.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">thermoextrap</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MaxNLocator</span>
+
+<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">active_utils</span>
+<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">gp_models</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this heading">#</a></h2>
+<p>Define some constants related to the square-well fluid. Note that these are also defined in example_projects/gpr_active_learning/run_active_adsorption.py.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">kBT_over_eps</span> <span class="o">=</span> <span class="mf">0.12500e01</span>
+<span class="n">eps_over_kB</span> <span class="o">=</span> <span class="mf">0.10000e03</span>  <span class="c1"># Assuming units of Kelvin</span>
+<span class="n">kB</span> <span class="o">=</span> <span class="mf">1.380649e-23</span>  <span class="c1"># In units of Joules / Kelvin</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="n">eps_over_kB</span> <span class="o">*</span> <span class="n">kB</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">eps</span> <span class="o">*</span> <span class="n">kBT_over_eps</span><span class="p">)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.30000e01</span>  <span class="c1"># Angstroms</span>
+<span class="n">lnZeta</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.268000e01</span>  <span class="c1"># Equal to beta*mu for the bulk reference simulation</span>
+<span class="n">muRef</span> <span class="o">=</span> <span class="n">lnZeta</span> <span class="o">*</span> <span class="n">kBT_over_eps</span>  <span class="c1"># In units of the LJ epsilon</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, it will be helpful to have a function to load in the macrostate distributions we will use as our data source.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_lnPi</span><span class="p">(</span>
+    <span class="n">mu</span><span class="p">,</span>
+    <span class="n">file_str</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span>
+        <span class="s2">&quot;SWF_Adsorption_data/sw_t125/t125.h0900_l10.ew_50.r*.lnpi.dat&quot;</span>
+    <span class="p">),</span>
+<span class="p">):</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">file_str</span><span class="p">)</span>
+    <span class="n">dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
+    <span class="n">Nvals</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">lnPi</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># lnPi_err = np.var(dat[:, :, 1], axis=0)</span>
+    <span class="c1"># Adjust to desired chemical potential</span>
+    <span class="n">lnPi</span> <span class="o">=</span> <span class="n">lnPi</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">kBT_over_eps</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mu</span> <span class="o">-</span> <span class="n">muRef</span><span class="p">)</span> <span class="o">*</span> <span class="n">Nvals</span>
+    <span class="k">return</span> <span class="n">Nvals</span><span class="p">,</span> <span class="n">lnPi</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To get a sense for the system, let’s first load in our macrostate distributions and take a look at them. We will plot the distributions for the fluid in the pores as solid colored lines at a variety of chemical potentials and also plot <span class="math notranslate nohighlight">\(\ln \Pi\)</span> for the bulk fluid at the same chemical potentials as black-dashed lines. With increasing chemical potential, the distributions will be tilted up at more of an incline.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot lnPi curves, both inside pore and in bulk</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">Nbulk</span><span class="p">,</span> <span class="n">lnPibulk</span> <span class="o">=</span> <span class="n">get_lnPi</span><span class="p">(</span>
+        <span class="n">m</span><span class="p">,</span>
+        <span class="n">file_str</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;SWF_Adsorption_data/sw_t125/t125.v729.b.lnpi.dat&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">N</span><span class="p">,</span> <span class="n">lnPi</span> <span class="o">=</span> <span class="n">get_lnPi</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">N</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">lnPi</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">lnPi</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Nbulk</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">lnPibulk</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">lnPibulk</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;k--&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$N$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\ln \Pi (N)$&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/6ba8fecc11874dc8e449604cbdd5d83fe3a64e382e6e579a0488d3da62dfcc6e.png" src="../../../_images/6ba8fecc11874dc8e449604cbdd5d83fe3a64e382e6e579a0488d3da62dfcc6e.png" />
+</div>
+</div>
+<p>For our GPR modeling and active learning target, we will focus on the adsorption isotherm, or the average number of particles adsorbed in the pore as a function of chemical potential. With knowledge of the chemical potential and the bulk macrostate distribution at the same temperature, this can be related to a bulk pressure of the adsorbing species. For our purposes, we only focus on learning how the average number of particles changes with the chemical potential.</p>
+<p>To make this work, we will need a custom <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a> class. This will actually be simpler than the typical <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a> class because we are not loading data from a simulation that we have to process. Instead, we just need to load a macrostate distribution and adjust it to the proper chemical potential. From the macrostate distribution, it is straightforward to compute the average number of particles adsorbed in a pore - it is simply the average <span class="math notranslate nohighlight">\(N\)</span> weighted by the probabilities <span class="math notranslate nohighlight">\(\Pi (N)\)</span> for which we know the relative (unnormalized) log-probabilities <span class="math notranslate nohighlight">\(\ln \Pi (N)\)</span>. Interestingly, this is also sufficient information to compute the derivative of the average number of particles, which is related to the variance of <span class="math notranslate nohighlight">\(N\)</span> given the distribution. More generally, higher order derivatives are related to moments of <span class="math notranslate nohighlight">\(N\)</span> and <span class="math notranslate nohighlight">\(-\beta N\)</span>, where <span class="math notranslate nohighlight">\(\beta = \frac{1}{k_\mathrm{B}T}\)</span> is the reciprocal temperature. As described in <a class="reference external" href="https://aip.scitation.org/doi/abs/10.1063/5.0014282">this paper</a>, <span class="math notranslate nohighlight">\(\langle N \rangle\)</span> is the average property of interest and <span class="math notranslate nohighlight">\(-\beta N\)</span> takes the place of the potential energy for the purposes of computing derivatives.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Adsorption_DataWrapper</span><span class="p">(</span><span class="n">active_utils</span><span class="o">.</span><span class="n">DataWrapper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lnPi_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span>
+            <span class="s2">&quot;SWF_Adsorption_data/sw_t125/t125.h0900_l10.ew_50.r*.lnpi.dat&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">mu</span>  <span class="c1"># Calling it beta for compatibility, but it&#39;s really mu</span>
+
+    <span class="k">def</span> <span class="nf">load_U_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">load_CV_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">load_x_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Instead of returning U, X, and weights, return -beta*N, N, and weights for each N</span>
+        <span class="c1"># Averaging those should give the appropriate moments in N and beta*N</span>
+        <span class="n">N</span><span class="p">,</span> <span class="n">lnPi</span> <span class="o">=</span> <span class="n">get_lnPi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">file_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lnPi_files</span><span class="p">)</span>
+        <span class="n">lnPi</span> <span class="o">=</span> <span class="n">lnPi</span> <span class="o">-</span> <span class="n">lnPi</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">maxProb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">lnPi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lnPi</span> <span class="o">-</span> <span class="n">maxProb</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">beta_N</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">kBT_over_eps</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rep&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">])</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">N</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rep&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">])</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rep&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">beta_N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">weights</span>
+
+    <span class="k">def</span> <span class="nf">build_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_order</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">all_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">all_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="n">u_vals</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">x_vals</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># Build raw moments array</span>
+        <span class="n">moments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">x_vals</span><span class="p">[</span><span class="s2">&quot;rep&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">moments</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">((</span><span class="n">x_vals</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_vals</span><span class="o">**</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">weights</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="p">)</span>
+        <span class="n">moments</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">moments</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rec&quot;</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="s2">&quot;xmom&quot;</span><span class="p">,</span> <span class="s2">&quot;umom&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">state_data</span> <span class="o">=</span> <span class="n">thermoextrap</span><span class="o">.</span><span class="n">DataCentralMoments</span><span class="o">.</span><span class="n">from_raw</span><span class="p">(</span><span class="n">moments</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">thermoextrap</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">factory_extrapmodel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">state_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To accompany our <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a> class, we need a function to create data. This is typically done by running a simulation, but here it’s as easy as loading an <span class="math notranslate nohighlight">\(\ln \Pi\)</span> distribution at a specific chemical potential and providing the associated <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.DataWrapper" title="thermoextrap.gpr_active.active_utils.DataWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataWrapper</span></code></a> object. This is a highly simplified version of the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.SimWrapper" title="thermoextrap.gpr_active.active_utils.SimWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimWrapper</span></code></a> class, but accomplishes the same goal - here it’s just way easier.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SimulateAdsorption</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_func</span> <span class="o">=</span> <span class="n">sim_func</span>  <span class="c1"># Will not perform any simulations</span>
+
+    <span class="k">def</span> <span class="nf">run_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unused</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">n_repeats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># All this does is creates an Adsorption_DataWrapper object at the specified chemical potential and returns it</span>
+        <span class="k">del</span> <span class="n">unused</span>
+        <span class="k">return</span> <span class="n">Adsorption_DataWrapper</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we can calculate isotherms. Below, we plot the adsorption isotherm and its derivative with respect to the chemical potential <span class="math notranslate nohighlight">\(\mu\)</span>. The uncertainties (standard deviations) associated with each average value of <span class="math notranslate nohighlight">\(N\)</span> in the isotherm are plotted on the right. Uncertainties are computed over three independent simulation runs to compute the macrostate distributions, with the standard deviation calculated for the computed average <span class="math notranslate nohighlight">\(N\)</span> at a given chemical potential.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># To look at convergence, compute absorption curves with uncertainties at many mu values</span>
+<span class="n">mu_plot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">ads_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">mu_plot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">ads_derivs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">mu_plot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">):</span>
+    <span class="n">this_dat</span> <span class="o">=</span> <span class="n">SimulateAdsorption</span><span class="p">()</span><span class="o">.</span><span class="n">run_sim</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    <span class="n">this_coefs</span> <span class="o">=</span> <span class="n">this_dat</span><span class="o">.</span><span class="n">build_state</span><span class="p">(</span><span class="n">max_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">derivs</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">this_means</span> <span class="o">=</span> <span class="n">this_coefs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s2">&quot;rec&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">this_stds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">this_coefs</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="s2">&quot;rec&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">ads_vals</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_means</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">ads_vals</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_stds</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">ads_derivs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_means</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">ads_derivs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_stds</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">7.13</span><span class="p">,</span> <span class="mf">7.13</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">,</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">yerr</span><span class="o">=</span><span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">,</span> <span class="n">ads_derivs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">yerr</span><span class="o">=</span><span class="n">ads_derivs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">,</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">,</span> <span class="n">ads_derivs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\langle N \rangle$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{d}</span><span class="s2">\langle N \rangle / \mathrm</span><span class="si">{d}</span><span class="s2"> \mu$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\mu / \epsilon$&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\sigma_{\langle N \rangle}$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\sigma_{\mathrm</span><span class="si">{d}</span><span class="s2">\langle N \rangle / \mathrm</span><span class="si">{d}</span><span class="s2"> \mu}$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\mu / \epsilon$&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/9286d027a420583d03e08dba038d23754e07f4becbd555b9e187fe326cdbe163.png" src="../../../_images/9286d027a420583d03e08dba038d23754e07f4becbd555b9e187fe326cdbe163.png" />
+</div>
+</div>
+<p>When we want to compare our GPR models to the ground truth, it will be helpful to have a function that represents it, at least for the adsorption isotherm. That function will be an interpolating polynomial based on the data just plotted.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+
+<span class="c1"># Create a function we can use as the ground truth to compare to</span>
+<span class="n">ground_truth_ads</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">,</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="active-learning">
+<h2>Active learning<a class="headerlink" href="#active-learning" title="Permalink to this heading">#</a></h2>
+<p>At this point, we are ready to perform active learning. This is a pedogogical reproduction of the function <code class="docutils literal notranslate"><span class="pre">run_active</span></code> in <a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/example_projects/gpr_active_learning/run_active_adsorption.py"><code class="docutils literal notranslate"><span class="pre">run_active_adsorption.py</span></code></a>.</p>
+<p>First we need to define how the update will be performed. Here we will use maximum variance updates, though other possibilities are random or space-filling. This can be modified by changing the update function, with a number of options in <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#module-thermoextrap.gpr_active.active_utils" title="thermoextrap.gpr_active.active_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">update_func</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">UpdateALMbrute</span><span class="p">(</span>
+    <span class="n">save_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Will not save plots</span>
+    <span class="n">show_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># But will show them in notebook</span>
+    <span class="n">compare_func</span><span class="o">=</span><span class="n">ground_truth_ads</span><span class="p">,</span>
+    <span class="n">avoid_repeats</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Here, running &quot;more simulations&quot; won&#39;t reduce uncertainty, so don&#39;t bother</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we will set up all of the stopping metrics we want to compute, along with the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.StopCriteria" title="thermoextrap.gpr_active.active_utils.StopCriteria"><code class="xref py py-class docutils literal notranslate"><span class="pre">StopCriteria</span></code></a> class wrapper that determines if the metrics have been satisfied. Note that we actually include a <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#thermoextrap.gpr_active.active_utils.MaxIter" title="thermoextrap.gpr_active.active_utils.MaxIter"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaxIter</span></code></a> metric, which can never be satisfied and will ensure that the maximum number of active learning iterations is reached. You can always include this metric as a simple way to change the behavior of the active learning algorithm. Otherwise, convergence is defined as the point when all metrics are simultaneously satisfied at the specified tolerances (the only argument passed to each metric). All metrics may be found in the <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html#module-thermoextrap.gpr_active.active_utils" title="thermoextrap.gpr_active.active_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code></a> module.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up list of metrics to compute</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxVar</span><span class="p">(</span><span class="mf">1e-03</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxRelVar</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">AvgVar</span><span class="p">(</span><span class="mf">1e-03</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">AvgRelVar</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MSD</span><span class="p">(</span><span class="mf">1e-01</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxAbsRelDeviation</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">AvgAbsRelDeviation</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">ErrorStability</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxRelGlobalVar</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxAbsRelGlobalDeviation</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">),</span>
+    <span class="n">active_utils</span><span class="o">.</span><span class="n">MaxIter</span><span class="p">(),</span>
+<span class="p">]</span>
+<span class="c1"># And stopping criteria function wraps metrics</span>
+<span class="n">stop_func</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">StopCriteria</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And run active learning! In the paper, we used 50 iterations, but here will just do 5 since we want this to be a quick tutorial. Note that we will in fact have the update function plot the iterations and information will be printed as we go.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dat_list</span><span class="p">,</span> <span class="n">train_history</span> <span class="o">=</span> <span class="n">active_utils</span><span class="o">.</span><span class="n">active_learning</span><span class="p">(</span>
+    <span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">],</span>  <span class="c1"># Initial values of chemical potentials</span>
+    <span class="n">SimulateAdsorption</span><span class="p">(),</span>  <span class="c1"># Function to perform &quot;simulation,&quot; really just return DataWrapper</span>
+    <span class="n">update_func</span><span class="p">,</span>
+    <span class="n">stop_criteria</span><span class="o">=</span><span class="n">stop_func</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">alpha_name</span><span class="o">=</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span>  <span class="c1"># Just the name of the input parameter to the GP model, here chemical potential</span>
+    <span class="n">max_order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="c1"># Maximum order of derivatives to be used</span>
+    <span class="n">gp_base_kwargs</span><span class="o">=</span><span class="p">{},</span>  <span class="c1"># If we want to change the kernel, can do that here by specifying keyword arguments for creating GP model</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial mu values:  [-12.0, 3.8]
+Metal device set to: Apple M2
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤══════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │    value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪══════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.706654 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 7.12763  │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.285788 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼──────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0        │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧══════════╛
+
+Current stopping metrics: 
+{&#39;MaxVar&#39;: 33.368781773936824, &#39;MaxVar_tol&#39;: 0.001, &#39;MaxRelVar&#39;: 0.24167522051492132, &#39;MaxRelVar_tol&#39;: 0.01, &#39;AvgVar&#39;: 15.817050749568901, &#39;AvgVar_tol&#39;: 0.001, &#39;AvgRelVar&#39;: 0.10823409002811854, &#39;AvgRelVar_tol&#39;: 0.01, &#39;MSD&#39;: 175703.8478709112, &#39;MSD_tol&#39;: 0.1, &#39;MaxAbsRelDev&#39;: 0.9999999999999987, &#39;MaxAbsRelDev_tol&#39;: 0.01, &#39;AvgAbsRelDev&#39;: 0.9999999999999196, &#39;AvgAbsRelDev_tol&#39;: 0.01, &#39;ErrorStability&#39;: 1.0, &#39;ErrorStability_tol&#39;: 0.01, &#39;MaxRelGlobalVar&#39;: 0.12219335135507876, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 2.8169777245057106, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01, &#39;MaxIter&#39;: 2.0, &#39;MaxIter_tol&#39;: 1.0}
+</pre></div>
+</div>
+<img alt="../../../_images/e94150accd6e5eb44958b315c5803bb614695fd0189e66fbe96e33cfad0e3e40.png" src="../../../_images/e94150accd6e5eb44958b315c5803bb614695fd0189e66fbe96e33cfad0e3e40.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 1 updates, mu values are: 
+[-12.0, 3.8, -3.1695703617068625]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │       value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.796786    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.31565     │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 6.70178e-05 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0           │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════════╛
+
+Current stopping metrics: 
+{&#39;MaxVar&#39;: 54.38810088154869, &#39;MaxVar_tol&#39;: 0.001, &#39;MaxRelVar&#39;: 0.5211720320529506, &#39;MaxRelVar_tol&#39;: 0.01, &#39;AvgVar&#39;: 29.923032980613527, &#39;AvgVar_tol&#39;: 0.001, &#39;AvgRelVar&#39;: 0.14496660037342468, &#39;AvgRelVar_tol&#39;: 0.01, &#39;MSD&#39;: 17161.58891393348, &#39;MSD_tol&#39;: 0.1, &#39;MaxAbsRelDev&#39;: 0.909011731589524, &#39;MaxAbsRelDev_tol&#39;: 0.01, &#39;AvgAbsRelDev&#39;: 0.41032583943701445, &#39;AvgAbsRelDev_tol&#39;: 0.01, &#39;ErrorStability&#39;: 1.0, &#39;ErrorStability_tol&#39;: 0.01, &#39;MaxRelGlobalVar&#39;: 0.22568304306205875, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.9119802022407292, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01, &#39;MaxIter&#39;: 2.0, &#39;MaxIter_tol&#39;: 1.0}
+</pre></div>
+</div>
+<img alt="../../../_images/e97a1b7a95dc3b200455539f5a4c10104cbfe3addfdae521ceee4d9e23316a53.png" src="../../../_images/e97a1b7a95dc3b200455539f5a4c10104cbfe3addfdae521ceee4d9e23316a53.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 2 updates, mu values are: 
+[-12.0, 3.8, -3.1695703617068625, -7.589422539806207]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │   value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.16547 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 2.54837 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.29218 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0       │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════╛
+
+Current stopping metrics: 
+{&#39;MaxVar&#39;: 45.73391938536791, &#39;MaxVar_tol&#39;: 0.001, &#39;MaxRelVar&#39;: 0.2550283782900389, &#39;MaxRelVar_tol&#39;: 0.01, &#39;AvgVar&#39;: 10.81489965595335, &#39;AvgVar_tol&#39;: 0.001, &#39;AvgRelVar&#39;: 0.0530042376561962, &#39;AvgRelVar_tol&#39;: 0.01, &#39;MSD&#39;: 9124.51638557436, &#39;MSD_tol&#39;: 0.1, &#39;MaxAbsRelDev&#39;: 13.154261368856268, &#39;MaxAbsRelDev_tol&#39;: 0.01, &#39;AvgAbsRelDev&#39;: 2.649544250129215, &#39;AvgAbsRelDev_tol&#39;: 0.01, &#39;ErrorStability&#39;: 0.37841528806762653, &#39;ErrorStability_tol&#39;: 0.01, &#39;MaxRelGlobalVar&#39;: 0.15646289415705913, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.7460354715165454, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01, &#39;MaxIter&#39;: 2.0, &#39;MaxIter_tol&#39;: 1.0}
+</pre></div>
+</div>
+<img alt="../../../_images/440764667d9cd8fe9df98b21843effb2dad144b9d6259e2a68691e6c17d4ea63.png" src="../../../_images/440764667d9cd8fe9df98b21843effb2dad144b9d6259e2a68691e6c17d4ea63.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 3 updates, mu values are: 
+[-12.0, 3.8, -3.1695703617068625, -7.589422539806207, 0.6132640502804736]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │   value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.10664 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 2.44882 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.3817  │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0       │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════╛
+
+Current stopping metrics: 
+{&#39;MaxVar&#39;: 4.390844836551273, &#39;MaxVar_tol&#39;: 0.001, &#39;MaxRelVar&#39;: 0.3140873056345023, &#39;MaxRelVar_tol&#39;: 0.01, &#39;AvgVar&#39;: 1.6568264973339222, &#39;AvgVar_tol&#39;: 0.001, &#39;AvgRelVar&#39;: 0.04677795199631348, &#39;AvgRelVar_tol&#39;: 0.01, &#39;MSD&#39;: 680.9600988957988, &#39;MSD_tol&#39;: 0.1, &#39;MaxAbsRelDev&#39;: 0.09788574299935855, &#39;MaxAbsRelDev_tol&#39;: 0.01, &#39;AvgAbsRelDev&#39;: 0.025893336325031605, &#39;AvgAbsRelDev_tol&#39;: 0.01, &#39;ErrorStability&#39;: 0.10171678824786973, &#39;ErrorStability_tol&#39;: 0.01, &#39;MaxRelGlobalVar&#39;: 0.01438667718053079, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.22202730700041273, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01, &#39;MaxIter&#39;: 2.0, &#39;MaxIter_tol&#39;: 1.0}
+</pre></div>
+</div>
+<img alt="../../../_images/df58da60672a0709089703782b22435913120fe635c67bf38baff233b2c1f4bf.png" src="../../../_images/df58da60672a0709089703782b22435913120fe635c67bf38baff233b2c1f4bf.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 4 updates, mu values are: 
+[-12.0, 3.8, -3.1695703617068625, -7.589422539806207, 0.6132640502804736, 2.6549411015242947]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │   value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.29579 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 2.47153 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.30257 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0       │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════╛
+
+Current stopping metrics: 
+{&#39;MaxVar&#39;: 2.503140700319048, &#39;MaxVar_tol&#39;: 0.001, &#39;MaxRelVar&#39;: 0.29114668457503184, &#39;MaxRelVar_tol&#39;: 0.01, &#39;AvgVar&#39;: 0.8572931141489303, &#39;AvgVar_tol&#39;: 0.001, &#39;AvgRelVar&#39;: 0.04125061635628719, &#39;AvgRelVar_tol&#39;: 0.01, &#39;MSD&#39;: 0.39864627656191604, &#39;MSD_tol&#39;: 0.1, &#39;MaxAbsRelDev&#39;: 0.06857040291389717, &#39;MaxAbsRelDev_tol&#39;: 0.01, &#39;AvgAbsRelDev&#39;: 0.009658972464118499, &#39;AvgAbsRelDev_tol&#39;: 0.01, &#39;ErrorStability&#39;: 2.6983970265041087e-05, &#39;ErrorStability_tol&#39;: 0.01, &#39;MaxRelGlobalVar&#39;: 0.00819020079438659, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.0061557822470107845, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01, &#39;MaxIter&#39;: 2.0, &#39;MaxIter_tol&#39;: 1.0}
+</pre></div>
+</div>
+<img alt="../../../_images/e6e2522a6fcda5565c8b8433296a5361b4a45cfc3ff2a2e1c0f51ee9f153a99b.png" src="../../../_images/e6e2522a6fcda5565c8b8433296a5361b4a45cfc3ff2a2e1c0f51ee9f153a99b.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>After 5 updates, mu values are: 
+[-12.0, 3.8, -3.1695703617068625, -7.589422539806207, 0.6132640502804736, 2.6549411015242947, -5.2698371497200425]
+
+Current GP info: 
+╒═══════════════════════════════════════════╤═══════════╤═════════════╤═════════╤═════════════╤═════════╤═════════╤═════════════╕
+│ name                                      │ class     │ transform   │ prior   │ trainable   │ shape   │ dtype   │       value │
+╞═══════════════════════════════════════════╪═══════════╪═════════════╪═════════╪═════════════╪═════════╪═════════╪═════════════╡
+│ HeteroscedasticGPR.kernel.kernel.var      │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.749811    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.kernel.kernel.l        │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 0.959127    │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_scale │ Parameter │ Softplus    │         │ True        │ ()      │ float64 │ 1.11657e-05 │
+├───────────────────────────────────────────┼───────────┼─────────────┼─────────┼─────────────┼─────────┼─────────┼─────────────┤
+│ HeteroscedasticGPR.likelihood.power_add   │ Parameter │ Identity    │         │ False       │ ()      │ float64 │ 0           │
+╘═══════════════════════════════════════════╧═══════════╧═════════════╧═════════╧═════════════╧═════════╧═════════╧═════════════╛
+
+Current stopping metrics: 
+{&#39;MaxVar&#39;: 72.08481964307762, &#39;MaxVar_tol&#39;: 0.001, &#39;MaxRelVar&#39;: 1.6341784740125775, &#39;MaxRelVar_tol&#39;: 0.01, &#39;AvgVar&#39;: 14.784076033503265, &#39;AvgVar_tol&#39;: 0.001, &#39;AvgRelVar&#39;: 0.2816469624575393, &#39;AvgRelVar_tol&#39;: 0.01, &#39;MSD&#39;: 1034.992789875864, &#39;MSD_tol&#39;: 0.1, &#39;MaxAbsRelDev&#39;: 0.8721152873406117, &#39;MaxAbsRelDev_tol&#39;: 0.01, &#39;AvgAbsRelDev&#39;: 0.2330526791541307, &#39;AvgAbsRelDev_tol&#39;: 0.01, &#39;ErrorStability&#39;: 0.7080381251355963, &#39;ErrorStability_tol&#39;: 0.01, &#39;MaxRelGlobalVar&#39;: 0.2380682751590889, &#39;MaxRelGlobalVar_tol&#39;: 0.01, &#39;MaxAbsRelGlobalDeviation&#39;: 0.34832825623625074, &#39;MaxAbsRelGlobalDeviation_tol&#39;: 0.01, &#39;MaxIter&#39;: 2.0, &#39;MaxIter_tol&#39;: 1.0}
+
+Reached maximum iterations of 5 without convergence
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="comparison-of-active-learning-strategies">
+<h2>Comparison of active learning strategies<a class="headerlink" href="#comparison-of-active-learning-strategies" title="Permalink to this heading">#</a></h2>
+<p>We repeated the above procedure many times and for different active learning strategies. Specifically, we used maximum variance, space-filling, and random updates. We also explored two different types of kernels described in the paper, the standard kernel and a change-points kernel that applies different kernels to different regions of chemical potential space. As we will show, this significant accelerates active learning because such a model better represents the function to be fit. Specifically, we need rapid function variations at intermediate chemical potentials, with small kernel length scale parameter values, while the function varies slowly with large kernel length scale values at low and high chemical potentials. Without a change-points kernel, sampling new points within the middle of the chemical potential range results in reductions of the kernel length-scale that then cause large increases in uncertainty and oscillations at low and high chemical potentials. This cycle keeps repeating, in the end requiring lots of data points over the entire range due to the GPR model learning that a small length-scale is necessary. A change-points kernel avoids this by only requiring many data points for intermediate chemical potentials.</p>
+<p>The first thing is to load all of the data. Note that for a small number of runs, data is not available because a numerical instability while creating a GPR model. This can happen for a variety of reasons, but is most likely due to sampling of chemical potentials that are very similar to each other with a large kernel lengthscale. Such behavior is far more likely for a random update strategy that does not make use of prior information to help drive exploration of the space. It is also more likely for a change-points kernel using a space-filling update strategy, where the scenario of the sampled points being too close to the points at which the kernel changes can also lead to instabilities.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load all the data that we&#39;ll need</span>
+<span class="c1"># Identify directory where data is held</span>
+<span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;SWF_Adsorption_data&quot;</span><span class="p">)</span>
+
+<span class="c1"># And all run directories</span>
+<span class="n">run_dirs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/run*&quot;</span> <span class="o">%</span> <span class="n">base_dir</span><span class="p">)</span>
+<span class="n">run_dirs</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+<span class="c1"># Define methods used for updates/models</span>
+<span class="n">method_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;alm&quot;</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="s2">&quot;space_fill&quot;</span><span class="p">,</span> <span class="s2">&quot;changepoints_alm&quot;</span><span class="p">,</span> <span class="s2">&quot;changepoints_space&quot;</span><span class="p">]</span>
+
+<span class="c1"># Collect training information</span>
+<span class="n">train_info_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">m_name</span> <span class="ow">in</span> <span class="n">method_names</span><span class="p">:</span>
+    <span class="n">train_info_dict</span><span class="p">[</span><span class="n">m_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">rdir</span> <span class="ow">in</span> <span class="n">run_dirs</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">train_info_dict</span><span class="p">[</span><span class="n">m_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">/active_history.npz&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rdir</span><span class="p">,</span> <span class="n">m_name</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File not found in </span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">rdir</span><span class="p">,</span> <span class="n">m_name</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>File not found in SWF_Adsorption_data/run18/alm
+File not found in SWF_Adsorption_data/run65/alm
+File not found in SWF_Adsorption_data/run7/alm
+File not found in SWF_Adsorption_data/run18/random
+File not found in SWF_Adsorption_data/run32/random
+File not found in SWF_Adsorption_data/run37/random
+File not found in SWF_Adsorption_data/run65/random
+File not found in SWF_Adsorption_data/run7/random
+File not found in SWF_Adsorption_data/run73/random
+File not found in SWF_Adsorption_data/run92/random
+File not found in SWF_Adsorption_data/run18/space_fill
+File not found in SWF_Adsorption_data/run65/space_fill
+File not found in SWF_Adsorption_data/run7/space_fill
+File not found in SWF_Adsorption_data/run18/changepoints_space
+File not found in SWF_Adsorption_data/run65/changepoints_space
+File not found in SWF_Adsorption_data/run7/changepoints_space
+</pre></div>
+</div>
+</div>
+</div>
+<p>The following reproduces Figure 6 from the paper, using the same data. The top panel plots the GPR models compared to the ground truth, with locations of sampling indicated at the bottom of the plot with markers. The bottom panel shows the uncertainty predicted by the models, along with the uncertainty in the provided average number of particles at each chemical potential.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># All final models (values, not derivatives)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.37</span><span class="p">,</span> <span class="mf">3.37</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">train_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:orange&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">]</span>
+<span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MaxVar&quot;</span><span class="p">,</span> <span class="s2">&quot;Random&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span> <span class="s2">&quot;MaxVar w/ CP&quot;</span><span class="p">,</span> <span class="s2">&quot;Space w/ CP&quot;</span><span class="p">]</span>
+<span class="n">line_styles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">]</span>
+<span class="n">marker_styles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">]</span>
+
+<span class="n">alpha_vals_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">method_names</span><span class="p">):</span>
+    <span class="n">t_info_list</span> <span class="o">=</span> <span class="n">train_info_dict</span><span class="p">[</span><span class="n">m_name</span><span class="p">]</span>
+    <span class="n">this_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t_info</span><span class="p">[</span><span class="s2">&quot;pred_mu&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">t_info</span> <span class="ow">in</span> <span class="n">t_info_list</span><span class="p">])</span>
+    <span class="n">this_avg_mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">this_mu</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">this_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t_info</span><span class="p">[</span><span class="s2">&quot;pred_std&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">t_info</span> <span class="ow">in</span> <span class="n">t_info_list</span><span class="p">])</span>
+    <span class="n">this_alpha</span> <span class="o">=</span> <span class="n">t_info_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;alpha&quot;</span><span class="p">]</span>
+    <span class="n">this_alpha_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">this_alpha</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">this_alpha</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">this_mu</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">this_alpha_grid</span><span class="p">,</span>
+        <span class="n">this_mu</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="p">)</span>  <span class="c1"># , alpha=0.3)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">this_alpha_grid</span><span class="p">,</span>
+        <span class="n">this_std</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="p">)</span>  <span class="c1"># , alpha=0.3)</span>
+    <span class="n">alpha_vals_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_alpha</span><span class="p">)</span>
+
+<span class="c1"># After plotting ALL other curves, plot alphas based on automatic y limits</span>
+<span class="n">y_lims</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">this_alpha</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">alpha_vals_list</span><span class="p">):</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">this_alpha</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">y_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.10</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_lims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_lims</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">this_alpha</span><span class="p">),</span>
+        <span class="n">marker</span><span class="o">=</span><span class="n">marker_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">,</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;k--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mu_plot</span><span class="p">,</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;k--&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">prune</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s2">&quot;Reduced chemical potential, $\mu_\mathrm</span><span class="si">{c}</span><span class="s2"> / \epsilon_\mathrm</span><span class="si">{sw}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;GPR mean for $\langle N \rangle$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;GPR std for $\langle N \rangle$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/00a4322641ebeb305b419575a000fb49eb6fb2d8140a72a78111c04dcc32ea24.png" src="../../../_images/00a4322641ebeb305b419575a000fb49eb6fb2d8140a72a78111c04dcc32ea24.png" />
+</div>
+</div>
+<p>We next reproduce Figure 7, where we compare convergence to the ground truth for all of our active learning methods and our two types of kernels. Each panel shows a different metric for assessing distance from the ground truth.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Have intentionally set mu_plot so that will be same as values used to evaluate GP models in training histories</span>
+<span class="c1"># So can compare distance to ground truth versus update iteration</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.37</span><span class="p">,</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">train_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:orange&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">]</span>
+<span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MaxVar&quot;</span><span class="p">,</span> <span class="s2">&quot;Random&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span> <span class="s2">&quot;MaxVar w/ CP&quot;</span><span class="p">,</span> <span class="s2">&quot;Space w/ CP&quot;</span><span class="p">]</span>
+<span class="n">line_styles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">method_names</span><span class="p">):</span>
+    <span class="n">t_info_list</span> <span class="o">=</span> <span class="n">train_info_dict</span><span class="p">[</span><span class="n">m_name</span><span class="p">]</span>
+    <span class="n">this_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t_info</span><span class="p">[</span><span class="s2">&quot;pred_mu&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t_info</span> <span class="ow">in</span> <span class="n">t_info_list</span><span class="p">])</span>
+    <span class="n">this_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t_info</span><span class="p">[</span><span class="s2">&quot;pred_std&quot;</span><span class="p">][</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t_info</span> <span class="ow">in</span> <span class="n">t_info_list</span><span class="p">])</span>
+    <span class="n">this_max_rel_dev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">this_mean</span> <span class="o">-</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">this_rmsd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(((</span><span class="n">this_mean</span> <span class="o">-</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">this_gt_logprob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+        <span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">this_mean</span> <span class="o">-</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ads_vals</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]),</span>
+        <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">this_rmsd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">this_max_rel_dev</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">this_gt_logprob</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of updates&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;RMSD&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Max abs rel dev&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$-\log P_\mathrm</span><span class="si">{like}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/e2a960a72905a3d93a40d82eaa081a2bce4f309c5622267702116703dd234a84.png" src="../../../_images/e2a960a72905a3d93a40d82eaa081a2bce4f309c5622267702116703dd234a84.png" />
+</div>
+</div>
+<p>Next, we reproduce Figure 8 from the paper, showing the behavior of different metrics that could be used to define stopping criteria without prior knowledge of the ground truth.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot stopping criteria metrics over update iterations</span>
+<span class="n">metric_names</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;MaxRelVar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AvgRelVar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MaxRelGlobalVar&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MaxAbsRelDev&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AvgAbsRelDev&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MaxAbsRelGlobalDeviation&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">metric_labels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{max}</span><span class="s2"> \left( \frac{\mathbf{\sigma}_\mathrm</span><span class="si">{pred}</span><span class="s2">}{\mathbf{\mu}_\mathrm</span><span class="si">{pred}</span><span class="s2">} \right)$&quot;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{avg}</span><span class="s2"> \left( \frac{\mathbf{\sigma}_\mathrm</span><span class="si">{pred}</span><span class="s2">}{\mathbf{\mu}_\mathrm</span><span class="si">{pred}</span><span class="s2">} \right)$&quot;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{max}</span><span class="s2"> \left( \mathbf{\sigma}_\mathrm</span><span class="si">{rel}</span><span class="s2"> \right) = \frac{ \mathrm</span><span class="si">{max}</span><span class="s2"> \left( \mathbf{\sigma}_\mathrm</span><span class="si">{pred}</span><span class="s2"> \right)}{\sigma_\mathrm</span><span class="si">{data}</span><span class="s2">}$&quot;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{max}</span><span class="s2"> \left( \frac{\left| \mathbf{\mu}_\mathrm{pred, t} - \mathbf{\mu}_\mathrm{pred, t-1} \right|}{\left| \mathbf{\mu}_\mathrm{pred, t} \right|} \right)$&quot;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{avg}</span><span class="s2"> \left( \frac{\left| \mathbf{\mu}_\mathrm{pred, t} - \mathbf{\mu}_\mathrm{pred, t-1} \right|}{\left| \mathbf{\mu}_\mathrm{pred, t} \right|} \right)$&quot;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{max}</span><span class="s2"> \left( \mathbf{\delta}_\mathrm</span><span class="si">{iter}</span><span class="s2"> \right) = \frac{ \mathrm</span><span class="si">{max}</span><span class="s2"> \left| \mathbf{\mu}_\mathrm{pred, t} - \mathbf{\mu}_\mathrm{pred, t-1} \right|}{\sigma_\mathrm</span><span class="si">{data}</span><span class="s2">}$&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.69</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">train_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:orange&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">]</span>
+<span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MaxVar&quot;</span><span class="p">,</span> <span class="s2">&quot;Random&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span> <span class="s2">&quot;MaxVar w/ CP&quot;</span><span class="p">,</span> <span class="s2">&quot;Space w/ CP&quot;</span><span class="p">]</span>
+<span class="n">line_styles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">]</span>
+
+<span class="n">dat_std_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">train_info_dict</span><span class="p">[</span><span class="s2">&quot;space_fill&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;pred_mu&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">method_names</span><span class="p">):</span>
+    <span class="n">t_info_list</span> <span class="o">=</span> <span class="n">train_info_dict</span><span class="p">[</span><span class="n">m_name</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metric_names</span><span class="p">):</span>
+        <span class="n">this_metric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">t_info</span> <span class="ow">in</span> <span class="n">t_info_list</span><span class="p">])</span>
+        <span class="n">this_avg_metric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">this_metric</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">j</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="n">j</span> <span class="o">%</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">this_avg_metric</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="n">linestyle</span><span class="o">=</span><span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="p">)</span>  <span class="c1"># , alpha=0.3)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">j</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="n">j</span> <span class="o">%</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+            <span class="n">metric_labels</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">xycoords</span><span class="o">=</span><span class="s2">&quot;axes fraction&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">j</span> <span class="o">//</span> <span class="mi">3</span><span class="p">,</span> <span class="n">j</span> <span class="o">%</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">10e-02</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="c1">#         ax[i, j].annotate(metric_names[i*3 + j], xy=(0.05, 0.85), xycoords=&#39;axes fraction&#39;)</span>
+
+<span class="c1"># ax[-1, 0].set_xlabel(r&#39;Number of updates&#39;)</span>
+<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Number of updates&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Relative std&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Absolute relative change&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="c1"># ax[0, 0].set_title(r&#39;Max local&#39;)</span>
+<span class="c1"># ax[0, 1].set_title(r&#39;Avg local&#39;)</span>
+<span class="c1"># ax[0, 2].set_title(r&#39;Max global&#39;)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/3905344bf5f6e27ae886c9f6ceafbac46e9ea6f7ca8c3ef64c15116e0abc11a4.png" src="../../../_images/3905344bf5f6e27ae886c9f6ceafbac46e9ea6f7ca8c3ef64c15116e0abc11a4.png" />
+</div>
+</div>
+<p>Finally, we also reproduce Figure S3 in the Supporting Information, which plots an additional, more sophisticated, stopping metric, that, though more seemingly more elegant, does not demonstrate significantly improved performance here. For random updates, this metric frequently becomes completely unstable after only a few iterations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot error stability metric versus iterations for SI</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.37</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">train_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:orange&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:gray&quot;</span><span class="p">]</span>
+<span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MaxVar&quot;</span><span class="p">,</span> <span class="s2">&quot;Random&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span> <span class="s2">&quot;MaxVar w/ CP&quot;</span><span class="p">,</span> <span class="s2">&quot;Space w/ CP&quot;</span><span class="p">]</span>
+<span class="n">line_styles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">method_names</span><span class="p">):</span>
+    <span class="n">t_info_list</span> <span class="o">=</span> <span class="n">train_info_dict</span><span class="p">[</span><span class="n">m_name</span><span class="p">]</span>
+    <span class="n">this_metric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t_info</span><span class="p">[</span><span class="s2">&quot;ErrorStability&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">t_info</span> <span class="ow">in</span> <span class="n">t_info_list</span><span class="p">])</span>
+    <span class="n">this_avg_metric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">this_metric</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">this_avg_metric</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">train_colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="n">line_styles</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="p">)</span>  <span class="c1"># , alpha=0.3)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">10e-02</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">1e-02</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Number of updates&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Error stability metric&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/fba319eaa73f88cd44f62ae8bcb83e02972e507277e015874e48c3fc81bbb904.png" src="../../../_images/fba319eaa73f88cd44f62ae8bcb83e02972e507277e015874e48c3fc81bbb904.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="LJ_lnPi.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lennard-Jones macrostate distribution</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../../reference/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API Reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#active-learning">Active learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-of-active-learning-strategies">Comparison of active learning strategies</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By William P. Krekelberg
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, William P. Krekelberg.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2023-04-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

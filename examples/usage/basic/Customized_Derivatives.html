@@ -1,0 +1,912 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Extrapolation in volume and custom derivatives &#8212; thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
+    <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../../_static/js/leave_notice.js"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/usage/basic/Customized_Derivatives';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="GP Models Utilizing Derivative Information and Active Learning" href="../../gpr.html" />
+    <link rel="prev" title="Data Organization" href="Data_Organization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">thermoextrap 0.2.3.dev25+ge3d1a53.d20230411 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    thermoextrap: Thermodynamic Extrapolation/Interpolation Library
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Data_Organization.html">Data Organization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Extrapolation in volume and custom derivatives</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../gpr/Ideal_Gas.html">Ideal Gas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gpr/LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gpr/SWF_Adsorption.html">Active learning: adsorption of a square-well fluid in a pore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-baseclasses.html">Base classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/usnistgov/thermoextrap/issues/new?title=Issue%20on%20page%20%2Fexamples/usage/basic/Customized_Derivatives.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../../_sources/examples/usage/basic/Customized_Derivatives.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Extrapolation in volume and custom derivatives</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="extrapolation-in-volume-and-custom-derivatives">
+<h1>Extrapolation in volume and custom derivatives<a class="headerlink" href="#extrapolation-in-volume-and-custom-derivatives" title="Permalink to this heading">#</a></h1>
+<p>There may be some cases where a custom derivative needs to be written. Most likely, this will be when you can’t write the necessary averages in terms of the observable and a specific Hamiltonian or thermodynamic conjugate variable. For instance, this might occur when extrapolating over volume in the NVT ensemble (see https://aip.scitation.org/doi/10.1063/5.0014282). In these cases, it is useful to know how to write custom derivative calculation functions and merge them back into the capabilities of the <a class="reference internal" href="../../../reference/api-public.html#module-thermoextrap" title="thermoextrap"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code></a> package.</p>
+<p>This example will be based on the code found in <a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html#module-thermoextrap.volume" title="thermoextrap.volume"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap.volume</span></code></a>, with sections of that file reproduced here for pedagogical purposes.</p>
+<p>First, it is useful to know the structure of how extrapolation coefficients (derivatives) are calculated in <a class="reference internal" href="../../../reference/api-public.html#module-thermoextrap" title="thermoextrap"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code></a>. Handily, there is a class called <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.Derivatives" title="thermoextrap.models.Derivatives"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.models.Derivatives</span></code></a> that uses functions or arrays of functions to compute derivatives at specific orders. Typically, these functions are generated using sympy based on known relationships between the derivatives and moments of the observable and Hamiltonian. However, they can instead be specified manually.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">thermoextrap</span> <span class="k">as</span> <span class="nn">xtrap</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Our goal here will be to extrapolate in volume (or 1D length) for the 1D ideal gas test system.</p>
+<p>To extrapolate in volume we need observable values at each snapshot along with values of the virial at each snapshot. For the ideal gas system, the virial is given by <span class="math notranslate nohighlight">\(W = -\sum_{i} \frac{\mathrm{d}U}{\mathrm{d}x_{i}} x_{i} = -\sum_{i} a x_{i}\)</span>, which for <span class="math notranslate nohighlight">\(a=1\)</span> leads us to <span class="math notranslate nohighlight">\(W = -N \langle x \rangle\)</span>, where the average is over all particles of a given configuration. For the purposes of extrapolation, we need a dimensionless virial, so <span class="math notranslate nohighlight">\(W\)</span> will be multiplied by <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+<p>For any observable, there is a unique term that appears in the derivative with respect to system size or volume, specifically <span class="math notranslate nohighlight">\(\langle \sum_{i} \frac{\partial Y}{\partial x_i} x_{i}\)</span> where <span class="math notranslate nohighlight">\(Y\)</span> is the observable and <span class="math notranslate nohighlight">\(x_i\)</span> is the <span class="math notranslate nohighlight">\(i^\mathrm{th}\)</span> degree of freedom. In the ideal gas system at hand, <span class="math notranslate nohighlight">\(Y = \frac{1}{N} \sum_{i} x_{i}\)</span> so that this correction term is equal to the observable itself, <span class="math notranslate nohighlight">\(Y = \langle x \rangle\)</span>, with again the average here only over all particles. It is interesting that the virial is then exactly <span class="math notranslate nohighlight">\(N\)</span> times larger than this correction term. This is typical, as the virial will scale with the number of degrees of freedom in the system. As a result the correction term is 1000 times smaller than the other two terms appearing in the first derivative with respect to system size, <span class="math notranslate nohighlight">\(L\)</span>. However, the other two terms nearly cancel, resulting in a small difference the same order of magnitude as the correction term. For any system you work with, you should check the magnitude of the unique correction term, either visually or by deriving and computing it.</p>
+<p>Getting back to the code, below is a custom derivative calculation function appearing in xtrap.volume.py. This will actually work for any extrapolation in volume for the NVT ensemble, not just for the 1D ideal gas test system.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">thermoextrap</span> <span class="k">as</span> <span class="nn">xtrap</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VolumeDerivFuncs</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates specific derivative values at refV with data x and W.</span>
+<span class="sd">    Only go to first order for volume extrapolation.</span>
+<span class="sd">    Here W represents the virial instead of the potential energy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="c1"># Check to make sure not going past first order</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Volume derivatives cannot go past 1st order&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot; and received </span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">order</span>
+                <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">(because would need derivatives of forces)&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_deriv_func</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_deriv_func</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">xW</span><span class="p">,</span> <span class="n">dxdq</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            dxdq is &lt;sum_{i=1}^N dy/dx_i x_i&gt;</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1"># NOTE: W here has beta in it:</span>
+            <span class="c1"># that is W &lt;- beta * virial</span>
+
+            <span class="c1"># Zeroth order derivative</span>
+            <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">deriv_val</span> <span class="o">=</span> <span class="n">xW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># First order derivative</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">deriv_val</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">xW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">xW</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dxdq</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">volume</span> <span class="o">*</span> <span class="n">ndim</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">deriv_val</span>
+
+        <span class="k">return</span> <span class="n">func</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are two key components in the above class: a <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> method and a <code class="docutils literal notranslate"><span class="pre">create_deriv_func</span></code> method. <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> is used to specify which order of derivative we want and return it - if this was an array of functions, we could just store the array and access them for the appropriate order. Here, this method just ensures that we don’t try and go past 1st order in our derivatives (because that is not implemented) and returns the derivative function shown. The <code class="docutils literal notranslate"><span class="pre">create_deriv_func</span></code> returns the appropriate derivative at the specified order. The function it returns takes as inputs the virial moments (would be array of potential energy moments in other scenarios), array of moments of the product of <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(W\)</span>, an explicit derivative term for of the observable with respect to the extrapolation variable, and the volume (or <span class="math notranslate nohighlight">\(L\)</span> for the 1D ideal gas here). The last argument, <code class="docutils literal notranslate"><span class="pre">ndim</span></code>, is the dimensionality of the system, so just 1 for the 1D ideal gas, but would be 3 in more typical systems.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import idealgas module</span>
+<span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">idealgas</span>
+
+<span class="c1"># Set temperature and volumes</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">volumes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Define our reference size to extrapolated from</span>
+<span class="n">volume_ref</span> <span class="o">=</span> <span class="n">volumes</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+
+<span class="n">npart</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># Number of particles (in single configuration)</span>
+<span class="n">nconfig</span> <span class="o">=</span> <span class="mi">100_000</span>  <span class="c1"># Number of configurations</span>
+
+<span class="c1"># And generate new data at this reference size, using a beta of 1.0 for simplicity</span>
+<span class="n">xdatavol</span><span class="p">,</span> <span class="n">udatavol</span> <span class="o">=</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">generate_data</span><span class="p">((</span><span class="n">nconfig</span><span class="p">,</span> <span class="n">npart</span><span class="p">),</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="n">volume_ref</span><span class="p">)</span>
+
+<span class="c1"># Wrap with xarray</span>
+<span class="n">xdatavol</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">xdatavol</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rec&quot;</span><span class="p">])</span>
+<span class="n">udatavol</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">udatavol</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rec&quot;</span><span class="p">])</span>
+
+<span class="c1"># For the IG model, the virial W is the same as the negative of the number of particles multiplied by the average position</span>
+<span class="c1"># (for a=1)</span>
+<span class="c1"># And we have to multiply by beta to make the virial dimensionless</span>
+<span class="n">wdatavol</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">npart</span> <span class="o">*</span> <span class="n">xdatavol</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next we create and train our volume extrapolation model and check its outputs. You can look at <a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html#thermoextrap.volume.factory_extrapmodel" title="thermoextrap.volume.factory_extrapmodel"><code class="xref py py-func docutils literal notranslate"><span class="pre">factory_extrapmodel()</span></code></a>, but it’s nearly identical to that in <a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html#module-thermoextrap.beta" title="thermoextrap.beta"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap.beta</span></code></a>, but uses specialized data callbacks and <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.Derivatives" title="thermoextrap.models.Derivatives"><code class="xref py py-class docutils literal notranslate"><span class="pre">Derivatives</span></code></a> models. We have already demonstrated above how to specify custom derivatives for the <a class="reference internal" href="../../../reference/generated/thermoextrap.models.html#thermoextrap.models.Derivatives" title="thermoextrap.models.Derivatives"><code class="xref py py-class docutils literal notranslate"><span class="pre">Derivatives</span></code></a> model.</p>
+<p>To create a special callback in a data object, follow <a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html#thermoextrap.volume.VolumeDataCallback" title="thermoextrap.volume.VolumeDataCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.volume.VolumeDataCallback</span></code></a>, reproduced below. Passing such callbacks to a data object through the argument <code class="docutils literal notranslate"><span class="pre">meta</span></code> is a very flexible way to adjust the data structures and information provided when calculating derivatives. Here, we extend the data class to also track the quantity <code class="docutils literal notranslate"><span class="pre">dxdqv</span></code>, or the specific derivative of the observable with respect to the extrapolation variable and is unique for every observable (see https://aip.scitation.org/doi/10.1063/5.0014282).</p>
+<p>Basically, the argument <code class="docutils literal notranslate"><span class="pre">meta</span></code> takes one of these custom callbacks with the implemented methods shown below (ignore <code class="docutils literal notranslate"><span class="pre">dxdqv</span></code>, though, as that is specific to this case). You must implement methods to define the names of extra parameters <code class="docutils literal notranslate"><span class="pre">param_names</span></code>, to resample, and to pass extra information to the derivative calculation function <code class="docutils literal notranslate"><span class="pre">deriv_args</span></code>. Note that the method <code class="docutils literal notranslate"><span class="pre">deriv_args</span></code> should mirror the input structure in the above custom derivative function, with extra arguments from the callback added to what is typically passed through the <code class="docutils literal notranslate"><span class="pre">deriv_args</span></code> function of the base data class (specifically, the potential energy moments and <span class="math notranslate nohighlight">\(xU\)</span> moments, which here are virial and <span class="math notranslate nohighlight">\(xW\)</span> moments).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">thermoextrap.core.cached_decorators</span> <span class="kn">import</span> <span class="n">gcached</span>
+<span class="kn">from</span> <span class="nn">thermoextrap.data</span> <span class="kn">import</span> <span class="n">DataCallbackABC</span>
+<span class="kn">import</span> <span class="nn">attrs</span>
+
+
+<span class="nd">@attrs</span><span class="o">.</span><span class="n">define</span>
+<span class="k">class</span> <span class="nc">VolumeDataCallback</span><span class="p">(</span><span class="n">DataCallbackABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    object to handle callbacks of metadata</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">validator</span><span class="o">=</span><span class="n">attrs</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">instance_of</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">dxdqv</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
+        <span class="n">validator</span><span class="o">=</span><span class="n">attrs</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">instance_of</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">ndim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="n">attrs</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">instance_of</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">param_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">,</span> <span class="s2">&quot;dxdqv&quot;</span><span class="p">,</span> <span class="s2">&quot;ndim&quot;</span><span class="p">]</span>
+
+    <span class="nd">@gcached</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">dxdq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rec_dim</span><span class="p">,</span> <span class="n">skipna</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dxdqv</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rec_dim</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">skipna</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">meta_kws</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_like</span><span class="p">(</span><span class="n">dxdqv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dxdqv</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">derivs_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">derivs_args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">derivs_args</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dxdq</span><span class="p">(</span><span class="n">rec_dim</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">rec_dim</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">skipna</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">,</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">thermoextrap</span> <span class="k">as</span> <span class="nn">xtrap</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xemv</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">factory_extrapmodel</span><span class="p">(</span>
+    <span class="n">volume</span><span class="o">=</span><span class="n">volume_ref</span><span class="p">,</span>
+    <span class="c1"># this is acually w</span>
+    <span class="n">uv</span><span class="o">=</span><span class="n">wdatavol</span><span class="p">,</span>
+    <span class="n">xv</span><span class="o">=</span><span class="n">xdatavol</span><span class="p">,</span>
+    <span class="c1"># dxdqv = single observation of sum(dx/dq_i q_i) where q_i is the ith coordinate</span>
+    <span class="c1"># for ideal gas, this is just xdata</span>
+    <span class="n">dxdqv</span><span class="o">=</span><span class="n">xdatavol</span><span class="p">,</span>
+    <span class="n">ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xemv</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">nrep</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DataValues(meta=VolumeDataCallback(volume=5.0, dxdqv=&lt;xarray.DataArray (rep: 100, rec: 100000)&gt;
+array([[0.94609288, 0.95738352, 0.99743824, ..., 1.03739842, 0.95548386,
+        0.97571255],
+       [0.91114992, 1.02685701, 0.98239856, ..., 0.93017812, 0.96486489,
+        0.97271714],
+       [0.98342243, 0.88254829, 0.95595421, ..., 0.96067677, 0.91552305,
+        0.99106797],
+       ...,
+       [1.00217994, 0.94249464, 0.97684759, ..., 0.93211171, 0.98501169,
+        1.01106293],
+       [0.97962024, 0.98127858, 0.97312977, ..., 0.95930964, 0.96413763,
+        1.00698284],
+       [0.96029639, 0.96077843, 0.97138311, ..., 0.98137368, 0.93167537,
+        0.99702763]])
+Dimensions without coordinates: rep, rec, ndim=1), uv=&lt;xarray.DataArray (rep: 100, rec: 100000)&gt;
+array([[ -946.09288181,  -957.38351947,  -997.43824228, ...,
+        -1037.39841509,  -955.48386143,  -975.71254542],
+       [ -911.14991591, -1026.85700742,  -982.39855529, ...,
+         -930.17811835,  -964.864893  ,  -972.71713859],
+       [ -983.42243117,  -882.54829323,  -955.95421258, ...,
+         -960.67676505,  -915.52304688,  -991.06796981],
+       ...,
+       [-1002.17993555,  -942.49464019,  -976.84759411, ...,
+         -932.11170975,  -985.01168904, -1011.06292879],
+       [ -979.62023873,  -981.278582  ,  -973.12977387, ...,
+         -959.30963637,  -964.13762641, -1006.98284293],
+       [ -960.29638741,  -960.77843153,  -971.38311179, ...,
+         -981.37368406,  -931.67537439,  -997.02762783]])
+Dimensions without coordinates: rep, rec, xv=&lt;xarray.DataArray (rep: 100, rec: 100000)&gt;
+array([[0.94609288, 0.95738352, 0.99743824, ..., 1.03739842, 0.95548386,
+        0.97571255],
+       [0.91114992, 1.02685701, 0.98239856, ..., 0.93017812, 0.96486489,
+        0.97271714],
+       [0.98342243, 0.88254829, 0.95595421, ..., 0.96067677, 0.91552305,
+        0.99106797],
+       ...,
+       [1.00217994, 0.94249464, 0.97684759, ..., 0.93211171, 0.98501169,
+        1.01106293],
+       [0.97962024, 0.98127858, 0.97312977, ..., 0.95930964, 0.96413763,
+        1.00698284],
+       [0.96029639, 0.96077843, 0.97138311, ..., 0.98137368, 0.93167537,
+        0.99702763]])
+Dimensions without coordinates: rep, rec, order=1, rec_dim=&#39;rec&#39;, umom_dim=&#39;umom&#39;, deriv_dim=None, skipna=False, chunk=None, compute=False, build_aves_kws={}, x_is_u=False)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check the computation of derivatives</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model parameters (derivatives):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xemv</span><span class="o">.</span><span class="n">derivs</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Finally, look at predictions</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model predictions:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xemv</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">volumes</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># And bootstrapped uncertainties</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bootstrapped uncertainties in predictions:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xemv</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">nrep</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">volumes</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s2">&quot;rep&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Model parameters (derivatives):
+[0.96604833 0.02732698]
+
+
+Model predictions:
+[0.84307694 0.85674043 0.87040392 0.8840674 ]
+
+
+Bootstrapped uncertainties in predictions:
+[0.00372111 0.00330842 0.00289578 0.00248321]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">nsampvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mf">10.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">nsampcolors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">nsampvals</span><span class="p">))))</span>
+
+<span class="c1"># First plot the analytical result</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">volumes</span><span class="p">,</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">x_ave</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">volumes</span><span class="p">),</span> <span class="s2">&quot;k--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="c1"># And the infinite sampling results for first order extrapolation</span>
+<span class="n">trueExtrap</span><span class="p">,</span> <span class="n">trueDerivs</span> <span class="o">=</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">x_vol_extrap</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">volume_ref</span><span class="p">,</span> <span class="n">volumes</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">volumes</span><span class="p">,</span> <span class="n">trueExtrap</span><span class="p">,</span> <span class="s2">&quot;r-&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;True extrapolation coefficients: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trueDerivs</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nsampvals</span><span class="p">):</span>
+    <span class="n">thisinds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xdatavol</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Get parameters for extrapolation model with this data by training it - the parameters are the derivatives</span>
+    <span class="n">xemv</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">factory_extrapmodel</span><span class="p">(</span>
+        <span class="n">volume</span><span class="o">=</span><span class="n">volume_ref</span><span class="p">,</span>
+        <span class="c1"># this is acually w</span>
+        <span class="n">uv</span><span class="o">=</span><span class="n">wdatavol</span><span class="p">[</span><span class="n">thisinds</span><span class="p">],</span>
+        <span class="n">xv</span><span class="o">=</span><span class="n">xdatavol</span><span class="p">[</span><span class="n">thisinds</span><span class="p">],</span>
+        <span class="n">dxdqv</span><span class="o">=</span><span class="n">xdatavol</span><span class="p">[</span><span class="n">thisinds</span><span class="p">],</span>
+        <span class="n">ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">xemv</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">volumes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> With N_configs = </span><span class="si">%6i</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">xemv</span><span class="o">.</span><span class="n">derivs</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)))</span>
+
+    <span class="n">out</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">nsampcolors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;N=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\langle x \rangle$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$L$&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;O(1) Extrapolation&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">),</span> <span class="n">xycoords</span><span class="o">=</span><span class="s2">&quot;axes fraction&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">ticker</span><span class="o">.</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">nbins</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">prune</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True extrapolation coefficients: [0.96608173 0.02736471]
+	 With N_configs =     10: [0.96568927 0.07042381]
+	 With N_configs =    100: [0.96655421 0.03073504]
+	 With N_configs =   1000: [0.96509015 0.02912657]
+	 With N_configs =  10000: [0.96602406 0.0244067 ]
+	 With N_configs = 100000: [0.96604833 0.02732698]
+</pre></div>
+</div>
+<img alt="../../../_images/7cbd0b02aaece03da14854b157a4221b41a8c0bc249f9d604dfdc2b9d8e251bf.png" src="../../../_images/7cbd0b02aaece03da14854b157a4221b41a8c0bc249f9d604dfdc2b9d8e251bf.png" />
+</div>
+</div>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Data_Organization.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Data Organization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../gpr.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">GP Models Utilizing Derivative Information and Active Learning</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By William P. Krekelberg
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2021, William P. Krekelberg.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on 2023-04-10.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
