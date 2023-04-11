@@ -94,6 +94,12 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
     git clone git@github.com:your_name_here/thermo-extrap.git
     ```
 
+    The example notebooks require the `examples/data` submodule to be loaded.
+
+    ```bash
+    git submodule update --init --recursive
+    ```
+
 3. Create development environment.  Using the `make` will install a development version using mamba.
 
     ```bash

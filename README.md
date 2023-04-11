@@ -92,6 +92,19 @@ If you install `thermoextrap` with conda, there are additional optional dependen
 pip install tensorflow tensorflow-probability gpflow
 ```
 
+To install from source do the following:
+```bash
+git clone git@github.com:usnistgov/thermo-extrap.git
+cd thermo-extrap
+pip install . [-e]
+```
+
+To (optionally) include the example data do the following:
+```bash
+git submodule update --init  --recursive
+```
+
+
 ## Example usage
 
 ```python
