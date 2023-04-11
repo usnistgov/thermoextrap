@@ -445,40 +445,57 @@ intersphinx_mapping = {
 def linkcode_resolve(domain, info):
     """Determine the URL corresponding to Python object."""
     import inspect
+    from operator import attrgetter
 
     if domain != "py":
         return None
 
-    modname = info["module"]
-    fullname = info["fullname"]
+    # modname = info["module"]
+    # fullname = info["fullname"]
 
     # submod = sys.modules.get(modname)
     # if obj is None:
     #     return None
     # obj = submod
 
-    # resolve submodule a little differently
-    # sys.modules.get doesn't play nice with importing submules in main
-    # (e.g., from thermoextrap.core import idealgas )
-    parts = modname.split(".")
-    obj = sys.modules.get(parts[0])
+    ### resolve submodule a little differently
+    ### sys.modules.get doesn't play nice with importing submules in main
+    ### (e.g., from thermoextrap.core import idealgas )
+    ## parts = modname.split(".")
+    ## obj = sys.modules.get(parts[0])
 
-    if obj is None:
+    # f obj is None:
+    #     return None
+
+    # for part in parts[1:]:
+    #     try:
+    #         obj = getattr(obj, part)
+    #     except Attribute:
+    #         return None
+
+    # # print("link submod", obj, type(obj))
+
+    # for part in fullname.split("."):
+    #     try:
+    #         obj = getattr(obj, part)
+    #     except AttributeError:
+    #         return None
+
+    parent_name, *sub_parts = info["module"].split(".")
+    parent_mod = sys.modules.get(parent_name)
+
+    try:
+        if len(sub_parts) > 0:
+            sub_name = ".".join(sub_parts)
+            obj = attrgetter(sub_name)(parent_mod)
+        else:
+            obj = parent_mod
+
+        # get fullname
+        obj = attrgetter(info["fullname"])(obj)
+
+    except AttributeError:
         return None
-
-    for part in parts[1:]:
-        try:
-            obj = getattr(obj, part)
-        except Attribute:
-            return None
-
-    # print("link submod", obj, type(obj))
-
-    for part in fullname.split("."):
-        try:
-            obj = getattr(obj, part)
-        except AttributeError:
-            return None
 
     try:
         fn = inspect.getsourcefile(inspect.unwrap(obj))
