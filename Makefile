@@ -54,7 +54,7 @@ clean-test: ## remove test and coverage artifacts
 ################################################################################
 # utilities
 ################################################################################
-.PHONY: lint pre-commit-init pre-commit-run pre-commit-run-all pre-commit-lint-extra pre-commit-codespell init
+.PHONY: lint pre-commit-init pre-commit-run pre-commit-run-all pre-commit-lint-extra pre-commit-codespell pre-commit-run-all-ruff
 
 lint: ## check style with flake8
 	flake8 cmomy tests
@@ -260,3 +260,15 @@ install: ## install the package to the active Python's site-packages (run clean?
 
 install-dev: ## install development version (run clean?)
 	pip install -e . --no-deps
+
+
+################################################################################
+# other tools
+################################################################################
+
+# Note that this requires `auto-changelog`, which can be installed with pip(x)
+auto-changelog: ## autogenerate changelog and print to stdout
+	auto-changelog -u -r usnistgov -v unreleased --tag-prefix v --stdout --template changelog.d/auto-changelog/template.jinja2
+
+commitizen-changelog:
+	cz changelog --unreleased-version unreleased --dry-run --incremental

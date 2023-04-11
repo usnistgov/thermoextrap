@@ -1,6 +1,6 @@
 # User Guide
 
-This uses the links created in `create-symlinks.sh`
+<!-- This uses the links created in `create-symlinks.sh` -->
 
 
 
