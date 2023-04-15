@@ -1,4 +1,5 @@
 ```{highlight} shell
+
 ```
 
 # Installation
@@ -19,13 +20,13 @@ $ conda install c wpk-nist thermoextrap
 
 ## Additional dependencies
 
-To utilize the full potential of `thermoextrap`, additional dependencies are needed.  This can be done via pip by using:
+To utilize the full potential of `thermoextrap`, additional dependencies are needed. This can be done via pip by using:
 
 ```
 $ pip install thermoextrap[all]
 ```
 
-If using conda, then you'll have to manually install some dependencies.  For example, you can run:
+If using conda, then you'll have to manually install some dependencies. For example, you can run:
 
 ```
 $ conda install bottleneck dask pymbar<4.0

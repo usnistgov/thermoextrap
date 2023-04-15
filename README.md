@@ -5,11 +5,12 @@
 [![Conda (channel only)][conda-badge]][conda-link]
 [![Code style: black][black-badge]][black-link]
 
-
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/ambv/black
 [pypi-badge]: https://img.shields.io/pypi/v/thermoextrap
+
 <!-- [pypi-badge]: https://badge.fury.io/py/thermoextrap -->
+
 [pypi-link]: https://pypi.org/project/thermoextrap
 [docs-badge]: https://img.shields.io/badge/docs-sphinx-informational
 [docs-link]: https://pages.nist.gov/thermoextrap/
@@ -17,9 +18,12 @@
 [repo-link]: https://github.com/usnistgov/thermoextrap
 [conda-badge]: https://img.shields.io/conda/v/wpk-nist/thermoextrap
 [conda-link]: https://anaconda.org/wpk-nist/thermoextrap
+
 <!-- Use total link so works from anywhere -->
+
 [license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
 [license-link]: https://github.com/usnistgov/thermoextrap/blob/main/LICENSE
+
 <!-- For more badges, see https://shields.io/category/other and https://naereen.github.io/badges/ -->
 
 [numpy]: https://numpy.org
@@ -29,16 +33,12 @@
 [gpr-link]: https://github.com/usnistgov/thermoextrap/tree/main/examples/gpr_active_learning
 [notebook-link]: https://github.com/usnistgov/thermoextrap/tree/main/examples/usage
 
-
-
 # `thermoextrap`: Thermodynamic Extrapolation/Interpolation Library
 
 This repository contains code used and described in references [^fn1] [^fn2].
 
 [^fn1]: [Extrapolation and Interpolation Strategies for Efficiently Estimating Structural Observables as a Function of Temperature and Density](https://doi.org/10.1063/5.0014282)
-
 [^fn2]: Leveraging Uncertainty Estimates and Derivative Information in Gaussian Process Regression for Expedited Data Collection in Molecular Simulations. In preparation.
-
 
 ## Overview
 
@@ -61,38 +61,42 @@ results make sense. If bugs are found, please report them. If specific features
 would be helpful just let us know and we will be happy to work with you to come
 up with a solution.
 
-
 ## Features
 
-* Fast calculation of derivatives
+-   Fast calculation of derivatives
 
 ## Status
 
-This package is actively used by the author.  Please feel free to create a pull request for wanted features and suggestions!
-
+This package is actively used by the author. Please feel free to create a pull request for wanted features and suggestions!
 
 ## Quick start
 
 `thermoextrap` may be installed with either (recommended)
+
 ```bash
 conda install -c wpk-nist thermoextrap
 ```
+
 or
+
 ```bash
 pip install thermoextrap
 ```
 
 If you use pip, then you can include additional dependencies using
+
 ```bash
 pip install thermoextrap[all]
 ```
 
-If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via `pip`, as the versions on the conda/conda-forge channels are often a bit old.
+If you install `thermoextrap` with conda, there are additional optional dependencies that take some care for installation. We recommend installing the following via `pip`, as the versions on the conda/conda-forge channels are often a bit old.
+
 ```bash
 pip install tensorflow tensorflow-probability gpflow
 ```
 
 To install from source do the following:
+
 ```bash
 git clone git@github.com:usnistgov/thermoextrap.git
 cd thermoextrap
@@ -100,10 +104,10 @@ pip install . [-e]
 ```
 
 To (optionally) include the example data do the following:
+
 ```bash
 git submodule update --init  --recursive
 ```
-
 
 ## Example usage
 
@@ -122,16 +126,15 @@ To have a look at using `thermoextrap` with Gaussian process regression, look in
 
 ## License
 
-This is free software.  See [LICENSE][license-link].
+This is free software. See [LICENSE][license-link].
 
 ## Related work
 
 This package extensively uses the [cmomy] package to handle central comoments.
 
-
 # Contact
-Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
 
+Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or Jacob Monroe at jacob.monroe@uark.edu.
 
 ## Credits
 

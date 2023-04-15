@@ -1,10 +1,10 @@
-:::{include} ../README.md
+```{include} ../README.md
 :end-before: <!-- end-docs -->
-:::
+```
 
 # Navigation
 
-:::{toctree}
+```{toctree}
 :maxdepth: 1
 
 installation
@@ -15,4 +15,4 @@ contributing
 authors
 changelog
 navigation
-:::
+```

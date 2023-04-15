@@ -80,7 +80,6 @@ structure, it does make specific use of some of the other classes described,
 which, as highlighted, vary in their generalizability and transferability to new
 situations.
 
-
 [Gpflow]: https://gpflow.github.io/GPflow/2.7.1/index.html
 [sympy]: https://www.sympy.org/en/index.html
 [OpenMM]: https://openmm.org/
