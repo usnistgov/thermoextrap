@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD041 -->
+
 ```{include} ../README.md
 :end-before: <!-- end-docs -->
 ```

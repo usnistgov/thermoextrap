@@ -56,25 +56,26 @@ itself {class}`~thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`. The
 former builds a likelihood model that takes covariances between derivatives into
 account and also allows for heteroscedasticity (different uncertainties for
 different data points, including different derivative orders). The latter,
-{class}`~thermoextrap.gpr_active.gp_models.HeteroscedasticGPR` is a heteroscedastic GP model making use of the likelihood
-just described and the {class}`~thermoextrap.gpr_active.gp_models.DerivativeKernel` and behaves much like other GP models
-in [GPflow]. Note, though, that `predict_y` is not implemented as that would
-require estimates of the uncertainty at new points. For heteroscedastic
-uncertainties, that would require a model of how the uncertainty varied with
-input location, which has not yet been implemented.
+{class}`~thermoextrap.gpr_active.gp_models.HeteroscedasticGPR` is a
+heteroscedastic GP model making use of the likelihood just described and the
+{class}`~thermoextrap.gpr_active.gp_models.DerivativeKernel` and behaves much
+like other GP models in [GPflow]. Note, though, that `predict_y` is not
+implemented as that would require estimates of the uncertainty at new points.
+For heteroscedastic uncertainties, that would require a model of how the
+uncertainty varied with input location, which has not yet been implemented.
 
 ## Active Learning
 
 Tools that assist in performing active learning protocols are found in
-{mod}`~thermoextrap.gpr_active.active_utils`. Though this includes functions for building and
-training GPR models, the focus is on classes and methods that enable active
-learning. Pre-eminent among these are classes for housing data and keeping track
-of simulations performed during active learning. Since every simulation
-environment and project will be unique, users are encouraged to use these as
-guidelines and templates for creating their own classes for managing data
-collection. More generally useful are classes describing active learning update
-strategies, metrics, and stopping criteria. These can easily be inherited to
-construct new active learning protocols without fundamentally changing the
+{mod}`~thermoextrap.gpr_active.active_utils`. Though this includes functions for
+building and training GPR models, the focus is on classes and methods that
+enable active learning. Pre-eminent among these are classes for housing data and
+keeping track of simulations performed during active learning. Since every
+simulation environment and project will be unique, users are encouraged to use
+these as guidelines and templates for creating their own classes for managing
+data collection. More generally useful are classes describing active learning
+update strategies, metrics, and stopping criteria. These can easily be inherited
+to construct new active learning protocols without fundamentally changing the
 primary active learning function. While this function is fairly general in its
 structure, it does make specific use of some of the other classes described,
 which, as highlighted, vary in their generalizability and transferability to new
@@ -85,4 +86,5 @@ situations.
 [OpenMM]: https://openmm.org/
 [FEASST]: https://pages.nist.gov/feasst/
 [CASSANDRA]: https://cassandra.nd.edu/
-[environment-link]: https://github.com/usnistgov/thermoextrap/blob/main/examples/gpr_active_learning/environment_active.yml
+[environment-link]:
+  https://github.com/usnistgov/thermoextrap/blob/main/examples/gpr_active_learning/environment_active.yml

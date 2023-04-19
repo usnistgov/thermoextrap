@@ -54,30 +54,39 @@ clean-test: ## remove test and coverage artifacts
 ################################################################################
 # utilities
 ################################################################################
-.PHONY: lint pre-commit-init pre-commit-run pre-commit-run-all pre-commit-lint-extra pre-commit-codespell pre-commit-run-all-ruff
-
-lint: ## check style with flake8
-	flake8 cmomy tests
-
+.PHONY: pre-commit-init pre-commit pre-commit-all
 pre-commit-init: ## install pre-commit
 	pre-commit install
 
-pre-commit-run: ## run pre-commit
+pre-commit: ## run pre-commit
 	pre-commit run
 
-pre-commit-run-all: ## run pre-commit on all files
+pre-commit-all: ## run pre-commit on all files
 	pre-commit run --all-files
 
-pre-commit-run-all-ruff: ## run ruff on on all files
+.PHONY: pre-commit-lint pre-commit-lint-notebooks pre-commit-prettier pre-commit-lint-markdown
+pre-commit-lint: ## run ruff and black on on all files
 	pre-commit run --all-files ruff
+	pre-commit run --all-files black
+	pre-commit run --all-files blacken-docs
 
-pre-commit-manual: ## run pre-commit manual flags
-	pre-commit run --hook-stage manual
+pre-commit-lint-notebooks: ## Run nbqa linting
+	pre-commit run --all-files nbqa-ruff
+	pre-commit run --all-files nbqa-black
 
-pre-commit-lint-extra: ## run all linting
+pre-commit-prettier: ## run prettier on all files.
+	pre-commit run --all-files prettier
+
+pre-commit-lint-markdown: ## run markdown linter.
+	pre-commit run --all-files --hook-stage manual markdownlint-cli2
+
+.PHONY: pre-commit-lint-extra pre-commit-mypy pre-commit-codespell
+pre-commit-lint-extra: ## run all extra linting (isort, flake8, pyupgrade, nbqa isort and pyupgrade)
 	pre-commit run --all-files --hook-stage manual isort
 	pre-commit run --all-files --hook-stage manual flake8
 	pre-commit run --all-files --hook-stage manual pyupgrade
+	pre-commit run --all-files --hook-stage manual nbqa-pyupgrade
+	pre-commit run --all-files --hook-stage manual nbqa-isort
 
 pre-commit-mypy: ## run mypy
 	pre-commit run --all-files --hook-stage manual mypy
@@ -85,10 +94,6 @@ pre-commit-mypy: ## run mypy
 pre-commit-codespell: ## run codespell. Note that this imports allowed words from docs/spelling_wordlist.txt
 	pre-commit run --all-files --hook-stage manual codespell
 
-.git: ## init git
-	git init
-
-init: .git pre-commit-init ## run git-init pre-commit
 
 
 ################################################################################
@@ -281,7 +286,7 @@ install-dev: ## install development version (run clean?)
 
 # Note that this requires `auto-changelog`, which can be installed with pip(x)
 auto-changelog: ## autogenerate changelog and print to stdout
-	auto-changelog -u -r usnistgov -v unreleased --tag-prefix v --stdout --template changelog.d/auto-changelog/template.jinja2
+	auto-changelog -u -r usnistgov -v unreleased --tag-prefix v --stdout --template changelog.d/templates/auto-changelog/template.jinja2
 
 commitizen-changelog:
 	cz changelog --unreleased-version unreleased --dry-run --incremental

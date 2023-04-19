@@ -1,6 +1,8 @@
 # Temperature Extrapolation/interpolation
 
-Here, we show the use of {mod}`thermoextrap` to perform thermodynamic extrapolation and interpolation in inverse temperature, $\beta = (k_{\rm B} T)^{-1}$.
+Here, we show the use of {mod}`thermoextrap` to perform thermodynamic
+extrapolation and interpolation in inverse temperature,
+$\beta = (k_{\rm B} T)^{-1}$.
 
 ```{toctree}
 :maxdepth: 2
