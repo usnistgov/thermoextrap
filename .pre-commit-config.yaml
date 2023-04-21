@@ -27,7 +27,7 @@ repos:
         stages: [commit]
         additional_dependencies:
           - prettier-plugin-toml
-        exclude: ^docs/reference/|^tests/lnpy_data/sample_data.json
+        exclude: ^tests/lnpy_data/sample_data.json
   #* Linting
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     # Ruff version.
