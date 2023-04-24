@@ -187,7 +187,6 @@ class DataCallbackABC(
     @abstractmethod
     def check(self, data):
         """Perform any consistency checks between self and data."""
-        pass
 
     @abstractmethod
     def derivs_args(self, data, derivs_args):
@@ -228,7 +227,6 @@ class DataCallback(DataCallbackABC):
 
     def check(self, data):
         """Perform any consistency checks between self and data."""
-        pass
 
     def derivs_args(self, data, derivs_args):
         """
@@ -283,13 +281,11 @@ class AbstractData(
     @abstractmethod
     def central(self):
         """Whether central (True) or raw (False) moments are used."""
-        pass
 
     @property
     @abstractmethod
     def derivs_args(self):
         """Sequence of arguments to derivative calculation function."""
-        pass
 
     @abstractmethod
     def __len__(self):
