@@ -102,154 +102,154 @@ conda env update -n {env-name} environment/tools.yaml
 
 Ready to contribute? Here's how to set up `thermoextrap` for local development.
 
-1. Fork the `thermoextrap` repo on GitHub.
+1.  Fork the `thermoextrap` repo on GitHub.
 
-1. Clone your fork locally:
+1.  Clone your fork locally:
 
-   ```bash
-   git clone git@github.com:your_name_here/thermoextrap.git
-   ```
+    ```bash
+    git clone git@github.com:your_name_here/thermoextrap.git
+    ```
 
-   If the repo includes submodules, you can add them either with the initial
-   close using:
+    If the repo includes submodules, you can add them either with the initial
+    close using:
 
-   ```bash
-   git clone --recursive-submodules git@github.com:your_name_here/thermoextrap.git
-   ```
+    ```bash
+    git clone --recursive-submodules git@github.com:your_name_here/thermoextrap.git
+    ```
 
-   or after the clone using
+    or after the clone using
 
-   ```bash
-   cd thermoextrap
-   git submodule update --init --recursive
-   ```
+    ```bash
+    cd thermoextrap
+    git submodule update --init --recursive
+    ```
 
-1. Create development environment. There are two options to create the
-   development environment. The recommended method is to use tox by using
-   either:
+1.  Create development environment. There are two options to create the
+    development environment.
 
-   ```bash
-   tox -e dev
-   ```
+    a. The recommended method is to use tox by using either:
 
-   or
+        ```bash
+        tox -e dev
+        ```
 
-   ```bash
-   make dev-env
-   ```
+        or
 
-   These create a development environment located at `.tox/dev`.
+        ```bash
+        make dev-env
+        ```
+        These create a development environment located at `.tox/dev`.
 
-   Alternativley, you can create centrally located conda environmentment using
-   the command:
+        ```bash
+        make tox-ipykernel-display-name
+        ```
 
-   ```bash
-   make mamba-dev
-   ```
+        This will add a meaningful display name for the kernel (assuming you're using
+        [nb-conda-kernels])
 
-   If the development environment includes `ipykernel`, you should also run:
+    b. Alternativley, you can create centrally located conda environmentment
+    using the command:
 
-   ```bash
-   make tox-ipykernel-display-name
-   ```
+        ```bash
+        make mamba-dev
+        ```
 
-   This will add a meaningful display name for the kernel (assuming you're using
-   [nb-conda-kernels])
+        This will create a conda environment 'thermoextrap-env' in the default location.
 
-1. Initiate [pre-commit] with:
+        To install (an editable version) of the current package:
 
-   ```bash
-   pre-commit install
-   ```
+        ```bash
+        pip install -e . --no-deps
+        ```
 
-   To update the recipe, periodically run:
+        or
 
-   ```bash
-   pre-commit autoupdate
-   ```
+        ```bash
+        make install-dev
+        ```
 
-   If recipes change over time, you can clean up old installs with:
+1.  Initiate [pre-commit] with:
 
-   ```bash
-   pre-commit gc
-   ```
+    ```bash
+    pre-commit install
+    ```
 
-1. Install editable package:
+    To update the recipe, periodically run:
 
-   ```bash
-   pip install -e . --no-deps
-   ```
+    ```bash
+    pre-commit autoupdate
+    ```
 
-   or
+    If recipes change over time, you can clean up old installs with:
 
-   ```bash
-   make install-dev
-   ```
+    ```bash
+    pre-commit gc
+    ```
 
-1. Create a branch for local development:
+1.  Create a branch for local development:
 
-   ```bash
-   git checkout -b name-of-your-bugfix-or-feature
-   ```
+    ```bash
+    git checkout -b name-of-your-bugfix-or-feature
+    ```
 
-   Now you can make your changes locally. Alternatively, we recommend using
-   [git-flow].
+    Now you can make your changes locally. Alternatively, we recommend using
+    [git-flow].
 
-1. When you're done making changes, check that your changes pass the pre-commit
-   checks: tests.
+1.  When you're done making changes, check that your changes pass the pre-commit
+    checks: tests.
 
-   ```bash
-   pre-commit run [--all-files]
-   ```
+    ```bash
+    pre-commit run [--all-files]
+    ```
 
-   To run tests, use:
+    To run tests, use:
 
-   ```bash
-   pytest
-   ```
+    ```bash
+    pytest
+    ```
 
-   To test against multiple python versions, use tox:
+    To test against multiple python versions, use tox:
 
-   ```bash
-   tox
-   ```
+    ```bash
+    tox
+    ```
 
-   or using the `make`:
+    or using the `make`:
 
-   ```bash
-   make test-all
-   ```
+    ```bash
+    make test-all
+    ```
 
-   Additionally, you should run the following:
+    Additionally, you should run the following:
 
-   ```bash
-   make pre-commit-lint-markdown
-   make pre-commit-codespell
-   ```
+    ```bash
+    make pre-commit-lint-markdown
+    make pre-commit-codespell
+    ```
 
-1. Create changelog fragment. See [scriv] for more info.
+1.  Create changelog fragment. See [scriv] for more info.
 
-   ```bash
-   scriv create --edit
-   ```
+    ```bash
+    scriv create --edit
+    ```
 
-1. Commit your changes and push your branch to GitHub:
+1.  Commit your changes and push your branch to GitHub:
 
-   ```bash
-   git add .
-   git commit -m "Your detailed description of your changes."
-   git push origin name-of-your-bugfix-or-feature
-   ```
+    ```bash
+    git add .
+    git commit -m "Your detailed description of your changes."
+    git push origin name-of-your-bugfix-or-feature
+    ```
 
-   Note that the pre-commit hooks will force the commit message to be in the
-   [conventional sytle][conventional-style]. To assist this, you may want to
-   commit using [commitizen].
+    Note that the pre-commit hooks will force the commit message to be in the
+    [conventional sytle][conventional-style]. To assist this, you may want to
+    commit using [commitizen].
 
-   ```bash
-   cz commit
-   ```
+    ```bash
+    cz commit
+    ```
 
-1. Submit a pull request through the GitHub website.
+1.  Submit a pull request through the GitHub website.
 
 ### Dependency management
 
