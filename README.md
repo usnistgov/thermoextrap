@@ -1,3 +1,38 @@
+<!-- markdownlint-disable MD041 -->
+
+[![Repo][repo-badge]][repo-link] [![Docs][docs-badge]][docs-link]
+[![PyPI license][license-badge]][license-link]
+[![PyPI version][pypi-badge]][pypi-link]
+[![Conda (channel only)][conda-badge]][conda-link]
+[![Code style: black][black-badge]][black-link]
+
+<!-- For more badges, see
+https://shields.io/category/other
+https://naereen.github.io/badges/
+[pypi-badge]: https://badge.fury.io/py/thermoextrap
+-->
+
+[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-link]: https://github.com/psf/black
+[pypi-badge]: https://img.shields.io/pypi/v/thermoextrap
+[pypi-link]: https://pypi.org/project/thermoextrap
+[docs-badge]: https://img.shields.io/badge/docs-sphinx-informational
+[docs-link]: https://pages.nist.gov/thermoextrap/
+[repo-badge]: https://img.shields.io/badge/--181717?logo=github&logoColor=ffffff
+[repo-link]: https://github.com/usnistgov/thermoextrap
+[conda-badge]: https://img.shields.io/conda/v/wpk-nist/thermoextrap
+[conda-link]: https://anaconda.org/wpk-nist/thermoextrap
+[license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
+[license-link]: https://github.com/usnistgov/thermoextrap/blob/main/LICENSE
+
+<!-- other links -->
+
+[cmomy]: https://github.com/usnistgov/cmomy
+[gpr-link]:
+  https://github.com/usnistgov/thermoextrap/tree/main/examples/gpr_active_learning
+[notebook-link]:
+  https://github.com/usnistgov/thermoextrap/tree/main/examples/usage
+
 # `thermoextrap`: Thermodynamic Extrapolation/Interpolation Library
 
 This repository contains code used and described in references [^fn1] [^fn2].
@@ -9,46 +44,6 @@ This repository contains code used and described in references [^fn1] [^fn2].
     Leveraging Uncertainty Estimates and Derivative Information in Gaussian
     Process Regression for Expedited Data Collection in Molecular Simulations.
     In preparation.
-
-[![Repo][repo-badge]][repo-link] [![Docs][docs-badge]][docs-link]
-[![PyPI license][license-badge]][license-link]
-[![PyPI version][pypi-badge]][pypi-link]
-[![Conda (channel only)][conda-badge]][conda-link]
-[![Code style: black][black-badge]][black-link]
-
-[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
-[black-link]: https://github.com/ambv/black
-[pypi-badge]: https://img.shields.io/pypi/v/thermoextrap
-
-<!-- [pypi-badge]: https://badge.fury.io/py/thermoextrap -->
-
-[pypi-link]: https://pypi.org/project/thermoextrap
-[docs-badge]: https://img.shields.io/badge/docs-sphinx-informational
-[docs-link]: https://pages.nist.gov/thermoextrap/
-[repo-badge]: https://img.shields.io/badge/--181717?logo=github&logoColor=ffffff
-[repo-link]: https://github.com/usnistgov/thermoextrap
-[conda-badge]: https://img.shields.io/conda/v/wpk-nist/thermoextrap
-[conda-link]: https://anaconda.org/wpk-nist/thermoextrap
-
-<!-- Use total link so works from anywhere -->
-
-[license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
-[license-link]: https://github.com/usnistgov/thermoextrap/blob/main/LICENSE
-
-<!-- For more badges, see
-https://shields.io/category/other
-https://naereen.github.io/badges/
--->
-
-<!-- [numpy]: https://numpy.org -->
-<!-- [Numba]: https://numba.pydata.org/ -->
-<!-- [xarray]: https://docs.xarray.dev/en/stable/ -->
-
-[cmomy]: https://github.com/usnistgov/cmomy
-[gpr-link]:
-  https://github.com/usnistgov/thermoextrap/tree/main/examples/gpr_active_learning
-[notebook-link]:
-  https://github.com/usnistgov/thermoextrap/tree/main/examples/usage
 
 ## Overview
 
