@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from .external.docfiller import DocFiller
+# from .external.docfiller import DocFiller
+from module_utilities.docfiller import DocFiller
+
+# TODO: clean this up.
+# There's a better way to do all this
+# - import cmomy docstrings
+# - use namespaces
 
 _docstring_cmomy = """\
 Parameters
