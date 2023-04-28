@@ -16,13 +16,13 @@ from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
 from custom_inherit import DocInheritMeta
+from module_utilities import cached
 from scipy.special import factorial as sp_factorial
 
 from thermoextrap.core.data import AbstractData, kw_only_field
 
 from ._attrs_utils import MyAttrsMixin, _cache_field
 from ._docstrings import factory_docfiller_shared
-from .cached_decorators import gcached
 from .sputils import get_default_indexed, get_default_symbol
 from .xrutils import xrwrap_alpha
 
@@ -132,7 +132,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
         self.args = args
         self.expand = expand
 
-    @gcached(prop=False)
+    @cached.meth
     def __getitem__(self, order):
         if order == 0:
             out = self.func
@@ -176,7 +176,7 @@ class SymSubs:
 
     _cache: dict = _cache_field()
 
-    @gcached(prop=False)
+    @cached.meth
     def __getitem__(self, order):
         func = self.funcs[order]
 
@@ -229,7 +229,7 @@ class Lambdify:
 
     _cache: dict = _cache_field()
 
-    @gcached(prop=False)
+    @cached.meth
     def __getitem__(self, order):
         return sp.lambdify(self.args, self.exprs[order], **self.lambdify_kws)
 
@@ -257,7 +257,7 @@ class SymMinusLog:
 
     X, dX = get_default_indexed("X", "dX")
 
-    @gcached(prop=False)
+    @cached.meth
     def __getitem__(self, order):
         if order == 0:
             return -sp.log(self.X[0])
@@ -444,7 +444,7 @@ class ExtrapModel(MyAttrsMixin):
 
     _cache: dict = _cache_field()
 
-    @gcached(prop=False)
+    @cached.meth
     def _derivs(self, order, order_dim, minus_log):
         return self.derivatives.derivs(
             data=self.data,
@@ -853,7 +853,7 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
 class InterpModel(StateCollection):
     """Interpolation model."""
 
-    @gcached(prop=False)
+    @cached.meth
     def coefs(self, order=None, order_dim="porder", minus_log=None):
         if order is None:
             order = self.order
@@ -932,10 +932,10 @@ class InterpModel(StateCollection):
 class InterpModelPiecewise(StateCollection, PiecewiseMixin):
     """Apposed to the multiple model InterpModel, perform a piecewise interpolation."""
 
-    # @gcached(prop=False)
+    # @cached.meth
     # def single_interpmodel(self, state0, state1):
     #     return InterpModel([state0, state1])
-    @gcached(prop=False)
+    @cached.meth
     def single_interpmodel(self, *state_indices):
         state0, state1 = (self[i] for i in state_indices)
         return InterpModel([state0, state1])
@@ -1054,7 +1054,7 @@ class MBARModel(StateCollection):
         if not _HAS_PYMBAR:
             raise ImportError("need pymbar to use this")
 
-    @gcached(prop=False)
+    @cached.meth
     def _default_params(self, state_dim="state", alpha_name="alpha"):
         # all xvalues:
         xv = xr.concat([m.data.xv for m in self], dim=state_dim)

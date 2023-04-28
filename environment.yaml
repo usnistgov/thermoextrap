@@ -12,6 +12,7 @@ dependencies:
   - cmomy>=0.1.9
   - custom-inherit
   - attrs
+  - module-utilities
   - pymbar<4.0
   - pip
   - pip:

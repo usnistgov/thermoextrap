@@ -5,6 +5,7 @@ dependencies:
   - attrs
   - cmomy>=0.1.9
   - custom-inherit
+  - module-utilities
   - numpy
   - pandas
   - pip

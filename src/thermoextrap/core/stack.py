@@ -4,8 +4,8 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
+from module_utilities import cached
 
-from .cached_decorators import gcached
 from .models import StateCollection
 
 
@@ -270,7 +270,7 @@ class StackedDerivatives:
     def alpha_name(self):
         return self.x_dims[0]
 
-    @gcached(prop=False)
+    @cached.meth
     def _stacked(self, order):
         da = self.da
         if order is not None:
@@ -577,7 +577,7 @@ class GPRData(StateCollection):
     def order_dim(self):
         return self.x_dims[-1]
 
-    @gcached(prop=False)
+    @cached.meth
     def _stacked(self, order):
         """
         Get stacked data representation.

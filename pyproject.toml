@@ -35,6 +35,7 @@ dependencies = [
     "cmomy >= 0.1.9",
     "custom-inherit",
     "attrs",
+    "module-utilities",
 ]
 
 [project.urls]

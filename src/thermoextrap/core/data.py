@@ -24,6 +24,7 @@ from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
 from custom_inherit import DocInheritMeta
+from module_utilities import cached
 
 from ._attrs_utils import (
     MyAttrsMixin,
@@ -32,7 +33,6 @@ from ._attrs_utils import (
     kw_only_field,
 )
 from ._docstrings import factory_docfiller_shared
-from .cached_decorators import gcached
 from .xrutils import xrwrap_uv, xrwrap_xv
 
 try:
@@ -761,7 +761,7 @@ class DataValues(DataValuesBase):
 
     _CENTRAL = False
 
-    @gcached(prop=False)
+    @cached.meth
     def _mean(self, skipna=None):
         if skipna is None:
             skipna = self.skipna
@@ -777,7 +777,7 @@ class DataValues(DataValuesBase):
             **self.build_aves_kws,
         )
 
-    @gcached()
+    @cached.prop
     def xu(self):
         """Average of `x * u ** n`."""
         out = self._mean()[1]
@@ -785,7 +785,7 @@ class DataValues(DataValuesBase):
             out = out.compute()
         return out
 
-    @gcached()
+    @cached.prop
     def u(self):
         """Average of `u ** n`."""
         if self.x_isnot_u:
@@ -797,14 +797,14 @@ class DataValues(DataValuesBase):
 
         return out
 
-    @gcached()
+    @cached.prop
     def u_selector(self):
         """Indexer for `self.u`."""
         return DatasetSelector.from_defaults(
             self.u, deriv_dim=None, mom_dim=self.umom_dim
         )
 
-    @gcached()
+    @cached.prop
     def xu_selector(self):
         """Indexer for `self.xu`."""
         return DatasetSelector.from_defaults(
@@ -826,7 +826,7 @@ class DataValuesCentral(DataValuesBase):
 
     _CENTRAL = True
 
-    @gcached(prop=False)
+    @cached.meth
     def _mean(self, skipna=None):
         if skipna is None:
             skipna = self.skipna
@@ -842,7 +842,7 @@ class DataValuesCentral(DataValuesBase):
             **self.build_aves_kws,
         )
 
-    @gcached()
+    @cached.prop
     def xave(self):
         """Averages of `x`."""
         out = self._mean()[0]
@@ -850,7 +850,7 @@ class DataValuesCentral(DataValuesBase):
             out = out.compute()
         return out
 
-    @gcached()
+    @cached.prop
     def dxdu(self):
         """Averages of `dx * du ** n`."""
         out = self._mean()[2]
@@ -858,7 +858,7 @@ class DataValuesCentral(DataValuesBase):
             out = out.compute()
         return out
 
-    @gcached()
+    @cached.prop
     def du(self):
         """Averages of `du ** n`."""
         if self.x_isnot_u:
@@ -870,19 +870,19 @@ class DataValuesCentral(DataValuesBase):
 
         return out
 
-    @gcached()
+    @cached.prop
     def du_selector(self):
         return DatasetSelector.from_defaults(
             self.du, deriv_dim=None, mom_dim=self.umom_dim
         )
 
-    @gcached()
+    @cached.prop
     def dxdu_selector(self):
         return DatasetSelector.from_defaults(
             self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
-    @gcached()
+    @cached.prop
     def xave_selector(self):
         if self.deriv_dim is None:
             return self.xave
@@ -1029,22 +1029,22 @@ class DataCentralMomentsBase(AbstractData):
         """
         return self.dxduave.values
 
-    @gcached(prop=False)
+    @cached.meth
     def rmom(self):
         """Raw co-moments."""
         return self.dxduave.rmom()
 
-    @gcached(prop=False)
+    @cached.meth
     def cmom(self):
         """Central co-moments."""
         return self.dxduave.cmom()
 
-    @gcached()
+    @cached.prop
     def xu(self):
         """Averages of form ``x * u ** n``."""
         return self.rmom().sel(**{self.xmom_dim: 1}, drop=True)
 
-    @gcached()
+    @cached.prop
     def u(self):
         """Averages of form ``u ** n``."""
         if self.x_isnot_u:
@@ -1056,19 +1056,19 @@ class DataCentralMomentsBase(AbstractData):
 
         return out
 
-    @gcached()
+    @cached.prop
     def xave(self):
         """Averages of form observable ``x``."""
         return self.dxduave.values.sel(
             **{self.umom_dim: 0, self.xmom_dim: 1}, drop=True
         )
 
-    @gcached()
+    @cached.prop
     def dxdu(self):
         """Averages of form ``dx * dx ** n``."""
         return self.cmom().sel(**{self.xmom_dim: 1}, drop=True)
 
-    @gcached()
+    @cached.prop
     def du(self):
         """Averages of ``du ** n``."""
         if self.x_isnot_u:
@@ -1080,21 +1080,21 @@ class DataCentralMomentsBase(AbstractData):
 
         return out
 
-    @gcached()
+    @cached.prop
     def u_selector(self):
         """Indexer for ``u_selector[n] = u ** n``."""
         return DatasetSelector.from_defaults(
             self.u, deriv_dim=None, mom_dim=self.umom_dim
         )
 
-    @gcached()
+    @cached.prop
     def xu_selector(self):
         """Indexer for ``xu_select[n] = x * u ** n``."""
         return DatasetSelector.from_defaults(
             self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
-    @gcached()
+    @cached.prop
     def xave_selector(self):
         """Selector for ``xave``."""
         if self.deriv_dim is None:
@@ -1102,14 +1102,14 @@ class DataCentralMomentsBase(AbstractData):
         else:
             return DatasetSelector(self.xave, dims=[self.deriv_dim])
 
-    @gcached()
+    @cached.prop
     def du_selector(self):
         """Selector for ``du_selector[n] = du ** n``."""
         return DatasetSelector.from_defaults(
             self.du, deriv_dim=None, mom_dim=self.umom_dim
         )
 
-    @gcached()
+    @cached.prop
     def dxdu_selector(self):
         """Selector for ``dxdu_selector[n] = dx * du ** n``."""
         return DatasetSelector.from_defaults(

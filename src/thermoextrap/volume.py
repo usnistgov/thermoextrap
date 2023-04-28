@@ -13,10 +13,10 @@ import attrs
 import xarray as xr
 from attrs import field
 from attrs import validators as attv
+from module_utilities import cached
 
 from .core._attrs_utils import _cache_field
 from .core._docstrings import factory_docfiller_shared
-from .core.cached_decorators import gcached
 from .core.data import DataCallbackABC, DataValues
 from .core.models import Derivatives, ExtrapModel
 from .core.xrutils import xrwrap_xv
@@ -115,7 +115,7 @@ class VolumeDataCallback(DataCallbackABC):
     def check(self, data):
         pass
 
-    @gcached(prop=False)
+    @cached.meth
     def dxdq(self, rec_dim, skipna):
         return self.dxdqv.mean(rec_dim, skipna=skipna)
 

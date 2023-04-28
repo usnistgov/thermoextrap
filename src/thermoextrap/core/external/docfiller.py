@@ -7,7 +7,8 @@ from collections.abc import Mapping
 from textwrap import dedent
 from typing import Any, Callable, TypeVar
 
-from ..cached_decorators import gcached
+from module_utilities import cached
+
 from .docscrape import NumpyDocString, Parameter
 
 try:
@@ -515,7 +516,7 @@ class DocFiller:
     def dedent(self):
         return type(self)(dedent_recursive(self.data))
 
-    @gcached(prop=False)
+    @cached.meth
     def keys(self):
         return _recursive_keys(self.data)
 
@@ -572,11 +573,11 @@ class DocFiller:
 
         return type(self).concat(self, *args, **kwargs)
 
-    @gcached()
+    @cached.prop
     def params(self):
         return AttributeDict.from_dict(self.data, max_level=1)
 
-    @gcached()
+    @cached.prop
     def default_decorator(self):
         return docfiller(**self.params)
 

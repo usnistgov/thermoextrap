@@ -9,9 +9,8 @@ import sympy as sp
 import tensorflow as tf
 import xarray as xr
 from gpflow.ci_utils import ci_niter
+from module_utilities import cached
 
-# from .models import StateCollection
-from .core.cached_decorators import gcached
 from .core.stack import GPRData, StackedDerivatives, multiindex_to_array
 
 __all__ = ("GPRData", "GPRModel", "StackedDerivatives", "factory_gprmodel")
@@ -222,7 +221,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         k_diag = tf.reshape(k_list, (x1.shape[0],))
         return k_diag
 
-    @gcached(prop=False)
+    @cached.meth
     def _lambda_kernel(self, d1, d2):
         expr = sp.diff(self.kernel_expr, self.x_syms[0], d1, self.x_syms[1], d2)
 
@@ -303,7 +302,7 @@ class GPRModel:
         self.kernel_expr = kernel_expr
         self.kernel_params = kernel_params
 
-    @gcached(prop=False)
+    @cached.meth
     def kern(self, out_dim):
         return [
             DerivativeKernel(
@@ -314,11 +313,11 @@ class GPRModel:
             for _ in range(out_dim)
         ]
 
-    @gcached(prop=False)
+    @cached.meth
     def het_gauss(self, out_dim):
         return [HeteroscedasticGaussian() for _ in range(out_dim)]
 
-    @gcached(prop=False)
+    @cached.meth
     def gp_params(self, order):
         x, ys = self.data.array_data(order=order)
         out_dim = len(ys)
