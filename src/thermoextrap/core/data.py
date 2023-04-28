@@ -32,7 +32,7 @@ from ._attrs_utils import (
     convert_dims_to_tuple,
     kw_only_field,
 )
-from ._docstrings import factory_docfiller_shared
+from ._docstrings import DOCFILLER_SHARED
 from .xrutils import xrwrap_uv, xrwrap_xv
 
 try:
@@ -43,9 +43,7 @@ except ImportError:
     _HAS_CMOMY = False
 
 
-docfiller_shared = factory_docfiller_shared(
-    names=("default",),
-)
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").dec
 
 __all__ = [
     "DataCentralMoments",

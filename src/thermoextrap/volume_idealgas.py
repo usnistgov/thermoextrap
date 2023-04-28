@@ -6,10 +6,12 @@ Volume expansion for ideal gas (:mod:`~thermoextrap.volume_idealgas`)
 
 from functools import lru_cache
 
-from .core._docstrings import factory_docfiller_shared
+from .core._docstrings import DOCFILLER_SHARED
 from .core.models import Derivatives, ExtrapModel
 
-docfiller_shared = factory_docfiller_shared(names=("default", "beta", "volume"))
+docfiller_shared = DOCFILLER_SHARED.levels_to_top(
+    "cmomy", "xtrap", "beta", "volume"
+).dec
 
 
 class VolumeDerivFuncsIG:

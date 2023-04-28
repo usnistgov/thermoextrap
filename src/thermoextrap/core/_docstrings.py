@@ -191,75 +191,10 @@ DOCFILLER_VOLUME = DocFiller.from_docstring(
     _docstring_volume, combine_keys="parameters"
 )
 
-SHARED_DOCS = {
-    "cmomy": DOCFILLER_CMOMY.data,
-    "xtrap": DOCFILLER_XTRAP.data,
-    "beta": DOCFILLER_BETA.data,
-    "volume": DOCFILLER_VOLUME.data,
-}
 
-
-# @lru_cache
-def _factory_get_mapping(
-    names=None,
-    *,
-    dotted=False,
-    shared_docs=None,
-    **kws,
-):
-    if names is None:
-        names = ()
-    elif isinstance(names, str):
-        names = (names,)
-    names = tuple(name.lower() for name in names)
-
-    names_parsed = []
-    for name in names:
-        if name == "all":
-            add_in = list(SHARED_DOCS.keys())
-        elif name == "default":
-            add_in = ["cmomy", "xtrap"]
-        else:
-            assert name in SHARED_DOCS.keys()
-            add_in = [name]
-
-        for n in add_in:
-            if n not in names_parsed:
-                names_parsed.append(n)
-
-    if shared_docs is None:
-        shared_docs = SHARED_DOCS
-
-    for name in names_parsed:
-        assert name in shared_docs.keys()
-
-    if dotted:
-        mapping = {k: shared_docs[k] for k in names_parsed}
-    else:
-        mapping = {}
-        for name in names_parsed:
-            mapping.update(**shared_docs[name])
-
-    mapping.update(**kws)
-    return mapping
-
-
-def factory_docfiller_shared(names=None, *, dotted=False, shared_docs=None, **kws):
-    """
-    Create a decorator for filling in documentation.
-
-    Based on pandas private method. This is not ideal, but going with it for now.
-
-    Parameters
-    ----------
-    names : hashable or sequence of hashable, optional
-        names of keys in ``shared_docs`` to include in expansion.
-    dotted : bool, default=False
-    If True,
-
-    """
-
-    mapping = _factory_get_mapping(
-        names=names, dotted=dotted, shared_docs=shared_docs, **kws
-    )
-    return DocFiller(mapping)()
+DOCFILLER_SHARED = DocFiller.concat(
+    cmomy=DOCFILLER_CMOMY,
+    xtrap=DOCFILLER_XTRAP,
+    beta=DOCFILLER_BETA,
+    volume=DOCFILLER_VOLUME,
+)

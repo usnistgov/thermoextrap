@@ -16,15 +16,14 @@ from attrs import validators as attv
 from module_utilities import cached
 
 from .core._attrs_utils import _cache_field
-from .core._docstrings import factory_docfiller_shared
+from .core._docstrings import DOCFILLER_SHARED
 from .core.data import DataCallbackABC, DataValues
 from .core.models import Derivatives, ExtrapModel
 from .core.xrutils import xrwrap_xv
 
-docfiller_shared = factory_docfiller_shared(
-    names=("default", "beta", "volume"),
-)
-
+docfiller_shared = DOCFILLER_SHARED.levels_to_top(
+    "cmomy", "xtrap", "beta", "volume"
+).dec
 
 # Need funcs to pass to Coefs class
 # Just needs to be indexable based on order, so...

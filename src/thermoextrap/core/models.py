@@ -22,7 +22,7 @@ from scipy.special import factorial as sp_factorial
 from thermoextrap.core.data import AbstractData, kw_only_field
 
 from ._attrs_utils import MyAttrsMixin, _cache_field
-from ._docstrings import factory_docfiller_shared
+from ._docstrings import DOCFILLER_SHARED
 from .sputils import get_default_indexed, get_default_symbol
 from .xrutils import xrwrap_alpha
 
@@ -34,9 +34,8 @@ except ImportError:
     _HAS_PYMBAR = False
 
 
-docfiller_shared = factory_docfiller_shared(
-    names="default",
-)
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").dec
+
 
 __all__ = [
     "ExtrapModel",
