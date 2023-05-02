@@ -67,7 +67,9 @@ shape : int or tuple of int
 """
 
 
-docfiller_shared = DocFiller.from_docstring(_shared_docs, combine_keys="parameters")()
+docfiller_shared = DocFiller.from_docstring(
+    _shared_docs, combine_keys="parameters"
+).decorate
 
 
 # global variables

@@ -23,7 +23,7 @@ from .core.xrutils import xrwrap_xv
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top(
     "cmomy", "xtrap", "beta", "volume"
-).dec
+).decorate
 
 # Need funcs to pass to Coefs class
 # Just needs to be indexable based on order, so...

@@ -7,7 +7,7 @@ dependencies:
   - custom-inherit
   - ipython
   - matplotlib
-  - module-utilities
+  - module-utilities >= 0.1
   - numpy
   - pip
   - pymbar<4.0

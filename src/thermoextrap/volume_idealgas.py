@@ -11,7 +11,7 @@ from .core.models import Derivatives, ExtrapModel
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top(
     "cmomy", "xtrap", "beta", "volume"
-).dec
+).decorate
 
 
 class VolumeDerivFuncsIG:

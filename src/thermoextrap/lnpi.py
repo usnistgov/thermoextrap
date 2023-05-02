@@ -30,7 +30,7 @@ from .core.data import DataCallbackABC
 from .core.models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").dec
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
 
 
 ################################################################################

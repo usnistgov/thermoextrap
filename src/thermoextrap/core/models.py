@@ -34,7 +34,7 @@ except ImportError:
     _HAS_PYMBAR = False
 
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").dec
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
 
 
 __all__ = [

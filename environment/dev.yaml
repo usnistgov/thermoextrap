@@ -8,7 +8,7 @@ dependencies:
   - ipykernel
   - ipython
   - matplotlib
-  - module-utilities
+  - module-utilities >= 0.1
   - nbconvert
   - numpy
   - pip

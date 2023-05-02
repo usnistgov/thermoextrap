@@ -19,7 +19,7 @@ from .core.models import (
     get_default_symbol,
 )
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").dec
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
 
 ##############################################################################
 # recursive deriatives for beta expansion
