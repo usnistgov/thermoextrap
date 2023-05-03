@@ -32,10 +32,10 @@ dependencies = [
     "xarray >= 0.16",
     "sympy",
     "scipy",
-    "cmomy >= 0.1.9",
+    "cmomy >= 0.4",
     "custom-inherit",
     "attrs",
-    "module-utilities >= 0.1",
+    "module-utilities >= 0.2",
 ]
 
 [project.urls]

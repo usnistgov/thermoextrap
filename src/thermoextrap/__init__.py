@@ -1,6 +1,8 @@
 """Classes/routines to deal with thermodynamic extrapolation."""
 
 from . import beta, lnpi, volume, volume_idealgas
+
+# TODO: move data, idealgas, models to top level.
 from .core import data, idealgas, models
 from .core.data import (
     DataCentralMoments,

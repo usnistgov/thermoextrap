@@ -9,10 +9,10 @@ dependencies:
   - scipy
   - xarray
   #  - openmm
-  - cmomy>=0.1.9
+  - cmomy>=0.4
   - custom-inherit
   - attrs
-  - module-utilities >= 0.1
+  - module-utilities>=0.2
   - pymbar<4.0
   - pip
   - pip:
