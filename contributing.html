@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Contributing &#8212; thermoextrap 0.2.3 documentation</title>
+    <title>Contributing &#8212; thermoextrap 0.3.0 documentation</title>
   
   
   
@@ -130,7 +130,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.2.3 documentation</p>
+    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -169,7 +169,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
-
 
 
 
@@ -304,7 +303,7 @@
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="py-modindex.html">Module Index</a></li>
@@ -511,7 +510,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#submit-feedback">Submit Feedback</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-started">Get Started!</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-started">Get Started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-setup">Environment setup</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-the-repo">Getting the repo</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependency-management">Dependency management</a></li>
@@ -520,6 +519,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pull-request-guidelines">Pull Request Guidelines</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-docs">Building the docs</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-tox">Using tox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-version">Package version</a></li>
 </ul>
             </nav>
         </div>
@@ -531,7 +531,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="contributing">
+  <!-- markdownlint-disable MD041 -->
+<section class="tex2jax_ignore mathjax_ignore" id="contributing">
 <h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h1>
 <p>Contributions are welcome, and they are greatly appreciated! Every little bit
 helps, and credit will always be given.</p>
@@ -566,68 +567,96 @@ articles, and such.</p>
 </section>
 <section id="submit-feedback">
 <h3>Submit Feedback<a class="headerlink" href="#submit-feedback" title="Permalink to this heading">#</a></h3>
-<p>The best way to send feedback is to file an issue at <a class="github reference external" href="https://github.com/usnistgov/thermoextrap/issues">usnistgov/thermoextrap#issues</a>.</p>
+<p>The best way to send feedback is to file an issue at
+<a class="github reference external" href="https://github.com/usnistgov/thermoextrap/issues">usnistgov/thermoextrap#issues</a>.</p>
 <p>If you are proposing a feature:</p>
 <ul class="simple">
 <li><p>Explain in detail how it would work.</p></li>
 <li><p>Keep the scope as narrow as possible, to make it easier to implement.</p></li>
-<li><p>Remember that this is a volunteer-driven project, and that contributions
-are welcome :)</p></li>
+<li><p>Remember that this is a volunteer-driven project, and that contributions are
+welcome :)</p></li>
 </ul>
 </section>
 </section>
 <section id="get-started">
-<h2>Get Started!<a class="headerlink" href="#get-started" title="Permalink to this heading">#</a></h2>
+<h2>Get Started<a class="headerlink" href="#get-started" title="Permalink to this heading">#</a></h2>
 <section id="environment-setup">
 <h3>Environment setup<a class="headerlink" href="#environment-setup" title="Permalink to this heading">#</a></h3>
-<p>This project uses a host of tools to (hopefully) make development easier.  We recommend installing some of these tools system wide.  For this, we recommend using
-either <a class="reference external" href="https://github.com/pypa/pipx">pipx</a> or <a class="reference external" href="https://github.com/mariusvniekerk/condax">condax</a>.  We mostly use conda/condax, but the choice is yours.  For conda, we recommend actually using <a class="reference external" href="https://github.com/mamba-org/mamba">mamba</a>. Alternatively, you can setup <code class="docutils literal notranslate"><span class="pre">conda</span></code> to use the faster <code class="docutils literal notranslate"><span class="pre">mamba</span></code> solver.
-See <a class="reference external" href="https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community">here</a> for details.</p>
-<p>Additional dependencies are:</p>
+<p>This project uses a host of tools to (hopefully) make development easier. We
+recommend installing some of these tools system wide. For this, we recommend
+using either <a class="reference external" href="https://github.com/pypa/pipx">pipx</a> or <a class="reference external" href="https://github.com/mariusvniekerk/condax">condax</a>. We mostly use conda/condax, but the choice is
+yours. For conda, we recommend actually using <a class="reference external" href="https://github.com/mamba-org/mamba">mamba</a>. Alternatively, you can
+setup <code class="docutils literal notranslate"><span class="pre">conda</span></code> to use the faster <code class="docutils literal notranslate"><span class="pre">mamba</span></code> solver. See <a class="reference external" href="https://www.anaconda.com/blog/a-faster-conda-for-a-growing-community">here</a> for
+details.</p>
+<p>Additional tools are:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pre-commit.com/">pre-commit</a></p></li>
 <li><p><a class="reference external" href="https://tox.wiki/en/latest/">tox</a> and <a class="reference external" href="https://github.com/tox-dev/tox-conda">tox-conda</a></p></li>
 <li><p><a class="reference external" href="https://github.com/cruft/cruft">cruft</a></p></li>
 <li><p><a class="reference external" href="https://github.com/amitbeka/conda-merge">conda-merge</a></p></li>
+<li><p><a class="reference external" href="https://github.com/nedbat/scriv">scriv</a></p></li>
 </ul>
 <p>These are setup using the following:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>condax<span class="w"> </span>install<span class="w"> </span>pre-commit
-condax<span class="w"> </span>install<span class="w"> </span>tox
-condax<span class="w"> </span>inject<span class="w"> </span>tox<span class="w"> </span>tox-conda
-condax<span class="w"> </span>install<span class="w"> </span>cruft
-condax<span class="w"> </span>install<span class="w"> </span>conda-merge
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">condax install pre-commit</span>
+<span class="go">condax install tox</span>
+<span class="go">condax inject tox tox-conda</span>
+<span class="go">condax install cruft</span>
+<span class="go">condax install conda-merge</span>
+<span class="go">condax install commitizen</span>
+<span class="go">pipx install scriv</span>
+</pre></div>
+</div>
+<p>Alternatively, you can install these dependencies using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">conda env update -n {env-name} environment/tools.yaml</span>
 </pre></div>
 </div>
 </section>
 <section id="getting-the-repo">
 <h3>Getting the repo<a class="headerlink" href="#getting-the-repo" title="Permalink to this heading">#</a></h3>
 <p>Ready to contribute? Here’s how to set up <code class="docutils literal notranslate"><span class="pre">thermoextrap</span></code> for local development.</p>
-<ol class="arabic">
+<ul>
 <li><p>Fork the <code class="docutils literal notranslate"><span class="pre">thermoextrap</span></code> repo on GitHub.</p></li>
 <li><p>Clone your fork locally:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:your_name_here/thermoextrap.git
 </pre></div>
 </div>
-<p>The example notebooks require the <code class="docutils literal notranslate"><span class="pre">examples/data</span></code> submodule to be loaded.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>--recursive
+<p>If the repo includes submodules, you can add them either with the initial
+close using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recursive-submodules<span class="w"> </span>git@github.com:your_name_here/thermoextrap.git
+</pre></div>
+</div>
+<p>or after the clone using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>thermoextrap
+git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>--recursive
 </pre></div>
 </div>
 </li>
-<li><p>Create development environment.  Using the <code class="docutils literal notranslate"><span class="pre">make</span></code> will install a development version using mamba.</p>
+<li><p>Create development environment. There are two options to create the
+development environment.</p>
+<ul>
+<li><p>The recommended method is to use tox by using either:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>dev
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dev-env
+</pre></div>
+</div>
+<p>These create a development environment located at <code class="docutils literal notranslate"><span class="pre">.tox/dev</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>tox-ipykernel-display-name
+</pre></div>
+</div>
+<p>This will add a meaningful display name for the kernel (assuming you’re
+using <a class="reference external" href="https://github.com/Anaconda-Platform/nb_conda_kernels">nb_conda_kernels</a>)</p>
+</li>
+<li><p>Alternativley, you can create centrally located conda environmentment using
+the command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>mamba-dev
 </pre></div>
 </div>
-</li>
-<li><p>Initiate pre-commit with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>init
-</pre></div>
-</div>
-<p>To update the recipe, periodically run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>autoupdate
-</pre></div>
-</div>
-</li>
-<li><p>Install editable package:</p>
+<p>This will create a conda environment ‘thermoextrap-env’ in the default
+location.</p>
+<p>To install (an editable version) of the current package:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--no-deps
 </pre></div>
 </div>
@@ -636,14 +665,30 @@ condax<span class="w"> </span>install<span class="w"> </span>conda-merge
 </pre></div>
 </div>
 </li>
+</ul>
+</li>
+<li><p>Initiate <a class="reference external" href="https://pre-commit.com/">pre-commit</a> with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install
+</pre></div>
+</div>
+<p>To update the recipe, periodically run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>autoupdate
+</pre></div>
+</div>
+<p>If recipes change over time, you can clean up old installs with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>gc
+</pre></div>
+</div>
+</li>
 <li><p>Create a branch for local development:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>name-of-your-bugfix-or-feature
 </pre></div>
 </div>
-<p>Now you can make your changes locally.  Alternatively, we recommend using <a class="reference external" href="https://github.com/nvie/gitflow">git-flow</a>.</p>
+<p>Now you can make your changes locally. Alternatively, we recommend using
+<a class="reference external" href="https://github.com/nvie/gitflow">git-flow</a>.</p>
 </li>
-<li><p>When you’re done making changes, check that your changes pass the pre-commit checks:
-tests.</p>
+<li><p>When you’re done making changes, check that your changes pass the pre-commit
+checks: tests.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>run<span class="w"> </span><span class="o">[</span>--all-files<span class="o">]</span>
 </pre></div>
 </div>
@@ -659,27 +704,50 @@ tests.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>test-all
 </pre></div>
 </div>
+<p>Additionally, you should run the following:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>pre-commit-lint-markdown
+make<span class="w"> </span>pre-commit-codespell
+</pre></div>
+</div>
+</li>
+<li><p>Create changelog fragment. See <a class="reference external" href="https://github.com/nedbat/scriv">scriv</a> for more info.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scriv<span class="w"> </span>create<span class="w"> </span>--edit
+</pre></div>
+</div>
 </li>
 <li><p>Commit your changes and push your branch to GitHub:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add .
-$ git commit -m &quot;Your detailed description of your changes.&quot;
-$ git push origin name-of-your-bugfix-or-feature
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Your detailed description of your changes.&quot;</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>name-of-your-bugfix-or-feature
+</pre></div>
+</div>
+<p>Note that the pre-commit hooks will force the commit message to be in the
+<a class="reference external" href="https://www.conventionalcommits.org/en/v1.0.0/">conventional sytle</a>. To assist this, you may want to
+commit using <a class="reference external" href="https://github.com/commitizen-tools/commitizen">commitizen</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cz<span class="w"> </span>commit
 </pre></div>
 </div>
 </li>
 <li><p>Submit a pull request through the GitHub website.</p></li>
-</ol>
+</ul>
 </section>
 <section id="dependency-management">
 <h3>Dependency management<a class="headerlink" href="#dependency-management" title="Permalink to this heading">#</a></h3>
-<p>Dependencies need to be placed in a few locations, which depend on the nature of the dependency.</p>
+<p>Dependencies need to be placed in a few locations, which depend on the nature of
+the dependency.</p>
 <ul class="simple">
-<li><p>Package dependency: <code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">dependencies</span></code> section of <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
-<li><p>Documentation dependency: <code class="docutils literal notranslate"><span class="pre">environment/docs-extras.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span></code> section of <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
-<li><p>Development dependency: <code class="docutils literal notranslate"><span class="pre">environment/dev-extras.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">dev</span></code> section of <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
+<li><p>Package dependency: <code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">dependencies</span></code> section of
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
+<li><p>Documentation dependency: <code class="docutils literal notranslate"><span class="pre">environment/docs-extras.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span></code> section of
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
+<li><p>Development dependency: <code class="docutils literal notranslate"><span class="pre">environment/dev-extras.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">dev</span></code> section of
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
 </ul>
-<p>Note that total yaml files are build using <a class="reference external" href="https://github.com/amitbeka/conda-merge">conda-merge</a>.  For example, <code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> is combined with <code class="docutils literal notranslate"><span class="pre">environment/docs-extras.yaml</span></code> to produce <code class="docutils literal notranslate"><span class="pre">environment/docs.yaml</span></code>.  This is automated in the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.  You can also run, after doing any updates,</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>environment-files
+<p>Note that total yaml files are build using <a class="reference external" href="https://github.com/amitbeka/conda-merge">conda-merge</a>. For example,
+<code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> is combined with <code class="docutils literal notranslate"><span class="pre">environment/docs-extras.yaml</span></code> to produce
+<code class="docutils literal notranslate"><span class="pre">environment/docs.yaml</span></code>. This is automated in the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>. You can also run,
+after doing any updates,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>environment-files-build
 </pre></div>
 </div>
 <p>which will rebuild all the needed yaml files.</p>
@@ -688,66 +756,92 @@ $ git push origin name-of-your-bugfix-or-feature
 <section id="pull-request-guidelines">
 <h2>Pull Request Guidelines<a class="headerlink" href="#pull-request-guidelines" title="Permalink to this heading">#</a></h2>
 <p>Before you submit a pull request, check that it meets these guidelines:</p>
-<ol class="arabic simple">
+<ul class="simple">
 <li><p>The pull request should include tests.</p></li>
-<li><p>If the pull request adds functionality, the docs should be updated. Put
-your new functionality into a function with a docstring, and add the
-feature to the list in README.rst.</p></li>
+<li><p>If the pull request adds functionality, the docs should be updated. Put your
+new functionality into a function with a docstring, and add the feature to the
+list in CHANGELOG.md. You should use <a class="reference external" href="https://github.com/nedbat/scriv">scriv</a> for this.</p></li>
 <li><p>The pull request should work for Python 3.8, 3.9, 3.10.</p></li>
-</ol>
+</ul>
 </section>
 <section id="building-the-docs">
 <h2>Building the docs<a class="headerlink" href="#building-the-docs" title="Permalink to this heading">#</a></h2>
-<p>We use <a class="reference external" href="https://tox.wiki/en/latest/">tox</a> to isolate the documentation build.  Useful commands are as follows.</p>
+<p>We use <a class="reference external" href="https://tox.wiki/en/latest/">tox</a> to isolate the documentation build. Useful commands are as follows.</p>
 <ul>
 <li><p>Build the docs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs-build
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>build
 </pre></div>
 </div>
 </li>
 <li><p>Spellcheck the docs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs-spelling
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>spelling
 </pre></div>
 </div>
 </li>
 <li><p>Create a release of the docs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs-release
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>release
 </pre></div>
 </div>
+<p>If you make any changes to <code class="docutils literal notranslate"><span class="pre">docs/examples</span></code>, you should run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-examples-symlink
+</pre></div>
+</div>
+<p>to update symlinks from <code class="docutils literal notranslate"><span class="pre">docs/examples</span></code> to <code class="docutils literal notranslate"><span class="pre">examples</span></code>.</p>
 <p>After this, the docs can be pushed to the correct branch for distribution.</p>
 </li>
-<li><p>Live documentation updates using</p></li>
+<li><p>Live documentation updates using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-livehtml
+</pre></div>
+</div>
+</li>
 </ul>
 </section>
 <section id="using-tox">
 <h2>Using tox<a class="headerlink" href="#using-tox" title="Permalink to this heading">#</a></h2>
-<p>The package is setup to use tox to test, build and release pip and conda distributions, and release the docs.  Most of these tasks have a command in the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.  To test against multiple versions, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make test-all
+<p>The package is setup to use tox to test, build and release pip and conda
+distributions, and release the docs. Most of these tasks have a command in the
+<code class="docutils literal notranslate"><span class="pre">Makefile</span></code>. To test against multiple versions, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>test-all
 </pre></div>
 </div>
 <p>To build the documentation in an isolated environment, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make docs-build
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-build
 </pre></div>
 </div>
 <p>To release the documentation use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make docs-release posargs=&#39;-m &quot;commit message&quot; -r origin -p&#39;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-release<span class="w"> </span><span class="nv">release_args</span><span class="o">=</span><span class="s1">&#39;-m &quot;commit message&quot; -r origin -p&#39;</span>
 </pre></div>
 </div>
-<p>Where posargs is are passed to ghp-import.  Note that the branch created is called <code class="docutils literal notranslate"><span class="pre">nist-pages</span></code>.  This can be changed in <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code>.</p>
+<p>Where posargs is are passed to ghp-import. Note that the branch created is
+called <code class="docutils literal notranslate"><span class="pre">nist-pages</span></code>. This can be changed in <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code>.</p>
 <p>To build the distribution, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make dist-pypi-[build-testrelease-release]
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dist-pypi-<span class="o">[</span>build-testrelease-release<span class="o">]</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">build</span></code> build to distro, <code class="docutils literal notranslate"><span class="pre">testrelease</span></code> tests putting on <code class="docutils literal notranslate"><span class="pre">testpypi</span></code> and release puts the distro on pypi.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">build</span></code> build to distro, <code class="docutils literal notranslate"><span class="pre">testrelease</span></code> tests putting on <code class="docutils literal notranslate"><span class="pre">testpypi</span></code> and
+release puts the distro on pypi.</p>
 <p>To build the conda distribution, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make dist-conda-[recipe, build]
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dist-conda-<span class="o">[</span>recipe,<span class="w"> </span>build<span class="o">]</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">recipe</span></code> makes the conda recipe (using grayskull), and <code class="docutils literal notranslate"><span class="pre">build</span></code> makes the distro.  This can be manually added to a channel.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">recipe</span></code> makes the conda recipe (using grayskull), and <code class="docutils literal notranslate"><span class="pre">build</span></code> makes the
+distro. This can be manually added to a channel.</p>
 <p>To test the created distributions, you can use one of:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make test-dist-[pypi, conda]-[local,remote] py=[38, 39, 310]
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>test-dist-<span class="o">[</span>pypi,<span class="w"> </span>conda<span class="o">]</span>-<span class="o">[</span>local,remote<span class="o">]</span>-py<span class="o">[</span><span class="m">38</span>,39,...<span class="o">]</span>
 </pre></div>
 </div>
+<p>or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>test-dist-<span class="o">[</span>pypi,<span class="w"> </span>conda<span class="o">]</span>-<span class="o">[</span>local,remote<span class="o">]</span><span class="w"> </span><span class="nv">py</span><span class="o">=[</span><span class="m">38</span>,<span class="w"> </span><span class="m">39</span>,<span class="w"> </span><span class="m">310</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>where one options in the brackets should be choosen.</p>
+</section>
+<section id="package-version">
+<h2>Package version<a class="headerlink" href="#package-version" title="Permalink to this heading">#</a></h2>
+<p>Versioning is handled with <a class="reference external" href="https://github.com/pypa/setuptools_scm">setuptools_scm</a>.The pacakge version is set by the
+git tag. For convenience, you can override the version in the makefile (calling
+tox) by setting <code class="docutils literal notranslate"><span class="pre">version=v{major}.{minor}.{micro}</span></code>. This is useful for updating
+the docs, etc.</p>
 </section>
 </section>
 
@@ -801,7 +895,7 @@ feature to the list in README.rst.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#submit-feedback">Submit Feedback</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-started">Get Started!</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-started">Get Started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-setup">Environment setup</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-the-repo">Getting the repo</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependency-management">Dependency management</a></li>
@@ -810,6 +904,7 @@ feature to the list in README.rst.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pull-request-guidelines">Pull Request Guidelines</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-docs">Building the docs</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-tox">Using tox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-version">Package version</a></li>
 </ul>
   </nav></div>
 
@@ -842,7 +937,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-04-10.
+  Last updated on 2023-05-03.
   <br/>
 </p>
   </div>

@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Volume extrapolation (volume) &#8212; thermoextrap 0.2.3 documentation</title>
+    <title>Volume extrapolation (volume) &#8212; thermoextrap 0.3.0 documentation</title>
   
   
   
@@ -130,7 +130,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.2.3 documentation</p>
+    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -169,7 +169,6 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
-
 
 
 
@@ -304,7 +303,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../py-modindex.html">Module Index</a></li>
@@ -554,7 +553,7 @@ Also, Only DataValues like objects are supported.</p>
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.volume.VolumeDerivFuncs">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">VolumeDerivFuncs</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/volume.py#L41-L81"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDerivFuncs" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">VolumeDerivFuncs</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/volume.py#L40-L80"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDerivFuncs" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Calculates specific derivative values at refV with data x and W.
 Only go to first order for volume extrapolation.
@@ -563,14 +562,14 @@ Here W represents the virial instead of the potential energy.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="thermoextrap.volume.factory_derivatives">
-<span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">factory_derivatives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/volume.py#L84-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.factory_derivatives" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">factory_derivatives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/volume.py#L83-L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.factory_derivatives" title="Permalink to this definition">#</a></dt>
 <dd><p>Factory function to provide coefficients of expansion.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.volume.VolumeDataCallback">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">VolumeDataCallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dxdqv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/volume.py#L91-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="thermoextrap.data.html#thermoextrap.data.DataCallbackABC" title="thermoextrap.core.data.DataCallbackABC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataCallbackABC</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">VolumeDataCallback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dxdqv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/volume.py#L90-L132"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="thermoextrap.data.html#thermoextrap.data.DataCallbackABC" title="thermoextrap.data.DataCallbackABC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataCallbackABC</span></code></a></p>
 <p>Object to handle callbacks of metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -601,20 +600,20 @@ Here W represents the virial instead of the potential energy.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.volume.VolumeDataCallback.check">
-<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/volume.py#L115-L116"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback.check" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/volume.py#L114-L115"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback.check" title="Permalink to this definition">#</a></dt>
 <dd><p>Perform any consistency checks between self and data.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.volume.VolumeDataCallback.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_kws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/volume.py#L122-L126"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback.resample" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_kws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/volume.py#L121-L125"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback.resample" title="Permalink to this definition">#</a></dt>
 <dd><p>Adjust create new object.</p>
 <p>Should return new instance of class or self no change</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.volume.VolumeDataCallback.derivs_args">
-<span class="sig-name descname"><span class="pre">derivs_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivs_args</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/volume.py#L128-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback.derivs_args" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">derivs_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivs_args</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/volume.py#L127-L132"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.VolumeDataCallback.derivs_args" title="Permalink to this definition">#</a></dt>
 <dd><p>Adjust derivs args from data class.</p>
 <p>should return a tuple</p>
 </dd></dl>
@@ -623,7 +622,7 @@ Here W represents the virial instead of the potential energy.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="thermoextrap.volume.factory_extrapmodel">
-<span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">factory_extrapmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dxdqv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'volume'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rep_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rep'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/src/thermoextrap/volume.py#L136-L210"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.factory_extrapmodel" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.volume.</span></span><span class="sig-name descname"><span class="pre">factory_extrapmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dxdqv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'volume'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rep_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rep'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/volume.py#L135-L209"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.volume.factory_extrapmodel" title="Permalink to this definition">#</a></dt>
 <dd><p>Factory function to create Extrapolation model for volume expansion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -735,7 +734,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-04-10.
+  Last updated on 2023-05-03.
   <br/>
 </p>
   </div>

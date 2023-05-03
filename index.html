@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>thermoextrap: Thermodynamic Extrapolation/Interpolation Library &#8212; thermoextrap 0.2.3 documentation</title>
+    <title>thermoextrap: Thermodynamic Extrapolation/Interpolation Library &#8212; thermoextrap 0.3.0 documentation</title>
   
   
   
@@ -129,7 +129,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.2.3 documentation</p>
+    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -168,7 +168,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
-
 
 
 
@@ -303,7 +302,7 @@
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="py-modindex.html">Module Index</a></li>
@@ -523,37 +522,43 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <p><a class="reference external" href="https://github.com/usnistgov/thermoextrap"><img alt="Repo" src="https://img.shields.io/badge/--181717?logo=github&amp;logoColor=ffffff" /></a>
-<a class="reference external" href="https://pages.nist.gov/thermoextrap/"><img alt="Docs" src="https://img.shields.io/badge/docs-sphinx-informational" /></a>
-<a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/master/LICENSE"><img alt="PyPI license" src="https://img.shields.io/pypi/l/cmomy?color=informational" /></a>
+  <!-- markdownlint-disable MD041 -->
+<!-- markdownlint-disable MD041 -->
+<p><a class="reference external" href="https://github.com/usnistgov/thermoextrap"><img alt="Repo" src="https://img.shields.io/badge/--181717?logo=github&amp;logoColor=ffffff" /></a> <a class="reference external" href="https://pages.nist.gov/thermoextrap/"><img alt="Docs" src="https://img.shields.io/badge/docs-sphinx-informational" /></a>
+<a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/LICENSE"><img alt="PyPI license" src="https://img.shields.io/pypi/l/cmomy?color=informational" /></a>
 <a class="reference external" href="https://pypi.org/project/thermoextrap"><img alt="PyPI version" src="https://img.shields.io/pypi/v/thermoextrap" /></a>
 <a class="reference external" href="https://anaconda.org/wpk-nist/thermoextrap"><img alt="Conda (channel only)" src="https://img.shields.io/conda/v/wpk-nist/thermoextrap" /></a>
-<a class="reference external" href="https://github.com/ambv/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a></p>
-<!-- [pypi-badge]: https://badge.fury.io/py/thermoextrap -->
-<!-- Use total link so works from anywhere -->
-<!-- For more badges, see https://shields.io/category/other and https://naereen.github.io/badges/ -->
+<a class="reference external" href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a></p>
+<!-- For more badges, see
+https://shields.io/category/other
+https://naereen.github.io/badges/
+[pypi-badge]: https://badge.fury.io/py/thermoextrap
+-->
+<!-- other links -->
 <section class="tex2jax_ignore mathjax_ignore" id="thermoextrap-thermodynamic-extrapolation-interpolation-library">
 <h1><code class="docutils literal notranslate"><span class="pre">thermoextrap</span></code>: Thermodynamic Extrapolation/Interpolation Library<a class="headerlink" href="#thermoextrap-thermodynamic-extrapolation-interpolation-library" title="Permalink to this heading">#</a></h1>
 <p>This repository contains code used and described in references <a class="footnote-reference brackets" href="#fn1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#fn2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
-<p>If you find this code useful in producing published works, please provide an appropriate citation.
-Note that the second citation is focused on adding features that make use of GPR models based on derivative information produced by the core code base.
-For now, the GPR code, along with more information, may be found under <a class="reference external" href="https://github.com/usnistgov/thermoextrap/tree/master/examples/gpr_active_learning">here</a>.
-In a future release, we expect this to be fully integrated into the code base rather than a standalone module.</p>
+<p>If you find this code useful in producing published works, please provide an
+appropriate citation. Note that the second citation is focused on adding
+features that make use of GPR models based on derivative information produced by
+the core code base. For now, the GPR code, along with more information, may be
+found under <a class="reference external" href="https://github.com/usnistgov/thermoextrap/tree/main/examples/gpr_active_learning">here</a>. In a future release, we expect this to be fully
+integrated into the code base rather than a standalone module.</p>
 <p>Code included here can be used to perform thermodynamic extrapolation and
 interpolation of observables calculated from molecular simulations. This allows
 for more efficient use of simulation data for calculating how observables change
 with simulation conditions, including temperature, density, pressure, chemical
 potential, or force field parameters. Users are highly encourage to work through
-the <a class="reference external" href="https://github.com/usnistgov/thermoextrap/tree/master/examples/usage">Jupyter Notebooks</a> presenting examples for
-a variety of different observable functional forms. We only guarantee that this
-code is functional for the test cases we present here or for which it has
-previously been applied Additionally, the code may be in continuous development
-at any time. Use at your own risk and always check to make sure the produced
-results make sense. If bugs are found, please report them. If specific features
-would be helpful just let us know and we will be happy to work with you to come
-up with a solution.</p>
+the <a class="reference external" href="https://github.com/usnistgov/thermoextrap/tree/main/examples/usage">Jupyter Notebooks</a> presenting examples for a variety of
+different observable functional forms. We only guarantee that this code is
+functional for the test cases we present here or for which it has previously
+been applied Additionally, the code may be in continuous development at any
+time. Use at your own risk and always check to make sure the produced results
+make sense. If bugs are found, please report them. If specific features would be
+helpful just let us know and we will be happy to work with you to come up with a
+solution.</p>
 </section>
 <section id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this heading">#</a></h2>
@@ -563,7 +568,8 @@ up with a solution.</p>
 </section>
 <section id="status">
 <h2>Status<a class="headerlink" href="#status" title="Permalink to this heading">#</a></h2>
-<p>This package is actively used by the author.  Please feel free to create a pull request for wanted features and suggestions!</p>
+<p>This package is actively used by the author. Please feel free to create a pull
+request for wanted features and suggestions!</p>
 </section>
 <section id="quick-start">
 <h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this heading">#</a></h2>
@@ -579,7 +585,10 @@ up with a solution.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>thermoextrap<span class="o">[</span>all<span class="o">]</span>
 </pre></div>
 </div>
-<p>If you install <code class="docutils literal notranslate"><span class="pre">thermoextrap</span></code> with conda, there are additional optional dependencies that take some care for installation.  We recommend installing the following via <code class="docutils literal notranslate"><span class="pre">pip</span></code>, as the versions on the conda/conda-forge channels are often a bit old.</p>
+<p>If you install <code class="docutils literal notranslate"><span class="pre">thermoextrap</span></code> with conda, there are additional optional
+dependencies that take some care for installation. We recommend installing the
+following via <code class="docutils literal notranslate"><span class="pre">pip</span></code>, as the versions on the conda/conda-forge channels are often
+a bit old.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>tensorflow<span class="w"> </span>tensorflow-probability<span class="w"> </span>gpflow
 </pre></div>
 </div>
@@ -612,7 +621,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.<span class="w"> </sp
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="navigation.html">Indices and tables</a></li>
 </ul>
 </div>
@@ -624,7 +633,9 @@ pip<span class="w"> </span>install<span class="w"> </span>.<span class="w"> </sp
 </aside>
 <aside class="footnote brackets" id="fn2" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
-<p>Leveraging Uncertainty Estimates and Derivative Information in Gaussian Process Regression for Expedited Data Collection in Molecular Simulations. In preparation.</p>
+<p>Leveraging Uncertainty Estimates and Derivative Information in Gaussian
+Process Regression for Expedited Data Collection in Molecular Simulations.
+In preparation.</p>
 </aside>
 </aside>
 </section>
@@ -704,7 +715,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-04-10.
+  Last updated on 2023-05-03.
   <br/>
 </p>
   </div>

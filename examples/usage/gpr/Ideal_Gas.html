@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Ideal Gas &#8212; thermoextrap 0.2.3 documentation</title>
+    <title>Ideal Gas &#8212; thermoextrap 0.3.0 documentation</title>
   
   
   
@@ -132,7 +132,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.2.3 documentation</p>
+    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -171,7 +171,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
-
 
 
 
@@ -306,7 +305,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
@@ -529,20 +528,15 @@ document.write(`
 <p>In this notebook, we create a GP model for the temperature-dependence of the average position of a 1D ideal gas in an external field. The system is described in <a class="reference external" href="https://doi.org/10.1063/5.0014282">this paper</a>, and is available as a helpful test module in <a class="reference internal" href="../../../reference/api-public.html#module-thermoextrap" title="thermoextrap"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code></a> with GP and active-learning specific features defined in <a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html#module-thermoextrap.gpr_active.ig_active" title="thermoextrap.gpr_active.ig_active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap.gpr_active.ig_active</span></code></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gpflow</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MaxNLocator</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
 
 <span class="kn">import</span> <span class="nn">thermoextrap</span>
 <span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">idealgas</span>
-
-<span class="kn">import</span> <span class="nn">gpflow</span>
-
-<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">ig_active</span>
-<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">active_utils</span>
-<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">gp_models</span>
-
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MaxNLocator</span>
+<span class="kn">from</span> <span class="nn">thermoextrap.gpr_active</span> <span class="kn">import</span> <span class="n">active_utils</span><span class="p">,</span> <span class="n">gp_models</span><span class="p">,</span> <span class="n">ig_active</span>
 </pre></div>
 </div>
 </div>
@@ -1459,7 +1453,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-04-10.
+  Last updated on 2023-05-03.
   <br/>
 </p>
   </div>

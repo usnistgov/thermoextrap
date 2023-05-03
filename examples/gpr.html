@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>GP Models Utilizing Derivative Information and Active Learning &#8212; thermoextrap 0.2.3 documentation</title>
+    <title>GP Models Utilizing Derivative Information and Active Learning &#8212; thermoextrap 0.3.0 documentation</title>
   
   
   
@@ -130,7 +130,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.2.3 documentation</p>
+    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -169,7 +169,6 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
-
 
 
 
@@ -304,7 +303,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../py-modindex.html">Module Index</a></li>
@@ -518,8 +517,13 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="gp-models-utilizing-derivative-information-and-active-learning">
 <h1>GP Models Utilizing Derivative Information and Active Learning<a class="headerlink" href="#gp-models-utilizing-derivative-information-and-active-learning" title="Permalink to this heading">#</a></h1>
-<p>The notebooks contained here provide a set of tutorials for using the Gaussian Process Regression (GPR) modeling capabilities found in the <a class="reference internal" href="../reference/api-gpr.html#module-thermoextrap.gpr_active" title="thermoextrap.gpr_active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap.gpr_active</span></code></a> module.
-For all of the code an analysis necessary to reproduce the paper associated with the development of this module, please see the <a class="reference external" href="https://github.com/usnistgov/thermoextrap/tree/master/examples/gpr_active_learning">example_projects</a> directory.</p>
+<p>The notebooks contained here provide a set of tutorials for using the Gaussian
+Process Regression (GPR) modeling capabilities found in the
+<a class="reference internal" href="../reference/api-gpr.html#module-thermoextrap.gpr_active" title="thermoextrap.gpr_active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap.gpr_active</span></code></a> module. For all of the code an analysis necessary
+to reproduce the paper associated with the development of this module, please
+see the
+<a class="reference external" href="https://github.com/usnistgov/thermoextrap/tree/main/examples/gpr_active_learning">example_projects</a>
+directory.</p>
 <section id="gaussian-process-models">
 <h2>Gaussian Process Models<a class="headerlink" href="#gaussian-process-models" title="Permalink to this heading">#</a></h2>
 <p>The components of all Gaussian Process (GP) models are housed in
@@ -539,25 +543,26 @@ itself <a class="reference internal" href="../reference/generated/thermoextrap.g
 former builds a likelihood model that takes covariances between derivatives into
 account and also allows for heteroscedasticity (different uncertainties for
 different data points, including different derivative orders). The latter,
-<a class="reference internal" href="../reference/generated/thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeteroscedasticGPR</span></code></a> is a heteroscedastic GP model making use of the likelihood
-just described and the <a class="reference internal" href="../reference/generated/thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a> and behaves much like other GP models
-in <a class="reference external" href="https://gpflow.github.io/GPflow/2.7.1/index.html">GPflow</a>. Note, though, that <code class="docutils literal notranslate"><span class="pre">predict_y</span></code> is not implemented as that would
-require estimates of the uncertainty at new points. For heteroscedastic
-uncertainties, that would require a model of how the uncertainty varied with
-input location, which has not yet been implemented.</p>
+<a class="reference internal" href="../reference/generated/thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeteroscedasticGPR</span></code></a> is a
+heteroscedastic GP model making use of the likelihood just described and the
+<a class="reference internal" href="../reference/generated/thermoextrap.gpr_active.gp_models.html#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a> and behaves much
+like other GP models in <a class="reference external" href="https://gpflow.github.io/GPflow/2.7.1/index.html">GPflow</a>. Note, though, that <code class="docutils literal notranslate"><span class="pre">predict_y</span></code> is not
+implemented as that would require estimates of the uncertainty at new points.
+For heteroscedastic uncertainties, that would require a model of how the
+uncertainty varied with input location, which has not yet been implemented.</p>
 </section>
 <section id="active-learning">
 <h2>Active Learning<a class="headerlink" href="#active-learning" title="Permalink to this heading">#</a></h2>
 <p>Tools that assist in performing active learning protocols are found in
-<a class="reference internal" href="../reference/generated/thermoextrap.gpr_active.active_utils.html#module-thermoextrap.gpr_active.active_utils" title="thermoextrap.gpr_active.active_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code></a>. Though this includes functions for building and
-training GPR models, the focus is on classes and methods that enable active
-learning. Pre-eminent among these are classes for housing data and keeping track
-of simulations performed during active learning. Since every simulation
-environment and project will be unique, users are encouraged to use these as
-guidelines and templates for creating their own classes for managing data
-collection. More generally useful are classes describing active learning update
-strategies, metrics, and stopping criteria. These can easily be inherited to
-construct new active learning protocols without fundamentally changing the
+<a class="reference internal" href="../reference/generated/thermoextrap.gpr_active.active_utils.html#module-thermoextrap.gpr_active.active_utils" title="thermoextrap.gpr_active.active_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code></a>. Though this includes functions for
+building and training GPR models, the focus is on classes and methods that
+enable active learning. Pre-eminent among these are classes for housing data and
+keeping track of simulations performed during active learning. Since every
+simulation environment and project will be unique, users are encouraged to use
+these as guidelines and templates for creating their own classes for managing
+data collection. More generally useful are classes describing active learning
+update strategies, metrics, and stopping criteria. These can easily be inherited
+to construct new active learning protocols without fundamentally changing the
 primary active learning function. While this function is fairly general in its
 structure, it does make specific use of some of the other classes described,
 which, as highlighted, vary in their generalizability and transferability to new
@@ -648,7 +653,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-04-10.
+  Last updated on 2023-05-03.
   <br/>
 </p>
   </div>

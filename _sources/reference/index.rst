@@ -1,22 +1,20 @@
-# API Reference
+API Reference
+=============
 
 
-:::{toctree}
-:maxdepth: 1
-:hidden:
+.. toctree::
+    :maxdepth: 1
+    :hidden:
 
-api-public
-api-modules
-api-gpr
-api-baseclasses
-:::
-
-
-## Modules
+    api-public
+    api-modules
+    api-gpr
+    api-baseclasses
 
 
+Modules
+-------
 
-:::{eval-rst}
 .. autosummary::
 
     thermoextrap
@@ -30,5 +28,3 @@ api-baseclasses
     thermoextrap.adaptive_interp
     thermoextrap.lnpi
     thermoextrap.gpr_active
-
-:::

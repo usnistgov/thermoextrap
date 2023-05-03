@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Top level API (thermoextrap) &#8212; thermoextrap 0.2.3 documentation</title>
+    <title>Top level API (thermoextrap) &#8212; thermoextrap 0.3.0 documentation</title>
   
   
   
@@ -130,7 +130,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.2.3 documentation</p>
+    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -169,7 +169,6 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
-
 
 
 
@@ -304,7 +303,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../py-modindex.html">Module Index</a></li>
@@ -411,7 +410,7 @@
       
       
       
-      <li><a href="../_sources/reference/api-public.md" target="_blank"
+      <li><a href="../_sources/reference/api-public.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -421,7 +420,7 @@
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="btn__text-container">.md</span>
+<span class="btn__text-container">.rst</span>
 </a>
 </li>
       
@@ -516,7 +515,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="module-thermoextrap">
+  <section id="module-thermoextrap">
 <span id="top-level-api-thermoextrap"></span><h1>Top level API (<a class="reference internal" href="#module-thermoextrap" title="thermoextrap"><code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code></a>)<a class="headerlink" href="#module-thermoextrap" title="Permalink to this heading">#</a></h1>
 <p>Classes/routines to deal with thermodynamic extrapolation.</p>
 <section id="data-models">
@@ -525,7 +524,7 @@ document.write(`
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/thermoextrap.data.html#thermoextrap.data.DataCentralMoments" title="thermoextrap.data.DataCentralMoments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCentralMoments</span></code></a>(dxduave, *, meta[, ...])</p></td>
-<td><p>Data class using <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> to handle central moments.</p></td>
+<td><p>Data class using <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> to handle central moments.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/thermoextrap.data.html#thermoextrap.data.DataCentralMomentsVals" title="thermoextrap.data.DataCentralMomentsVals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCentralMomentsVals</span></code></a>(uv, xv, *, meta[, ...])</p></td>
 <td><p>Data object based on central co-moments array.</p></td>
@@ -576,122 +575,6 @@ document.write(`
 </tr>
 </tbody>
 </table>
-<!-- ## Specific models -->
-<!-- ### Inverse temperature extrapolation -->
-<!-- ```{eval-rst} -->
-<!-- .. currentmodule:: thermoextrap.beta -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    :template: custom-class.rst -->
-<!--    :recursive: -->
-<!--    SymDerivBeta -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    factory_derivatives -->
-<!--    factory_extrapmodel -->
-<!--    factory_perturbmodel -->
-<!-- ``` -->
-<!-- ### Volume extrapolation -->
-<!-- ```{eval-rst} -->
-<!-- .. currentmodule:: thermoextrap.volume -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    :template: custom-class.rst -->
-<!--    :recursive: -->
-<!--    VolumeDerivFuncs -->
-<!--    VolumeDataCallback -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    factory_derivatives -->
-<!--    factory_extrapmodel -->
-<!-- ``` -->
-<!-- ### Ideal gas volume extrapolation -->
-<!-- ```{eval-rst} -->
-<!-- .. currentmodule:: thermoextrap.volume_idealgas -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    :template: custom-class.rst -->
-<!--    :recursive: -->
-<!--    VolumeDerivFuncsIG -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    factory_derivatives -->
-<!--    factory_extrapmodel -->
-<!--    factory_extrapmodel_data -->
-<!-- ``` -->
-<!-- ### TMMC $\ln \Pi(N)$ extrapolation -->
-<!-- ```{eval-rst} -->
-<!-- .. currentmodule:: thermoextrap.lnpi -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    :template: custom-class.rst -->
-<!--    :recursive: -->
-<!--    lnPiDataCallback -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    factory_derivatives -->
-<!--    factory_extrapmodel_lnPi -->
-<!-- ``` -->
-<!-- ### Gaussian Process Regression -->
-<!-- ```{eval-rst} -->
-<!-- .. currentmodule:: thermoextrap.gpr_active -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    :template: custom-class.rst -->
-<!--    :recursive: -->
-<!--    ig_active.IG_DataWrapper -->
-<!--    ig_active.SimulateIG -->
-<!--    active_utils.DataWrapper -->
-<!--    active_utils.SimWrapper -->
-<!--    active_utils.ChangeInnerOuterRBFDerivKernel -->
-<!--    active_utils.UpdateALMbrute -->
-<!--    active_utils.UpdateSpaceFill -->
-<!--    active_utils.UpdateFuncBase -->
-<!--    active_utils.MaxRelGlobalVar -->
-<!--    active_utils.MaxAbsRelGlobalDeviation -->
-<!--    active_utils.MaxRelVar -->
-<!--    active_utils.StopCriteria -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    active_utils.active_learning -->
-<!--    active_utils.get_logweights -->
-<!--    active_utils.input_GP_from_state -->
-<!--    active_utils.create_base_GP_model -->
-<!--    active_utils.train_GPR -->
-<!--    active_utils.create_GPR -->
-<!--    active_utils.make_poly_expr -->
-<!--    active_utils.make_matern_expr -->
-<!--    active_utils.make_rbf_expr -->
-<!-- ``` -->
-<!-- ```{eval-rst} -->
-<!-- .. autosummary:: -->
-<!--    :toctree: generated/ -->
-<!--    :template: custom-class.rst -->
-<!--    :recursive: -->
-<!--    gp_models.DerivativeKernel -->
-<!--    gp_models.HetGaussianDeriv -->
-<!--    gp_models.HeteroscedasticGPR -->
-<!-- ``` -->
 </section>
 </section>
 
@@ -771,7 +654,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-04-10.
+  Last updated on 2023-05-03.
   <br/>
 </p>
   </div>
