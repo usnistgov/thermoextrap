@@ -536,8 +536,8 @@ def factory_state_idealgas(
     """
 
     from . import beta as xpan_beta
-    from .core import idealgas
-    from .core.data import DataCentralMomentsVals
+    from . import idealgas
+    from .data import DataCentralMomentsVals
 
     # NOTE: this is for reproducible results.
     if seed_from_beta:
@@ -574,7 +574,7 @@ def callback_plot_progress(  # noqa: D417
 
     import matplotlib.pyplot as plt
 
-    from .core import idealgas
+    from . import idealgas
 
     if verbose:
         print("depth:", info_dict["depth"])

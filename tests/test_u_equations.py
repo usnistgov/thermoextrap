@@ -15,7 +15,7 @@ def data(request):
 
     n = request.param
     data.n = n
-    data.u, data.x1 = xtrap.core.models.get_default_symbol("u", "x1")
+    data.u, data.x1 = xtrap.models.get_default_symbol("u", "x1")
     data.du, data.dxdu = get_default_indexed("du", "dxdu")
     data.xu, data.ui = get_default_indexed("xu", "u")
 

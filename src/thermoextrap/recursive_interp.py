@@ -17,10 +17,10 @@ from scipy import stats
 # TODO: Change this to point to the "new" ideagas.py
 # TODO: rework this code to be cleaner
 # from ..legacy.ig import IGmodel
-from .core import idealgas
+from . import idealgas
 from .core._deprecate import deprecate, deprecate_kwarg
-from .core.data import factory_data_values
-from .core.models import ExtrapModel, InterpModel
+from .data import factory_data_values
+from .models import ExtrapModel, InterpModel
 
 try:
     import matplotlib.pyplot as plt

@@ -21,19 +21,16 @@ import xarray as xr
 from attrs import field
 from attrs import validators as attv
 from cmomy import xCentralMoments
+from module_utilities import cached
 
 from . import beta as beta_xpan
-
-# from .beta import ExtrapModel, SymDerivBeta, u_func, u_func_central
-# from .beta import factory_derivatives as factory_derivatives_beta
 from .core._attrs_utils import _cache_field, convert_dims_to_tuple
-from .core._docstrings import factory_docfiller_shared
-from .core.cached_decorators import gcached
-from .core.data import DataCallbackABC
-from .core.models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol
+from .data import DataCallbackABC
+from .docstrings import DOCFILLER_SHARED
+from .models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
 
-docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
 
 
 ################################################################################
@@ -260,7 +257,7 @@ class lnPiDataCallback(DataCallbackABC):
             # assume lnPi0 is an averaging object ala cmomy
             return self.lnPi0.values
 
-    @gcached()
+    @cached.prop
     def mudotN(self):
         """Dot product of `self.mu` and `self.ncoords`, reduces along `self.dims_comp`."""
         return xr.dot(self.mu, self.ncoords, dims=self.dims_comp)

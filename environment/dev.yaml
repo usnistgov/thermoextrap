@@ -3,11 +3,12 @@ channels:
   - wpk-nist
 dependencies:
   - attrs
-  - cmomy>=0.1.9
+  - cmomy>=0.4
   - custom-inherit
   - ipykernel
   - ipython
   - matplotlib
+  - module-utilities>=0.2
   - nbconvert
   - numpy
   - pip

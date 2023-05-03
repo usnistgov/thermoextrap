@@ -3,8 +3,9 @@ channels:
   - wpk-nist
 dependencies:
   - attrs
-  - cmomy>=0.1.9
+  - cmomy>=0.4
   - custom-inherit
+  - module-utilities>=0.2
   - numpy
   - pandas
   - pip
