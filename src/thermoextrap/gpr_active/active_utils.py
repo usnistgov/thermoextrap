@@ -16,8 +16,9 @@ import xarray as xr
 from pymbar import timeseries
 from scipy import integrate, linalg, special
 
-from .. import DataCentralMomentsVals, ExtrapModel
 from .. import beta as xpan_beta
+from ..data import DataCentralMomentsVals
+from ..models import ExtrapModel
 from .gp_models import (
     ConstantMeanWithDerivs,
     DerivativeKernel,

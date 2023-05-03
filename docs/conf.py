@@ -211,7 +211,7 @@ napoleon_type_aliases = {
     "Symbol": "~sympy.core.symbol.Symbol",
     "symFunction": "~sympy.core.function.Function",
     "ExtrapModel": "~thermoextrap.models.ExtrapModel",
-    # "DataCentralMoments": "~cmomy.core.data.DataCentralMoments"
+    # "DataCentralMoments": "~cmomy.DataCentralMoments"
 }
 
 

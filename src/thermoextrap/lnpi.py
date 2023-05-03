@@ -25,10 +25,10 @@ from module_utilities import cached
 
 from . import beta as beta_xpan
 from .core._attrs_utils import _cache_field, convert_dims_to_tuple
-from .core._docstrings import DOCFILLER_SHARED
-from .core.data import DataCallbackABC
-from .core.models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
 from .core.sputils import get_default_indexed, get_default_symbol
+from .data import DataCallbackABC
+from .docstrings import DOCFILLER_SHARED
+from .models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
 

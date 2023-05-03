@@ -7,37 +7,37 @@ Base classes
    :inherited-members:
    :members:
 
-.. autoclass:: thermoextrap.core.models.PiecewiseMixin
+.. autoclass:: thermoextrap.models.PiecewiseMixin
    :autosummary:
    :show-inheritance:
    :inherited-members:
    :members:
 
-.. autoclass:: thermoextrap.core.models.SymDerivBase
+.. autoclass:: thermoextrap.models.SymDerivBase
    :autosummary:
    :show-inheritance:
    :inherited-members:
    :members:
 
-.. autoclass:: thermoextrap.core.models.SymFuncBase
+.. autoclass:: thermoextrap.models.SymFuncBase
    :autosummary:
    :show-inheritance:
    :members:
 
 
-.. autoclass:: thermoextrap.core.data.AbstractData
-   :autosummary:
-   :show-inheritance:
-   :inherited-members:
-   :members:
-
-.. autoclass:: thermoextrap.core.data.DataCentralMomentsBase
+.. autoclass:: thermoextrap.data.AbstractData
    :autosummary:
    :show-inheritance:
    :inherited-members:
    :members:
 
-.. autoclass:: thermoextrap.core.data.DataValuesBase
+.. autoclass:: thermoextrap.data.DataCentralMomentsBase
+   :autosummary:
+   :show-inheritance:
+   :inherited-members:
+   :members:
+
+.. autoclass:: thermoextrap.data.DataValuesBase
    :autosummary:
    :show-inheritance:
    :inherited-members:

@@ -1,10 +1,9 @@
 """Classes/routines to deal with thermodynamic extrapolation."""
 
-from . import beta, lnpi, volume, volume_idealgas
-
 # TODO: move data, idealgas, models to top level.
-from .core import data, idealgas, models
-from .core.data import (
+from . import beta, data, idealgas, lnpi, models, volume, volume_idealgas
+from .core.xrutils import xrwrap_alpha, xrwrap_uv, xrwrap_xv
+from .data import (
     DataCentralMoments,
     DataCentralMomentsVals,
     DataValues,
@@ -14,7 +13,7 @@ from .core.data import (
 )
 
 # expose some data/models
-from .core.models import (
+from .models import (
     Derivatives,
     ExtrapModel,
     ExtrapWeightedModel,
@@ -24,7 +23,6 @@ from .core.models import (
     PerturbModel,
     StateCollection,
 )
-from .core.xrutils import xrwrap_alpha, xrwrap_uv, xrwrap_xv
 
 # updated versioning scheme
 try:

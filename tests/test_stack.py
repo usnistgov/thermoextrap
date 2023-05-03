@@ -4,7 +4,7 @@ import pytest
 import xarray as xr
 
 import thermoextrap as xtrap
-from thermoextrap.core import stack
+from thermoextrap import stack
 
 
 @pytest.fixture

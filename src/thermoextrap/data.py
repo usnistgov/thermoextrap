@@ -26,14 +26,14 @@ from attrs import validators as attv
 from custom_inherit import DocInheritMeta
 from module_utilities import cached
 
-from ._attrs_utils import (
+from .core._attrs_utils import (
     MyAttrsMixin,
     _cache_field,
     convert_dims_to_tuple,
     kw_only_field,
 )
-from ._docstrings import DOCFILLER_SHARED
-from .xrutils import xrwrap_uv, xrwrap_xv
+from .core.xrutils import xrwrap_uv, xrwrap_xv
+from .docstrings import DOCFILLER_SHARED
 
 try:
     from cmomy import xCentralMoments
@@ -51,7 +51,6 @@ __all__ = [
     "DataValues",
     "DataValuesCentral",
     "DataCallbackABC",
-    "AbstractData",
     "factory_data_values",
     "resample_indices",
 ]

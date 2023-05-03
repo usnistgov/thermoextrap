@@ -11,7 +11,8 @@ import xarray as xr
 from gpflow.ci_utils import ci_niter
 from module_utilities import cached
 
-from .core.stack import GPRData, StackedDerivatives, multiindex_to_array
+
+from ..stack import GPRData, StackedDerivatives, multiindex_to_array
 
 __all__ = ("GPRData", "GPRModel", "StackedDerivatives", "factory_gprmodel")
 

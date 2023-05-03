@@ -19,12 +19,11 @@ from custom_inherit import DocInheritMeta
 from module_utilities import cached
 from scipy.special import factorial as sp_factorial
 
-from thermoextrap.core.data import AbstractData, kw_only_field
-
-from ._attrs_utils import MyAttrsMixin, _cache_field
-from ._docstrings import DOCFILLER_SHARED
-from .sputils import get_default_indexed, get_default_symbol
-from .xrutils import xrwrap_alpha
+from .core._attrs_utils import MyAttrsMixin, _cache_field
+from .core.sputils import get_default_indexed, get_default_symbol
+from .core.xrutils import xrwrap_alpha
+from .data import AbstractData, kw_only_field
+from .docstrings import DOCFILLER_SHARED
 
 try:
     from pymbar import mbar
@@ -59,7 +58,7 @@ class SymFuncBase(sp.Function):
 
     See Also
     --------
-    :class:`thermoextrap.core.models.SymDerivBase`
+    :class:`thermoextrap.models.SymDerivBase`
 
     """
 
@@ -77,7 +76,7 @@ class SymFuncBase(sp.Function):
         raise NotImplementedError("must specify in sublcass")
 
     def fdiff(self, argindex=1):
-        """Derivative of function.  This will be used by :class:`thermoextrap.core.models.SymDerivBase`."""
+        """Derivative of function.  This will be used by :class:`thermoextrap.models.SymDerivBase`."""
         raise NotImplementedError("must specify in subclass")
 
     @classmethod
@@ -100,7 +99,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
     ----------
     func : symFunction
         Function to differentiate.  This should (most likely) be an instance
-        of :class:`thermoextrap.core.models.SymFuncBase`
+        of :class:`thermoextrap.models.SymFuncBase`
     args : sequence of Symbol
         Arguments to func
     {expand}
@@ -145,7 +144,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
 @attrs.define
 class SymSubs:
     """
-    Class to handle substitution on :class:`thermoextrap.core.models.SymDerivBase`.
+    Class to handle substitution on :class:`thermoextrap.models.SymDerivBase`.
 
     Parameters
     ----------

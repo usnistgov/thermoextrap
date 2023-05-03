@@ -482,8 +482,6 @@ class StackedDerivatives:
         `StackedDerivatives.from_derivs`
         """
 
-        from .models import StateCollection
-
         if not isinstance(states, StateCollection):
             states = StateCollection(states)
 

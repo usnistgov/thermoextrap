@@ -14,7 +14,7 @@ from functools import lru_cache
 import numpy as np
 import sympy as sp
 
-from ._docstrings import DocFiller
+from .docstrings import DocFiller
 
 __all__ = [
     "x_ave",
