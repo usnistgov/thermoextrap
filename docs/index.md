@@ -1,10 +1,12 @@
-:::{include} ../README.md
+<!-- markdownlint-disable MD041 -->
+
+```{include} ../README.md
 :end-before: <!-- end-docs -->
-:::
+```
 
 # Navigation
 
-:::{toctree}
+```{toctree}
 :maxdepth: 1
 
 installation
@@ -13,6 +15,6 @@ reference/index
 license
 contributing
 authors
-history
+changelog
 navigation
-:::
+```

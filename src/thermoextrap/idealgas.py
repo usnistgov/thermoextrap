@@ -14,7 +14,7 @@ from functools import lru_cache
 import numpy as np
 import sympy as sp
 
-from ._docstrings import DocFiller
+from .docstrings import DocFiller
 
 __all__ = [
     "x_ave",
@@ -67,7 +67,9 @@ shape : int or tuple of int
 """
 
 
-docfiller_shared = DocFiller.from_docstring(_shared_docs, combine_keys="parameters")()
+docfiller_shared = DocFiller.from_docstring(
+    _shared_docs, combine_keys="parameters"
+).decorate
 
 
 # global variables

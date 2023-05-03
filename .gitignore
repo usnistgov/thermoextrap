@@ -12,7 +12,6 @@ env/
 build/
 develop-eggs/
 dist/
-dist-conda/
 downloads/
 eggs/
 .eggs/
@@ -107,9 +106,7 @@ ENV/
 pyrightconfig.json
 .autoenv.zsh
 .autoenv_leave.zsh
-/docs/generated/
+/docs/**/generated/
 /monkeytype.sqlite3
-/dist-conda/
-/cruft.patch
-/docs/jupyter_execute/
-/docs/reference/generated/
+/dist-conda/*
+!/dist-conda/Makefile

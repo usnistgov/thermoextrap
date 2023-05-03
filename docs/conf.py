@@ -17,6 +17,7 @@
 # relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 #
+"""Build docs."""
 import os
 import sys
 
@@ -124,7 +125,7 @@ github_username = "usnistgov"
 html_context = {
     "github_user": "usnistgov",
     "github_repo": "thermoextrap",
-    "github_version": "master",
+    "github_version": "main",
     "doc_path": "docs",
 }
 
@@ -210,7 +211,7 @@ napoleon_type_aliases = {
     "Symbol": "~sympy.core.symbol.Symbol",
     "symFunction": "~sympy.core.function.Function",
     "ExtrapModel": "~thermoextrap.models.ExtrapModel",
-    # "DataCentralMoments": "~cmomy.core.data.DataCentralMoments"
+    # "DataCentralMoments": "~cmomy.DataCentralMoments"
 }
 
 
@@ -440,28 +441,33 @@ intersphinx_mapping = {
     ),
 }
 
+linkcheck_ignore = ["https://doi.org/"]
+
 
 # based on numpy doc/source/conf.py
 def linkcode_resolve(domain, info):
     """Determine the URL corresponding to Python object."""
     import inspect
+    from operator import attrgetter
 
     if domain != "py":
         return None
 
-    modname = info["module"]
-    fullname = info["fullname"]
+    parent_name, *sub_parts = info["module"].split(".")
+    parent_mod = sys.modules.get(parent_name)
 
-    submod = sys.modules.get(modname)
-    if submod is None:
+    try:
+        if len(sub_parts) > 0:
+            sub_name = ".".join(sub_parts)
+            obj = attrgetter(sub_name)(parent_mod)
+        else:
+            obj = parent_mod
+
+        # get fullname
+        obj = attrgetter(info["fullname"])(obj)
+
+    except AttributeError:
         return None
-
-    obj = submod
-    for part in fullname.split("."):
-        try:
-            obj = getattr(obj, part)
-        except AttributeError:
-            return None
 
     try:
         fn = inspect.getsourcefile(inspect.unwrap(obj))

@@ -1,15 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.2",
-    "setuptools_scm[toml]>=7.0",
-]
+requires = ["setuptools>=61.2", "setuptools_scm[toml]>=7.0"]
 build-backend = "setuptools.build_meta"
-
 
 [project]
 name = "thermoextrap"
-authors = [{name = "Jacob Monroe", email = "jacob.monroe@nist.gov"}, {name = "William Krekelberg", email="wpk@nist.gov"}]
-license = {text = '"NIST license https://www.nist.gov/director/licensing"'}
+authors = [
+    { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
+    { name = "William Krekelberg", email = "wpk@nist.gov" }
+]
+license = { text = '"NIST license https://www.nist.gov/director/licensing"' }
 description = "Thermodynamic extrapolation"
 # if using markdown
 # long_description_content_type = text/markdown
@@ -33,11 +32,11 @@ dependencies = [
     "xarray >= 0.16",
     "sympy",
     "scipy",
-    "cmomy >= 0.1.9",
+    "cmomy >= 0.4",
     "custom-inherit",
     "attrs",
+    "module-utilities >= 0.2",
 ]
-
 
 [project.urls]
 homepage = "https://github.com/usnistgov/thermoextrap"
@@ -48,11 +47,7 @@ accel = ["bottleneck"]
 parallel = ["dask[complete]"]
 viz = ["matplotlib"]
 mbar = ["pymbar<4.0"]
-gpr = [
-    "tensorflow",
-    "tensorflow-probability",
-    "gpflow",
-]
+gpr = ["tensorflow", "tensorflow-probability", "gpflow"]
 openmm = ["openmm"]
 all = [
     "thermoextrap[mbar]",
@@ -61,12 +56,10 @@ all = [
     "thermoextrap[parallel]",
     "thermoextrap[viz]",
 ]
-test = [
-    "pytest",
-]
+test = ["pytest"]
+
 # dev = []
 # docs = []
-
 ## Defer this to setup.cfg
 ## Will transition when everything works (grayskull in particular)
 ## and will remove setup.py
@@ -74,15 +67,18 @@ test = [
 # zip-safe = true # if using mypy, must be False
 # include-package-data = true
 # license-files = ["LICENSE"]
-
 # [tool.setuptools.packages.find]
 # namespaces = true
 # where = ["src"]
 ## include = []
 ## exclude = []
-
+##
 [tool.setuptools.dynamic]
-readme = {file = ["README.md", "HISTORY.md", "LICENSE"], content-type = "text/markdown"}
+readme = { file = [
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+], content-type = "text/markdown" }
 
 [tool.setuptools_scm]
 fallback_version = "999"
@@ -99,47 +95,43 @@ profile = "black"
 skip_gitignore = true
 known_first_party = ["thermoextrap"]
 
-
 [tool.ruff]
+fix = true
 line-length = 88
 update-check = false
 target-version = "py38"
-
 select = [
-  # pyflakes
-  "F",
-  # pycodestyle
-  "E",
-  "W",
-  # isort
-  "I",
-  # pyupgrade
-  "UP",
-  # pydocstyle
-  "D",
-  # # flake8-2020
-  # "YTT",
-  # # flake8-bugbear
-  # "B",
-  # # flake8-quotes
-  # "Q",
-  # # pylint
-  # "PLE", "PLR", "PLW",
-  # # misc lints
-  # "PIE",
-  # # tidy imports
-  # "TID",
-  # # implicit string concatenation
-  # "ISC",
-  # # type-checking imports
-  # "TCH",
+    # pyflakes
+    "F",
+    # pycodestyle
+    "E",
+    "W",
+    # isort
+    "I",
+    # pyupgrade
+    "UP",
+    # pydocstyle
+    "D",
+    # # flake8-2020
+    "YTT",
+    # # flake8-bugbear
+    # "B",
+    # flake8-quotes
+    "Q",
+    # # pylint
+    # "PLE", "PLR", "PLW",
+    # # misc lints
+    "PIE",
+    # # tidy imports
+    "TID",
+    # # implicit string concatenation
+    # "ISC",
+    # # type-checking imports
+    "TCH",
 ]
-
-
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 # fixable = ["A", "B", "C", "D", "E", "F", "..."]
 unfixable = []
-
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",
@@ -168,8 +160,6 @@ exclude = [
     "src/thermoextrap/legacy/",
     "examples/gpr_active_learning/",
 ]
-
-
 ignore = [
     # # whitespace before ':' - doesn't work well with black
     # "E203",
@@ -198,10 +188,10 @@ ignore = [
     "D107",
     "D203",
     "D212",
+    # Allow relative imports
+    "TID252",
 ]
-
-per-file-ignores = {}
-
+per-file-ignores = {  }
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
@@ -212,8 +202,52 @@ known-first-party = ["thermoextrap"]
 # Unlike Flake8, default to a complexity level of 10.
 max-complexity = 10
 
-[tool.cruft]
+# TODO : Fix examples/gpr_active_learning/analysis_polymer.ipynb F821
+# beta_list data_list
+[tool.nbqa.addopts]
+ruff = ["--fix", "--extend-ignore=D100,B018,F821"]
 
+[tool.flake8]
+docstring-convention = "numpy"
+ignore = [
+    # # whitespace before ':' - doesn't work well with black
+    "E203",
+    # module level import not at top of file
+    "E402",
+    # line too long - let black worry about that
+    "E501",
+    # do not assign a lambda expression, use a def
+    "E731",
+    # # line break before binary operator
+    "W503",
+    # allow black line after docstring
+    "D202",
+    "D105",
+    "D205",
+    # this leads to errors with placing titles in module
+    # docstrings
+    "D400",
+    "D401",
+    "D415",
+    "D102",
+    "D103",
+    # these are useful, but too many errors
+    # due to use of docfiller
+    "D417",
+    "D107",
+    "D203",
+    "D212",
+]
+
+[tool.scriv]
+format = "md"
+md_header_level = "2"
+new_fragment_template = "file: changelog.d/templates/new_fragment.md.j2"
+
+[tool.commitizen]
+use_shortcuts = true
+
+[tool.cruft]
 
 [tool.mypy]
 files = ["src/thermoextrap"]
@@ -221,23 +255,41 @@ show_error_codes = true
 warn_unused_ignores = true
 warn_return_any = true
 warn_unused_configs = true
-exclude = [
-    ".eggs",
-    ".tox",
-    "doc",
-    "docs",
-]
+exclude = [".eggs", ".tox", "doc", "docs"]
+check_untyped_defs = true
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
-module = [
-       "numpy.*",
-       "pandas.*",
-       "pytest.*",
-       "scipy.*",
-       "setuptools",
-]
+module = []
 
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = []
+
+[tool.pyright]
+include = ["src", "tests"]
+exclude = ["**/__pycache__", ".tox/**", "**/.mypy_cache"]
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+# enable subset of "strict"
+reportDuplicateImport = true
+reportInvalidStubStatement = true
+reportOverlappingOverload = true
+reportPropertyTypeMismatch = true
+reportUntypedClassDecorator = true
+reportUntypedFunctionDecorator = true
+reportUntypedNamedTuple = true
+reportUnusedImport = true
+# disable subset of "basic"
+reportGeneralTypeIssues = false
+reportMissingModuleSource = false
+reportOptionalCall = false
+reportOptionalIterable = false
+reportOptionalMemberAccess = false
+reportOptionalOperand = false
+reportOptionalSubscript = false
+reportPrivateImportUsage = false
+reportUnboundVariable = false
+
+[tool.pytype]
+inputs = ["src", "tests"]

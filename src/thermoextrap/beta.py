@@ -7,8 +7,8 @@ Inverse temperature (beta) extrapolation (:mod:`~thermoextrap.beta`)
 from functools import lru_cache
 from typing import Literal
 
-from .core._docstrings import factory_docfiller_shared
-from .core.models import (
+from .docstrings import DOCFILLER_SHARED
+from .models import (
     Derivatives,
     ExtrapModel,
     PerturbModel,
@@ -19,7 +19,7 @@ from .core.models import (
     get_default_symbol,
 )
 
-docfiller_shared = factory_docfiller_shared(names=("default", "beta"))
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
 
 ##############################################################################
 # recursive deriatives for beta expansion
@@ -692,7 +692,7 @@ def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     --------
     ~thermoextrap.models.PerturbModel
     """
-    from .core.data import factory_data_values
+    from .data import factory_data_values
 
     data = factory_data_values(uv=uv, xv=xv, order=0, central=False, **kws)
     return PerturbModel(alpha0=beta, data=data, alpha_name=alpha_name)

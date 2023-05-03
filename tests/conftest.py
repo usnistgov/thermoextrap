@@ -2,11 +2,10 @@ import numpy as np
 import pytest
 import xarray as xr
 
+from module_utilities import cached
+
 import thermoextrap as xtrap
 import thermoextrap.legacy
-
-# import thermoextrap.xpan_beta as betaxtrap
-from thermoextrap.core.cached_decorators import gcached
 
 
 class FixtureData:
@@ -29,19 +28,19 @@ class FixtureData:
         self.xb = self.rs.rand(n, nv) + xoff
 
     # bunch of things to test
-    @gcached()
+    @cached.prop
     def rdata(self):
         return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=False
         )
 
-    @gcached()
+    @cached.prop
     def cdata(self):
         return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=True
         )
 
-    @gcached()
+    @cached.prop
     def xdata(self):
         return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
@@ -51,13 +50,13 @@ class FixtureData:
             dims=["val"],
         )
 
-    @gcached()
+    @cached.prop
     def xdata_val(self):
         return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x, uv=self.u, order=self.order, central=True
         )
 
-    @gcached()
+    @cached.prop
     def xrdata(self):
         return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
@@ -67,7 +66,7 @@ class FixtureData:
             dims=["val"],
         )
 
-    @gcached()
+    @cached.prop
     def xrdata_val(self):
         return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x,
@@ -77,19 +76,19 @@ class FixtureData:
         )
 
     # bunch of things to test
-    @gcached()
+    @cached.prop
     def rdata(self):
         return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=False
         )
 
-    @gcached()
+    @cached.prop
     def cdata(self):
         return xtrap.factory_data_values(
             uv=self.u, xv=self.x, order=self.order, central=True
         )
 
-    @gcached()
+    @cached.prop
     def xdata(self):
         return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
@@ -100,13 +99,13 @@ class FixtureData:
             axis=0,
         )
 
-    @gcached()
+    @cached.prop
     def xdata_val(self):
         return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x, uv=self.u, order=self.order, central=True
         )
 
-    @gcached()
+    @cached.prop
     def xrdata(self):
         return xtrap.DataCentralMoments.from_vals(
             xv=self.x,
@@ -117,7 +116,7 @@ class FixtureData:
             axis=0,
         )
 
-    @gcached()
+    @cached.prop
     def xrdata_val(self):
         return xtrap.DataCentralMomentsVals.from_vals(
             xv=self.x,
@@ -134,7 +133,7 @@ class FixtureData:
     def betas(self):
         return [0.3, 0.4]
 
-    @gcached()
+    @cached.prop
     def em(self):
         """extrapolation model fixture"""
 
@@ -151,12 +150,12 @@ class FixtureData:
 
     #     return ufunc_out, xufunc_out
 
-    @gcached()
+    @cached.prop
     def u_xu_funcs(self):
         ufunc, xufunc = thermoextrap.legacy.buildAvgFuncs(self.x, self.u, self.order)
         return ufunc, xufunc
 
-    @gcached()
+    @cached.prop
     def derivs_list(self):
         fs = [thermoextrap.legacy.symDerivAvgX(i) for i in range(self.order + 1)]
         ufunc, xufunc = self.u_xu_funcs
@@ -240,12 +239,12 @@ def pytest_collection_modifyitems(config, items):
 #         self.u = u
 #         self.order = order
 
-#     @gcached()
+#     @cached.prop
 #     def u_xu_funcs(self):
 #         ufunc, xufunc = thermoextrap.legacy.buildAvgFuncs(self.x, self.u, self.order)
 #         return ufunc, xufunc
 
-#     @gcached(prop=False)
+#     @cached.meth
 #     def em(self, alpha0=0.5):
 #         return thermoextrap.legacy.ExtrapModel(self.order, alpha0, self.x, self.u)
 
@@ -254,7 +253,7 @@ def pytest_collection_modifyitems(config, items):
 #     def __init__(self, data):
 #         self.data = data
 
-#     @gcached(prop=False)
+#     @cached.meth
 #     def xem(self, alpha0=0.5, minus_log=False):
 #         return xtrap.beta.factory_extrapmodel(alpha0=alpha0, data=self.data,
 #                                              minus_log=minus_log)
