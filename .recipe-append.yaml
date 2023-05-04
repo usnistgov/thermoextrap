@@ -1,0 +1,19 @@
+test:
+  imports:
+    - thermoextrap
+  commands:
+    - pip check
+  requires:
+    - pip
+
+about:
+  home: https://github.com/usnistgov/thermoextrap
+  summary: Thermodynamic extrapolation
+  description: |
+    A package to perform thermodynamic extrapolation of molecular simulations.
+  license: NIST-PD
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - wpk-nist-gov

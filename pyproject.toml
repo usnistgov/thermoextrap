@@ -8,7 +8,7 @@ authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" }
 ]
-license = { text = '"NIST license https://www.nist.gov/director/licensing"' }
+license = { text = "NIST-PD" }
 description = "Thermodynamic extrapolation"
 # if using markdown
 # long_description_content_type = text/markdown
@@ -60,16 +60,16 @@ test = ["pytest"]
 
 # dev = []
 # docs = []
-## Defer this to setup.cfg
-## Will transition when everything works (grayskull in particular)
-## and will remove setup.py
-# [tool.setuptools]
-# zip-safe = true # if using mypy, must be False
-# include-package-data = true
-# license-files = ["LICENSE"]
-# [tool.setuptools.packages.find]
-# namespaces = true
-# where = ["src"]
+## grayskull still messes some things up, but use scripts/recipe-append.sh for this
+[tool.setuptools]
+zip-safe = true # if using mypy, must be False
+include-package-data = true
+license-files = ["LICENSE"]
+
+[tool.setuptools.packages.find]
+namespaces = true
+where = ["src"]
+
 ## include = []
 ## exclude = []
 ##
