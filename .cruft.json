@@ -14,7 +14,7 @@
       "email": "wpk@nist.gov",
       "github_username": "usnistgov",
       "pypi_username": "wpk-nist",
-      "conda_channel": "wpk-nist",
+      "conda_channel": "conda-forge",
       "project_name": "thermoextrap",
       "project_slug": "thermoextrap",
       "_copy_without_render": [

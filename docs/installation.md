@@ -11,7 +11,7 @@ pip install thermoextrap
 or, if you use conda, run:
 
 ```bash
-conda install c wpk-nist thermoextrap
+conda install -c conda-forge thermoextrap
 ```
 
 ## Additional dependencies

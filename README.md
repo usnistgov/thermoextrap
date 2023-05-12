@@ -20,8 +20,8 @@ https://naereen.github.io/badges/
 [docs-link]: https://pages.nist.gov/thermoextrap/
 [repo-badge]: https://img.shields.io/badge/--181717?logo=github&logoColor=ffffff
 [repo-link]: https://github.com/usnistgov/thermoextrap
-[conda-badge]: https://img.shields.io/conda/v/wpk-nist/thermoextrap
-[conda-link]: https://anaconda.org/wpk-nist/thermoextrap
+[conda-badge]: https://img.shields.io/conda/v/conda-forge/thermoextrap
+[conda-link]: https://anaconda.org/conda-forge/thermoextrap
 [license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
 [license-link]: https://github.com/usnistgov/thermoextrap/blob/main/LICENSE
 
@@ -82,7 +82,7 @@ request for wanted features and suggestions!
 `thermoextrap` may be installed with either (recommended)
 
 ```bash
-conda install -c wpk-nist thermoextrap
+conda install -c conda-forge thermoextrap
 ```
 
 or
