@@ -110,3 +110,4 @@ pyrightconfig.json
 /monkeytype.sqlite3
 /dist-conda/*
 !/dist-conda/Makefile
+/thermoextrap-feedstock*/
