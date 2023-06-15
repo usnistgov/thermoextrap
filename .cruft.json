@@ -1,7 +1,7 @@
 {
   "template": "https://github.com/wpk-nist-gov/cookiecutter-pypackage.git",
-  "commit": "10a9fe1a4f0b341184e41953433c344020f92c72",
-  "checkout": "feature/markdown",
+  "commit": "49d100c749e6cfa2cba3460ed06e4a06be07cc63",
+  "checkout": "feature/nox",
   "skip": [
     "src/thermoextrap/__init__.py",
     "docs/examples/usage/demo.ipynb",
@@ -14,7 +14,7 @@
       "email": "wpk@nist.gov",
       "github_username": "usnistgov",
       "pypi_username": "wpk-nist",
-      "conda_channel": "wpk-nist",
+      "conda_channel": "conda-forge",
       "project_name": "thermoextrap",
       "project_slug": "thermoextrap",
       "_copy_without_render": [

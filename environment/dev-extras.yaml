@@ -45,12 +45,12 @@ dependencies:
   # - pytest-mypy
   # # Monkeytype: autocreate type hints
   # - MonkeyType
-  # - pip
-  # - pip:
-  #     - pytest-accept
-  #     - mypy-extensions
-  #     - pytest-monkeytype
-  #     - flake8-mypy
-  #     - attr-utils
-  #     spelling?
-  #     - pyenchant
+  - pip
+  - pip:
+      - pytest-accept
+  # - mypy-extensions
+  # - pytest-monkeytype
+  # - flake8-mypy
+  # - attr-utils
+  # spelling?
+  # - pyenchant

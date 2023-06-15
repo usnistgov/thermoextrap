@@ -15,6 +15,7 @@ dependencies:
   - custom-inherit
   - attrs
   - module-utilities >= 0.2
+  - mypy
   - pytest
   - pytest-xdist
   - pytest-cov
