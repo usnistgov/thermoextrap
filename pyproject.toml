@@ -123,6 +123,8 @@ docs = [
     "sphinx-book-theme",
     "autodocsumm",
     "thermoextrap[viz]",
+    "thermoextrap[mbar]",
+    "thermoextrap[gpr]",
 ]
 # to be parsed with pyproject2conda with --no-base option
 dist-pypi = ["twine", "build"]
