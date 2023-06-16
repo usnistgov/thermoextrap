@@ -1089,7 +1089,7 @@ class MBARModel(StateCollection):
 
         out = []
         for b in alpha.values:
-            out.append(mbar_obj.computeMultipleExpectations(x_flat.T, b * U)[0])
+            out.append(mbar_obj.compute_multiple_expectations(x_flat.T, b * U)["mu"])
 
         out = np.array(out)
         # reshape

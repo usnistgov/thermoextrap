@@ -133,8 +133,8 @@ class DensityGPModel:
         mu = []
         var = []
         for k in range(dens_info.shape[1]):
-            this_g = timeseries.statisticalInefficiency(dens_info[:, k])
-            timeseries.subsampleCorrelatedData(np.arange(dens_info.shape[0]), this_g)
+            this_g = timeseries.statistical_inefficiency(dens_info[:, k])
+            timeseries.subsample_correlated_data(np.arange(dens_info.shape[0]), this_g)
             # Take logarithm to ensure density cannot go negative
             # Note that default transformation function handles this, modeling log(dens)
             # and transforming back to density for prediction

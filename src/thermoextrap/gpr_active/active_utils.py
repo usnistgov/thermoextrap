@@ -247,16 +247,16 @@ class DataWrapper:
         g_x = 0.0
         g_cross = 0.0
         for k in range(x.shape[1]):
-            this_g_x = timeseries.statisticalInefficiency(x[:, k])
-            this_g_cross = timeseries.statisticalInefficiency(x[:, k], pot)
+            this_g_x = timeseries.statistical_inefficiency(x[:, k])
+            this_g_cross = timeseries.statistical_inefficiency(x[:, k], pot)
             if this_g_x > g_x:
                 g_x = this_g_x
             if this_g_cross > g_cross:
                 g_cross = this_g_cross
-        g_pot = timeseries.statisticalInefficiency(pot)
+        g_pot = timeseries.statistical_inefficiency(pot)
         g_max = np.max([g_x, g_pot, g_cross])
         # Get indices of uncorrelated data and subsample everything
-        uncorr_inds = timeseries.subsampleCorrelatedData(np.arange(x.shape[0]), g_max)
+        uncorr_inds = timeseries.subsample_correlated_data(np.arange(x.shape[0]), g_max)
         x = x[uncorr_inds, :]
         bias = bias[uncorr_inds]
         pot = pot[uncorr_inds]

@@ -27,7 +27,7 @@ dependencies:
   - sphinx-book-theme
   - autodocsumm
   - matplotlib
-  - pymbar<4.0
+  - pymbar>=4.0
   - pip
   - pip:
       - tensorflow

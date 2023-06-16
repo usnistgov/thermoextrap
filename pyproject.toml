@@ -50,7 +50,7 @@ parallel = [
 
 ]
 viz = ["matplotlib"]
-mbar = ["pymbar<4.0"]
+mbar = ["pymbar>=4.0"]
 gpr = [
     "tensorflow", # p2c: -p
     "tensorflow-probability", # p2c: -p
