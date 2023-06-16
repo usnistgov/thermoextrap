@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>thermoextrap: Thermodynamic Extrapolation/Interpolation Library &#8212; thermoextrap 0.3.0 documentation</title>
+    <title>thermoextrap: Thermodynamic Extrapolation/Interpolation Library &#8212; thermoextrap 0.4.0 documentation</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -37,8 +37,8 @@
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -129,7 +129,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
+    <p class="title logo__title">thermoextrap 0.4.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -527,7 +527,7 @@ document.write(`
 <p><a class="reference external" href="https://github.com/usnistgov/thermoextrap"><img alt="Repo" src="https://img.shields.io/badge/--181717?logo=github&amp;logoColor=ffffff" /></a> <a class="reference external" href="https://pages.nist.gov/thermoextrap/"><img alt="Docs" src="https://img.shields.io/badge/docs-sphinx-informational" /></a>
 <a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/LICENSE"><img alt="PyPI license" src="https://img.shields.io/pypi/l/cmomy?color=informational" /></a>
 <a class="reference external" href="https://pypi.org/project/thermoextrap"><img alt="PyPI version" src="https://img.shields.io/pypi/v/thermoextrap" /></a>
-<a class="reference external" href="https://anaconda.org/wpk-nist/thermoextrap"><img alt="Conda (channel only)" src="https://img.shields.io/conda/v/wpk-nist/thermoextrap" /></a>
+<a class="reference external" href="https://anaconda.org/conda-forge/thermoextrap"><img alt="Conda (channel only)" src="https://img.shields.io/conda/v/conda-forge/thermoextrap" /></a>
 <a class="reference external" href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a></p>
 <!-- For more badges, see
 https://shields.io/category/other
@@ -574,7 +574,7 @@ request for wanted features and suggestions!</p>
 <section id="quick-start">
 <h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">thermoextrap</span></code> may be installed with either (recommended)</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>wpk-nist<span class="w"> </span>thermoextrap
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>thermoextrap
 </pre></div>
 </div>
 <p>or</p>
@@ -647,7 +647,10 @@ In preparation.</p>
               
               
                 <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="right-next"
        href="installation.html"
@@ -658,7 +661,10 @@ In preparation.</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -691,7 +697,7 @@ In preparation.</p>
             
           </div>
           <footer class="bd-footer-content">
-            <div class="bd-footer-content__inner">
+            
 <div class="bd-footer-content__inner container">
   
   <div class="footer-item">
@@ -715,7 +721,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-05-03.
+  Last updated on 2023-06-15.
   <br/>
 </p>
   </div>
@@ -724,7 +730,7 @@ By William P. Krekelberg
     
   </div>
   
-</div></div>
+</div>
           </footer>
         
 
@@ -733,8 +739,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>

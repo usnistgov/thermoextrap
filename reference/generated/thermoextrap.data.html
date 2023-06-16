@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Data handlers (data) &#8212; thermoextrap 0.3.0 documentation</title>
+    <title>Data handlers (data) &#8212; thermoextrap 0.4.0 documentation</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -37,8 +37,8 @@
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -130,7 +130,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
+    <p class="title logo__title">thermoextrap 0.4.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -674,7 +674,7 @@ document.write(`
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMoments" title="thermoextrap.data.DataCentralMoments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCentralMoments</span></code></a>(dxduave, *, meta[, ...])</p></td>
-<td><p>Data class using <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> to handle central moments.</p></td>
+<td><p>Data class using <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> to handle central moments.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMomentsVals" title="thermoextrap.data.DataCentralMomentsVals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCentralMomentsVals</span></code></a>(uv, xv, *, meta[, ...])</p></td>
 <td><p>Data object based on central co-moments array.</p></td>
@@ -705,11 +705,11 @@ document.write(`
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMoments">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.data.</span></span><span class="sig-name descname"><span class="pre">DataCentralMoments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dxduave</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'umom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xmom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_is_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1138-L1902"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMoments" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../api-baseclasses.html#thermoextrap.data.DataCentralMomentsBase" title="thermoextrap.data.DataCentralMomentsBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataCentralMomentsBase</span></code></a></p>
-<p>Data class using <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> to handle central moments.</p>
+<p>Data class using <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> to handle central moments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dxduave</strong> (<a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xCentralMoments</span></code></a>) – Central moments object.</p></li>
+<li><p><strong>dxduave</strong> (<a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xCentralMoments</span></code></a>) – Central moments object.</p></li>
 <li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
 <li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
 <li><p><strong>xmom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'xmom'</span></code>) – Name of dimension for moments of observable <cite>x</cite>.</p></li>
@@ -799,7 +799,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <td><p>Selector for <code class="docutils literal notranslate"><span class="pre">dxdu_selector[n]</span> <span class="pre">=</span> <span class="pre">dx</span> <span class="pre">*</span> <span class="pre">du</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMoments.dxduave" title="thermoextrap.data.DataCentralMoments.dxduave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dxduave</span></code></a></p></td>
-<td><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p></td>
+<td><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMoments.meta" title="thermoextrap.data.DataCentralMoments.meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meta</span></code></a></p></td>
 <td><p>Callback</p></td>
@@ -856,7 +856,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <li><p><strong>dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension to reduce along.</p></li>
 <li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Axis to reduce along.</p></li>
 <li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <a class="reference internal" href="#thermoextrap.data.DataCentralMoments.rec_dim" title="thermoextrap.data.DataCentralMoments.rec_dim"><code class="xref py py-attr docutils literal notranslate"><span class="pre">rec_dim</span></code></a>) – axis or dimension to block average along</p></li>
-<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – extra arguments to <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.block" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.block()</span></code></a></p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – extra arguments to <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.block" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.block()</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -885,11 +885,11 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>freq</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.24)"><span class="xref std std-term">array</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(nrep,</span> <span class="pre">size)</span></code> where <cite>nrep</cite> is the number of replicates and
 <code class="docutils literal notranslate"><span class="pre">size</span> <span class="pre">=</span> <span class="pre">self.shape[axis]</span></code>.  <cite>freq</cite> is the weight that each sample contributes
-to resamples values.  See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
+to resamples values.  See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
 <li><p><strong>indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.24)"><span class="xref std std-term">array</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(nrep,</span> <span class="pre">size)</span></code>.  If passed, create <cite>freq</cite> from indices.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
 <li><p><strong>nrep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Number of replicates.  Create <cite>freq</cite> with this many replicates.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
 <li><p><strong>dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension to reduce along.</p></li>
 <li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Axis to reduce along.</p></li>
 <li><p><strong>rep_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of new ‘replicated’ dimension:</p></li>
@@ -922,7 +922,7 @@ and xarray objects will have a derivative</p></li>
 a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>val_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>, <em>optional</em>) – Shape of <cite>values</cite> part of data.  That is, the non-moment dimensions.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>, <em>optional</em>) – Optional <code class="docutils literal notranslate"><span class="pre">dtype</span></code> for output data.</p></li>
-<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
+<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.ndim</span></code>, then dims specifies all dimensions.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.val_ndim</span></code>, <code class="docutils literal notranslate"><span class="pre">dims</span> <span class="pre">=</span> <span class="pre">dims</span> <span class="pre">+</span> <span class="pre">mom_dims</span></code></p></li>
@@ -933,7 +933,7 @@ a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.11)"><span class="xref std std-term">mapping</span></a>) – Coordinates of output</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>) – Name of output</p></li>
 <li><p><strong>indexes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Any</span></code>) – indexes attribute.  This is ignored.</p></li>
-<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
+<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
 Overrides other options.</p></li>
 <li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
@@ -948,7 +948,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_raw" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_raw()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_raw" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_raw()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -959,8 +959,8 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
-<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
+<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
 <li><p><strong>xmom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'xmom'</span></code>) – Name of dimension for moments of observable <cite>x</cite>.</p></li>
 <li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
@@ -976,7 +976,7 @@ In this case, if <code class="docutils literal notranslate"><span class="pre">x1
 broadcast <cite>x1</cite> to <code class="docutils literal notranslate"><span class="pre">x0.shape</span></code>.</p></li>
 <li><p><strong>val_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>, <em>optional</em>) – Shape of <cite>values</cite> part of data.  That is, the non-moment dimensions.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>, <em>optional</em>) – Optional <code class="docutils literal notranslate"><span class="pre">dtype</span></code> for output data.</p></li>
-<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
+<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.ndim</span></code>, then dims specifies all dimensions.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.val_ndim</span></code>, <code class="docutils literal notranslate"><span class="pre">dims</span> <span class="pre">=</span> <span class="pre">dims</span> <span class="pre">+</span> <span class="pre">mom_dims</span></code></p></li>
@@ -987,7 +987,7 @@ broadcast <cite>x1</cite> to <code class="docutils literal notranslate"><span cl
 <li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.11)"><span class="xref std std-term">mapping</span></a>) – Coordinates of output</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>) – Name of output</p></li>
 <li><p><strong>indexes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Any</span></code>) – indexes attribute.  This is ignored.</p></li>
-<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
+<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
 Overrides other options.</p></li>
 <li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
@@ -1002,7 +1002,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1030,7 +1030,7 @@ and xarray objects will have a derivative</p></li>
 a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>val_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>, <em>optional</em>) – Shape of <cite>values</cite> part of data.  That is, the non-moment dimensions.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>, <em>optional</em>) – Optional <code class="docutils literal notranslate"><span class="pre">dtype</span></code> for output data.</p></li>
-<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
+<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.ndim</span></code>, then dims specifies all dimensions.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.val_ndim</span></code>, <code class="docutils literal notranslate"><span class="pre">dims</span> <span class="pre">=</span> <span class="pre">dims</span> <span class="pre">+</span> <span class="pre">mom_dims</span></code></p></li>
@@ -1041,7 +1041,7 @@ a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.11)"><span class="xref std std-term">mapping</span></a>) – Coordinates of output</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>) – Name of output</p></li>
 <li><p><strong>indexes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Any</span></code>) – indexes attribute.  This is ignored.</p></li>
-<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
+<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
 Overrides other options.</p></li>
 <li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
@@ -1056,7 +1056,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_data" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_data()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_data" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_data()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1093,7 +1093,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_resample_vals" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_resample_vals()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_resample_vals" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_resample_vals()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1122,7 +1122,7 @@ and xarray objects will have a derivative</p></li>
 <li><p><strong>mom</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Order or moments.  If integer or length one tuple, then moments are for
 a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>, <em>optional</em>) – Optional <code class="docutils literal notranslate"><span class="pre">dtype</span></code> for output data.</p></li>
-<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
+<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.ndim</span></code>, then dims specifies all dimensions.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.val_ndim</span></code>, <code class="docutils literal notranslate"><span class="pre">dims</span> <span class="pre">=</span> <span class="pre">dims</span> <span class="pre">+</span> <span class="pre">mom_dims</span></code></p></li>
@@ -1133,7 +1133,7 @@ a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.11)"><span class="xref std std-term">mapping</span></a>) – Coordinates of output</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>) – Name of output</p></li>
 <li><p><strong>indexes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Any</span></code>) – indexes attribute.  This is ignored.</p></li>
-<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
+<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
 Overrides other options.</p></li>
 <li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
@@ -1145,7 +1145,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_raw" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_raw()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_raw" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_raw()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1180,7 +1180,7 @@ and xarray objects will have a derivative</p></li>
 a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>val_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>, <em>optional</em>) – Shape of <cite>values</cite> part of data.  That is, the non-moment dimensions.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>, <em>optional</em>) – Optional <code class="docutils literal notranslate"><span class="pre">dtype</span></code> for output data.</p></li>
-<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
+<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.ndim</span></code>, then dims specifies all dimensions.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.val_ndim</span></code>, <code class="docutils literal notranslate"><span class="pre">dims</span> <span class="pre">=</span> <span class="pre">dims</span> <span class="pre">+</span> <span class="pre">mom_dims</span></code></p></li>
@@ -1191,7 +1191,7 @@ a single variable.  If length 2 tuple, then comoments of two variables</p></li>
 <li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.11)"><span class="xref std std-term">mapping</span></a>) – Coordinates of output</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>) – Name of output</p></li>
 <li><p><strong>indexes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Any</span></code>) – indexes attribute.  This is ignored.</p></li>
-<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
+<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
 Overrides other options.</p></li>
 <li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
@@ -1203,7 +1203,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_data" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_data()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_data" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_data()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1271,7 +1271,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMoments.dxduave">
 <span class="sig-name descname"><span class="pre">dxduave</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMoments.dxduave" title="Permalink to this definition">#</a></dt>
-<dd><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p>
+<dd><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1339,7 +1339,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dd><p>Data underlying <a class="reference internal" href="#thermoextrap.data.DataCentralMoments.dxduave" title="thermoextrap.data.DataCentralMoments.dxduave"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dxduave</span></code></a>.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.values" title="(in cmomy v0.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.values</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.values" title="(in cmomy v0.5.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.values</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1396,7 +1396,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dxduave</strong> (<a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xCentralMoments</span></code></a>) – Central moments object.</p></li>
+<li><p><strong>dxduave</strong> (<a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xCentralMoments</span></code></a>) – Central moments object.</p></li>
 <li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
 <li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
 <li><p><strong>xmom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'xmom'</span></code>) – Name of dimension for moments of observable <cite>x</cite>.</p></li>
@@ -1408,8 +1408,8 @@ if ‘checker’ in meta, then perform a callback of the form meta[‘checker](s
 this can also be used to override things like derivs_args.
 Values passed through method <cite>resample_meta</cite></p></li>
 <li><p><strong>x_is_u</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, treat <cite>xv = uv</cite> and do adjust u/du accordingly</p></li>
-<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
+<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
 <li><p><strong>from_vals_kws</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra arguments passed to xCentralMoments.from_vals</p></li>
 </ul>
@@ -1431,10 +1431,10 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <td><p>Stored weights</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMomentsVals.from_vals_kws" title="thermoextrap.data.DataCentralMomentsVals.from_vals_kws"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_vals_kws</span></code></a></p></td>
-<td><p>Optional parameters to <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p></td>
+<td><p>Optional parameters to <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMomentsVals.dxduave" title="thermoextrap.data.DataCentralMomentsVals.dxduave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dxduave</span></code></a></p></td>
-<td><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p></td>
+<td><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMomentsVals.central" title="thermoextrap.data.DataCentralMomentsVals.central"><code class="xref py py-obj docutils literal notranslate"><span class="pre">central</span></code></a></p></td>
 <td><p>Whether central or raw moments are used</p></td>
@@ -1554,13 +1554,13 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsVals.from_vals_kws">
 <span class="sig-name descname"><span class="pre">from_vals_kws</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsVals.from_vals_kws" title="Permalink to this definition">#</a></dt>
-<dd><p>Optional parameters to <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p>
+<dd><p>Optional parameters to <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsVals.dxduave">
 <span class="sig-name descname"><span class="pre">dxduave</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsVals.dxduave" title="Permalink to this definition">#</a></dt>
-<dd><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.4.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p>
+<dd><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.5.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1570,8 +1570,8 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
-<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
+<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
 <li><p><strong>xmom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'xmom'</span></code>) – Name of dimension for moments of observable <cite>x</cite>.</p></li>
 <li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
@@ -1585,7 +1585,7 @@ In this case, if <code class="docutils literal notranslate"><span class="pre">x1
 broadcast <cite>x1</cite> to <code class="docutils literal notranslate"><span class="pre">x0.shape</span></code>.</p></li>
 <li><p><strong>val_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>, <em>optional</em>) – Shape of <cite>values</cite> part of data.  That is, the non-moment dimensions.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.24)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>, <em>optional</em>) – Optional <code class="docutils literal notranslate"><span class="pre">dtype</span></code> for output data.</p></li>
-<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
+<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Dimension of resulting <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>.</p>
 <ul class="simple">
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.ndim</span></code>, then dims specifies all dimensions.</p></li>
 <li><p>If <code class="docutils literal notranslate"><span class="pre">len(dims)</span> <span class="pre">==</span> <span class="pre">self.val_ndim</span></code>, <code class="docutils literal notranslate"><span class="pre">dims</span> <span class="pre">=</span> <span class="pre">dims</span> <span class="pre">+</span> <span class="pre">mom_dims</span></code></p></li>
@@ -1596,7 +1596,7 @@ broadcast <cite>x1</cite> to <code class="docutils literal notranslate"><span cl
 <li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.11)"><span class="xref std std-term">mapping</span></a>) – Coordinates of output</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>) – Name of output</p></li>
 <li><p><strong>indexes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Any</span></code>) – indexes attribute.  This is ignored.</p></li>
-<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
+<li><p><strong>template</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – If present, output will have attributes of <cite>template</cite>.
 Overrides other options.</p></li>
 <li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
@@ -1611,7 +1611,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.from_vals" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.from_vals()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1635,7 +1635,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.resample" title="(in cmomy v0.4.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.resample()</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.resample" title="(in cmomy v0.5.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.resample()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1759,7 +1759,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dd><p>Data underlying <a class="reference internal" href="#thermoextrap.data.DataCentralMomentsVals.dxduave" title="thermoextrap.data.DataCentralMomentsVals.dxduave"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dxduave</span></code></a>.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.values" title="(in cmomy v0.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.values</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.values" title="(in cmomy v0.5.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.values</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -1816,8 +1816,8 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
+<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
 <li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
 <li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
@@ -2000,7 +2000,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>uv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span class="xref std std-term">array-like</span></a>) – raw values of u (energy)
 if not DataArray, wrap with <cite>xrwrap_uv</cite></p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
 if not DataArray, wrap with <cite>xrwrap_xv</cite></p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
 <li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
@@ -2057,9 +2057,9 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.24)"><span class="xref std std-term">array</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(nrep,</span> <span class="pre">size)</span></code>.  If passed, create <cite>freq</cite> from indices.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
 <li><p><strong>nrep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Number of replicates.  Create <cite>freq</cite> with this many replicates.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
 <li><p><strong>rep_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of new ‘replicated’ dimension:</p></li>
 <li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
 <li><p><strong>compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – whether to perform compute step on xarray outputs</p></li>
@@ -2121,8 +2121,8 @@ See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/g
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
+<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
 <li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
 <li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
@@ -2296,7 +2296,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>uv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span class="xref std std-term">array-like</span></a>) – raw values of u (energy)
 if not DataArray, wrap with <cite>xrwrap_uv</cite></p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
 if not DataArray, wrap with <cite>xrwrap_xv</cite></p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
 <li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
@@ -2353,9 +2353,9 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.24)"><span class="xref std std-term">array</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(nrep,</span> <span class="pre">size)</span></code>.  If passed, create <cite>freq</cite> from indices.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
 <li><p><strong>nrep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Number of replicates.  Create <cite>freq</cite> with this many replicates.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
 <li><p><strong>rep_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of new ‘replicated’ dimension:</p></li>
 <li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
 <li><p><strong>compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – whether to perform compute step on xarray outputs</p></li>
@@ -2507,7 +2507,7 @@ the Data class include <cite>self.meta</cite> which performs these actions.</p>
 For the case <cite>x_is_u</cite>, highest order is &lt;u ** (order+1)&gt;</p></li>
 <li><p><strong>uv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.24)"><span class="xref std std-term">array-like</span></a>) – raw values of u (energy)
 if not DataArray, wrap with <cite>xrwrap_uv</cite></p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
 if not DataArray, wrap with <cite>xrwrap_xv</cite></p></li>
 <li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
 <li><p><strong>xalpha</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – Flag whether <cite>u</cite> depends on variable <cite>alpha</cite>.</p></li>
@@ -2543,7 +2543,7 @@ and xarray objects will have a derivative</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – size of axis to bootstrap along</p></li>
 <li><p><strong>nrep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Number of replicates.  Create <cite>freq</cite> with this many replicates.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.4.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.5.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
 <li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
 <li><p><strong>rep_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of new ‘replicated’ dimension:</p></li>
 <li><p><strong>replace</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>) – If True, sample with replacement.</p></li>
@@ -2551,7 +2551,7 @@ See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/g
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>indices</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – if transpose, shape=(size, nrep)
+<dd class="field-even"><p><strong>indices</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – if transpose, shape=(size, nrep)
 else, shape=(nrep, size)</p>
 </dd>
 </dl>
@@ -2565,7 +2565,10 @@ else, shape=(nrep, size)</p>
               
               
                 <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="../api-modules.html"
@@ -2585,7 +2588,10 @@ else, shape=(nrep, size)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -2754,7 +2760,7 @@ else, shape=(nrep, size)</p>
             
           </div>
           <footer class="bd-footer-content">
-            <div class="bd-footer-content__inner">
+            
 <div class="bd-footer-content__inner container">
   
   <div class="footer-item">
@@ -2778,7 +2784,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-05-03.
+  Last updated on 2023-06-15.
   <br/>
 </p>
   </div>
@@ -2787,7 +2793,7 @@ By William P. Krekelberg
     
   </div>
   
-</div></div>
+</div>
           </footer>
         
 
@@ -2796,8 +2802,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>

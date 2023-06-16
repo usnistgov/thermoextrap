@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Temperature indepent average observable &#8212; thermoextrap 0.3.0 documentation</title>
+    <title>Temperature indepent average observable &#8212; thermoextrap 0.4.0 documentation</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -37,8 +37,8 @@
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -132,7 +132,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
+    <p class="title logo__title">thermoextrap 0.4.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -622,7 +622,7 @@ Perturbation:
 </div>
 </div>
 </div>
-<p>All of the extrapolation/interpolation model classes come with a way to resample data efficiently to allow for bootstrapped uncertainty estimates. The <a class="reference internal" href="../../../reference/generated/thermoextrap.data.html#thermoextrap.data.DataCentralMomentsVals.resample" title="thermoextrap.data.DataCentralMomentsVals.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">thermoextrap.data.DataCentralMomentsVals.resample()</span></code></a> function actually resamples the data and returns a new extrapolation/interpolation class object, meaning that the necessary coefficients are automatically recomputed. However, the coefficients are computed separately for the different bootstrapped samples, which appear as different entries in the “replication” or “rep” dimension. In what we show below, this makes it easy to create bootstrap resampled data, then compute statistics on the coefficients or the predictions using built in statistical functions in xarray (e.g., <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.mean.html#xarray.DataArray.mean" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.mean()</span></code></a> and <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.std.html#xarray.DataArray.std" title="(in xarray v2023.4.3.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.std()</span></code></a>).</p>
+<p>All of the extrapolation/interpolation model classes come with a way to resample data efficiently to allow for bootstrapped uncertainty estimates. The <a class="reference internal" href="../../../reference/generated/thermoextrap.data.html#thermoextrap.data.DataCentralMomentsVals.resample" title="thermoextrap.data.DataCentralMomentsVals.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">thermoextrap.data.DataCentralMomentsVals.resample()</span></code></a> function actually resamples the data and returns a new extrapolation/interpolation class object, meaning that the necessary coefficients are automatically recomputed. However, the coefficients are computed separately for the different bootstrapped samples, which appear as different entries in the “replication” or “rep” dimension. In what we show below, this makes it easy to create bootstrap resampled data, then compute statistics on the coefficients or the predictions using built in statistical functions in xarray (e.g., <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.mean.html#xarray.DataArray.mean" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.mean()</span></code></a> and <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.std.html#xarray.DataArray.std" title="(in xarray v2023.5.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.std()</span></code></a>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a bootstrapped sample</span>
@@ -2401,7 +2401,10 @@ Coordinates:
               
               
                 <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="../../thermoextrap.html"
@@ -2421,7 +2424,10 @@ Coordinates:
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -2431,7 +2437,7 @@ Coordinates:
             
           </div>
           <footer class="bd-footer-content">
-            <div class="bd-footer-content__inner">
+            
 <div class="bd-footer-content__inner container">
   
   <div class="footer-item">
@@ -2455,7 +2461,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-05-03.
+  Last updated on 2023-06-15.
   <br/>
 </p>
   </div>
@@ -2464,7 +2470,7 @@ By William P. Krekelberg
     
   </div>
   
-</div></div>
+</div>
           </footer>
         
 
@@ -2473,8 +2479,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>

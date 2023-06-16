@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Contributing &#8212; thermoextrap 0.3.0 documentation</title>
+    <title>Contributing &#8212; thermoextrap 0.4.0 documentation</title>
   
   
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -37,8 +37,8 @@
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -130,7 +130,7 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.3.0 documentation</p>
+    <p class="title logo__title">thermoextrap 0.4.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -517,9 +517,16 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ipykernel">ipykernel</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-docs">Building the docs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-tox">Using tox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-with-nox">Testing with nox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-distribution-for-conda">Building distribution for conda</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-distribution-for-pypi">Building distribution for pypi</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-pypi-or-conda-installs">Testing pypi or conda installs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#type-checking">Type checking</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-version">Package version</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-on-nox">Notes on nox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#serving-the-documentation">Serving the documentation</a></li>
 </ul>
             </nav>
         </div>
@@ -574,7 +581,7 @@ articles, and such.</p>
 <li><p>Explain in detail how it would work.</p></li>
 <li><p>Keep the scope as narrow as possible, to make it easier to implement.</p></li>
 <li><p>Remember that this is a volunteer-driven project, and that contributions are
-welcome :)</p></li>
+welcome!</p></li>
 </ul>
 </section>
 </section>
@@ -591,23 +598,33 @@ details.</p>
 <p>Additional tools are:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pre-commit.com/">pre-commit</a></p></li>
-<li><p><a class="reference external" href="https://tox.wiki/en/latest/">tox</a> and <a class="reference external" href="https://github.com/tox-dev/tox-conda">tox-conda</a></p></li>
+<li><p><a class="reference external" href="https://github.com/wntrblm/nox">nox</a> with <a class="reference external" href="https://github.com/rmorshea/noxopt">noxopt</a></p></li>
 <li><p><a class="reference external" href="https://github.com/cruft/cruft">cruft</a></p></li>
-<li><p><a class="reference external" href="https://github.com/amitbeka/conda-merge">conda-merge</a></p></li>
 <li><p><a class="reference external" href="https://github.com/nedbat/scriv">scriv</a></p></li>
+<li><p><a class="reference external" href="https://github.com/commitizen-tools/commitizen">commitizen</a> (optional)</p></li>
+<li><p><a class="reference external" href="https://github.com/wpk-nist-gov/pyproject2conda">pyproject2conda</a> (optional)</p></li>
+<li><p><a class="reference external" href="https://github.com/nedbat/cog">cog</a> (optional)</p></li>
 </ul>
 <p>These are setup using the following:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">condax install pre-commit</span>
-<span class="go">condax install tox</span>
-<span class="go">condax inject tox tox-conda</span>
-<span class="go">condax install cruft</span>
-<span class="go">condax install conda-merge</span>
-<span class="go">condax install commitizen</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">condax/pipx install pre-commit</span>
+<span class="go">condax/pipx install cruft</span>
+<span class="go">condax/pipx install commitizen # optional</span>
 <span class="go">pipx install scriv</span>
+<span class="go">pipx install pyproject2conda # optional</span>
+<span class="go">condax/pipx install cogapp # optional</span>
 </pre></div>
 </div>
-<p>Alternatively, you can install these dependencies using:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">conda env update -n {env-name} environment/tools.yaml</span>
+<p>if using pipx, nox can be installed with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pipx<span class="w"> </span>install<span class="w"> </span>nox
+pipx<span class="w"> </span>inject<span class="w"> </span>nox<span class="w"> </span>ruamel.yaml
+pipx<span class="w"> </span>inject<span class="w"> </span>nox<span class="w"> </span>noxopt
+</pre></div>
+</div>
+<p>If using condax, you’ll need to use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>condax<span class="w"> </span>install<span class="w"> </span>nox
+condax<span class="w"> </span>inject<span class="w"> </span>nox<span class="w"> </span>ruamel.yaml
+conda<span class="w"> </span>activate<span class="w"> </span>~/.condax/nox
+pip<span class="w"> </span>install<span class="w"> </span>noxopt
 </pre></div>
 </div>
 </section>
@@ -634,34 +651,23 @@ git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w
 <li><p>Create development environment. There are two options to create the
 development environment.</p>
 <ul>
-<li><p>The recommended method is to use tox by using either:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>dev
+<li><p>The recommended method is to use nox. First you’ll need to create the
+environment files using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-e<span class="w"> </span>pyproject2conda
 </pre></div>
 </div>
-<p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dev-env
+<p>Then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-e<span class="w"> </span>dev
 </pre></div>
 </div>
-<p>These create a development environment located at <code class="docutils literal notranslate"><span class="pre">.tox/dev</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>tox-ipykernel-display-name
-</pre></div>
-</div>
-<p>This will add a meaningful display name for the kernel (assuming you’re
-using <a class="reference external" href="https://github.com/Anaconda-Platform/nb_conda_kernels">nb_conda_kernels</a>)</p>
+<p>This create a development environment located at <code class="docutils literal notranslate"><span class="pre">.nox/dev</span></code>.</p>
 </li>
 <li><p>Alternativley, you can create centrally located conda environmentment using
 the command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>mamba-dev
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda/mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span><span class="o">{</span>env-name<span class="o">}</span><span class="w"> </span>-f<span class="w"> </span>environment/dev.yaml
 </pre></div>
 </div>
-<p>This will create a conda environment ‘thermoextrap-env’ in the default
-location.</p>
-<p>To install (an editable version) of the current package:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--no-deps
-</pre></div>
-</div>
-<p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>install-dev
 </pre></div>
 </div>
 </li>
@@ -696,12 +702,8 @@ checks: tests.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest
 </pre></div>
 </div>
-<p>To test against multiple python versions, use tox:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox
-</pre></div>
-</div>
-<p>or using the <code class="docutils literal notranslate"><span class="pre">make</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>test-all
+<p>To test against multiple python versions, use <a class="reference external" href="https://github.com/wntrblm/nox">nox</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span><span class="nb">test</span>
 </pre></div>
 </div>
 <p>Additionally, you should run the following:</p>
@@ -733,24 +735,13 @@ commit using <a class="reference external" href="https://github.com/commitizen-t
 </section>
 <section id="dependency-management">
 <h3>Dependency management<a class="headerlink" href="#dependency-management" title="Permalink to this heading">#</a></h3>
-<p>Dependencies need to be placed in a few locations, which depend on the nature of
-the dependency.</p>
-<ul class="simple">
-<li><p>Package dependency: <code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">dependencies</span></code> section of
-<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
-<li><p>Documentation dependency: <code class="docutils literal notranslate"><span class="pre">environment/docs-extras.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span></code> section of
-<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
-<li><p>Development dependency: <code class="docutils literal notranslate"><span class="pre">environment/dev-extras.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">dev</span></code> section of
-<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p></li>
-</ul>
-<p>Note that total yaml files are build using <a class="reference external" href="https://github.com/amitbeka/conda-merge">conda-merge</a>. For example,
-<code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> is combined with <code class="docutils literal notranslate"><span class="pre">environment/docs-extras.yaml</span></code> to produce
-<code class="docutils literal notranslate"><span class="pre">environment/docs.yaml</span></code>. This is automated in the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>. You can also run,
-after doing any updates,</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>environment-files-build
+<p>We use <a class="reference external" href="https://github.com/wpk-nist-gov/pyproject2conda">pyproject2conda</a> to handle conda <code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> files. This extracts
+the dependencies from <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>. See <a class="reference external" href="https://github.com/wpk-nist-gov/pyproject2conda">pyproject2conda</a> for info. To make
+the <code class="docutils literal notranslate"><span class="pre">environment.yaml</span></code> files, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>pyproject2conda<span class="w"> </span>--<span class="w"> </span><span class="o">[</span>--pyproject2conda-force<span class="o">]</span>
 </pre></div>
 </div>
-<p>which will rebuild all the needed yaml files.</p>
+<p>Where the option in brackets is optional.</p>
 </section>
 </section>
 <section id="pull-request-guidelines">
@@ -764,84 +755,120 @@ list in CHANGELOG.md. You should use <a class="reference external" href="https:/
 <li><p>The pull request should work for Python 3.8, 3.9, 3.10.</p></li>
 </ul>
 </section>
+<section id="ipykernel">
+<h2>ipykernel<a class="headerlink" href="#ipykernel" title="Permalink to this heading">#</a></h2>
+<p>The environments created by nox <code class="docutils literal notranslate"><span class="pre">dev</span></code> and <code class="docutils literal notranslate"><span class="pre">docs</span></code> will try to add meaningful
+display names for ipykernel (assuming you’re using <a class="reference external" href="https://github.com/Anaconda-Platform/nb_conda_kernels">nb_conda_kernels</a>)</p>
+</section>
 <section id="building-the-docs">
 <h2>Building the docs<a class="headerlink" href="#building-the-docs" title="Permalink to this heading">#</a></h2>
-<p>We use <a class="reference external" href="https://tox.wiki/en/latest/">tox</a> to isolate the documentation build. Useful commands are as follows.</p>
-<ul>
-<li><p>Build the docs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>build
+<p>We use <a class="reference external" href="https://github.com/wntrblm/nox">nox</a> to isolate the documentation build. Specific tasks can be run with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>-d<span class="w"> </span><span class="o">[</span>commands<span class="o">]</span>
 </pre></div>
 </div>
-</li>
-<li><p>Spellcheck the docs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>spelling
-</pre></div>
-</div>
-</li>
-<li><p>Create a release of the docs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>release
-</pre></div>
-</div>
-<p>If you make any changes to <code class="docutils literal notranslate"><span class="pre">docs/examples</span></code>, you should run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-examples-symlink
-</pre></div>
-</div>
-<p>to update symlinks from <code class="docutils literal notranslate"><span class="pre">docs/examples</span></code> to <code class="docutils literal notranslate"><span class="pre">examples</span></code>.</p>
-<p>After this, the docs can be pushed to the correct branch for distribution.</p>
-</li>
-<li><p>Live documentation updates using</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-livehtml
-</pre></div>
-</div>
-</li>
+<p>where commands can be one of:</p>
+<ul class="simple">
+<li><p>clean : remove old doc build</p></li>
+<li><p>build/html : build html documentation</p></li>
+<li><p>spelling : check spelling</p></li>
+<li><p>linkcheck : check the links</p></li>
+<li><p>symlink : rebuild symlinks from <code class="docutils literal notranslate"><span class="pre">examples</span></code> to <code class="docutils literal notranslate"><span class="pre">docs/examples</span></code></p></li>
+<li><p>release : make pages branch for documentation hosting (using
+<a class="reference external" href="https://github.com/c-w/ghp-import">ghp-import</a>)</p></li>
+<li><p>livehtml : Live documentation updates</p></li>
+<li><p>open : open the documentation in a web browser</p></li>
 </ul>
 </section>
-<section id="using-tox">
-<h2>Using tox<a class="headerlink" href="#using-tox" title="Permalink to this heading">#</a></h2>
-<p>The package is setup to use tox to test, build and release pip and conda
-distributions, and release the docs. Most of these tasks have a command in the
-<code class="docutils literal notranslate"><span class="pre">Makefile</span></code>. To test against multiple versions, use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>test-all
+<section id="testing-with-nox">
+<h2>Testing with nox<a class="headerlink" href="#testing-with-nox" title="Permalink to this heading">#</a></h2>
+<p>The basic command is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--<span class="w"> </span><span class="o">[</span>--test-opts<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-cov<span class="o">]</span>
 </pre></div>
 </div>
-<p>To build the documentation in an isolated environment, use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-build
+<p>where you can pass in additional pytest options (properly escaped) via
+<code class="docutils literal notranslate"><span class="pre">--test-opts</span></code>. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--<span class="w"> </span>--test-opts<span class="w"> </span><span class="s2">&quot;&#39;-v&#39;&quot;</span>
+<span class="c1"># or</span>
+nox<span class="w"> </span>-s<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--<span class="w"> </span>--test-opts<span class="w"> </span><span class="s2">&quot;\-v&quot;</span>
 </pre></div>
 </div>
-<p>To release the documentation use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs-release<span class="w"> </span><span class="nv">release_args</span><span class="o">=</span><span class="s1">&#39;-m &quot;commit message&quot; -r origin -p&#39;</span>
+</section>
+<section id="building-distribution-for-conda">
+<h2>Building distribution for conda<a class="headerlink" href="#building-distribution-for-conda" title="Permalink to this heading">#</a></h2>
+<p>For the most part, we use <a class="reference external" href="https://github.com/conda/grayskull">grayskull</a> to create the conda recipe. However, I’ve
+had issues getting it to play nice with <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> for some of the ‘extra’
+variables. So, we use grayskull to build the majority of the recipe, and append
+the file <code class="docutils literal notranslate"><span class="pre">.recipe-append.yaml</span></code>. For some edge cases (install name different from
+package name, etc), you’ll need to manually edit this file to create the final
+recipe.</p>
+<p>The basic command is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>dist-conda<span class="w"> </span>--<span class="w"> </span>-c<span class="w"> </span><span class="o">[</span>command<span class="o">]</span>
 </pre></div>
 </div>
-<p>Where posargs is are passed to ghp-import. Note that the branch created is
-called <code class="docutils literal notranslate"><span class="pre">nist-pages</span></code>. This can be changed in <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code>.</p>
-<p>To build the distribution, use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dist-pypi-<span class="o">[</span>build-testrelease-release<span class="o">]</span>
+<p>Where <code class="docutils literal notranslate"><span class="pre">command</span></code> is one of:</p>
+<ul class="simple">
+<li><p>clean</p></li>
+<li><p>recipe : create recipe via <a class="reference external" href="https://github.com/conda/grayskull">grayskull</a></p></li>
+<li><p>build : build the distribution</p></li>
+</ul>
+<p>To upload the recipe, you’ll need to run an external command like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>dist-conda<span class="w"> </span>--<span class="w"> </span>--dist-conda-run<span class="w"> </span><span class="s2">&quot;anaconda upload PATH-TO-TARBALL&quot;</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">build</span></code> build to distro, <code class="docutils literal notranslate"><span class="pre">testrelease</span></code> tests putting on <code class="docutils literal notranslate"><span class="pre">testpypi</span></code> and
-release puts the distro on pypi.</p>
-<p>To build the conda distribution, use:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dist-conda-<span class="o">[</span>recipe,<span class="w"> </span>build<span class="o">]</span>
+</section>
+<section id="building-distribution-for-pypi">
+<h2>Building distribution for pypi<a class="headerlink" href="#building-distribution-for-pypi" title="Permalink to this heading">#</a></h2>
+<p>The basic command is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>dist-pypi<span class="w"> </span>--<span class="w"> </span>-p<span class="w"> </span><span class="o">[</span>command<span class="o">]</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">recipe</span></code> makes the conda recipe (using grayskull), and <code class="docutils literal notranslate"><span class="pre">build</span></code> makes the
-distro. This can be manually added to a channel.</p>
-<p>To test the created distributions, you can use one of:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox<span class="w"> </span>-e<span class="w"> </span>test-dist-<span class="o">[</span>pypi,<span class="w"> </span>conda<span class="o">]</span>-<span class="o">[</span>local,remote<span class="o">]</span>-py<span class="o">[</span><span class="m">38</span>,39,...<span class="o">]</span>
+<p>where <code class="docutils literal notranslate"><span class="pre">command</span></code> is one of:</p>
+<ul class="simple">
+<li><p>clean : clean out old distribution</p></li>
+<li><p>build : build distribution (if specify only this, clean will be called first)</p></li>
+<li><p>testrelease : upload to testpypi</p></li>
+<li><p>release : upload to pypi</p></li>
+</ul>
+</section>
+<section id="testing-pypi-or-conda-installs">
+<h2>Testing pypi or conda installs<a class="headerlink" href="#testing-pypi-or-conda-installs" title="Permalink to this heading">#</a></h2>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>testdist-pypi<span class="w"> </span>--<span class="w"> </span>--version<span class="w"> </span><span class="o">[</span>version<span class="o">]</span>
 </pre></div>
 </div>
-<p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>test-dist-<span class="o">[</span>pypi,<span class="w"> </span>conda<span class="o">]</span>-<span class="o">[</span>local,remote<span class="o">]</span><span class="w"> </span><span class="nv">py</span><span class="o">=[</span><span class="m">38</span>,<span class="w"> </span><span class="m">39</span>,<span class="w"> </span><span class="m">310</span><span class="o">]</span>
+<p>to test a specific version from pypi and</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>testdist-conda<span class="w"> </span>--<span class="w"> </span>--version<span class="w"> </span><span class="o">[</span>version<span class="o">]</span>
 </pre></div>
 </div>
-<p>where one options in the brackets should be choosen.</p>
+<p>to to likewise from conda.</p>
+</section>
+<section id="type-checking">
+<h2>Type checking<a class="headerlink" href="#type-checking" title="Permalink to this heading">#</a></h2>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>typing<span class="w"> </span>--<span class="w"> </span>-m<span class="w"> </span><span class="o">[</span>commands<span class="o">]</span><span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+</div>
 </section>
 <section id="package-version">
 <h2>Package version<a class="headerlink" href="#package-version" title="Permalink to this heading">#</a></h2>
-<p>Versioning is handled with <a class="reference external" href="https://github.com/pypa/setuptools_scm">setuptools_scm</a>.The pacakge version is set by the
-git tag. For convenience, you can override the version in the makefile (calling
-tox) by setting <code class="docutils literal notranslate"><span class="pre">version=v{major}.{minor}.{micro}</span></code>. This is useful for updating
-the docs, etc.</p>
+<p>Versioning is handled with <a class="reference external" href="https://github.com/pypa/setuptools_scm">setuptools_scm</a>.The package version is set by the
+git tag. For convenience, you can override the version with nox setting
+<code class="docutils literal notranslate"><span class="pre">--version</span> <span class="pre">...</span></code>. This is useful for updating the docs, etc.</p>
+</section>
+<section id="notes-on-nox">
+<h2>Notes on <a class="reference external" href="https://github.com/wntrblm/nox">nox</a><a class="headerlink" href="#notes-on-nox" title="Permalink to this heading">#</a></h2>
+<p>One downside of using <a class="reference external" href="https://tox.wiki/en/latest/">tox</a> with this particular workflow is the need for
+multiple scripts/makefiles, while with <a class="reference external" href="https://github.com/wntrblm/nox">nox</a>, most everything is self contained
+in the file <code class="docutils literal notranslate"><span class="pre">noxfile.py</span></code>. <a class="reference external" href="https://github.com/wntrblm/nox">nox</a> also is allows for a mix of conda and virtualenv
+environments.</p>
+</section>
+<section id="serving-the-documentation">
+<h2>Serving the documentation<a class="headerlink" href="#serving-the-documentation" title="Permalink to this heading">#</a></h2>
+<p>To view to documentation with js headers/footers, you’ll need to serve them:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>http.server<span class="w"> </span>-d<span class="w"> </span>docs/_build/html
+</pre></div>
+</div>
+<p>Then open the address <code class="docutils literal notranslate"><span class="pre">localhost:8000</span></code> in a webbrowser.</p>
 </section>
 </section>
 
@@ -852,7 +879,10 @@ the docs, etc.</p>
               
               
                 <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="license.html"
@@ -872,7 +902,10 @@ the docs, etc.</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -902,9 +935,16 @@ the docs, etc.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ipykernel">ipykernel</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-docs">Building the docs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-tox">Using tox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-with-nox">Testing with nox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-distribution-for-conda">Building distribution for conda</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-distribution-for-pypi">Building distribution for pypi</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-pypi-or-conda-installs">Testing pypi or conda installs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#type-checking">Type checking</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-version">Package version</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-on-nox">Notes on nox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#serving-the-documentation">Serving the documentation</a></li>
 </ul>
   </nav></div>
 
@@ -913,7 +953,7 @@ the docs, etc.</p>
             
           </div>
           <footer class="bd-footer-content">
-            <div class="bd-footer-content__inner">
+            
 <div class="bd-footer-content__inner container">
   
   <div class="footer-item">
@@ -937,7 +977,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-05-03.
+  Last updated on 2023-06-15.
   <br/>
 </p>
   </div>
@@ -946,7 +986,7 @@ By William P. Krekelberg
     
   </div>
   
-</div></div>
+</div>
           </footer>
         
 
@@ -955,8 +995,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>
