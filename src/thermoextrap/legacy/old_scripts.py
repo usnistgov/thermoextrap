@@ -213,7 +213,7 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
         mbarObj = mbar.MBAR(np.array([refB * U]), [U.shape[0]])
         outval = np.zeros((len(B), x.shape[1]))
         for i in range(len(B)):
-            outval[i, :] = mbarObj.computeMultipleExpectations(x.T, B[i] * U)[0]
+            outval[i, :] = mbarObj.compute_multiple_expectations(x.T, B[i] * U)["mu"]
 
     else:
         # Compute what goes in the exponent and subtract out the maximum

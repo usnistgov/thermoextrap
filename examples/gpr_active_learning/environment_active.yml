@@ -15,7 +15,7 @@ dependencies:
   - xarray
   - openmm
   - cmomy
-  - pymbar<4.0
+  - pymbar>=4.0
   - netcdf4
   - parmed
   - mdtraj

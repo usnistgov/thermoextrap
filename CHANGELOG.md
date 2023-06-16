@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD024 -->
+
 # Changelog
 
 Changelog for `thermoextrap`
@@ -8,6 +10,23 @@ See the fragment files in
 [changelog.d](https://github.com/usnistgov/thermoextrap)
 
 <!-- scriv-insert-here -->
+
+## v0.4.0 — 2023-06-15
+
+### Added
+
+- Package now available on conda-forge
+
+- Now support python3.11
+- Bumped pymbar version to pymbar>=4.0
+
+### Changed
+
+- Switched from tox to nox for testing.
+
+### Deprecated
+
+- No longer support pymbar < 4.0
 
 ## v0.3.0 — 2023-05-03
 

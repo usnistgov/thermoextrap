@@ -11,7 +11,7 @@ pip install thermoextrap
 or, if you use conda, run:
 
 ```bash
-conda install c wpk-nist thermoextrap
+conda install -c conda-forge thermoextrap
 ```
 
 ## Additional dependencies
@@ -27,7 +27,7 @@ If using conda, then you'll have to manually install some dependencies. For
 example, you can run:
 
 ```bash
-conda install bottleneck dask pymbar<4.0
+conda install bottleneck dask pymbar>=4.0
 ```
 
 At this time, it is recommended to install the Gaussian Process Regression (GPR)
@@ -39,7 +39,7 @@ pip install tensorflow tensorflow-probability gpflow
 
 ## From sources
 
-The sources for thermodynamic-extrapolation can be downloaded from the [Github
+The sources for thermodynamic-extrapolation can be downloaded from the [github
 repo].
 
 You can either clone the public repository:
