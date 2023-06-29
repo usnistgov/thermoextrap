@@ -15,7 +15,6 @@ dependencies:
   - custom-inherit
   - attrs
   - module-utilities >= 0.2
-  - setuptools-scm
   - ipython
   - pyenchant
   - ghp-import

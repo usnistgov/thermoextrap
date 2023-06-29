@@ -22,7 +22,6 @@ dependencies:
   - pandas
   - pymbar>=4.0
   - mypy
-  - setuptools-scm
   - ipython
   - ipykernel
   - bottleneck
