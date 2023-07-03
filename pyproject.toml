@@ -37,6 +37,8 @@ dependencies = [
     "custom-inherit",
     "attrs",
     "module-utilities >= 0.2",
+    "lazy-import", # p2c: -s lazy_import
+
 ]
 
 [project.urls]
