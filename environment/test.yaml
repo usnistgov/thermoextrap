@@ -15,7 +15,7 @@ dependencies:
   - custom-inherit
   - attrs
   - module-utilities >= 0.2
-  - lazy_import
+  - lazy_loader
   - pytest
   - pytest-xdist
   - pytest-cov

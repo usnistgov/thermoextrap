@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import attrs
-import numpy as np
+
+from ._lazy_imports import np
 
 # from custom_inherit import DocInheritMeta
 

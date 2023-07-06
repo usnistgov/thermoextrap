@@ -37,8 +37,7 @@ dependencies = [
     "custom-inherit",
     "attrs",
     "module-utilities >= 0.2",
-    "lazy-import", # p2c: -s lazy_import
-
+    "lazy_loader",
 ]
 
 [project.urls]
@@ -348,9 +347,17 @@ module = []
 
 [tool.pyright]
 include = ["src", "tests"]
-exclude = ["**/__pycache__", ".tox/**", "**/.mypy_cache"]
+exclude = [
+    "**/__pycache__",
+    ".tox/**",
+    ".nox/**",
+    "**/.mypy_cache",
+    "dist-conda",
+    "examples"
+]
 pythonVersion = "3.10"
 typeCheckingMode = "basic"
+useLibraryCodeForTypes = false
 # enable subset of "strict"
 reportDuplicateImport = true
 reportInvalidStubStatement = true
