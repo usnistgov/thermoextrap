@@ -499,8 +499,7 @@ class RecursiveInterp:
 
             allPvals.append(np.vstack((p12, p1full, p2full)))
             print(
-                "Interval with edges %s (indices %s):"
-                % (str(self.edge_beta[aset]), str(aset))
+                f"Interval with edges {str(self.edge_beta[aset])} (indices {str(aset)}):"
             )
             print("\tP-values between regions:")
             print(p12)

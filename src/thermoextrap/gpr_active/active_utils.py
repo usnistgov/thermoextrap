@@ -2077,14 +2077,12 @@ def active_learning(
 
     if log_scale ^ update_func.log_scale:  # Bitwise XOR
         print(
-            "WARNING: Usage of log scale in x for GPs is set to %s but %s for updates. Typically these should match, so make sure you know what you're doing!"
-            % (str(log_scale), str(update_func.log_scale))
+            f"WARNING: Usage of log scale in x for GPs is set to {str(log_scale)} but {str(update_func.log_scale)} for updates. Typically these should match, so make sure you know what you're doing!"
         )
     if stop_criteria is not None:
         if log_scale ^ stop_criteria.log_scale:
             print(
-                "WARNING: Usage of log scale in x for GPs is set to %s but %s for stopping criteria. Typically these should match, so make sure you know what you're doing!"
-                % (str(log_scale), str(stop_criteria.log_scale))
+                f"WARNING: Usage of log scale in x for GPs is set to {str(log_scale)} but {str(stop_criteria.log_scale)} for stopping criteria. Typically these should match, so make sure you know what you're doing!"
             )
 
     data_list = [None] * len(init_states)

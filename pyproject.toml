@@ -177,7 +177,6 @@ known_first_party = ["thermoextrap"]
 [tool.ruff]
 fix = true
 line-length = 88
-update-check = false
 target-version = "py38"
 select = [
     # pyflakes

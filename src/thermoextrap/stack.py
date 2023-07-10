@@ -188,6 +188,7 @@ def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
     kws : dict
         extra arguments to `states[i].derivs` method
         Note, default is `norm = False`
+
     Returns
     -------
     out : DataArray
