@@ -27,7 +27,7 @@ repos:
         stages: [commit]
         additional_dependencies:
           - prettier-plugin-toml
-        exclude: ^tests/lnpy_data/sample_data.json
+        exclude: environment/lock/.*[.]yaml|^tests/lnpy_data/sample_data.json
   #** markdown
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.8.1

@@ -6,9 +6,6 @@
 channels:
   - conda-forge
 dependencies:
-  - python>=3.8
-  - anaconda-client
-  - grayskull
-  - conda-build
-  - conda-verify
-  - boa
+  - python=3.10
+  - twine
+  - build
