@@ -4,6 +4,7 @@
 Tests for GP models with derivatives and active learning based on those models.
 """
 
+import copy
 import gpflow
 import numpy as np
 import pytest
@@ -89,14 +90,40 @@ class RBF_covs:
         return out
 
 
-def test_deriv_kernel_manual():
+# For multiple input dimensions with separate lengthscales, implement as product of kernels
+# Derivatives will also be products since dimensions separable as products of exponentials
+class multiD_RBF_covs(object):
+    def __init__(self, rbf_cov_list):
+        self.rbf_cov_list = rbf_cov_list
+        self.n_dims = len(rbf_cov_list)
+
+    def __call__(self, x1, x2):
+        # Loop over dimensions and collect covariance matrices for each
+        cov_mats = []
+        for i in range(self.n_dims):
+            cov_mats.append(self.rbf_cov_list[i](x1[i], x2[i]))
+
+        # Put together all combinations of covariances
+        out = copy.deepcopy(cov_mats[0])
+        for i in range(1, self.n_dims):
+            new_out = []
+            for j in range(out.shape[0]):
+                new_out.append([c * cov_mats[i] for c in out[j, :]])
+            out = np.block(new_out)
+
+        return out
+
+
+def test_deriv_kernel_manual_1D():
     # Create manually implemented RBF class to use as reference
     rbf_check = RBF_covs(1.0, 2.0)
 
     # Create a derivative kernel to check
     kern_expr, kern_params = make_rbf_expr()
     # Overwrite transforms on kernel parameters
-    kern_params = {"var": [1.0, {}], "l": [2.0, {}]}
+    with pytest.raises(ValueError):
+        deriv_kern = DerivativeKernel(kern_expr, 1, {"var": [1.0, {}], "l": [2.0, {}]})
+    kern_params = {"var": [1.0, {}], "l_0": [2.0, {}]}
     deriv_kern = DerivativeKernel(kern_expr, 1, kernel_params=kern_params)
 
     # Want to work with a few points to check...
@@ -125,10 +152,74 @@ def test_deriv_kernel_manual():
     np.testing.assert_allclose(ref, to_check)
 
 
-def test_deriv_kernel_self():
+def test_deriv_kernel_manual_multiD():
+    # Create manually implemented RBF class to use as reference
+    rbf_check = multiD_RBF_covs(
+        [
+            RBF_covs(1.0, 2.0),
+            RBF_covs(1.0, 1.0),
+        ]
+    )
+
+    # Create a derivative kernel to check
+    kern_expr, kern_params = make_rbf_expr(2)
+    # Overwrite transforms on kernel parameters
+    kern_params = {
+        "var": [1.0, {}],
+        "l_0": [2.0, {}],
+        "l_1": [1.0, {}],
+    }
+    deriv_kern = DerivativeKernel(kern_expr, 2, kernel_params=kern_params)
+
+    # Want to work with a few points to check...
+    # (0.0, 0.0) and (0.0, 0.0)
+    # (1.0, 1.0) and (1.0, 1.0)
+    # (0.0, 0.0) and (0.0, 1.0)
+    # (1.0, 0.0) and (0.0, 0.0)
+    # (0.0, 0.0) and (-1.0, -1.0)
+    # Helpful to put together all combos of derivatives for each set of points
+    d_combos = []
+    for i in range(3):
+        for j in range(3):
+            d_combos.append([i, j])
+    d_combos = np.array(d_combos)
+
+    for x_pair in [
+        [np.array([0.0, 0.0]), np.array([0.0, 0.0])],
+        [np.array([1.0, 1.0]), np.array([1.0, 1.0])],
+        [np.array([0.0, 0.0]), np.array([0.0, 1.0])],
+        [np.array([1.0, 0.0]), np.array([0.0, 0.0])],
+        [np.array([0.0, 0.0]), np.array([-1.0, -1.0])],
+    ]:
+        ref = rbf_check(x_pair[0], x_pair[1])
+        this_x1 = np.hstack([np.tile(x_pair[0], (9, 1)), d_combos])
+        this_x2 = np.hstack([np.tile(x_pair[1], (9, 1)), d_combos])
+        to_check = deriv_kern.K(this_x1, this_x2).numpy()
+        np.testing.assert_allclose(ref, to_check)
+
+    # Next test with multiple points provided at once
+    pt1 = np.array([0.0, 0.0])
+    pt2 = np.array([1.0, 1.0])
+    x_check = np.block(
+        [
+            [np.tile(pt1, (9, 1)), d_combos],
+            [np.tile(pt2, (9, 1)), d_combos],
+        ]
+    )
+    to_check = deriv_kern.K(x_check, x_check).numpy()
+    ref = np.block(
+        [
+            [rbf_check(pt1, pt1), rbf_check(pt1, pt2)],
+            [rbf_check(pt2, pt1), rbf_check(pt2, pt2)],
+        ]
+    )
+    np.testing.assert_allclose(ref, to_check)
+
+
+def test_deriv_kernel_self_1D():
     # Now test for self-consistency within the derivative kernel
     kern_expr, kern_params = make_rbf_expr()
-    kern_params = {"var": [1.0, {}], "l": [2.0, {}]}
+    kern_params = {"var": [1.0, {}], "l_0": [2.0, {}]}
     deriv_kern = DerivativeKernel(kern_expr, 1, kernel_params=kern_params)
 
     # Create test input
@@ -164,6 +255,64 @@ def test_deriv_kernel_self():
 
     # And if switch around derivatives and points
     x_check_dorder = x_check_reorder = np.roll(x_check, 1, axis=0)
+    output_dorder = deriv_kern.K(x_check_dorder, x_check_dorder).numpy()
+    output_dorder = np.roll(np.roll(output_dorder, -1, axis=0), -1, axis=1)
+    np.testing.assert_allclose(output_dorder, output)
+
+
+def test_deriv_kernel_self_multiD():
+    # Now test for self-consistency within the derivative kernel
+    kern_expr, kern_params = make_rbf_expr(2)
+    kern_params = {
+        "var": [1.0, {}],
+        "l_0": [2.0, {}],
+        "l_1": [1.0, {}],
+    }
+    deriv_kern = DerivativeKernel(kern_expr, 2, kernel_params=kern_params)
+
+    # Helpful to put together all combos of derivatives for each set of points
+    d_combos = []
+    for i in range(3):
+        for j in range(3):
+            d_combos.append([i, j])
+    d_combos = np.array(d_combos)
+
+    # Create test input
+    pt1 = np.array([0.0, 0.0])
+    pt2 = np.array([1.0, 1.0])
+    pt3 = np.array([-1.0, 0.0])
+    x_check = np.block(
+        [
+            [np.tile(pt1, (9, 1)), d_combos],
+            [np.tile(pt2, (9, 1)), d_combos],
+            [np.tile(pt3, (9, 1)), d_combos],
+        ]
+    )
+
+    # Test that splits x data correctly (told it that observation dims is 2)
+    check_locs, check_dorder = deriv_kern._split_x_into_locs_and_deriv_info(x_check)
+    np.testing.assert_allclose(check_locs, x_check[:, :2])
+    np.testing.assert_allclose(check_dorder, x_check[:, 2:])
+
+    # Generate full output to check against various equivalent scenarios
+    output = deriv_kern.K(x_check, x_check).numpy()
+
+    # Check that K_diag function same as diagonal of K
+    output_diag = deriv_kern.K_diag(x_check).numpy()
+    np.testing.assert_allclose(output_diag, np.diag(output))
+
+    # Check that passing single x is same as passing twice
+    output_single = deriv_kern.K(x_check)
+    np.testing.assert_allclose(output_single, output)
+
+    # Make sure that if re-order x inputs get same thing with different order
+    x_check_reorder = np.roll(x_check, 9, axis=0)
+    output_reorder = deriv_kern.K(x_check_reorder, x_check_reorder).numpy()
+    output_reorder = np.roll(np.roll(output_reorder, -9, axis=0), -9, axis=1)
+    np.testing.assert_allclose(output_reorder, output)
+
+    # And if switch around derivatives and points
+    x_check_dorder = np.roll(x_check, 1, axis=0)
     output_dorder = deriv_kern.K(x_check_dorder, x_check_dorder).numpy()
     output_dorder = np.roll(np.roll(output_dorder, -1, axis=0), -1, axis=1)
     np.testing.assert_allclose(output_dorder, output)
@@ -343,7 +492,7 @@ def test_multiout_multivar_normal():
 def test_GP_likelihood():
     # Check that handles input correctly
     cov_id = np.eye(3)
-    d_orders = np.arange(3.0)
+    d_orders = np.arange(3.0)[:, None]  # Add dimension since now handles nD inputs
     check = HetGaussianDeriv(cov_id, d_orders)
     check_flat = HetGaussianDeriv(np.diag(cov_id), d_orders)
     np.testing.assert_allclose(check.cov, check_flat.cov)
@@ -416,7 +565,16 @@ def test_GP():
     )
 
     # Check to make sure likelihood handled correctly
-    ref_like = HetGaussianDeriv(cov_data, x_data[:, 1], **like_kwargs)
+    ref_like = HetGaussianDeriv(
+        cov_data,
+        x_data[
+            :,
+            [
+                1,
+            ],
+        ],
+        **like_kwargs,
+    )
     np.testing.assert_allclose(ref_like.cov, check_1d.likelihood.cov)
     np.testing.assert_allclose(
         ref_like.build_scaled_cov_mat(), check_1d.likelihood.build_scaled_cov_mat()
@@ -431,36 +589,38 @@ def test_GP():
         kernel=make_kern(),
         scale_fac=2.0,
     )
-    check_xscale = HeteroscedasticGPR(
-        (x_data, y_data, cov_data),
-        kernel=make_kern(),
-        x_scale_fac=2.0,
-    )
+    # Removing tests with x scaling factor
+    # Essentially unused previously and not helpful, just confusing
+    # check_xscale = HeteroscedasticGPR(
+    #     (x_data, y_data, cov_data),
+    #     kernel=make_kern(),
+    #     x_scale_fac=2.0,
+    # )
     check_base = HeteroscedasticGPR(
         (x_data, y_data, cov_data),
         kernel=make_kern(),
     )
     train_GPR(check_base)
     train_GPR(check_scale)
-    train_GPR(check_xscale)
+    # train_GPR(check_xscale)
 
     x_test = np.linspace(-np.pi, np.pi, 100)[:, None]
     x_test = np.block([[x_test, np.zeros_like(x_test)], [x_test, np.ones_like(x_test)]])
 
     pred_base = check_base.predict_f(x_test)
     pred_scale = check_base.predict_f(x_test)
-    pred_xscale = check_base.predict_f(x_test)
+    # pred_xscale = check_base.predict_f(x_test)
 
     # Comparing predictions
     np.testing.assert_allclose(pred_base[0], pred_scale[0])
     np.testing.assert_allclose(pred_base[1], pred_scale[1])
-    np.testing.assert_allclose(pred_base[0], pred_xscale[0])
-    np.testing.assert_allclose(pred_base[1], pred_xscale[1])
+    # np.testing.assert_allclose(pred_base[0], pred_xscale[0])
+    # np.testing.assert_allclose(pred_base[1], pred_xscale[1])
 
     # Comparing parameters
     np.testing.assert_allclose(
-        check_base.kernel.kernel.l.numpy(),
-        check_scale.kernel.kernel.l.numpy(),
+        check_base.kernel.kernel.l_0.numpy(),
+        check_scale.kernel.kernel.l_0.numpy(),
         rtol=1e-03,
     )
     np.testing.assert_allclose(
@@ -468,16 +628,16 @@ def test_GP():
         check_scale.kernel.kernel.var.numpy() * (check_scale.scale_fac**2),
         rtol=1e-03,
     )
-    np.testing.assert_allclose(
-        check_base.kernel.kernel.l.numpy(),
-        check_xscale.kernel.kernel.l.numpy() / (check_xscale.x_scale_fac),
-        rtol=1e-03,
-    )
-    np.testing.assert_allclose(
-        check_base.kernel.kernel.var.numpy(),
-        check_xscale.kernel.kernel.var.numpy(),
-        rtol=1e-03,
-    )
+    # np.testing.assert_allclose(
+    #     check_base.kernel.kernel.l.numpy(),
+    #     check_xscale.kernel.kernel.l.numpy() / (check_xscale.x_scale_fac),
+    #     rtol=1e-03,
+    # )
+    # np.testing.assert_allclose(
+    #     check_base.kernel.kernel.var.numpy(),
+    #     check_xscale.kernel.kernel.var.numpy(),
+    #     rtol=1e-03,
+    # )
 
     # Define points for testing model prediction and compare to reference
     # This will test for correct behavior across operating systems and software versions
@@ -574,8 +734,8 @@ def test_GP():
     np.testing.assert_allclose(pred_base[0], pred_sepInd[0][:, :1], rtol=1e-03)
     np.testing.assert_allclose(pred_base[1], pred_sepInd[1][:, :1], rtol=1e-03)
     np.testing.assert_allclose(
-        check_base.kernel.kernel.l.numpy(),
-        check_sepInd.kernel.kernels[0].l.numpy(),
+        check_base.kernel.kernel.l_0.numpy(),
+        check_sepInd.kernel.kernels[0].l_0.numpy(),
         rtol=1e-03,
     )
     np.testing.assert_allclose(
@@ -611,7 +771,7 @@ def test_GP():
         likelihood_kwargs={"p": 0.0, "transform_p": None},
     )
 
-    check_meanf.kernel.kernel.l.assign(1e-06)
+    check_meanf.kernel.kernel.l_0.assign(1e-06)
     np.testing.assert_allclose(y_data, check_meanf.predict_f(x_data)[0], atol=1e-01)
 
     train_GPR(check_meanf)
@@ -621,7 +781,7 @@ def test_GP():
     np.testing.assert_allclose(pred_base[0], pred_meanf[0], atol=1e-01)
     np.testing.assert_allclose(pred_base[1], pred_meanf[1], atol=1e-01)
     np.testing.assert_allclose(
-        check_base.kernel.kernel.l.numpy(),
-        check_meanf.kernel.kernel.l.numpy(),
+        check_base.kernel.kernel.l_0.numpy(),
+        check_meanf.kernel.kernel.l_0.numpy(),
         atol=2e-01,
     )

@@ -485,7 +485,45 @@ def make_matern_expr(p):
     return var * full_expr.subs(d, distance), kern_params
 
 
-def make_rbf_expr():
+def make_rbf_expr(n_dims=1):
+    """
+    Creates a sympy expression for an RBF kernel.
+
+    Parameters
+    ----------
+    n_dims : int, default 1
+        the number of input dimensions for this kernel
+
+    Returns
+    -------
+    expr : Expr
+        sympy expression representing the kernel
+    kern_params : dict
+        parameters matching naming in sympy expression
+    """
+    var = sp.symbols("var", real=True)
+    l = sp.Matrix(  # noqa: E741
+        [sp.symbols("l_%i" % i, real=True) for i in range(n_dims)]
+    )  # noqa: E741
+    l_inv = sp.Matrix([1 / k for k in l])
+    x1 = sp.Matrix([sp.symbols("x1_%i" % i, real=True) for i in range(n_dims)])
+    x2 = sp.Matrix([sp.symbols("x2_%i" % i, real=True) for i in range(n_dims)])
+
+    scaled_diff = sp.hadamard_product((x2 - x1), l_inv)
+    scaled_diff_sq = scaled_diff.dot(scaled_diff)
+    rbf_kern_expr = var * sp.exp(-0.5 * scaled_diff_sq)
+
+    kern_params = {
+        "var": [1.0, {"transform": gpflow.utilities.positive()}],
+    }
+
+    for k in l:
+        kern_params[k.name] = [1.0, {"transform": gpflow.utilities.positive()}]
+
+    return rbf_kern_expr, kern_params
+
+
+def make_rbf_expr_old():
     """
     Creates a sympy expression for an RBF kernel.
 
@@ -677,9 +715,6 @@ def create_base_GP_model(
     # Or more generally may want to specify which order to pay attention to rather than just 0
     ref_d_bool = gpr_data[0][:, 1] == d_order_ref
 
-    # Have played with scaling x data to change length scales without major success
-    x_scale = 1.0
-
     # Create mean function, if not provided
     if mean_func is None:
         # But only if working with zero-order data - mean functions not fancy enough yet
@@ -688,7 +723,7 @@ def create_base_GP_model(
             # By default, fit linear model to help get rid of monotonicity
             if len(np.unique(gpr_data[0][ref_d_bool, :1])) > 2:
                 mean_func = LinearWithDerivs(
-                    x_scale * gpr_data[0][ref_d_bool, :1], gpr_data[1][ref_d_bool, :]
+                    gpr_data[0][ref_d_bool, :1], gpr_data[1][ref_d_bool, :]
                 )
             # Linear mean only meaningful if have at least 3 different input locations
             # If just have 1 or 2, just fit constant mean function
@@ -706,8 +741,7 @@ def create_base_GP_model(
     # doing it with 2 won't hurt, will just scale by mean, technically
     if len(np.unique(gpr_data[0][ref_d_bool, :1])) > 1:
         std_scale = np.std(
-            gpr_data[1][ref_d_bool, :]
-            - mean_func(x_scale * gpr_data[0][ref_d_bool, :]),
+            gpr_data[1][ref_d_bool, :] - mean_func(gpr_data[0][ref_d_bool, :]),
             axis=0,
         )
     else:
@@ -739,7 +773,6 @@ def create_base_GP_model(
         gpr_data,
         kernel=full_kernel,
         scale_fac=std_scale,
-        x_scale_fac=x_scale,
         mean_function=mean_func,
         likelihood_kwargs=likelihood_kwargs,
     )
@@ -1781,15 +1814,9 @@ class ErrorStability(MetricBase, UpdateStopABC):
         # Get input data points for current active learning step (current GP model)
         input_x = gp.data[0].numpy()
         input_y = gp.data[1].numpy()
-        input_x = np.concatenate(
-            [input_x[:, :1] / gp.x_scale_fac, input_x[:, 1:]], axis=-1
-        )
-        input_y = input_y * (gp.x_scale_fac ** input_x[:, 1:])
+        input_x = np.concatenate([input_x[:, :1], input_x[:, 1:]], axis=-1)
         input_y = input_y * gp.scale_fac
         input_cov = gp.likelihood.cov.copy()
-        input_cov = input_cov * gp.x_scale_fac ** (
-            np.add(*np.meshgrid(input_x[:, 1:], input_x[:, 1:]))
-        )
         input_cov = input_cov * (
             np.expand_dims(
                 gp.scale_fac, axis=tuple(range(gp.scale_fac.ndim, input_cov.ndim))

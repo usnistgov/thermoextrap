@@ -124,7 +124,6 @@ git submodule update --init  --recursive
 
 ```python
 import thermoextrap
-
 ```
 
 <!-- end-docs -->
