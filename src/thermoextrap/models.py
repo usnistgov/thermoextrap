@@ -8,30 +8,18 @@ from functools import lru_cache
 from typing import Callable, Mapping, Sequence
 
 import attrs
-import numpy as np
-import pandas as pd
-import sympy as sp
-import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
 from custom_inherit import DocInheritMeta
 from module_utilities import cached
-from scipy.special import factorial as sp_factorial
 
 from .core._attrs_utils import MyAttrsMixin, _cache_field
+from .core._lazy_imports import _has_pymbar, np, pd, pymbar, sp, xr
 from .core.sputils import get_default_indexed, get_default_symbol
 from .core.xrutils import xrwrap_alpha
 from .data import AbstractData, kw_only_field
 from .docstrings import DOCFILLER_SHARED
-
-try:
-    from pymbar import mbar
-
-    _HAS_PYMBAR = True
-except ImportError:
-    _HAS_PYMBAR = False
-
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
 
@@ -853,6 +841,8 @@ class InterpModel(StateCollection):
 
     @cached.meth
     def coefs(self, order=None, order_dim="porder", minus_log=None):
+        from scipy.special import factorial as sp_factorial
+
         if order is None:
             order = self.order
 
@@ -1049,7 +1039,7 @@ class MBARModel(StateCollection):
     """Sadly, this doesn't work as beautifully."""
 
     def __attrs_pre_init__(self):
-        if not _HAS_PYMBAR:
+        if not _has_pymbar():
             raise ImportError("need pymbar to use this")
 
     @cached.meth
@@ -1067,7 +1057,7 @@ class MBARModel(StateCollection):
         # alpha[alpha] * uv[state, rec_dim] = out[alpha, state, rec_dim]
         Ukn = (alpha0 * uv).values.reshape(len(self), -1)
         N = np.ones(len(self)) * len(xv[rec_dim])
-        mbar_obj = mbar.MBAR(Ukn, N)
+        mbar_obj = pymbar.mbar.MBAR(Ukn, N)
 
         return uv, xv, alpha0, mbar_obj
 

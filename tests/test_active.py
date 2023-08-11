@@ -19,17 +19,17 @@ from thermoextrap.gpr_active import active_utils, gp_models, ig_active
 
 # First test some simple utility functions, starting with sympy expressions for RBF
 def test_rbf_expr():
-    l_sym = sp.symbols("l", real=True)
+    l_sym = sp.symbols("l_0", real=True)
     var_sym = sp.symbols("var", real=True)
-    x1_sym = sp.symbols("x1", real=True)
-    x2_sym = sp.symbols("x2", real=True)
+    x1_sym = sp.symbols("x1_0", real=True)
+    x2_sym = sp.symbols("x2_0", real=True)
 
     check_expr, check_params = active_utils.make_rbf_expr()
     assert l_sym in check_expr.free_symbols
     assert var_sym in check_expr.free_symbols
     assert x1_sym in check_expr.free_symbols
     assert x2_sym in check_expr.free_symbols
-    assert "l" in check_params.keys()
+    assert "l_0" in check_params.keys()
     assert "var" in check_params.keys()
 
     def rbf(var, l, x1, x2):
@@ -236,14 +236,14 @@ def test_base_GP_creation():
     # Warning should be printed, so should come up with some way to check for that...
     k_rbf = active_utils.RBFDerivKernel()
     # Changing parameter values to check if passed faithfully
-    k_rbf.l.assign(0.5)
+    k_rbf.l_0.assign(0.5)
     k_rbf.var.assign(5.0)
     check_kernel = active_utils.create_base_GP_model(
         data_input_1p, d_order_ref=0, shared_kernel=False, kernel=k_rbf
     )
     assert isinstance(check_kernel.kernel, gpflow.kernels.SharedIndependent)
     assert check_kernel.kernel.kernel == k_rbf
-    assert check_kernel.kernel.kernel.l.numpy() == 0.5
+    assert check_kernel.kernel.kernel.l_0.numpy() == 0.5
     assert check_kernel.kernel.kernel.var.numpy() == 5.0
 
 

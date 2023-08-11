@@ -124,7 +124,6 @@ git submodule update --init  --recursive
 
 ```python
 import thermoextrap
-
 ```
 
 <!-- end-docs -->
@@ -147,8 +146,8 @@ This package extensively uses the [cmomy] package to handle central comoments.
 
 ## Contact
 
-Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or
-Jacob Monroe at jacob.monroe@uark.edu.
+Questions may be addressed to Bill Krekelberg at <william.krekelberg@nist.gov>
+or Jacob Monroe at <jacob.monroe@uark.edu>.
 
 ## Credits
 

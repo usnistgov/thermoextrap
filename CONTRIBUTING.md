@@ -156,7 +156,7 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
 
     This create a development environment located at `.nox/dev`.
 
-  - Alternativley, you can create centrally located conda environmentment using
+  - Alternatively, you can create centrally located conda environmentment using
     the command:
 
     ```bash
@@ -235,7 +235,7 @@ Ready to contribute? Here's how to set up `thermoextrap` for local development.
   ```
 
   Note that the pre-commit hooks will force the commit message to be in the
-  [conventional sytle][conventional-style]. To assist this, you may want to
+  [conventional style][conventional-style]. To assist this, you may want to
   commit using [commitizen].
 
   ```bash
@@ -384,12 +384,50 @@ Versioning is handled with [setuptools_scm].The package version is set by the
 git tag. For convenience, you can override the version with nox setting
 `--version ...`. This is useful for updating the docs, etc.
 
+We use the `write_to` option to [setuptools_scm]. This stores the current
+version in `_version.py`. Note that if you build the package (or, build docs
+with the `--version` flag), this will overwrite information in `_version.py` in
+the `src` directory. To refresh the version, run:
+
+```bash
+make version-scm
+```
+
+This scheme avoids having to install `setuptools-scm` (and `setuptools`) in each
+environment.
+
 ## Notes on [nox]
 
 One downside of using [tox] with this particular workflow is the need for
 multiple scripts/makefiles, while with [nox], most everything is self contained
 in the file `noxfile.py`. [nox] also is allows for a mix of conda and virtualenv
 environments.
+
+We use a mix of conda environments and virtualenv with nox. For example, for
+building the distribution, we use virtualenv, while for development, the default
+is to create a conda environment. To facilitate this, we need to let virtualenv
+know where different python interpreters are. I've had trouble mixing pyenv with
+conda. Instead, I use conda to create multiple invironments to hold different
+python version:
+
+```bash
+$ for version in 3.8 3.9 3.10 3.11; do
+    conda create -n test-3.8 python=3.8
+  done
+```
+
+To tell nox where these environments live, create the file `.noxconfig.toml`
+with the following:
+
+```toml
+[nox.python]
+paths = ["~/.conda/envs/test-3.*/bin"]
+
+```
+
+where `~/.conda/envs` should be replaced by whatever prefix you have setup on
+your machine. The noxfile will add this to the search path for python versions
+when creating virtualenvs.
 
 ## Serving the documentation
 

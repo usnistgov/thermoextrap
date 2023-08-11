@@ -12,9 +12,7 @@ See :ref:`examples/usage/basic/temperature_interp:adaptive interpolation` for ex
 
 from itertools import chain, islice
 
-import numpy as np
-import xarray as xr
-from scipy import stats
+from .core._lazy_imports import np, xr
 
 
 def window(seq, n=2):
@@ -464,6 +462,7 @@ def check_polynomial_consistency(
         collection of models created.  Keys are of the form
         (alpha0, alpha1)
     """
+    from scipy import stats
 
     ave = {}
     var = {}

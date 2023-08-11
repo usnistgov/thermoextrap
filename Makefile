@@ -133,11 +133,12 @@ coverage: ## check code coverage quickly with the default Python
 # versioning
 ################################################################################
 .PHONY: version-scm version-import version
-version-scm: ## check version of package
+
+version-scm: ## check/update version of package with setuptools-scm
 	python -m setuptools_scm
 
 version-import: ## check version from python import
-	python -c 'import thermoextrap; print(thermoextrap.__version__)'
+	-python -c 'import thermoextrap; print(thermoextrap.__version__)'
 
 version: version-scm version-import
 
@@ -172,12 +173,12 @@ mamba-dev-update: environment/dev.yaml environment-files-build ## update develop
 ## dev env
 NOX=nox
 .PHONY: dev-env
-dev-env: environment/dev.yaml ## create development environment using nox
+dev-env: environment/py310-dev.yaml ## create development environment using nox
 	$(NOX) -e dev
 
 ## testing
 .PHONY: test-all
-test-all: environment/test.yaml ## run tests on every Python version with nox.
+test-all: environment/py310-test.yaml ## run tests on every Python version with nox.
 	$(NOX) -s test
 
 ## docs
@@ -190,7 +191,7 @@ docs-clean: ## clean docs
 	rm -rf docs/reference/generated/*
 docs-clean-build: docs-clean docs-build ## clean and build
 docs-release: ## release docs.
-	$(NOX) -s docs -- release
+	$(NOX) -s docs -- -d release
 docs-command: ## run arbitrary command with command=...
 	$(NOX) -s docs -- --docs-run $(command)
 
@@ -204,7 +205,7 @@ docs-open: ## open the build
 docs-linkcheck: ## check links
 	$(NOX) -s docs -- -d linkcheck
 
-docs-build docs-release docs-command docs-clean docs-livehtml docs-linkcheck: environment/docs.yaml
+docs-build docs-release docs-command docs-clean docs-livehtml docs-linkcheck: environment/py310-docs.yaml
 
 ## typing
 .PHONY: typing-mypy typing-pyright typing-pytype typing-all typing-command
@@ -218,7 +219,7 @@ typing-all:
 	$(NOX) -s typing -- -m mypy pyright pytype
 typing-command:
 	$(NOX) -s typing -- --typing-run $(command)
-typing-mypy typing-pyright typing-pytype typing-all typing-command: environment/typing.yaml
+typing-mypy typing-pyright typing-pytype typing-all typing-command: environment/py310-typing.yaml
 
 ## distribution
 .PHONY: dist-pypi-build dist-pypi-testrelease dist-pypi-release dist-pypi-command
@@ -231,7 +232,7 @@ dist-pypi-release: ## release to pypi, can pass posargs=...
 	$(NOX) -s dist-pypi -- -p release
 dist-pypi-command: ## run command with command=...
 	$(NOX) -s dist-pypi -- --dist-pypi-run $(command)
-dist-pypi-build dist-pypi-testrelease dist-pypi-release dist-pypi-command: environment/dist-pypi.yaml
+dist-pypi-build dist-pypi-testrelease dist-pypi-release dist-pypi-command: environment/py310-dist-pypi.yaml
 
 .PHONY: dist-conda-recipe dist-conda-build dist-conda-command
 dist-conda-recipe: ## build conda recipe can pass posargs=...
@@ -240,7 +241,7 @@ dist-conda-build: ## build conda recipe can pass posargs=...
 	$(NOX) -s dist-conda -- -c build
 dist-conda-command: ## run command with command=...
 	$(NOX) -s dist-conda -- -dist-conda-run $(command)
-dist-conda-build dist-conda-recipe dist-conda-command: environment/dist-conda.yaml
+dist-conda-build dist-conda-recipe dist-conda-command: environment/py310-dist-conda.yaml
 
 
 ## list all options
@@ -270,3 +271,10 @@ auto-changelog: ## autogenerate changelog and print to stdout
 
 commitizen-changelog:
 	cz changelog --unreleased-version unreleased --dry-run --incremental
+
+# tuna analyze load time:
+.PHONY: tuna-analyze
+tuna-import: ## Analyze load time for module
+	python -X importtime -c 'import thermoextrap' 2> tuna-loadtime.log
+	tuna tuna-loadtime.log
+	rm tuna-loadtime.log

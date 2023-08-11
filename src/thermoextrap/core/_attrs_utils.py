@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import attrs
-import numpy as np
+
+from ._lazy_imports import np
 
 # from custom_inherit import DocInheritMeta
 
@@ -16,7 +17,7 @@ def optional_converter(converter):
     """Create a converter which can pass through None."""
 
     def wrapped(value):
-        if value is None or attrs.NOTHING:
+        if value in [None, attrs.NOTHING]:
             return value
         else:
             return converter(value)

@@ -37,6 +37,7 @@ dependencies = [
     "custom-inherit",
     "attrs",
     "module-utilities >= 0.2",
+    "lazy_loader",
 ]
 
 [project.urls]
@@ -75,14 +76,14 @@ test = [
     "thermoextrap[gpr]",
 ]
 dev-extras = [
+    "setuptools-scm", #
     "pytest-accept", # p2c: -p
-    "setuptools-scm",
     "ipython",
     "ipykernel",
 ]
 typing-extras = [
-    # "pytype; python_version < '3.11'",
-    "mypy",
+    "pytype; python_version < '3.11'", #
+    "mypy >= 1.4.1",
 ]
 typing = [
     "thermoextrap[typing-extras]", #
@@ -111,8 +112,7 @@ dev-complete = [
     "thermoextrap[nox]",
 ]
 docs = [
-    "setuptools-scm", #
-    "ipython",
+    "ipython", #
     "pyenchant",
     "ghp-import",
     "sphinx",
@@ -134,7 +134,6 @@ dist-conda = [
     "conda-build",
     "conda-verify",
     "boa",
-    "setuptools-scm",
 ]
 
 [tool.pyproject2conda]
@@ -161,6 +160,7 @@ readme = { file = [
 
 [tool.setuptools_scm]
 fallback_version = "999"
+write_to = "src/thermoextrap/_version.py"
 
 [tool.aliases]
 test = "pytest"
@@ -168,6 +168,11 @@ test = "pytest"
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --doctest-glob='*.md'"
 testpaths = ["tests", "README.md"]
+
+[tool.coverage.report]
+exclude_also = ["if TYPE_CHECKING:", "@overload"]
+omit = ["*/vendored/*"]
+include = ["src/*"]
 
 [tool.isort]
 profile = "black"
@@ -177,7 +182,6 @@ known_first_party = ["thermoextrap"]
 [tool.ruff]
 fix = true
 line-length = 88
-update-check = false
 target-version = "py38"
 select = [
     # pyflakes
@@ -347,9 +351,17 @@ module = []
 
 [tool.pyright]
 include = ["src", "tests"]
-exclude = ["**/__pycache__", ".tox/**", "**/.mypy_cache"]
+exclude = [
+    "**/__pycache__",
+    ".tox/**",
+    ".nox/**",
+    "**/.mypy_cache",
+    "dist-conda",
+    "examples"
+]
 pythonVersion = "3.10"
 typeCheckingMode = "basic"
+useLibraryCodeForTypes = false
 # enable subset of "strict"
 reportDuplicateImport = true
 reportInvalidStubStatement = true

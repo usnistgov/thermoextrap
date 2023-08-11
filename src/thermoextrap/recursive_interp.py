@@ -9,36 +9,40 @@ See :ref:`examples/usage/basic/temperature_interp:recursive interpolation` for e
 """
 
 
-import numpy as np
-
-# import xarray as xr
-from scipy import stats
-
 # TODO: Change this to point to the "new" ideagas.py
 # TODO: rework this code to be cleaner
 # from ..legacy.ig import IGmodel
 from . import idealgas
 from .core._deprecate import deprecate, deprecate_kwarg
+from .core._lazy_imports import np
 from .data import factory_data_values
 from .models import ExtrapModel, InterpModel
 
-try:
-    import matplotlib.pyplot as plt
+# try:
+#     import matplotlib.pyplot as plt
 
-    _HAS_PLT = True
-except ImportError:
-    _HAS_PLT = False
-    # print(
-    #     "Could not find matplotlib - plotting will fail, so ensure that all"
-    #     " doPlot options are set to False, which is the default."
-    # )
+#     _HAS_PLT = True
+# except ImportError:
+#     _HAS_PLT = False
+#     # print(
+#     #     "Could not find matplotlib - plotting will fail, so ensure that all"
+#     #     " doPlot options are set to False, which is the default."
+#     # )
 
 
-def _has_plt():
-    if _HAS_PLT:
-        pass
-    else:
-        raise ImportError("install matplotlib for this functionality")
+# def _has_plt():
+#     if _HAS_PLT:
+#         pass
+#     else:
+#         raise ImportError("install matplotlib for this functionality")
+
+
+def _get_plt():
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise ImportError("must install matplotlib to use plotting")
+    return plt
 
 
 class RecursiveInterp:
@@ -132,6 +136,10 @@ class RecursiveInterp:
         used instead. This is useful when data has already been generated at
         specific state points and you do not wish to generate more.
         """
+
+        if do_plot:
+            plt = _get_plt()
+
         if recurse_depth > recurse_max:
             raise RecursionError("Maximum recursion depth reached.")
 
@@ -207,7 +215,6 @@ class RecursiveInterp:
 
         # Do some plotting just as a visual for how things are going, if desired
         if do_plot:
-            _has_plt()
             if "val" in predictVals.dims:
                 toplot = predictVals.isel(val=0)
             else:
@@ -415,6 +422,11 @@ class RecursiveInterp:
         and you can have higher confidence in the resulting model output. Will also
         generate plots as a visual check if desired.
         """
+        from scipy import stats
+
+        if do_plot:
+            plt = _get_plt()
+
         if self.model_cls != InterpModel:
             print(
                 "Can only check polynomial consistency with a polynomial interpolation model class."
@@ -445,7 +457,6 @@ class RecursiveInterp:
 
         # Before loop, set up plot if wanted
         if do_plot:
-            _has_plt()
             pColors = plt.cm.cividis(np.linspace(0.0, 1.0, len(edgeSets)))
             pFig, pAx = plt.subplots()
             plotYmin = 1e10
@@ -488,8 +499,7 @@ class RecursiveInterp:
 
             allPvals.append(np.vstack((p12, p1full, p2full)))
             print(
-                "Interval with edges %s (indices %s):"
-                % (str(self.edge_beta[aset]), str(aset))
+                f"Interval with edges {str(self.edge_beta[aset])} (indices {str(aset)}):"
             )
             print("\tP-values between regions:")
             print(p12)
@@ -515,7 +525,6 @@ class RecursiveInterp:
                     plotYmax = np.max(allPlotY)
 
         if do_plot:
-            _has_plt()
             for edge in self.edge_beta:
                 pAx.plot([edge] * 2, [plotYmin, plotYmax], "k-")
             pAx.set_xlabel(r"$\beta$")

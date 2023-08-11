@@ -132,6 +132,7 @@ def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
         Note that this data object should have central=False, deriv_dim=None
     alpha_name, str, default='volume'
         name of expansion parameter
+
     Returns
     -------
     extrapmodel : ExtrapModel
