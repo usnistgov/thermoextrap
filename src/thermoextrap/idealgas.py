@@ -11,9 +11,7 @@ This is a useful test system with analytical solutions coded alongside the abili
 
 from functools import lru_cache
 
-import numpy as np
-import sympy as sp
-
+from .core._lazy_imports import np, sp
 from .docstrings import DocFiller
 
 __all__ = [

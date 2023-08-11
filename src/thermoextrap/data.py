@@ -18,8 +18,6 @@ from abc import abstractmethod
 from typing import Hashable, Mapping, Sequence
 
 import attrs
-import numpy as np
-import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
@@ -32,16 +30,9 @@ from .core._attrs_utils import (
     convert_dims_to_tuple,
     kw_only_field,
 )
+from .core._lazy_imports import cmomy, np, xr
 from .core.xrutils import xrwrap_uv, xrwrap_xv
 from .docstrings import DOCFILLER_SHARED
-
-try:
-    from cmomy import xCentralMoments
-
-    _HAS_CMOMY = True
-except ImportError:
-    _HAS_CMOMY = False
-
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
 
@@ -995,7 +986,9 @@ class DataCentralMomentsBase(AbstractData):
     """
 
     #: :class:`cmomy.xCentralMoments` object
-    dxduave: xCentralMoments = field(validator=attv.instance_of(xCentralMoments))
+    dxduave: cmomy.xCentralMoments = field(
+        validator=attv.instance_of(cmomy.xCentralMoments)
+    )
     #: Energy moment dimension
     umom_dim: Hashable = kw_only_field(default="umom")
     #: Overvable moment dimension
@@ -1316,7 +1309,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             )
             raw = raw.transpose(..., xmom_dim, umom_dim)
 
-        dxduave = xCentralMoments.from_raw(
+        dxduave = cmomy.xCentralMoments.from_raw(
             raw=raw,
             mom=mom,
             mom_ndim=2,
@@ -1406,7 +1399,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         if xv is None or x_is_u:
             xv = uv
 
-        dxduave = xCentralMoments.from_vals(
+        dxduave = cmomy.xCentralMoments.from_vals(
             x=(xv, uv),
             w=w,
             axis=axis,
@@ -1503,7 +1496,7 @@ class DataCentralMoments(DataCentralMomentsBase):
                 dim=xmom_dim,
             )
 
-        dxduave = xCentralMoments.from_data(
+        dxduave = cmomy.xCentralMoments.from_data(
             data=data,
             mom_ndim=2,
             mom=mom,
@@ -1614,7 +1607,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             mom_dims=(xmom_dim, umom_dim),
         )
 
-        dxduave = xCentralMoments.from_resample_vals(**kws)
+        dxduave = cmomy.xCentralMoments.from_resample_vals(**kws)
 
         out = cls(
             dxduave=dxduave,
@@ -1876,7 +1869,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             if uave is not None:
                 data[..., 0, 1] = uave
 
-        dxduave = xCentralMoments.from_data(
+        dxduave = cmomy.xCentralMoments.from_data(
             data=data,
             mom=mom,
             mom_ndim=2,
@@ -1913,7 +1906,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     {xv}
     {order}
     from_vals_kws : dict, optional
-        extra arguments passed to xCentralMoments.from_vals
+        extra arguments passed to :meth:`cmomy.xCentralMoments.from_vals`.
     {dxduave}
     """
 
@@ -1932,9 +1925,9 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     #: Optional parameters to :meth:`cmomy.xCentralMoments.from_vals`
     from_vals_kws: Mapping | None = kw_only_field(default=None)
     #: :class:`cmomy.xCentralMoments` object
-    dxduave: xCentralMoments | None = kw_only_field(
+    dxduave: cmomy.xCentralMoments | None = kw_only_field(
         default=None,
-        validator=attv.optional(attv.instance_of(xCentralMoments)),
+        validator=attv.optional(attv.instance_of(cmomy.xCentralMoments)),
     )
 
     def __attrs_post_init__(self):
@@ -1947,7 +1940,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             if self.order is None:
                 raise ValueError("must pass order if calculating dxduave")
 
-            self.dxduave = xCentralMoments.from_vals(
+            self.dxduave = cmomy.xCentralMoments.from_vals(
                 x=(self.xv, self.uv),
                 w=self.w,
                 dim=self.rec_dim,
@@ -2087,7 +2080,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             rep_dim=rep_dim,
         )
 
-        dxduave = xCentralMoments.from_resample_vals(
+        dxduave = cmomy.xCentralMoments.from_resample_vals(
             x=(self.xv, self.uv),
             w=self.w,
             mom=(1, self.order),
