@@ -114,3 +114,5 @@ cruft.patch
 /dist-conda/
 /tmp/
 /thermoextrap-feedstock*/
+/src/**/_version.py
+tuna-loadtime.log
