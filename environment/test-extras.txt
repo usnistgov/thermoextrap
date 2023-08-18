@@ -11,4 +11,4 @@ pandas
 pymbar>=4.0
 tensorflow
 tensorflow-probability
-gpflow < 2.6.0
+gpflow >= 2.6.0
