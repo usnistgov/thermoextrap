@@ -17,7 +17,7 @@ dependencies:
   - module-utilities >= 0.2
   - lazy_loader
   - pytype
-  - mypy
+  - mypy >= 1.4.1
   - pytest
   - pytest-xdist
   - pytest-cov
@@ -28,4 +28,4 @@ dependencies:
   - pip:
       - tensorflow
       - tensorflow-probability
-      - gpflow < 2.6.0
+      - gpflow >= 2.6.0

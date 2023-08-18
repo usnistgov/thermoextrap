@@ -23,7 +23,7 @@ dependencies:
   - pandas
   - pymbar>=4.0
   - pytype
-  - mypy
+  - mypy >= 1.4.1
   - setuptools-scm
   - ipython
   - ipykernel
@@ -35,6 +35,6 @@ dependencies:
   - pip:
       - tensorflow
       - tensorflow-probability
-      - gpflow < 2.6.0
+      - gpflow >= 2.6.0
       - pytest-accept
       - noxopt
