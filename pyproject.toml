@@ -55,7 +55,7 @@ mbar = ["pymbar>=4.0"]
 gpr = [
     "tensorflow", # p2c: -p
     "tensorflow-probability", # p2c: -p
-    "gpflow < 2.6.0", # p2c: -p
+    "gpflow", # p2c: -p
 
 ]
 openmm = ["openmm"]

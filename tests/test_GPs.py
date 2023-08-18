@@ -493,22 +493,24 @@ def test_GP_likelihood():
     # Check that handles input correctly
     cov_id = np.eye(3)
     d_orders = np.arange(3.0)[:, None]  # Add dimension since now handles nD inputs
-    check = HetGaussianDeriv(cov_id, d_orders)
-    check_flat = HetGaussianDeriv(np.diag(cov_id), d_orders)
+    x = np.hstack([d_orders, d_orders])
+    check = HetGaussianDeriv(cov_id, 1)
+    check_flat = HetGaussianDeriv(np.diag(cov_id), 1)
     np.testing.assert_allclose(check.cov, check_flat.cov)
 
     # Including if input is 1D
-    check_1d = HetGaussianDeriv(cov_id[:1, :1], d_orders[:1])
-    check_1d_flat = HetGaussianDeriv(cov_id[0, :1], d_orders[:1])
+    check_1d = HetGaussianDeriv(cov_id[:1, :1], 1)
+    check_1d_flat = HetGaussianDeriv(cov_id[0, :1], 1)
     np.testing.assert_allclose(check_1d.cov, check_1d_flat.cov)
 
     # Check that applies scaling appropriately for different scenarios above
     np.testing.assert_allclose(
-        check.build_scaled_cov_mat().numpy(), check_flat.build_scaled_cov_mat().numpy()
+        check.build_scaled_cov_mat(x).numpy(),
+        check_flat.build_scaled_cov_mat(x).numpy(),
     )
     np.testing.assert_allclose(
-        check_1d.build_scaled_cov_mat().numpy(),
-        check_1d_flat.build_scaled_cov_mat().numpy(),
+        check_1d.build_scaled_cov_mat(x[:1]).numpy(),
+        check_1d_flat.build_scaled_cov_mat(x[:1]).numpy(),
     )
 
     # Now check specifics of building covariance matrix
@@ -520,16 +522,16 @@ def test_GP_likelihood():
     # Default has p=10.0, s=0.0
     cov = np.array([[0.5, 0.0, 0.0], [-1.5, 2.5, 0.0], [3.5, 4.5, 5.5]])
     cov = cov.T @ cov
-    check = HetGaussianDeriv(cov, d_orders)
+    check = HetGaussianDeriv(cov, 1)
     np.testing.assert_allclose(
         log_cov_model(cov, 10.0, 0.0, d_orders),
-        np.log(check.build_scaled_cov_mat().numpy()),
+        np.log(check.build_scaled_cov_mat(x).numpy()),
     )
     # Also do for new model with p and s changed
-    check_newps = HetGaussianDeriv(cov, d_orders, p=2.0, s=-2.0)
+    check_newps = HetGaussianDeriv(cov, 1, p=2.0, s=-2.0)
     np.testing.assert_allclose(
         log_cov_model(cov, 2.0, -2.0, d_orders),
-        np.log(check_newps.build_scaled_cov_mat().numpy()),
+        np.log(check_newps.build_scaled_cov_mat(x).numpy()),
     )
 
 
@@ -567,17 +569,13 @@ def test_GP():
     # Check to make sure likelihood handled correctly
     ref_like = HetGaussianDeriv(
         cov_data,
-        x_data[
-            :,
-            [
-                1,
-            ],
-        ],
+        1,
         **like_kwargs,
     )
     np.testing.assert_allclose(ref_like.cov, check_1d.likelihood.cov)
     np.testing.assert_allclose(
-        ref_like.build_scaled_cov_mat(), check_1d.likelihood.build_scaled_cov_mat()
+        ref_like.build_scaled_cov_mat(x_data),
+        check_1d.likelihood.build_scaled_cov_mat(x_data),
     )
 
     # Since working with 1D data, scaling should not change the trained model

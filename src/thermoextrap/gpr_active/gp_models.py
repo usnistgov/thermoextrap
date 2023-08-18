@@ -673,10 +673,12 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     Parameters
     ----------
     cov : array
-        covariance matrix (or its diagonal) for the uncertainty (noise) in the data
-    d_orders : int
-        derivative order of the data; should be in same order as columns/rows of
-        the covariance matrix
+        (fixed) covariance matrix (or its diagonal) for the uncertainty (noise)
+        in the data
+    obs_dims : int
+        number of dimensions in the input/observation, X; the first obs_dims
+        columns of X will be treated as input locations while the final obs_dims
+        entries will be derivative orders of each data point (see DerivativeKernel)
     p : float, default=10.0
         scaling of the covariance matrix dependent on derivative order
     s : float, default=0.0
@@ -698,7 +700,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     def __init__(
         self,
         cov,
-        d_orders,
+        obs_dims,
         p=10.0,  # Sometimes gets stuck if starts small, but no issues if start large
         s=0.0,
         transform_p=gpflow.utilities.positive(),
@@ -714,11 +716,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         else:
             self.cov = cov
 
-        # No need to squeeze if handle multidimensional input case generally
-        #        #Need to track derivative orders associated with each covariance entry
-        #        if len(d_orders.shape) > 1:
-        #            d_orders = np.squeeze(d_orders, axis=-1)
-        self.d_orders = d_orders
+        self.obs_dims = obs_dims
 
         # Define parameters for power scale
         self.power_scale = gpflow.Parameter(
@@ -731,15 +729,17 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         # Define stability threshold
         self.stable_var_min = 1.0e-12
 
-    def build_scaled_cov_mat(self):
+    def build_scaled_cov_mat(self, X: gpflow.base.TensorType):
         """Creates scaled covariance matrix using noise scale parameters"""
         # First step is determining scaling based on exponential function
         # Add 1 so even zeroth order can be scaled
-        # Have modified for multiple input dimensions by just summing over self.d_orders
+        # Have modified for multiple input dimensions by just summing over d_orders
+        # (last obs_dims columns of input, X)
         # Effectively assumes same linear model on all input dimensions, then add together
         # So power_scale will depend on the input dimensionality
+        d_orders = X[:, self.obs_dims :]
         scale = tf.exp(
-            self.power_scale * tf.reduce_sum(self.d_orders + 1, axis=-1)
+            self.power_scale * tf.reduce_sum(d_orders + 1, axis=-1)
             + 0.5 * self.power_add
         )
         scale = tf.linalg.diag(scale)
@@ -751,24 +751,32 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         return tf.linalg.set_diag(output, out_diag)
 
     def _scalar_log_prob(
-        self, F: gpflow.base.TensorType, Y: gpflow.base.TensorType
+        self,
+        X: gpflow.base.TensorType,
+        F: gpflow.base.TensorType,
+        Y: gpflow.base.TensorType,
     ) -> tf.Tensor:
         return multioutput_multivariate_normal(
-            Y, F, tf.linalg.cholesky(self.build_scaled_cov_mat())
+            Y, F, tf.linalg.cholesky(self.build_scaled_cov_mat(X))
         )
 
     def _conditional_mean(
-        self, F: gpflow.base.TensorType
+        self, X: gpflow.base.TensorType, F: gpflow.base.TensorType
     ) -> tf.Tensor:  # pylint: disable=R0201
         return tf.identity(F)
 
-    def _conditional_variance(self, F: gpflow.base.TensorType) -> tf.Tensor:
+    def _conditional_variance(
+        self, X: gpflow.base.TensorType, F: gpflow.base.TensorType
+    ) -> tf.Tensor:
         # Returns full covariance for INPUT Y data
         # May not fit with expected behavior, so could consider making "Not Implemented"
-        return self.build_scaled_cov_mat()
+        return self.build_scaled_cov_mat(X)
 
     def _predict_mean_and_var(
-        self, Fmu: gpflow.base.TensorType, Fvar: gpflow.base.TensorType
+        self,
+        X: gpflow.base.TensorType,
+        Fmu: gpflow.base.TensorType,
+        Fvar: gpflow.base.TensorType,
     ) -> gpflow.models.model.MeanAndVariance:
         # From what I can tell, use this in predict_y, which will not be implemented either
         # Can't predict noise variance at NEW points, so no way to add noise to Fvar
@@ -778,6 +786,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
 
     def _predict_log_density(
         self,
+        X: gpflow.base.TensorType,
         Fmu: gpflow.base.TensorType,
         Fvar: gpflow.base.TensorType,
         Y: gpflow.base.TensorType,
@@ -790,6 +799,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
 
     def _variational_expectations(
         self,
+        X: gpflow.base.TensorType,
         Fmu: gpflow.base.TensorType,
         Fvar: gpflow.base.TensorType,
         Y: gpflow.base.TensorType,
@@ -1059,9 +1069,7 @@ class HeteroscedasticGPR(
                 n_obs_dims = kernel.obs_dims
 
         # Create specific likelihood for this model
-        likelihood = HetGaussianDeriv(
-            noise_cov, X_data[:, n_obs_dims:], **likelihood_kwargs
-        )
+        likelihood = HetGaussianDeriv(noise_cov, n_obs_dims, **likelihood_kwargs)
 
         super().__init__(kernel, likelihood, mean_function, num_latent_gps=1)
         self.data = gpflow.models.util.data_input_to_tensor((X_data, Y_data))
@@ -1073,7 +1081,7 @@ class HeteroscedasticGPR(
         X, Y = self.data
 
         K = self.kernel(X, full_cov=True, full_output_cov=False)
-        ks = K + self.likelihood.build_scaled_cov_mat()
+        ks = K + self.likelihood.build_scaled_cov_mat(X)
         L = tf.linalg.cholesky(ks)
         m = self.mean_function(X) / self.scale_fac
 
@@ -1102,7 +1110,7 @@ class HeteroscedasticGPR(
         kmm = self.kernel(X_data, full_cov=True, full_output_cov=False)
         knn = self.kernel(Xnew, full_cov=full_cov, full_output_cov=False)
         kmn = self.kernel(X_data, Xnew, full_cov=True, full_output_cov=False)
-        kmm_plus_s = kmm + self.likelihood.build_scaled_cov_mat()
+        kmm_plus_s = kmm + self.likelihood.build_scaled_cov_mat(X_data)
 
         # To generally handle multioutput data, use appropriate conditional
         # Means also need to tile kernel (not kmm_plus_s, though, since __init__ checks noise)
@@ -1173,7 +1181,7 @@ class HeteroscedasticGPR(
         )
 
 
-class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
+class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
     """
     Constant mean function that takes derivative-augmented X as input.
     Only applies mean function constant to zeroth order derivatives.
@@ -1197,7 +1205,7 @@ class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
         return tf.where((X[:, -1:] == 0), filled_mean, filled_zeros)
 
 
-class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
+class LinearWithDerivs(gpflow.functions.MeanFunction):
     """
     Linear mean function that can be applied to derivative data - in other words,
     the 0th order derivative is fit with a linear fit, so the 1st derivative also
@@ -1241,7 +1249,7 @@ class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
         return output_0 + output_1
 
 
-class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
+class SympyMeanFunc(gpflow.functions.MeanFunction):
     """
     Mean function based on sympy expression. This way, can take derivatives up
     to any order. In the provided expression, the input variable should be 'x'
@@ -1356,7 +1364,6 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
             )
             inds_list.append(this_inds)
 
-        # NOTE: never used, so commented out.  Something wrong here?
-        # k_list = tf.dynamic_stitch(inds_list, f_list)
+        f_list = tf.dynamic_stitch(inds_list, f_list)
         out = tf.reshape(f_list, (x_vals.shape[0], 1))  # Really, just for 1D functions
         return out
