@@ -12,7 +12,8 @@ See :ref:`examples/usage/basic/temperature_interp:adaptive interpolation` for ex
 
 from itertools import chain, islice
 
-from .core._lazy_imports import np, xr
+import numpy as np
+import xarray as xr
 
 
 def window(seq, n=2):

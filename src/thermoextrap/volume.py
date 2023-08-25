@@ -10,12 +10,12 @@ Also, Only DataValues like objects are supported.
 from functools import lru_cache
 
 import attrs
+import xarray as xr
 from attrs import field
 from attrs import validators as attv
 from module_utilities import cached
 
 from .core._attrs_utils import _cache_field
-from .core._lazy_imports import xr
 from .core.xrutils import xrwrap_xv
 from .data import DataCallbackABC, DataValues
 from .docstrings import DOCFILLER_SHARED

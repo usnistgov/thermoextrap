@@ -19,7 +19,7 @@ dependencies:
   - ipython
   - pyenchant
   - ghp-import
-  - sphinx
+  - sphinx >= 5.3.0
   - sphinx-copybutton
   - sphinxcontrib-spelling
   - sphinx-autobuild

@@ -14,6 +14,9 @@ from functools import lru_cache
 from typing import Hashable, Sequence
 
 import attrs
+import cmomy
+import numpy as np
+import xarray as xr
 
 # from attrs import converters as attc
 from attrs import field
@@ -22,7 +25,6 @@ from module_utilities import cached
 
 from . import beta as beta_xpan
 from .core._attrs_utils import _cache_field, convert_dims_to_tuple
-from .core._lazy_imports import cmomy, np, xr
 from .core.sputils import get_default_indexed, get_default_symbol
 from .data import DataCallbackABC
 from .docstrings import DOCFILLER_SHARED

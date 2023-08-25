@@ -8,6 +8,10 @@ from functools import lru_cache
 from typing import Callable, Mapping, Sequence
 
 import attrs
+import numpy as np
+import pandas as pd
+import pymbar
+import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
@@ -15,7 +19,8 @@ from custom_inherit import DocInheritMeta
 from module_utilities import cached
 
 from .core._attrs_utils import MyAttrsMixin, _cache_field
-from .core._lazy_imports import _has_pymbar, np, pd, pymbar, sp, xr
+from .core._imports import has_pymbar
+from .core._imports import sympy as sp
 from .core.sputils import get_default_indexed, get_default_symbol
 from .core.xrutils import xrwrap_alpha
 from .data import AbstractData, kw_only_field
@@ -1039,7 +1044,7 @@ class MBARModel(StateCollection):
     """Sadly, this doesn't work as beautifully."""
 
     def __attrs_pre_init__(self):
-        if not _has_pymbar():
+        if not has_pymbar():
             raise ImportError("need pymbar to use this")
 
     @cached.meth
