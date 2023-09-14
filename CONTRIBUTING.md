@@ -366,24 +366,30 @@ pipx run --spec git+https://github.com/wpk-nist-gov/nox-bootstrap.git \
      nox -s bootstrap -- \
      --python-paths "~/.conda/envs/test-3.*/bin" \
      --dev-extras dev nox
+
+conda activate .nox/{project-name}/envs/dev
 ```
 
 This will, in isolation, install nox, and run the `bootstrap` session.
-
-The above commands create a development environment located at
-`.nox/{project-name}/envs/dev`.
 
 Note that nox environments are under `.nox/{project-name}/envs` instead of under
 `.nox`. This fixes some issues with things like [nb_conda_kernels], as well as
 other third party tools that expect conda environment to be located in a
 directory like `.../miniforge/envs/env-name`.
 
+If you go this route, you may want to use something like
+[zsh-autoenv](https://github.com/Tarrasch/zsh-autoenv) (if using zsh shell) or
+[autoenv](https://github.com/hyperupcall/autoenv) (if using bash).
+
 If instead you'd like to just install directly with conda, you can use:
 
 ```bash
-conda env create [-n {env-name}] -f environment/py{version}-dev-base.yaml
+conda env create [-n {env-name}] -f environment/py{version}-dev-complete.yaml
 conda activate {environment-name or -p path/to/environment}
 ```
+
+This installs all optional dependencies except those need to build the docs. For
+that, please use nox.
 
 ### Development tools
 
@@ -409,10 +415,16 @@ conda activate {environment-name or -p path/to/environment}
 We recommend installing the following tools with [pipx] or [condax]. If you'd
 like to install them in the development environment instead, include the
 "extras" `tools` in the `nox.extras.dev` section of `config/userconfig.toml`
-file:
+file, or run:
 
 ```bash
-nox -s config -- --dev-extras dev nox tools
+nox -seconfig -- --dev-extras dev nox tools
+```
+
+Alternatively, you can just create a conda environment using
+
+```bash
+conda env create [-n {env-name}] -f environment/py{version}-dev-complete.yaml
 ```
 
 Additional tools are:

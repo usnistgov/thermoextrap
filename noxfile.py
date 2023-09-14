@@ -1,4 +1,5 @@
 """Config file for nox."""
+# * Imports ----------------------------------------------------------------------------
 from __future__ import annotations
 
 import shutil
@@ -139,7 +140,7 @@ LOG_SESSION_CLI = Annotated[
 
 
 # * Environments------------------------------------------------------------------------
-# ** Development (conda)
+# ** Dev (conda)
 @DEFAULT_SESSION
 def dev(
     session: Session,
@@ -163,6 +164,7 @@ def dev(
     session_run_commands(session, dev_run)
 
 
+# ** Dev (virtualenv)
 @DEFAULT_SESSION_VENV
 def dev_venv(
     session: Session,
@@ -187,6 +189,16 @@ def dev_venv(
     session_run_commands(session, dev_run)
 
 
+# ** bootstrap
+@group.session(python=False)  # type: ignore
+def bootstrap(session: Session):
+    """Run config, reqs, and dev"""
+    session.notify("config")
+    session.notify("requirements")
+    session.notify("dev")
+
+
+# ** config
 @group.session(python=False)  # type: ignore
 def config(
     session: Session,
@@ -204,14 +216,7 @@ def config(
     session.run("python", "tools/projectconfig.py", *args)
 
 
-@group.session(python=False)  # type: ignore
-def bootstrap(session: Session):
-    """Run config, reqs, and dev"""
-    session.notify("config")
-    session.notify("requirements")
-    session.notify("dev")
-
-
+# ** requirements
 @group.session(python=False)  # type: ignore
 def pyproject2conda(
     session: Session,
@@ -236,7 +241,7 @@ def requirements(
     pkg_install_venv(
         session=session,
         name="reqs",
-        reqs=["pyproject2conda>=0.4.0"],
+        reqs=["pyproject2conda>=0.5.1"],
         force_reinstall=force_reinstall,
         log_session=log_session,
     )
@@ -302,7 +307,7 @@ def requirements(
         )
 
     for env, python_version in product(
-        ["docs", "dev", "dev-base"], [PYTHON_DEFAULT_VERSION]
+        ["docs", "dev", "dev-base", "dev-complete"], [PYTHON_DEFAULT_VERSION]
     ):
         create_env(
             name=env,
@@ -358,7 +363,7 @@ def conda_lock(
     pkg_install_venv(
         session,
         name="conda-lock",
-        reqs=["conda-lock>=2.0.0"],
+        reqs=["conda-lock>=2.2.0"],
         force_reinstall=force_reinstall,
     )
 
@@ -874,15 +879,33 @@ def dist_conda(
                 )
 
 
-def _append_recipe(recipe_path: str, append_path: str) -> None:
-    with open(recipe_path) as f:
-        recipe = f.readlines()
+# ** lint
+@group.session
+def lint(
+    session: nox.Session,
+    lint_run: RUN_CLI = [],  # noqa
+    force_reinstall: FORCE_REINSTALL_CLI = False,
+    log_session: bool = False,
+):
+    """
+    Run linters with pre-commit.
 
-    with open(append_path) as f:
-        append = f.readlines()
+    Defaults to `pre-commit run --all-files`.
+    To run something else pass, e.g.,
+    `nox -s lint -- --lint-run "pre-commit run --hook-stage manual --all-files`
+    """
+    pkg_install_venv(
+        session=session,
+        name="lint",
+        reqs=["pre-commit"],
+        force_reinstall=force_reinstall,
+        log_session=log_session,
+    )
 
-    with open(recipe_path, "w") as f:
-        f.writelines(recipe + ["\n"] + append)
+    if lint_run:
+        session_run_commands(session, lint_run, external=False)
+    else:
+        session.run("pre-commit", "run", "--all-files")
 
 
 # ** type checking
@@ -1007,7 +1030,7 @@ def typing_venv(
     )
 
 
-# ** testdist conda
+# ** testdist (conda)
 @ALL_SESSION
 def testdist_conda(
     session: Session,
@@ -1034,24 +1057,12 @@ def testdist_conda(
         log_session=log_session,
     )
 
-    # assert isinstance(session.python, str)
-    # session_install_envs(
-    #     session,
-    #     session_environment_filename(
-    #         python_version=session.python, name="test-extras.yaml"
-    #     ),
-    #     deps=[install_str],
-    #     channels=["conda-forge"],
-    #     force_reinstall=force_reinstall,
-    #     install_package=False,
-    # )
-
     if not test_no_pytest:
         opts = combine_list_str(test_opts)
         session.run("pytest", *opts)
 
 
-# ** testdist pypi
+# ** testdist (pypi)
 @ALL_SESSION_VENV
 def testdist_pypi(
     session: Session,
@@ -1123,20 +1134,6 @@ def testdist_pypi_condaenv(
         log_session=log_session,
     )
 
-    # assert isinstance(session.python, str)
-    # session_install_envs(
-    #     session,
-    #     session_environment_filename(
-    #         python_version=session.python, name="test-extras.yaml"
-    #     ),
-    #     reqs=[install_str],
-    #     channels=["conda-forge"],
-    #     force_reinstall=force_reinstall,
-    #     install_package=False,
-    # )
-    # if log_session:
-    #     session_log_session(session, False)
-
     _test(
         session=session,
         run=testdist_pypi_run,
@@ -1201,6 +1198,17 @@ def _create_doc_examples_symlinks(session: nox.Session, clean: bool = True) -> N
             session.log(f"linking {target_rel} -> {link}")
 
             os.symlink(target_rel, link)
+
+
+def _append_recipe(recipe_path: str, append_path: str) -> None:
+    with open(recipe_path) as f:
+        recipe = f.readlines()
+
+    with open(append_path) as f:
+        append = f.readlines()
+
+    with open(recipe_path, "w") as f:
+        f.writelines(recipe + ["\n"] + append)
 
 
 # # If want separate env for updating/reporting version with setuptools-scm

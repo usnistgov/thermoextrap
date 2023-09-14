@@ -7,25 +7,25 @@ channels:
   - conda-forge
 dependencies:
   - python=3.8
-  - numpy >= 1.20
-  - xarray >= 0.16
-  - sympy
-  - scipy
+  - attrs
   - cmomy >= 0.5
   - custom-inherit
-  - attrs
-  - module-utilities >= 0.2
   - lazy_loader
-  - pytype
+  - module-utilities >= 0.2
   - mypy >= 1.4.1
-  - pytest
-  - pytest-xdist
-  - pytest-cov
-  - pytest-sugar
+  - numpy >= 1.20
   - pandas
   - pymbar>=4.0
+  - pytest
+  - pytest-cov
+  - pytest-sugar
+  - pytest-xdist
+  - pytype
+  - scipy
+  - sympy
+  - xarray >= 0.16
   - pip
   - pip:
+      - gpflow >= 2.6.0
       - tensorflow
       - tensorflow-probability
-      - gpflow >= 2.6.0

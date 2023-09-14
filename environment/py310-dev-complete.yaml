@@ -6,15 +6,38 @@
 channels:
   - conda-forge
 dependencies:
-  - python=3.9
+  - python=3.10
+  - attrs
+  - bottleneck
+  - cmomy >= 0.5
+  - custom-inherit
+  - ipykernel
+  - ipython
+  - lazy_loader
+  - matplotlib
+  - module-utilities >= 0.2
+  - mypy >= 1.4.1
+  - nbqa
+  - nox
+  - numpy >= 1.20
   - pandas
+  - pre-commit
   - pymbar>=4.0
   - pytest
   - pytest-cov
   - pytest-sugar
   - pytest-xdist
+  - pytype
+  - ruamel.yaml
+  - scipy
+  - setuptools-scm
+  - sympy
+  - xarray >= 0.16
   - pip
   - pip:
       - gpflow >= 2.6.0
+      - noxopt
+      - pytest-accept
+      - scriv
       - tensorflow
       - tensorflow-probability
