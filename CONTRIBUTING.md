@@ -381,11 +381,14 @@ If you go this route, you may want to use something like
 [zsh-autoenv](https://github.com/Tarrasch/zsh-autoenv) (if using zsh shell) or
 [autoenv](https://github.com/hyperupcall/autoenv) (if using bash).
 
+### Conda create development environment
+
 If instead you'd like to just install directly with conda, you can use:
 
 ```bash
 conda env create [-n {env-name}] -f environment/py{version}-dev-complete.yaml
-conda activate {environment-name or -p path/to/environment}
+conda activate {env-name}
+pip install -e .
 ```
 
 This installs all optional dependencies except those need to build the docs. For
@@ -418,14 +421,11 @@ like to install them in the development environment instead, include the
 file, or run:
 
 ```bash
-nox -seconfig -- --dev-extras dev nox tools
+nox -s config -- --dev-extras dev nox tools
 ```
 
-Alternatively, you can just create a conda environment using
-
-```bash
-conda env create [-n {env-name}] -f environment/py{version}-dev-complete.yaml
-```
+Alternatively, you can just create a conda environment using the commands in
+[](#conda-create-development-environment).
 
 Additional tools are:
 
