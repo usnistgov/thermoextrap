@@ -7,34 +7,37 @@ channels:
   - conda-forge
 dependencies:
   - python=3.10
-  - numpy >= 1.20
-  - xarray >= 0.16
-  - sympy
-  - scipy
+  - attrs
+  - bottleneck
   - cmomy >= 0.5
   - custom-inherit
-  - attrs
-  - module-utilities >= 0.2
+  - ipykernel
+  - ipython
   - lazy_loader
+  - matplotlib
+  - module-utilities >= 0.2
+  - mypy >= 1.4.1
+  - nbqa
+  - nox
+  - numpy >= 1.20
+  - pandas
+  - pre-commit
+  - pymbar>=4.0
   - pytest
-  - pytest-xdist
   - pytest-cov
   - pytest-sugar
-  - pandas
-  - pymbar>=4.0
+  - pytest-xdist
   - pytype
-  - mypy >= 1.4.1
-  - setuptools-scm
-  - ipython
-  - ipykernel
-  - bottleneck
-  - matplotlib
-  - nox
   - ruamel.yaml
+  - scipy
+  - setuptools-scm
+  - sympy
+  - xarray >= 0.16
   - pip
   - pip:
+      - gpflow >= 2.6.0
+      - noxopt
+      - pytest-accept
+      - scriv
       - tensorflow
       - tensorflow-probability
-      - gpflow >= 2.6.0
-      - pytest-accept
-      - noxopt

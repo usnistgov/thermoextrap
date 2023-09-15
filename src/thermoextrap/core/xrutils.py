@@ -1,6 +1,7 @@
 """Utilities for working with :mod:`xarray`."""
 
-from ._lazy_imports import np, xr
+import numpy as np
+import xarray as xr
 
 
 ###############################################################################

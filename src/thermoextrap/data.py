@@ -18,6 +18,9 @@ from abc import abstractmethod
 from typing import Hashable, Mapping, Sequence
 
 import attrs
+import cmomy
+import numpy as np
+import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
@@ -30,7 +33,6 @@ from .core._attrs_utils import (
     convert_dims_to_tuple,
     kw_only_field,
 )
-from .core._lazy_imports import cmomy, np, xr
 from .core.xrutils import xrwrap_uv, xrwrap_xv
 from .docstrings import DOCFILLER_SHARED
 

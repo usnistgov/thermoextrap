@@ -1,7 +1,8 @@
 """Utilities for sympy."""
 from functools import lru_cache
 
-from ._lazy_imports import sp
+# fix an issue with typing
+from ._imports import sympy as sp
 
 
 @lru_cache(100)

@@ -12,9 +12,10 @@ See :ref:`examples/usage/basic/temperature_interp:recursive interpolation` for e
 # TODO: Change this to point to the "new" ideagas.py
 # TODO: rework this code to be cleaner
 # from ..legacy.ig import IGmodel
+import numpy as np
+
 from . import idealgas
 from .core._deprecate import deprecate, deprecate_kwarg
-from .core._lazy_imports import np
 from .data import factory_data_values
 from .models import ExtrapModel, InterpModel
 

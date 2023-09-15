@@ -3,12 +3,12 @@
 # You should not manually edit this file.
 # Instead edit the corresponding pyproject.toml file.
 #
-pytest
-pytest-xdist
-pytest-cov
-pytest-sugar
+gpflow >= 2.6.0
 pandas
 pymbar>=4.0
+pytest
+pytest-cov
+pytest-sugar
+pytest-xdist
 tensorflow
 tensorflow-probability
-gpflow >= 2.6.0

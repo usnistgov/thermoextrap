@@ -1,9 +1,11 @@
 """A set of routines to stack data for gpflow analysis."""
 
 
+import numpy as np
+import pandas as pd
+import xarray as xr
 from module_utilities import cached
 
-from .core._lazy_imports import np, pd, xr
 from .models import StateCollection
 
 
