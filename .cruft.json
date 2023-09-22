@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/wpk-nist-gov/cookiecutter-pypackage.git",
-  "commit": "0b5de34137dc6dedc46daf621a8d422ede111c14",
+  "commit": "71625a367d3dc20e38fd58c761e10ee671e9a7d2",
   "checkout": "feature/nox",
   "skip": [
     "src/thermoextrap/__init__.py",
