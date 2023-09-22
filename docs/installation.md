@@ -34,24 +34,9 @@ At this time, it is recommended to install the Gaussian Process Regression (GPR)
 dependencies via pip, as the conda-forge recipes are slightly out of date:
 
 ```bash
-pip install tensorflow tensorflow-probability gpflow
+pip install tensorflow tensorflow-probability "gpflow>=2.6.0"
 ```
 
 ## From sources
 
-The sources for thermodynamic-extrapolation can be downloaded from the [github
-repo].
-
-You can either clone the public repository:
-
-```bash
-git clone git://github.com/usnistgov/thermoextrap.git
-```
-
-Once you have a copy of the source, you can install it with:
-
-```bash
-pip install .
-```
-
-[github repo]: https://github.com/usnistgov/thermoextrap
+See [](./contributing) for details on installing from source.

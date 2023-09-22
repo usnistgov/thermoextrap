@@ -34,7 +34,7 @@ repos:
         stages: [commit]
         additional_dependencies:
           - prettier-plugin-toml
-        exclude: environment/lock/.*[.]yml|^tests/lnpy_data/sample_data.json
+        exclude: requirements/lock/.*[.]yml|^tests/lnpy_data/sample_data.json
 
   # * Markdown
   - repo: https://github.com/DavidAnson/markdownlint-cli2
@@ -71,7 +71,7 @@ repos:
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: 3.8.1
+    rev: 3.9.0
     hooks:
       - id: commitizen
         stages: [commit-msg]

@@ -175,40 +175,67 @@ search for python interpreters. The variable `nox.extras.dev` is a list of
 ```toml
 # config/userconfig.toml
 [nox.python]
-paths = ["~/.conda/envs/test-3.*/bin"]
+paths = ["~/.conda/envs/python-3.*/bin"]
 
-[nox.extras]
-dev = ["dev", "nox"]
+# overrides dev environment for user
+[tool.pyproject2conda.envs.dev]
+extras = ["dev", "nox"]
 
 ```
 
-For example, the above file will add the paths `~/.conda/envs/test-3.*/bin` to
+For example, the above file will add the paths `~/.conda/envs/python-3.*/bin` to
 the search path, and the development environment will include the extras `dev`
 and `nox` from the `project.optional-dependencies` section of the
-`pyproject.toml` file in the development environment.
+`pyproject.toml` file in the development environment. See
+[below](#creating-environmentyamlrequirementtxt-files) and [pyproject2conda] for
+more info.
 
-You can alos create this file using either of the following commands:
+You can also create this file using either of the following commands:
 
 ```bash
-nox -s config -- --python-paths "~/.conda/envs/test-3.*/bin" --dev-extras dev nox...
+nox -s config -- --python-paths "~/.conda/envs/python-3.*/bin" --dev-extras dev nox...
 # or
 python tools/projectconfig.py  --python-paths ... --dev-extras ...
 ```
+
+Run the latter with `--help` for more options.
 
 ### Installing interpreters for virtualenv creation
 
 If using virtualenvs across multiple python versions (e.g., `test_venv`,
 `typing_venv`, etc), you'll need to install python interpreters for each
 version. I've had trouble mixing pyenv with conda. Instead, I use conda to
-create multiple invironments to hold different python version:
+create multiple invironments to hold different python version. You can use the
+following script to create the needed conda environments:
 
 ```bash
-for version in 3.8 3.9 3.10 3.11; do
-    conda create -n test-${version} python=${version}
-done
+python tools/create_pythons.py -p 3.8 3.9 ...
 ```
 
-Also, set the variable `nox.python.paths` (see [](#setup-user-configuration)).
+Run with `--help` for more options. Then, set the variable `nox.python.paths`
+(see [](#setup-user-configuration)).
+
+### See nox sessions/options
+
+To see all nox session, run:
+
+```bash
+nox --list
+```
+
+We use [noxopt] to pass command line options to the different sessions. Use the
+following to get help on these options:
+
+```bash
+nox -- --help
+```
+
+Note that these options should be passed _after_ `--`. For example, to build and
+open the documentation, run:
+
+```bash
+nox -s docs -- -d build open
+```
 
 ### Creating environment.yaml/requirement.txt files
 
@@ -221,8 +248,9 @@ nox -s requirements
 
 This uses [pyproject2conda] to create the requirement files. Note that all
 requirement files are under something like
-`environment/py{version}-{env-name}.yaml`. The file
-`environment/py{version}-dev.yaml` is user specific and **should not** be
+`requirements/py{version}-{env-name}.yaml` (conda environment) or
+`requirements/{env-name}.txt` (virtual environment). The file
+`requirements/py{version}-dev.yaml` is user specific and **should not** be
 tracked by git.
 
 ## ipykernel
@@ -364,7 +392,7 @@ procedure using [pipx] and the following command:
 ```bash
 pipx run --spec git+https://github.com/wpk-nist-gov/nox-bootstrap.git \
      nox -s bootstrap -- \
-     --python-paths "~/.conda/envs/test-3.*/bin" \
+     --python-paths "~/.conda/envs/python-3.*/bin" \
      --dev-extras dev nox
 
 conda activate .nox/{project-name}/envs/dev
@@ -388,7 +416,7 @@ activate the development environment when in the parent directory.
 If instead you'd like to just install directly with conda, you can use:
 
 ```bash
-conda env create [-n {env-name}] -f environment/py{version}-dev-complete.yaml
+conda env create [-n {env-name}] -f requirements/py{version}-dev-complete.yaml
 conda activate {env-name}
 pip install -e . --no-deps
 ```
@@ -410,12 +438,13 @@ that, please use nox.
 [cruft]: https://github.com/cruft/cruft
 [cog]: https://github.com/nedbat/cog
 [git-flow]: https://github.com/nvie/gitflow
-[scriv]: https://github.com/nedbat/scriv
+[scriv]: https://github.com/nedbat/scrivl
 [conventional-style]: https://www.conventionalcommits.org/en/v1.0.0/
 [commitizen]: https://github.com/commitizen-tools/commitizen
 [nb_conda_kernels]: https://github.com/Anaconda-Platform/nb_conda_kernels
 [pyproject2conda]: https://github.com/wpk-nist-gov/pyproject2conda
 [nbqa]: https://github.com/nbQA-dev/nbQA
+[pyright]: https://github.com/microsoft/pyright
 
 We recommend installing the following tools with [pipx] or [condax]. If you'd
 like to install them in the development environment instead, include the
@@ -439,6 +468,7 @@ Additional tools are:
 - [pyproject2conda] (optional)
 - [cog] (optional)
 - [nbqa] (optional)
+- [pyright] (recommended)
 
 These are setup using the following:
 
@@ -451,6 +481,7 @@ pipx install scriv
 condax/pipx install commitizen
 condax/pipx install cogapp
 condax/pipx install nbqa
+condax/pipx install pyright
 ```
 
 If you'd like to install a central [nox] to be used with this project, use one
