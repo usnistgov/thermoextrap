@@ -1,7 +1,7 @@
 {
-  "template": "https://github.com/wpk-nist-gov/cookiecutter-pypackage.git",
-  "commit": "71625a367d3dc20e38fd58c761e10ee671e9a7d2",
-  "checkout": "feature/nox",
+  "template": "https://github.com/usnistgov/cookiecutter-nist-python.git",
+  "commit": "4d7e7e1a9733a6226b4b397624923c3bdcad6967",
+  "checkout": "develop",
   "skip": [
     "src/thermoextrap/__init__.py",
     "docs/examples/usage/demo.ipynb",
@@ -28,16 +28,10 @@
         "changelog.d/templates/auto-changelog/*.jinja2"
       ],
       "project_short_description": "Thermodynamic extrapolation",
-      "version": "0.0.1",
-      "use_pytest": "y",
-      "use_pypi_deployment_with_travis": "n",
       "command_line_interface": "No command-line interface",
-      "create_author_file": "y",
-      "open_source_license": "NIST license",
-      "sphinx_auto": "autosummary",
       "sphinx_use_autodocsumm": "y",
       "sphinx_theme": "sphinx_book_theme",
-      "_template": "https://github.com/wpk-nist-gov/cookiecutter-pypackage.git"
+      "_template": "https://github.com/usnistgov/cookiecutter-nist-python.git"
     }
   },
   "directory": null
