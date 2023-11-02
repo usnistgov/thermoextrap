@@ -25,6 +25,8 @@ https://naereen.github.io/badges/
 [license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
 [license-link]: https://github.com/usnistgov/thermoextrap/blob/main/LICENSE
 
+<!-- prettier-ignore-end -->
+
 <!-- other links -->
 
 [cmomy]: https://github.com/usnistgov/cmomy

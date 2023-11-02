@@ -113,7 +113,10 @@ nb_execution_mode = "off"
 # nb_execution_mode = "auto"
 
 # set the kernel name
-nb_kernel_rgx_aliases = {"thermoextrap.*": "python3", "conda.*": "python3"}
+nb_kernel_rgx_aliases = {
+    "thermoextrap.*": "python3",
+    "conda.*": "python3",
+}
 
 nb_execution_allow_errors = True
 
@@ -499,7 +502,9 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
+    # fmt: off
     fn = os.path.relpath(fn, start=os.path.dirname(thermoextrap.__file__))
+    # fmt: on
 
     return f"https://github.com/{github_username}/thermoextrap/blob/{html_context['github_version']}/src/thermoextrap/{fn}{linespec}"
 

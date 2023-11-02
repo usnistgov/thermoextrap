@@ -7,7 +7,9 @@ You can contribute in many ways:
 
 ## Types of Contributions
 
+<!-- prettier-ignore-start -->
 [issues]: https://github.com/usnistgov/thermoextrap/issues
+<!-- prettier-ignore-end -->
 
 ### Report Bugs
 
