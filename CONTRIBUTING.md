@@ -33,9 +33,9 @@ and "help wanted" is open to whoever wants to implement it.
 
 ### Write Documentation
 
-`thermoextrap` could always use more documentation, whether as part of the
-official `thermoextrap` docs, in docstrings, or even on the web in blog posts,
-articles, and such.
+This project could always use more documentation, whether as part of the
+official docs, in docstrings, or even on the web in blog posts, articles, and
+such.
 
 ### Submit Feedback
 
@@ -50,9 +50,9 @@ If you are proposing a feature:
 
 ## Making a contribution
 
-Ready to contribute? Here's how to set up `thermoextrap` for local development.
+Ready to contribute? Here's how to make a contribution.
 
-- Fork the `thermoextrap` repo on GitHub.
+- Fork the repo on GitHub.
 
 - Clone your fork locally:
 

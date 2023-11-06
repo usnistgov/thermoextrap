@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/usnistgov/cookiecutter-nist-python.git",
-  "commit": "7ba78569cba4c2b39c2706d1f95b74c919b310cf",
+  "commit": "ab2f71c9e76533931d52cd32c7091fce972f7626",
   "checkout": "develop",
   "skip": [
     "src/thermoextrap/__init__.py",

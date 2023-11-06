@@ -31,7 +31,7 @@ pytest-xdist
 pytype; python_version < '3.11'
 ruamel.yaml
 scipy
-setuptools-scm
+setuptools-scm>=8.0
 sympy
 tensorflow
 tensorflow-probability

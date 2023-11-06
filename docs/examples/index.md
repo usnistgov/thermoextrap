@@ -1,6 +1,11 @@
-# User Guide
+# User guide
 
-<!-- This uses the links created in `create-symlinks.sh` -->
+<!-- NOTE: Any references like `usage/...`
+Are links to the top level `/examples/usage/...`.
+To Generate these links, run
+
+$ nox -s docs -- -d symlink
+-->
 
 ```{toctree}
 :maxdepth: 2

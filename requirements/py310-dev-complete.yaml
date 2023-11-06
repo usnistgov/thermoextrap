@@ -35,7 +35,7 @@ dependencies:
   - pytype
   - ruamel.yaml
   - scipy
-  - setuptools-scm
+  - setuptools-scm>=8.0
   - sympy
   - xarray >= 0.16
   - pip
