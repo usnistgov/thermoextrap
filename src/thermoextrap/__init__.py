@@ -73,9 +73,12 @@ else:
 
 
 # updated versioning scheme
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _version
+
 try:
-    from ._version import __version__
-except Exception:
+    __version__ = _version("thermoextrap")
+except PackageNotFoundError:  # pragma: no cover
     __version__ = "999"
 
 
