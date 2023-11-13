@@ -236,7 +236,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "thermoextrap"
-copyright = "2021, William P. Krekelberg"
+copyright = "2020, William P. Krekelberg"
 author = "William P. Krekelberg"
 
 # The version info for the project you're documenting, acts as replacement
