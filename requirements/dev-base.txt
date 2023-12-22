@@ -9,16 +9,16 @@
 #
 attrs
 bottleneck
-cmomy >= 0.5
+cmomy>=0.5
 custom-inherit
-gpflow >= 2.6.0
+gpflow>=2.6.0
 ipykernel
 ipython
 lazy_loader
 matplotlib
-module-utilities >= 0.2
-mypy >= 1.4.1
-numpy >= 1.20
+module-utilities>=0.2
+mypy>=1.4.1
+numpy>=1.20
 pandas
 pymbar>=4.0
 pytest
@@ -26,10 +26,10 @@ pytest-accept
 pytest-cov
 pytest-sugar
 pytest-xdist
-pytype; python_version < '3.11'
+pytype;python_version<"3.11"
 scipy
 setuptools-scm>=8.0
 sympy
 tensorflow
 tensorflow-probability
-xarray >= 0.16
+xarray>=0.16

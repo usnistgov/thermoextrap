@@ -13,17 +13,18 @@ dependencies:
   - python=3.10
   - attrs
   - bottleneck
-  - cmomy >= 0.5
+  - cmomy>=0.5
   - custom-inherit
   - ipykernel
   - ipython
   - lazy_loader
   - matplotlib
-  - module-utilities >= 0.2
-  - mypy >= 1.4.1
+  - module-utilities>=0.2
+  - mypy>=1.4.1
   - nbqa
   - nox
-  - numpy >= 1.20
+  - noxopt
+  - numpy>=1.20
   - pandas
   - pre-commit
   - pymbar>=4.0
@@ -37,11 +38,10 @@ dependencies:
   - scipy
   - setuptools-scm>=8.0
   - sympy
-  - xarray >= 0.16
+  - xarray>=0.16
   - pip
   - pip:
-      - gpflow >= 2.6.0
-      - noxopt
+      - gpflow>=2.6.0
       - pytest-accept
       - scriv
       - tensorflow

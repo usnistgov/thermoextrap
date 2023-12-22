@@ -8,22 +8,22 @@
 # Instead edit the corresponding pyproject.toml file.
 #
 attrs
-cmomy >= 0.5
+cmomy>=0.5
 custom-inherit
-gpflow >= 2.6.0
+gpflow>=2.6.0
 lazy_loader
-module-utilities >= 0.2
-mypy >= 1.4.1
-numpy >= 1.20
+module-utilities>=0.2
+mypy>=1.4.1
+numpy>=1.20
 pandas
 pymbar>=4.0
 pytest
 pytest-cov
 pytest-sugar
 pytest-xdist
-pytype; python_version < '3.11'
+pytype;python_version<"3.11"
 scipy
 sympy
 tensorflow
 tensorflow-probability
-xarray >= 0.16
+xarray>=0.16

@@ -12,11 +12,11 @@ channels:
 dependencies:
   - python=3.11
   - attrs
-  - cmomy >= 0.5
+  - cmomy>=0.5
   - custom-inherit
   - lazy_loader
-  - module-utilities >= 0.2
-  - numpy >= 1.20
+  - module-utilities>=0.2
+  - numpy>=1.20
   - pandas
   - pymbar>=4.0
   - pytest
@@ -25,9 +25,9 @@ dependencies:
   - pytest-xdist
   - scipy
   - sympy
-  - xarray >= 0.16
+  - xarray>=0.16
   - pip
   - pip:
-      - gpflow >= 2.6.0
+      - gpflow>=2.6.0
       - tensorflow
       - tensorflow-probability

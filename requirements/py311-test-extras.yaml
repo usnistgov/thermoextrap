@@ -19,6 +19,6 @@ dependencies:
   - pytest-xdist
   - pip
   - pip:
-      - gpflow >= 2.6.0
+      - gpflow>=2.6.0
       - tensorflow
       - tensorflow-probability

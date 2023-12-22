@@ -1,25 +1,24 @@
 [build-system]
-requires = ["setuptools>=61.2", "setuptools_scm[toml]>=8.0"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.2", "setuptools_scm[toml]>=8.0"]
 
 [project]
 name = "thermoextrap"
+description = "Thermodynamic extrapolation"
+keywords = ["thermoextrap"]
+license = { text = "NIST-PD" }
 authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" }
 ]
-license = { text = "NIST-PD" }
-description = "Thermodynamic extrapolation"
-# if using markdown
-# long_description_content_type = text/markdown
-keywords = ["thermoextrap"]
+requires-python = ">=3.8,<3.12"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
     "License :: Public Domain",
     "Operating System :: OS Independent",
-    "Intended Audience :: Science/Research",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -27,74 +26,26 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dynamic = ["readme", "version"]
-requires-python = ">=3.8"
 dependencies = [
-    "numpy >= 1.20",
-    "xarray >= 0.16",
-    "sympy",
-    "scipy",
+    "attrs",
     "cmomy >= 0.5",
     "custom-inherit",
-    "attrs",
-    "module-utilities >= 0.2",
     "lazy_loader",
+    "module-utilities >= 0.2",
+    "numpy >= 1.20",
+    "scipy",
+    "sympy",
+    "xarray >= 0.16",
 ]
-
-[project.urls]
-homepage = "https://github.com/usnistgov/thermoextrap"
-documentation = "https://pages.nist.gov/thermoextrap/"
 
 [project.optional-dependencies]
 accel = ["bottleneck"]
-parallel = [
-    "dask[complete]", # p2c: -s dask
-
-]
-viz = ["matplotlib"]
-mbar = ["pymbar>=4.0"]
-gpr = [
-    "tensorflow", # p2c: -p
-    "tensorflow-probability", # p2c: -p
-    "gpflow >= 2.6.0", # p2c: -p
-
-]
-openmm = ["openmm"]
 all = [
     "thermoextrap[mbar]",
     "thermoextrap[gpr]",
     "thermoextrap[accel]",
     "thermoextrap[parallel]",
     "thermoextrap[viz]",
-]
-test = [
-    "pytest", #
-    "pytest-xdist",
-    "pytest-cov",
-    "pytest-sugar",
-    "pandas",
-    "thermoextrap[mbar]",
-    "thermoextrap[gpr]",
-]
-dev-extras = [
-    "setuptools-scm>=8.0", #
-    "pytest-accept", # p2c: -p
-    "ipython",
-    "ipykernel",
-    # "nbval",
-
-]
-typing-extras = [
-    "pytype; python_version < '3.11'", #
-    "mypy >= 1.4.1",
-]
-typing = [
-    "thermoextrap[typing-extras]", #
-    "thermoextrap[test]",
-]
-nox = [
-    "nox",
-    "noxopt", # p2c: -p
-    "ruamel.yaml",
 ]
 dev = [
     "thermoextrap[test]", #
@@ -103,80 +54,89 @@ dev = [
     "thermoextrap[accel]",
     "thermoextrap[viz]",
 ]
-tools = [
-    "pre-commit", #
-    # "cruft",
-    "scriv", # p2c: -p
-    "nbqa",
-    "pyright",
-]
 dev-complete = [
     "thermoextrap[dev]", #
     "thermoextrap[tools]",
     "thermoextrap[nox]",
 ]
+dev-extras = [
+    "ipykernel", # "nbval",
+    "ipython",
+    "pytest-accept", #
+    "setuptools-scm>=8.0", #
+
+]
+dist-conda = [
+    "anaconda-client", #
+    "boa",
+    "conda-build",
+    "conda-verify",
+    "grayskull",
+]
+dist-pypi = ["build", "twine"]
 docs = [
-    "ipython", #
-    "pyenchant",
+    "autodocsumm",
     "ghp-import",
+    "ipython", #
+    "myst-nb",
+    "pyenchant",
     "sphinx >= 5.3.0",
+    "sphinx-autobuild",
+    "sphinx-book-theme",
     "sphinx-copybutton",
     "sphinxcontrib-spelling",
-    "sphinx-autobuild",
-    "myst-nb",
-    "sphinx-book-theme",
-    "autodocsumm",
     "thermoextrap[viz]",
     "thermoextrap[mbar]",
     "thermoextrap[gpr]",
 ]
-# to be parsed with pyproject2conda with --no-base option
-dist-pypi = ["twine", "build"]
-dist-conda = [
-    "anaconda-client", #
-    "grayskull",
-    "conda-build",
-    "conda-verify",
-    "boa",
+gpr = [
+    "gpflow >= 2.6.0", #
+    "tensorflow", #
+    "tensorflow-probability", #
+
 ]
-
-[tool.pyproject2conda]
-user_config = "config/userconfig.toml"
-template_python = "requirements/py{py}-{env}"
-template = "requirements/{env}"
-# defaults
-python = ["3.10"]
-channels = ["conda-forge"]
-style = ["yaml", "requirements"]
-default_envs = [
-    "test",
-    "typing",
-    "docs",
-    "dev",
-    "dev-complete",
-    "dist-conda",
-    "dist-pypi"
+mbar = ["pymbar>=4.0"]
+nox = [
+    "nox",
+    "noxopt", #
+    "ruamel.yaml",
 ]
+openmm = ["openmm"]
+parallel = [
+    "dask[complete]", # p2c: -s dask
 
-[tool.pyproject2conda.envs.test-extras]
-extras = ["test"]
+]
+test = [
+    "pandas",
+    "pytest", #
+    "pytest-cov",
+    "pytest-sugar",
+    "pytest-xdist",
+    "thermoextrap[mbar]",
+    "thermoextrap[gpr]",
+]
+tools = [
+    "nbqa",
+    "pre-commit", #  "cruft",
+    "pyright",
+    "scriv", # p2c: -p
 
-[tool.pyproject2conda.envs.dev-base]
-extras = ["dev"]
+]
+typing = [
+    "thermoextrap[typing-extras]", #
+    "thermoextrap[test]",
+]
+typing-extras = [
+    "mypy >= 1.4.1",
+    "pytype; python_version < '3.11'", #
 
-[[tool.pyproject2conda.overrides]]
-envs = ["test-extras", "dist-conda", "dist-pypi"]
-base = false
+]
+viz = ["matplotlib"]
 
-[[tool.pyproject2conda.overrides]]
-envs = ["test", "typing", "test-extras"]
-python = ["3.8", "3.9", "3.10", "3.11"]
+[project.urls]
+documentation = "https://pages.nist.gov/thermoextrap/"
+homepage = "https://github.com/usnistgov/thermoextrap"
 
-[[tool.pyproject2conda.overrides]]
-envs = ["dist-conda"]
-style = ["yaml"]
-
-## grayskull still messes some things up, but use scripts/recipe-append.sh for this
 [tool.setuptools]
 zip-safe = true # if using mypy, must be False
 include-package-data = true
@@ -197,23 +157,6 @@ readme = { file = [
 
 [tool.setuptools_scm]
 fallback_version = "999"
-
-[tool.aliases]
-test = "pytest"
-
-[tool.pytest.ini_options]
-addopts = "--doctest-modules --doctest-glob='*.md'"
-testpaths = ["tests", "README.md"]
-
-[tool.coverage.report]
-exclude_also = ["if TYPE_CHECKING:", "@overload"]
-omit = ["*/vendored/*"]
-include = ["src/*"]
-
-[tool.isort]
-profile = "black"
-skip_gitignore = true
-known_first_party = ["thermoextrap"]
 
 [tool.ruff]
 fix = true
@@ -323,8 +266,10 @@ max-complexity = 10
 
 # TODO : Fix examples/gpr_active_learning/analysis_polymer.ipynb F821
 # beta_list data_list
-[tool.nbqa.addopts]
-ruff = ["--fix", "--extend-ignore=D100,B018,F821"]
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+known_first_party = ["thermoextrap"]
 
 [tool.flake8]
 docstring-convention = "numpy"
@@ -358,15 +303,17 @@ ignore = [
     "D212",
 ]
 
-[tool.scriv]
-format = "md"
-md_header_level = "2"
-new_fragment_template = "file: changelog.d/templates/new_fragment.md.j2"
+[tool.nbqa.addopts]
+ruff = ["--fix", "--extend-ignore=D100,B018,F821"]
 
-[tool.commitizen]
-use_shortcuts = true
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --doctest-glob='*.md'"
+testpaths = ["tests", "README.md"]
 
-[tool.cruft]
+[tool.coverage.report]
+exclude_also = ["if TYPE_CHECKING:", "@overload"]
+omit = ["*/vendored/*"]
+include = ["src/*"]
 
 [tool.mypy]
 files = ["src", "tests", "noxfile.py", "tools"]
@@ -417,6 +364,63 @@ reportOptionalOperand = false
 reportOptionalSubscript = false
 reportPrivateImportUsage = false
 reportUnboundVariable = false
+
+[tool.pyproject2conda]
+user_config = "config/userconfig.toml"
+template_python = "requirements/py{py}-{env}"
+template = "requirements/{env}"
+# defaults
+python = ["3.10"]
+channels = ["conda-forge"]
+style = ["yaml", "requirements"]
+default_envs = [
+    "test",
+    "typing",
+    "docs",
+    "dev",
+    "dev-complete",
+    "dist-conda",
+    "dist-pypi"
+]
+
+[tool.pyproject2conda.dependencies]
+pytest-accept = { pip = true }
+scriv = { pip = true }
+gpflow = { pip = true }
+tensorflow = { pip = true }
+tensorflow-probability = { pip = true }
+
+[tool.pyproject2conda.envs.test-extras]
+extras = ["test"]
+
+[tool.pyproject2conda.envs.dev-base]
+extras = ["dev"]
+
+[[tool.pyproject2conda.overrides]]
+envs = ["test-extras", "dist-conda", "dist-pypi"]
+base = false
+
+[[tool.pyproject2conda.overrides]]
+envs = ["test", "typing", "test-extras"]
+python = ["3.8", "3.9", "3.10", "3.11"]
+
+[[tool.pyproject2conda.overrides]]
+envs = ["dist-conda"]
+style = ["yaml"]
+
+## grayskull still messes some things up, but use scripts/recipe-append.sh for this
+[tool.aliases]
+test = "pytest"
+
+[tool.scriv]
+format = "md"
+md_header_level = "2"
+new_fragment_template = "file: changelog.d/templates/new_fragment.md.j2"
+
+[tool.commitizen]
+use_shortcuts = true
+
+[tool.cruft]
 
 [tool.pytype]
 inputs = ["src", "tests"]
