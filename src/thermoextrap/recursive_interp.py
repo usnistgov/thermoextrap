@@ -74,9 +74,7 @@ class RecursiveInterp:
             model_cls  # The model CLASS used for interpolation, like InterpModel
         )
         self.derivatives = derivatives  # Derivatives object describing how derivatives will be calculated
-        self.states = (
-            []
-        )  # List of ExtrapModel objects sharing same Derivatives but different Data
+        self.states = []  # List of ExtrapModel objects sharing same Derivatives but different Data
         self.edge_beta = np.array(
             edge_beta
         )  # Values of state points that we interpolate between
@@ -381,16 +379,16 @@ class RecursiveInterp:
             # Check if out of lower bound
             if beta < self.edge_beta[0]:
                 print(
-                    "Have provided point {:f} below interpolation function"
-                    " interval edges ({}).".format(beta, str(self.edge_beta))
+                    f"Have provided point {beta:f} below interpolation function"
+                    f" interval edges ({str(self.edge_beta)})."
                 )
                 raise IndexError("Interpolation point below range")
 
             # Check if out of upper bound
             if beta > self.edge_beta[-1]:
                 print(
-                    "Have provided point {:f} above interpolation function"
-                    " interval edges ({}).".format(beta, str(self.edge_beta))
+                    f"Have provided point {beta:f} above interpolation function"
+                    f" interval edges ({str(self.edge_beta)})."
                 )
                 raise IndexError("Interpolation point above range")
 

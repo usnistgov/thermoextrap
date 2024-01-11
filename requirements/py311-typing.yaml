@@ -21,9 +21,6 @@ dependencies:
   - pandas
   - pymbar>=4.0
   - pytest
-  - pytest-cov
-  - pytest-sugar
-  - pytest-xdist
   - scipy
   - sympy
   - xarray>=0.16

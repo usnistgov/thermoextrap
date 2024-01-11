@@ -278,7 +278,7 @@ def test_du2_3(beta, order, data, betas_extrap):
     np.testing.assert_allclose(a, b)
 
     # <du**3> = <u**3> - 3 * <u**2><u> + 2<u>**3
-    # need to be carful with product <u**2> * <u>
+    # need to be careful with product <u**2> * <u>
     # <u**2> * <u>
     o = order - (3 - 1)
     kws = {"alpha": betas_extrap, "no_sum": True, "order": o}

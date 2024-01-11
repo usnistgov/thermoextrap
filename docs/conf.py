@@ -126,7 +126,7 @@ nb_execution_allow_errors = True
 github_username = "usnistgov"
 
 html_context = {
-    "github_user": "usnistgov",
+    "github_user": github_username,
     "github_repo": "thermoextrap",
     "github_version": "main",
     "doc_path": "docs",
@@ -260,8 +260,7 @@ author = "William P. Krekelberg"
 def _get_version():
     import os
 
-    version = os.environ.get("SETUPTOOLS_SCM_PRETEND_VERSION", None)
-    if version is None:
+    if (version := os.environ.get("SETUPTOOLS_SCM_PRETEND_VERSION")) is None:
         version = thermoextrap.__version__
     return version
 
@@ -439,7 +438,8 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "numba": ("https://numba.pydata.org/numba-doc/latest", None),
-    "matplotlib": ("https://matplotlib.org", None),
+    # "matplotlib": ("https://matplotlib.org", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
     "dask": ("https://docs.dask.org/en/latest", None),
     "cftime": ("https://unidata.github.io/cftime", None),
     "sparse": ("https://sparse.pydata.org/en/latest/", None),
@@ -462,7 +462,7 @@ linkcheck_ignore = ["https://doi.org/"]
 
 # based on numpy doc/source/conf.py
 def linkcode_resolve(domain, info):
-    """Determine the URL corresponding to Python object."""
+    """Determine the URL corresponding to Python object"""
     import inspect
     from operator import attrgetter
 

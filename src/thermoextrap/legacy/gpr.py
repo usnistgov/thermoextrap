@@ -8,7 +8,6 @@ import numpy as np
 import sympy as sp
 import tensorflow as tf
 import xarray as xr
-from gpflow.ci_utils import ci_niter
 
 from ..models import StateCollection
 
@@ -311,6 +310,7 @@ class GPRModel(StateCollection):
     # Hopefully, won't need to re-train many times with changing data
     # However, if do need to and want to keep same model, this allows for that
     def _train_GP(self, x_input, y_input, opt_steps=100, fresh_train=False):
+        from gpflow.ci_utils import ci_niter
         # Want option to continue training with same model, so adding in
         # So default behavior is fresh_train=False, so continues training if model exists
         # Might use to add extra training or if add more data

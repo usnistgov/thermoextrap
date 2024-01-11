@@ -521,9 +521,7 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
             Y, F, tf.math.sqrt(self.scale_noise) * self.Lcov
         )
 
-    def _conditional_mean(
-        self, F: gpflow.base.TensorType
-    ) -> tf.Tensor:  # pylint: disable=R0201
+    def _conditional_mean(self, F: gpflow.base.TensorType) -> tf.Tensor:  # pylint: disable=R0201
         return tf.identity(F)
 
     def _conditional_variance(self, F: gpflow.base.TensorType) -> tf.Tensor:
@@ -1299,7 +1297,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         # If kernel_params is not provided, set everything to 1.0 by default
         else:
             for s in self.param_syms:
-                setattr(self, s.name, float(1.0))
+                setattr(self, s.name, 1.0)
 
         # Collect only zeroth-order data for training mean function
         zero_bool = x_data[:, 1] == 0

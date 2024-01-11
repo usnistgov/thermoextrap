@@ -66,7 +66,7 @@ class SymFuncBase(sp.Function):
         --------
         sympy.utilities.lambdify.lambdify
         """
-        raise NotImplementedError("must specify in sublcass")
+        raise NotImplementedError("must specify in subclass")
 
     def fdiff(self, argindex=1):
         """Derivative of function.  This will be used by :class:`thermoextrap.models.SymDerivBase`."""
@@ -154,7 +154,7 @@ class SymSubs:
     simplify : bool, default=False
         If True, simplify result.
     expand : bool, default=True
-        If True, try to exapand result.
+        If True, try to expand result.
     """
 
     funcs: Sequence[sp.Function] = field()
@@ -281,7 +281,7 @@ class Derivatives(MyAttrsMixin):
         ``funcs[i](*args)`` gives the ith derivative
     exprs : sequence of Expr, optional
         expressions corresponding to the `funcs`
-        Mostly for debuggin purposes.
+        Mostly for debugging purposes.
     """
 
     #: Sequence of callable functions
@@ -415,7 +415,7 @@ def taylor_series_norm(order, order_dim="order"):
 class ExtrapModel(MyAttrsMixin):
     """Apply taylor series extrapolation."""
 
-    #: Alpha value data is evalulated at
+    #: Alpha value data is evaluated at
     alpha0: float = field(converter=float)
 
     #: Data object

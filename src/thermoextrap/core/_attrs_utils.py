@@ -124,16 +124,14 @@ class MyAttrsMixin:
         Examples
         --------
         >>> @attrs.frozen
-        ... class Derived(PhiBase):
+        ... class Derived(MyAttrsMixin):
         ...     _derived = attrs.field(init=False)
         ...
         ...     def __attrs_post_init__(self):
-        ...         self._immutable_setattrs(_derived=self.r_min + 10)
-        ...
-
-        >>> x = Derived(r_min=5)
+        ...         self._immutable_setattrs(_derived=10)
+        >>> x = Derived()
         >>> x._derived
-        15.0
+        10
         """
 
         for key, value in kws.items():

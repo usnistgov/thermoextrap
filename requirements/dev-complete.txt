@@ -19,10 +19,11 @@ matplotlib
 module-utilities>=0.2
 mypy>=1.4.1
 nbqa
+nbval
 nox
-noxopt
 numpy>=1.20
 pandas
+pip-tools
 pre-commit
 pymbar>=4.0
 pyright
@@ -32,10 +33,8 @@ pytest-cov
 pytest-sugar
 pytest-xdist
 pytype;python_version<"3.11"
-ruamel.yaml
 scipy
 scriv
-setuptools-scm>=8.0
 sympy
 tensorflow
 tensorflow-probability

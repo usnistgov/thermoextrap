@@ -10,39 +10,30 @@
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.11
   - attrs
-  - bottleneck
+  - autodocsumm
   - cmomy>=0.5
   - custom-inherit
-  - ipykernel
+  - ghp-import
   - ipython
   - lazy_loader
-  - matplotlib
+  - matplotlib-base
   - module-utilities>=0.2
-  - mypy>=1.4.1
-  - nbqa
-  - nox
-  - noxopt
+  - myst-nb
   - numpy>=1.20
-  - pandas
-  - pre-commit
+  - pyenchant
   - pymbar>=4.0
-  - pyright
-  - pytest
-  - pytest-cov
-  - pytest-sugar
-  - pytest-xdist
-  - pytype
-  - ruamel.yaml
   - scipy
-  - setuptools-scm>=8.0
+  - sphinx-autobuild
+  - sphinx-book-theme
+  - sphinx-copybutton
+  - sphinx>=5.3.0
+  - sphinxcontrib-spelling
   - sympy
   - xarray>=0.16
   - pip
   - pip:
       - gpflow>=2.6.0
-      - pytest-accept
-      - scriv
       - tensorflow
       - tensorflow-probability

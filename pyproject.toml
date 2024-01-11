@@ -1,11 +1,16 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = ["setuptools>=61.2", "setuptools_scm[toml]>=8.0"]
+requires = [
+    "setuptools>=61.2",
+    "setuptools_scm[toml]>=8.0",
+]
 
 [project]
 name = "thermoextrap"
 description = "Thermodynamic extrapolation"
-keywords = ["thermoextrap"]
+keywords = [
+    "thermoextrap",
+]
 license = { text = "NIST-PD" }
 authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
@@ -25,7 +30,10 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
 ]
-dynamic = ["readme", "version"]
+dynamic = [
+    "readme",
+    "version",
+]
 dependencies = [
     "attrs",
     "cmomy >= 0.5",
@@ -37,9 +45,10 @@ dependencies = [
     "sympy",
     "xarray >= 0.16",
 ]
-
 [project.optional-dependencies]
-accel = ["bottleneck"]
+accel = [
+    "bottleneck",
+]
 all = [
     "thermoextrap[mbar]",
     "thermoextrap[gpr]",
@@ -48,36 +57,26 @@ all = [
     "thermoextrap[viz]",
 ]
 dev = [
-    "thermoextrap[test]", #
+    "thermoextrap[nbval]",
+    "thermoextrap[test]",
     "thermoextrap[typing-extras]",
     "thermoextrap[dev-extras]",
-    "thermoextrap[accel]",
-    "thermoextrap[viz]",
+    "thermoextrap[accel,viz]",
 ]
 dev-complete = [
-    "thermoextrap[dev]", #
+    "thermoextrap[dev]",
     "thermoextrap[tools]",
-    "thermoextrap[nox]",
 ]
 dev-extras = [
-    "ipykernel", # "nbval",
+    "ipykernel",
     "ipython",
-    "pytest-accept", #
-    "setuptools-scm>=8.0", #
-
+    "nox",
+    "pytest-accept",
 ]
-dist-conda = [
-    "anaconda-client", #
-    "boa",
-    "conda-build",
-    "conda-verify",
-    "grayskull",
-]
-dist-pypi = ["build", "twine"]
 docs = [
     "autodocsumm",
     "ghp-import",
-    "ipython", #
+    "ipython",
     "myst-nb",
     "pyenchant",
     "sphinx >= 5.3.0",
@@ -85,57 +84,56 @@ docs = [
     "sphinx-book-theme",
     "sphinx-copybutton",
     "sphinxcontrib-spelling",
-    "thermoextrap[viz]",
-    "thermoextrap[mbar]",
-    "thermoextrap[gpr]",
+    "thermoextrap[gpr,mbar,viz]",
 ]
 gpr = [
-    "gpflow >= 2.6.0", #
-    "tensorflow", #
-    "tensorflow-probability", #
-
+    "gpflow >= 2.6.0",
+    "tensorflow",
+    "tensorflow-probability",
 ]
-mbar = ["pymbar>=4.0"]
-nox = [
-    "nox",
-    "noxopt", #
-    "ruamel.yaml",
+mbar = [
+    "pymbar>=4.0",
 ]
-openmm = ["openmm"]
+nbval = [
+    "nbval",
+]
+openmm = [
+    "openmm",
+]
 parallel = [
-    "dask[complete]", # p2c: -s dask
-
+    "dask[complete]",
 ]
 test = [
     "pandas",
-    "pytest", #
+    "pytest",
     "pytest-cov",
     "pytest-sugar",
     "pytest-xdist",
-    "thermoextrap[mbar]",
-    "thermoextrap[gpr]",
+    "thermoextrap[mbar,gpr]",
 ]
 tools = [
     "nbqa",
-    "pre-commit", #  "cruft",
+    "pip-tools",
+    "pre-commit",
     "pyright",
-    "scriv", # p2c: -p
-
+    "scriv",
 ]
 typing = [
-    "thermoextrap[typing-extras]", #
-    "thermoextrap[test]",
+    "pandas",
+    "pytest",
+    "thermoextrap[typing-extras]",
+    "thermoextrap[mbar,gpr]",
 ]
 typing-extras = [
     "mypy >= 1.4.1",
-    "pytype; python_version < '3.11'", #
-
+    "pytype; python_version < '3.11'",
 ]
-viz = ["matplotlib"]
-
+viz = [
+    "matplotlib",
+]
 [project.urls]
-documentation = "https://pages.nist.gov/thermoextrap/"
-homepage = "https://github.com/usnistgov/thermoextrap"
+Documentation = "https://pages.nist.gov/thermoextrap/"
+Homepage = "https://github.com/usnistgov/thermoextrap"
 
 [tool.setuptools]
 zip-safe = true # if using mypy, must be False
@@ -146,8 +144,6 @@ license-files = ["LICENSE"]
 namespaces = true
 where = ["src"]
 
-## include = []
-## exclude = []
 [tool.setuptools.dynamic]
 readme = { file = [
     "README.md",
@@ -158,43 +154,12 @@ readme = { file = [
 [tool.setuptools_scm]
 fallback_version = "999"
 
+# * Linting --------------------------------------------------------------------
+
 [tool.ruff]
 fix = true
 line-length = 88
 target-version = "py38"
-select = [
-    # pyflakes
-    "F",
-    # pycodestyle
-    "E",
-    "W",
-    # isort
-    "I",
-    # pyupgrade
-    "UP",
-    # pydocstyle
-    "D",
-    # # flake8-2020
-    "YTT",
-    # # flake8-bugbear
-    # "B",
-    # flake8-quotes
-    "Q",
-    # # pylint
-    # "PLE", "PLR", "PLW",
-    # # misc lints
-    "PIE",
-    # # tidy imports
-    "TID",
-    # # implicit string concatenation
-    # "ISC",
-    # # type-checking imports
-    "TCH",
-]
-# Allow autofix for all enabled rules (when `--fix`) is provided.
-# fixable = ["A", "B", "C", "D", "E", "F", "..."]
-unfixable = []
-# Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",
     ".direnv",
@@ -216,107 +181,87 @@ exclude = [
     "dist",
     "node_modules",
     "venv",
-    "docs/conf.py",
-    "src/thermoextrap/tests",
     "tests/",
+    "src/thermoextrap/tests",
     "src/thermoextrap/legacy/",
     "examples/gpr_active_learning/",
 ]
-ignore = [
-    # # whitespace before ':' - doesn't work well with black
-    # "E203",
-    # module level import not at top of file
-    "E402",
-    # line too long - let black worry about that
-    "E501",
-    # do not assign a lambda expression, use a def
-    "E731",
-    # # line break before binary operator
-    # "W503",
-    # allow black line after docstring
-    "D202",
-    "D105",
-    "D205",
-    # this leads to errors with placing titles in module
-    # docstrings
-    "D400",
-    "D401",
-    "D415",
-    "D102",
-    "D103",
-    # these are useful, but too many errors
-    # due to use of docfiller
-    "D417",
-    "D107",
-    "D203",
-    "D212",
-    # Allow relative imports
-    "TID252",
+
+[tool.ruff.lint]
+select = [
+    "F",      ## pyflakes
+    "E", "W", ## pycodestyle
+    "I",      ## isort
+    "UP",     ## pyupgrade
+    "D",      ## pydocstyle
+    "YTT",    ## flake8-2020
+    # "B",    ## flake8-bugbear
+    "Q",      ## flake8-quotes
+    # "PLE",  ## pylint
+    # "PLR"   ## pylint
+    # "PLW",  ## pylint
+    "PIE",    ## misc lints
+    "TID",    ## tidy imports
+    # "ISC",  ## implicit string concatenation
+    "TCH",    ## type-checking imports
 ]
-per-file-ignores = {  }
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+# fixable = ["A", "B", "C", "D", "E", "F", "..."]
+unfixable = []
+# Exclude a variety of commonly ignored directories.
+ignore = [
+    # "E203", ## whitespace before ':' - doesn't work well with black
+    "E402",   ## module level import not at top of file
+    "E501",   ## line too long - let black worry about that
+    "E731",   ## do not assign a lambda expression, use a def
+    # "W503", ## line break before binary operator
+    "D202",   ## blank line after docstring
+    "D105",   ## Missing magic method docstring
+    "D205",   ## blank line after summary
+    # this leads to errors with placing titles in module
+    "D400",   ## First line should end with a period
+    "D401",   ## First line of docstring should be in imperative mood: "{first_line}"
+    "D415",   ## First line should end with a period, question mark, or exclamation point
+    "D102",   ## Missing docstring in public method
+    "D103",   ## Missing docstring in public function
+    # these are useful, but too many errors with docfiller
+    "D417",   ## Missing argument description in the docstring for {definition}: {name}
+    "D107",   ## Missing docstring in __init__
+    "D203",   ## 1 blank line required before class docstring
+    "D212",   ## Multi-line docstring summary should start at the first line
+    "TID252", ## Allow relative imports
+]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+# per-file-ignores = {  }
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["thermoextrap"]
 
-[tool.ruff.mccabe]
-# Unlike Flake8, default to a complexity level of 10.
-max-complexity = 10
-
-# TODO : Fix examples/gpr_active_learning/analysis_polymer.ipynb F821
-# beta_list data_list
-[tool.isort]
-profile = "black"
-skip_gitignore = true
-known_first_party = ["thermoextrap"]
-
-[tool.flake8]
-docstring-convention = "numpy"
-ignore = [
-    # # whitespace before ':' - doesn't work well with black
-    "E203",
-    # module level import not at top of file
-    "E402",
-    # line too long - let black worry about that
-    "E501",
-    # do not assign a lambda expression, use a def
-    "E731",
-    # # line break before binary operator
-    "W503",
-    # allow black line after docstring
-    "D202",
-    "D105",
-    "D205",
-    # this leads to errors with placing titles in module
-    # docstrings
-    "D400",
-    "D401",
-    "D415",
-    "D102",
-    "D103",
-    # these are useful, but too many errors
-    # due to use of docfiller
-    "D417",
-    "D107",
-    "D203",
-    "D212",
-]
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.nbqa.addopts]
 ruff = ["--fix", "--extend-ignore=D100,B018,F821"]
 
+# * Testing --------------------------------------------------------------------
+
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --doctest-glob='*.md'"
-testpaths = ["tests", "README.md"]
+addopts = "--doctest-modules --doctest-glob='*.md' --ignore-glob='**/legacy/**' --pyargs"
+testpaths = ["thermoextrap", "tests", "README.md"]
 
 [tool.coverage.report]
 exclude_also = ["if TYPE_CHECKING:", "@overload"]
-omit = ["*/vendored/*"]
+omit = ["*/vendored/*", "*/_typing.py"]
 include = ["src/*"]
 
+[tool.coverage.paths]
+source = ["src/", ".nox/**/site-packages/"]
+
+# * Typing
+
 [tool.mypy]
-files = ["src", "tests", "noxfile.py", "tools"]
+files = ["src", "tests"]
 show_error_codes = true
 warn_unused_ignores = true
 warn_return_any = true
@@ -334,17 +279,9 @@ module = []
 
 [tool.pyright]
 include = ["src", "tests"]
-exclude = [
-    "**/__pycache__",
-    ".tox/**",
-    ".nox/**",
-    "**/.mypy_cache",
-    "dist-conda",
-    "examples"
-]
-pythonVersion = "3.10"
+exclude = ["**/__pycache__", ".tox/**", ".nox/**", "**/.mypy_cache", "dist-conda", "examples"]
+pythonVersion = "3.11"
 typeCheckingMode = "basic"
-useLibraryCodeForTypes = false
 # enable subset of "strict"
 reportDuplicateImport = true
 reportInvalidStubStatement = true
@@ -365,52 +302,56 @@ reportOptionalSubscript = false
 reportPrivateImportUsage = false
 reportUnboundVariable = false
 
+[tool.pytype]
+inputs = ["src", "tests"]
+
+# * Dependency creation --------------------------------------------------------
+
 [tool.pyproject2conda]
 user_config = "config/userconfig.toml"
 template_python = "requirements/py{py}-{env}"
 template = "requirements/{env}"
-# defaults
-python = ["3.10"]
+python = ["3.11"]
 channels = ["conda-forge"]
 style = ["yaml", "requirements"]
-default_envs = [
-    "test",
-    "typing",
-    "docs",
-    "dev",
-    "dev-complete",
-    "dist-conda",
-    "dist-pypi"
-]
+default_envs = ["test", "typing", "docs", "dev", "dev-complete"]
 
 [tool.pyproject2conda.dependencies]
 pytest-accept = { pip = true }
 scriv = { pip = true }
+dask = { skip = true, packages = "dask" }
+matplotlib = { skip = true, packages = "matplotlib-base" }
 gpflow = { pip = true }
 tensorflow = { pip = true }
 tensorflow-probability = { pip = true }
 
+[tool.pyproject2conda.envs.build]
+extras = "build-system.requires"
+reqs = ["build"]
+base = false
+style = "requirements"
+
 [tool.pyproject2conda.envs.test-extras]
 extras = ["test"]
+base = false
 
-[tool.pyproject2conda.envs.dev-base]
-extras = ["dev"]
+[tool.pyproject2conda.envs.test-notebook]
+extras = ["test", "nbval"]
 
 [[tool.pyproject2conda.overrides]]
-envs = ["test-extras", "dist-conda", "dist-pypi"]
-base = false
+# Ensure these have pip in yaml file
+envs = ["test", "docs", "dev", "dev-complete"]
+deps = ["pip"]
 
 [[tool.pyproject2conda.overrides]]
 envs = ["test", "typing", "test-extras"]
 python = ["3.8", "3.9", "3.10", "3.11"]
 
-[[tool.pyproject2conda.overrides]]
-envs = ["dist-conda"]
-style = ["yaml"]
+[tool.pip-tools]
+allow-unsafe = true
+strip-extras = true
 
-## grayskull still messes some things up, but use scripts/recipe-append.sh for this
-[tool.aliases]
-test = "pytest"
+# * Other tools ----------------------------------------------------------------
 
 [tool.scriv]
 format = "md"
@@ -421,6 +362,3 @@ new_fragment_template = "file: changelog.d/templates/new_fragment.md.j2"
 use_shortcuts = true
 
 [tool.cruft]
-
-[tool.pytype]
-inputs = ["src", "tests"]

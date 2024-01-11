@@ -99,7 +99,8 @@ class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_m
     >>> x = xr.DataArray([[1, 2, 3], [4, 5, 6]], dims=["x", "y"])
     >>> s = DatasetSelector(data=x, dims=["y", "x"])
     >>> s[0, 1]
-    4
+    <xarray.DataArray ()>
+    array(4)
     """
 
     #: Data to index

@@ -124,7 +124,6 @@ def deprecate_kwarg(
     >>> @deprecate_kwarg(old_arg_name="cols", new_arg_name="columns")
     ... def f(columns=""):
     ...     print(columns)
-    ...
     >>> f(columns="should work ok")
     should work ok
     >>> f(cols="should raise warning")  # doctest: +SKIP
@@ -136,7 +135,6 @@ def deprecate_kwarg(
     >>> @deprecate_kwarg("old", "new", {"yes": True, "no": False})
     ... def f(new=False):
     ...     print("yes!" if new else "no!")
-    ...
     >>> f(old="yes")  # doctest: +SKIP
     FutureWarning: old='yes' is deprecated, use new=True instead
       warnings.warn(msg, FutureWarning)
@@ -145,7 +143,6 @@ def deprecate_kwarg(
     >>> @deprecate_kwarg(old_arg_name="cols", new_arg_name=None)
     ... def f(cols="", another_param=""):
     ...     print(cols)
-    ...
     >>> f(cols="should raise warning")  # doctest: +SKIP
     FutureWarning: the 'cols' keyword is deprecated and will be removed in a
     future version please takes steps to stop use of 'cols'

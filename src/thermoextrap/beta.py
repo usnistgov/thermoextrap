@@ -292,9 +292,7 @@ class SymDerivBeta(SymDerivBase):
 
     @classmethod
     @docfiller_shared
-    def x_ave(
-        cls, xalpha=False, central=None, expand=True, post_func=None
-    ):  # noqa: 417
+    def x_ave(cls, xalpha=False, central=None, expand=True, post_func=None):  # noqa: 417
         r"""
         General method to find derivatives of :math:`\langle x \rangle`.
 
