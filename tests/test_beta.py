@@ -6,8 +6,8 @@ import thermoextrap as xtrap
 import thermoextrap.legacy
 
 
-@pytest.mark.slow
-def test_beta_derivs_slow(fixture):
+@pytest.mark.slow()
+def test_beta_derivs_slow(fixture) -> None:
     a = np.array(fixture.derivs_list)
     s = xtrap.beta.factory_derivatives(xalpha=False, central=False)
     b = s.derivs(fixture.rdata, norm=False)
@@ -18,7 +18,7 @@ def test_beta_derivs_slow(fixture):
     np.testing.assert_allclose(a, b)
 
 
-def test_beta_derivs(fixture):
+def test_beta_derivs(fixture) -> None:
     s = xtrap.beta.factory_derivatives(xalpha=False, central=False)
     b = s.derivs(fixture.rdata, norm=False)
     fixture.xr_test(b, s.derivs(fixture.xrdata, norm=False))
@@ -31,16 +31,16 @@ def test_beta_derivs(fixture):
     fixture.xr_test(b, s.derivs(fixture.xdata_val, norm=False))
 
 
-@pytest.mark.slow
-def test_extrapmodel_slow(fixture):
+@pytest.mark.slow()
+def test_extrapmodel_slow(fixture) -> None:
     betas = [0.3, 0.4]
     em = fixture.em
     xem = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
     np.testing.assert_allclose(em.predict(betas, order=3), xem.predict(betas, order=3))
 
 
-@pytest.mark.slow
-def test_extrapmodel_resample_slow(fixture):
+@pytest.mark.slow()
+def test_extrapmodel_resample_slow(fixture) -> None:
     betas = [0.3, 0.4]
     em = fixture.em
     xem = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
@@ -51,11 +51,11 @@ def test_extrapmodel_resample_slow(fixture):
     np.testing.assert_allclose(a, b, atol=0.1, rtol=0.1)
 
 
-def test_extrapmodel(fixture):
+def test_extrapmodel(fixture) -> None:
     betas = [0.3, 0.4]
     xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
 
-    for data in [
+    for _data in [
         fixture.cdata,
         fixture.xdata,
         fixture.xrdata,
@@ -66,7 +66,7 @@ def test_extrapmodel(fixture):
         fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
-def test_extrapmodel_ig():
+def test_extrapmodel_ig() -> None:
     ref_beta = 5.0
     max_order = 3
     test_betas = np.array([4.9, 5.1])
@@ -109,9 +109,9 @@ def test_extrapmodel_ig():
         # But bootstrapped std decreases faster with N than absolute error from analytical
         # Must be good way to do this, but not sure what it is
         # As long as well-control random number seed and number of samples, should work
-        print("Order %i" % o)
-        print(true_derivs[-1], test_derivs[-1])
-        print(true_extrap, test_extrap)
+        # print("Order %i" % o)
+        # print(true_derivs[-1], test_derivs[-1])
+        # print(true_extrap, test_extrap)
         np.testing.assert_allclose(
             true_derivs[-1], test_derivs[-1], rtol=0.0, atol=test_derivs_err * 5
         )
@@ -120,7 +120,7 @@ def test_extrapmodel_ig():
         )
 
 
-def test_extrapmodel_resample(fixture):
+def test_extrapmodel_resample(fixture) -> None:
     betas = [0.3, 0.4]
 
     ndat = len(fixture.u)
@@ -130,7 +130,7 @@ def test_extrapmodel_resample(fixture):
     xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
     a = xem0.resample(indices=idx).predict(betas, order=3)
 
-    for data in [
+    for _data in [
         fixture.cdata,
         fixture.xdata,
         fixture.xrdata,
@@ -142,7 +142,7 @@ def test_extrapmodel_resample(fixture):
         fixture.xr_test(a, b)
 
 
-def test_perturbmodel(fixture):
+def test_perturbmodel(fixture) -> None:
     beta0 = 0.5
 
     betas = [0.3, 0.7]
@@ -153,15 +153,15 @@ def test_perturbmodel(fixture):
     np.testing.assert_allclose(pm.predict(betas), xpm.predict(betas))
 
 
-@pytest.mark.slow
-def test_extrapmodel_weighted_slow(fixture):
+@pytest.mark.slow()
+def test_extrapmodel_weighted_slow(fixture) -> None:
     beta0 = [0.05, 0.5]
 
-    X = np.array((fixture.x, fixture.xb))
-    U = np.array((fixture.u, fixture.ub))
+    observable = np.array((fixture.x, fixture.xb))
+    energy = np.array((fixture.u, fixture.ub))
 
     emw = thermoextrap.legacy.ExtrapWeightedModel(
-        fixture.order, beta0, xData=X, uData=U
+        fixture.order, beta0, xData=observable, uData=energy
     )
 
     betas = [0.3, 0.4]
@@ -182,7 +182,7 @@ def test_extrapmodel_weighted_slow(fixture):
     )
 
 
-def test_extrapmodel_weighted(fixture):
+def test_extrapmodel_weighted(fixture) -> None:
     beta0 = [0.05, 0.5]
     betas = [0.3, 0.4]
 
@@ -233,7 +233,7 @@ def test_extrapmodel_weighted(fixture):
     fixture.xr_test(a, b)
 
 
-def test_extrapmodel_weighted_multi(fixture):
+def test_extrapmodel_weighted_multi(fixture) -> None:
     beta0 = [0.05, 0.2, 1.0]
     betas = [0.3, 0.4, 0.6, 0.7]
 
@@ -301,13 +301,15 @@ def test_extrapmodel_weighted_multi(fixture):
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
-@pytest.mark.slow
-def test_interpmodel_slow(fixture):
+@pytest.mark.slow()
+def test_interpmodel_slow(fixture) -> None:
     beta0 = [0.05, 0.5, 1.0]
 
-    X = np.array([np.random.rand(*fixture.x.shape) for _ in beta0])
-    U = np.array([np.random.rand(*fixture.u.shape) for _ in beta0])
-    emi = thermoextrap.legacy.InterpModel(fixture.order, beta0, xData=X, uData=U)
+    observable = np.array([np.random.rand(*fixture.x.shape) for _ in beta0])
+    energy = np.array([np.random.rand(*fixture.u.shape) for _ in beta0])
+    emi = thermoextrap.legacy.InterpModel(
+        fixture.order, beta0, xData=observable, uData=energy
+    )
 
     betas = [0.3, 0.4, 0.6, 0.7]
 
@@ -319,7 +321,7 @@ def test_interpmodel_slow(fixture):
                 uv=u, xv=x, order=fixture.order, central=False
             ),
         )
-        for beta, u, x in zip(beta0, U, X)
+        for beta, u, x in zip(beta0, energy, observable)
     ]
 
     xemi = xtrap.InterpModel(xems)
@@ -327,7 +329,7 @@ def test_interpmodel_slow(fixture):
     np.testing.assert_allclose(emi.predict(betas), xemi.predict(betas))
 
 
-def test_interpmodel(fixture):
+def test_interpmodel(fixture) -> None:
     beta0 = [0.05, 0.5, 1.0]
     betas = [0.3, 0.4, 0.6, 0.7]
 
@@ -383,7 +385,7 @@ def test_interpmodel(fixture):
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
-def test_interpmodelpiecewise(fixture):
+def test_interpmodelpiecewise(fixture) -> None:
     beta0 = [0.05, 0.2, 1.0]
 
     xems_r = [
@@ -412,7 +414,7 @@ def test_interpmodelpiecewise(fixture):
     fixture.xr_test(xemw_b.predict(vals), xemw_r.predict(vals, method="between"))
 
 
-def test_interpmodel_polynomial():
+def test_interpmodel_polynomial() -> None:
     # Test 1st, 2nd, and 3rd order polynomials at [-1.0, 1.0] points
     xdat2 = xr.DataArray([0.5, 1.5], dims=["rec"])
 
@@ -420,7 +422,7 @@ def test_interpmodel_polynomial():
         xdat1 = ((-1.0) ** (i + 1)) * xdat2
         udat1 = (i + 1) * xr.DataArray([-2.0, 2.0], dims=["rec"])
         udat2 = (i + 1) * xr.DataArray([2.0, -2.0], dims=["rec"])
-        print(udat1, udat2)
+        # print(udat1, udat2)
         dat1 = xtrap.DataCentralMomentsVals.from_vals(
             order=1, xv=xdat1, uv=udat1, central=True
         )
@@ -436,13 +438,15 @@ def test_interpmodel_polynomial():
         np.testing.assert_array_equal(interp.coefs().values, check_array)
 
 
-def test_mbar(fixture):
+def test_mbar(fixture) -> None:
     beta0 = [0.05, 0.5]
 
-    X = np.array((fixture.x, fixture.xb))
-    U = np.array((fixture.u, fixture.ub))
+    observable = np.array((fixture.x, fixture.xb))
+    energy = np.array((fixture.u, fixture.ub))
 
-    emi = thermoextrap.legacy.MBARModel(fixture.order, beta0, xData=X, uData=U)
+    emi = thermoextrap.legacy.MBARModel(
+        fixture.order, beta0, xData=observable, uData=energy
+    )
 
     betas = [0.3, 0.4]
 
@@ -468,39 +472,38 @@ from sympy import bell
 
 
 class LogAvgExtrapModel(thermoextrap.legacy.ExtrapModel):
-    def calcDerivVals(self, refB, x, U):
-        if x.shape[0] != U.shape[0]:
-            print(
-                "First observable dimension (%i) and size of potential energy array (%i) do not match!"
-                % (x.shape[0], U.shape[0])
-            )
-            return
+    def calcDerivVals(self, refB, x, energy):  # noqa: N802, ARG002, N803
+        if x.shape[0] != energy.shape[0]:
+            msg = f"First observable dimension {x.shape[0]} and size of potential energy array {energy.shape[0]} do not match!"
+            raise ValueError(msg)
 
-        avgUfunc, avgXUfunc = thermoextrap.legacy.buildAvgFuncs(x, U, self.maxOrder)
+        avg_ufunc, avg_xufunc = thermoextrap.legacy.buildAvgFuncs(
+            x, energy, self.maxOrder
+        )
 
-        derivVals = np.zeros((self.maxOrder + 1, x.shape[1]))
+        deriv_vals = np.zeros((self.maxOrder + 1, x.shape[1]))
         for o in range(self.maxOrder + 1):
             if o == 0:
-                derivVals[o] = -np.log(avgXUfunc(0))
+                deriv_vals[o] = -np.log(avg_xufunc(0))
                 continue
             for k in range(1, o + 1):
                 # Get the derivatives of the average quantity
-                thisDiffs = np.array(
-                    [self.derivF[l](avgUfunc, avgXUfunc) for l in range(1, o - k + 2)]
+                this_diffs = np.array(
+                    [self.derivF[v](avg_ufunc, avg_xufunc) for v in range(1, o - k + 2)]
                 )
                 # Loop to apply the chain rule to each element of the observable array
-                for l in range(x.shape[1]):
-                    derivVals[o, l] += (
+                for v in range(x.shape[1]):
+                    deriv_vals[o, v] += (
                         np.math.factorial(k - 1)
-                        * ((-1 / avgXUfunc(0)[l]) ** k)
-                        * bell(o, k, thisDiffs[:, l])
+                        * ((-1 / avg_xufunc(0)[v]) ** k)
+                        * bell(o, k, this_diffs[:, v])
                     )
 
-        return derivVals
+        return deriv_vals
 
 
-@pytest.mark.slow
-def test_extrapmodel_minuslog_slow(fixture):
+@pytest.mark.slow()
+def test_extrapmodel_minuslog_slow(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.3]
     u, x, order = fixture.u, fixture.x, fixture.order
@@ -526,14 +529,14 @@ def test_extrapmodel_minuslog_slow(fixture):
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
 
 
-def test_extrapmodel_minuslog_slow(fixture):
+def test_extrapmodel_minuslog_slow2(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.3]
-    u, x, order = fixture.u, fixture.x, fixture.order
+    _u, _x, _order = fixture.u, fixture.x, fixture.order
 
     xem0 = xtrap.beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
 
-    for data in [
+    for _data in [
         fixture.cdata,
         fixture.xdata,
         fixture.xrdata,
@@ -546,7 +549,7 @@ def test_extrapmodel_minuslog_slow(fixture):
         fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
-def test_extrapmodel_minuslog_ig():
+def test_extrapmodel_minuslog_ig() -> None:
     ref_beta = 5.0
     max_order = 3
     test_betas = np.array([4.9, 5.1])
@@ -607,42 +610,35 @@ class ExtrapModelDependent(thermoextrap.legacy.ExtrapModel):
 
     # Calculates symbolic derivatives up to maximum order given data
     # Returns list of functions that can be used to evaluate derivatives for specific data
-    def calcDerivFuncs(self):
-        derivs = []
-        for o in range(self.maxOrder + 1):
-            derivs.append(
-                symDerivAvgXdependent(o)
-            )  # Only changing this line to get dependent information
-        return derivs
+    def calcDerivFuncs(self):  # noqa: N802
+        return [symDerivAvgXdependent(o) for o in range(self.maxOrder + 1)]
 
     # And given data, calculate numerical values of derivatives up to maximum order
     # Will be very helpful when generalize to different extrapolation techniques
     # (and interpolation)
-    def calcDerivVals(self, refB, x, U):
-        """Calculates specific derivative values at B with data x and U up to max order.
+    def calcDerivVals(self, refB, x, energy):  # noqa: N802, ARG002, N803
+        """
+        Calculates specific derivative values at B with data x and energy up to max order.
         Returns these derivatives.
         """
-        if x.shape[0] != U.shape[0]:
-            print(
-                "First observable dimension (%i) and size of potential energy array (%i) don't match!"
-                % (x.shape[0], U.shape[0])
-            )
-            return
+        if x.shape[0] != energy.shape[0]:
+            msg = f"First observable dimension {x.shape[0]} and size of potential energy array {energy.shape[0]} don't match!"
+            raise ValueError(msg)
 
-        avgUfunc, avgXUfunc = buildAvgFuncsDependent(
-            x, U, self.maxOrder
+        avg_ufunc, avg_xufunc = buildAvgFuncsDependent(
+            x, energy, self.maxOrder
         )  # Change this line to use dependent function
 
-        derivVals = np.zeros(
+        deriv_vals = np.zeros(
             (self.maxOrder + 1, x.shape[2])
         )  # And change this line because x data is of different shape
         for o in range(self.maxOrder + 1):
-            derivVals[o] = self.derivF[o](avgUfunc, avgXUfunc)
-        return derivVals
+            deriv_vals[o] = self.derivF[o](avg_ufunc, avg_xufunc)
+        return deriv_vals
 
 
-@pytest.mark.slow
-def test_extrapmodel_alphadep_slow(fixture):
+@pytest.mark.slow()
+def test_extrapmodel_alphadep_slow(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -666,7 +662,7 @@ def test_extrapmodel_alphadep_slow(fixture):
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
 
 
-def test_extrapmodel_alphadep(fixture):
+def test_extrapmodel_alphadep(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -705,7 +701,7 @@ def test_extrapmodel_alphadep(fixture):
     fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
-def test_extrapmodel_alphadep_ig():
+def test_extrapmodel_alphadep_ig() -> None:
     ref_beta = 5.0
     max_order = 3
     test_betas = np.array([4.9, 5.1])
@@ -762,57 +758,53 @@ def test_extrapmodel_alphadep_ig():
 # minus_log, alphadep
 
 
-from thermoextrap.legacy.utilities import buildAvgFuncsDependent
-
-
 class LogAvgExtrapModelDependent(ExtrapModelDependent):
-    """Class to hold information about an extrapolation that is dependent on the extrapolation variable and
+    """
+    Class to hold information about an extrapolation that is dependent on the extrapolation variable and
     involves the negative logarithm of an average.
     """
 
-    def calcDerivVals(self, refB, x, U):
-        """Calculates specific derivative values at B with data x and U up to max order.
+    def calcDerivVals(self, refB, x, energy):  # noqa: N802, N803, ARG002
+        """
+        Calculates specific derivative values at B with data x and energy up to max order.
         Returns these derivatives.
         """
-        if x.shape[0] != U.shape[0]:
-            print(
-                "First observable dimension (%i) and size of potential energy array (%i) don't match!"
-                % (x.shape[0], U.shape[0])
-            )
-            return
+        if x.shape[0] != energy.shape[0]:
+            msg = f"First observable dimension {x.shape[0]} and size of potential energy array {energy.shape[0]} don't match!"
+            raise ValueError(msg)
 
-        avgUfunc, avgXUfunc = buildAvgFuncsDependent(
-            x, U, self.maxOrder
+        avg_ufunc, avg_xufunc = buildAvgFuncsDependent(
+            x, energy, self.maxOrder
         )  # Change this line to use dependent function
 
-        derivVals = np.zeros(
+        deriv_vals = np.zeros(
             (self.maxOrder + 1, x.shape[2])
         )  # And change this line because x data is of different shape
         for o in range(self.maxOrder + 1):
             if o == 0:
-                derivVals[o] = -np.log(
-                    avgXUfunc(0, 0)
-                )  # First index is derivative of function, next is power on U
+                deriv_vals[o] = -np.log(
+                    avg_xufunc(0, 0)
+                )  # First index is derivative of function, next is power on energy
                 continue
             for k in range(1, o + 1):
                 # Get the derivatives of the average quantity
 
-                thisDiffs = np.array(
-                    [self.derivF[l](avgUfunc, avgXUfunc) for l in range(1, o - k + 2)]
+                this_diffs = np.array(
+                    [self.derivF[v](avg_ufunc, avg_xufunc) for v in range(1, o - k + 2)]
                 )
                 # Loop to apply the chain rule to each element of the observable array
-                for l in range(x.shape[2]):
-                    derivVals[o, l] += (
+                for v in range(x.shape[2]):
+                    deriv_vals[o, v] += (
                         np.math.factorial(k - 1)
-                        * ((-1 / avgXUfunc(0, 0)[l]) ** k)
-                        * bell(o, k, thisDiffs[:, l])
+                        * ((-1 / avg_xufunc(0, 0)[v]) ** k)
+                        * bell(o, k, this_diffs[:, v])
                     )
 
-        return derivVals
+        return deriv_vals
 
 
-@pytest.mark.slow
-def test_extrapmodel_alphadep_minuslog_slow(fixture):
+@pytest.mark.slow()
+def test_extrapmodel_alphadep_minuslog_slow(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -858,7 +850,7 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture):
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
 
 
-def test_extrapmodel_alphadep_minuslog(fixture):
+def test_extrapmodel_alphadep_minuslog(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -902,7 +894,7 @@ def test_extrapmodel_alphadep_minuslog(fixture):
     )
 
 
-def test_extrapmodel_alphadep_minuslog_ig():
+def test_extrapmodel_alphadep_minuslog_ig() -> None:
     ref_beta = 5.0
     max_order = 3
     test_betas = np.array([4.9, 5.1])

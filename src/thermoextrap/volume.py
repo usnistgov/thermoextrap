@@ -52,15 +52,14 @@ class VolumeDerivFuncs:
                 + " and received %i" % order
                 + "\n(because would need derivatives of forces)"
             )
-        else:
-            return self.create_deriv_func(order)
+        return self.create_deriv_func(order)
 
-    # TODO: move this to just a functions
+    # TODO(wpk): move this to just a functions
     @staticmethod
     def create_deriv_func(order):
         # Works only because of local scope
         # Even if order is defined somewhere outside of this class, won't affect returned func
-        def func(W, xW, dxdq, volume, ndim=1):
+        def func(W, xW, dxdq, volume, ndim=1):  # noqa: N803
             """
             Calculat function.  dxdq is <sum_{i=1}^N dy/dx_i x_i>.
 
@@ -111,21 +110,22 @@ class VolumeDataCallback(DataCallbackABC):
 
     _cache: dict = _cache_field()
 
-    def check(self, data):
+    def check(self, data) -> None:
         pass
 
     @cached.meth
     def dxdq(self, rec_dim, skipna):
         return self.dxdqv.mean(rec_dim, skipna=skipna)
 
-    def resample(self, data, meta_kws, indices, **kws):
+    def resample(self, data, meta_kws, indices, **kws):  # noqa: ARG002
         if not isinstance(data, DataValues):
-            raise NotImplementedError("resampling only possible with DataValues style.")
-        else:
-            return self.new_like(dxdqv=self.dxdqv[indices])
+            msg = "resampling only possible with DataValues style."
+            raise NotImplementedError(msg)
+        return self.new_like(dxdqv=self.dxdqv[indices])
 
     def derivs_args(self, data, derivs_args):
-        return tuple(derivs_args) + (
+        return (
+            *tuple(derivs_args),
             self.dxdq(data.rec_dim, data.skipna),
             self.volume,
             self.ndim,
@@ -178,7 +178,8 @@ def factory_extrapmodel(
     """
 
     if order != 1:
-        raise ValueError("only order=1 is supported")
+        msg = "only order=1 is supported"
+        raise ValueError(msg)
 
     dxdqv = xrwrap_xv(
         dxdqv, rec_dim=rec_dim, rep_dim=rep_dim, deriv_dim=None, val_dims=val_dims

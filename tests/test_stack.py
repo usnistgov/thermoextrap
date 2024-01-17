@@ -7,7 +7,7 @@ import thermoextrap as xtrap
 from thermoextrap import stack
 
 
-@pytest.fixture
+@pytest.fixture()
 def states():
     shape = (3, 2, 4)
     dims = ["rec", "pair", "position"]
@@ -25,7 +25,7 @@ def states():
     return s.resample(nrep=3)
 
 
-def test_mean_var(states):
+def test_mean_var(states) -> None:
     x = states[0].derivs(norm=False)
 
     out = stack.to_mean_var(x, dim="rep")
@@ -40,7 +40,7 @@ def test_mean_var(states):
     xr.testing.assert_allclose(out.sel(var=1, drop=True), x.var("rep"))
 
 
-def test_derivs_concat(states):
+def test_derivs_concat(states) -> None:
     a = xr.concat(
         (s.derivs(norm=False) for s in states),
         dim=pd.Index(states.alpha0, name=states.alpha_name),
@@ -49,18 +49,20 @@ def test_derivs_concat(states):
     xr.testing.assert_allclose(a, b)
 
 
-def test_stack(states):
-    Y_unstack = stack.states_derivs_concat(states).pipe(stack.to_mean_var, "rep")
-    Y = stack.stack_dataarray(Y_unstack, x_dims=["beta", "order"], stats_dim="stats")
+def test_stack(states) -> None:
+    y_unstack = stack.states_derivs_concat(states).pipe(stack.to_mean_var, "rep")
+    y_data = stack.stack_dataarray(
+        y_unstack, x_dims=["beta", "order"], stats_dim="stats"
+    )
 
-    X = stack.multiindex_to_array(Y.indexes["xstack"])
+    x_data = stack.multiindex_to_array(y_data.indexes["xstack"])
 
     ij = 0
-    for i, beta in enumerate(Y_unstack.beta):
-        for j, order in enumerate(Y_unstack.order):
-            np.testing.assert_allclose((beta, order), X[ij, :])
+    for _i, beta in enumerate(y_unstack.beta):
+        for _j, order in enumerate(y_unstack.order):
+            np.testing.assert_allclose((beta, order), x_data[ij, :])
             ij += 1
 
-    Ytest = Y_unstack.transpose("beta", "order", ..., "stats")
-    newshape = (Ytest.sizes["beta"] * Ytest.sizes["order"], -1, Ytest.sizes["stats"])
-    np.testing.assert_allclose(Ytest.values.reshape(newshape), Y.values)
+    y_test = y_unstack.transpose("beta", "order", ..., "stats")
+    newshape = (y_test.sizes["beta"] * y_test.sizes["order"], -1, y_test.sizes["stats"])
+    np.testing.assert_allclose(y_test.values.reshape(newshape), y_data.values)

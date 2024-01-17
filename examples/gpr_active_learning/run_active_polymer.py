@@ -11,9 +11,9 @@ from thermoextrap.gpr_active import active_utils
 
 
 def parse_bool(astr):
-    if astr in ["True", "true", "Yes", "yes", "Y", "y"]:
+    if astr in {"True", "true", "Yes", "yes", "Y", "y"}:
         return True
-    elif astr in ["False", "false", "No", "no", "N", "n"]:
+    elif astr in {"False", "false", "No", "no", "N", "n"}:
         return False
     else:
         raise ValueError("Provided string %s is not convertible to boolean." % astr)

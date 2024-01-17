@@ -45,7 +45,7 @@ def test_relative_fluctuations(
     model,
     states,
     reduce_dim="rep",
-    states_avail=None,
+    # states_avail=None,
     predict_kws=None,
     tol=0.003,
     alpha_tol=0.01,
@@ -99,7 +99,7 @@ def train_iterative(
     states=None,
     reduce_dim="rep",
     maxiter=10,
-    states_avail=None,
+    # states_avail=None,
     state_kws=None,
     statecollection_kws=None,
     predict_kws=None,
@@ -202,7 +202,7 @@ def train_iterative(
             model=model,
             states=states,
             reduce_dim=reduce_dim,
-            states_avail=states_avail,
+            # states_avail=states_avail,
             predict_kws=predict_kws,
             tol=tol,
             alpha_tol=alpha_tol,
@@ -211,20 +211,19 @@ def train_iterative(
         info_dict["depth"] = depth
         info.append(info_dict)
 
-        if callback is not None:
-            if callback(model, alphas, info_dict, **callback_kws):
-                break
+        if callback is not None and callback(model, alphas, info_dict, **callback_kws):
+            break
 
         if alpha_new is not None:
             state_new = factory_state(alpha_new, **state_kws)
-            states = sorted(states + [state_new], key=lambda x: x.alpha0)
+            states = sorted([*states, state_new], key=lambda x: x.alpha0)
         else:
             break
 
     return model, info
 
 
-def train_recursive(
+def train_recursive(  # noqa: C901,PLR0913,PLR0917
     alphas,
     factory_state,
     factory_statecollection,
@@ -235,7 +234,7 @@ def train_recursive(
     reduce_dim="rep",
     depth=0,
     maxiter=10,
-    states_avail=None,
+    # states_avail=None,
     state_kws=None,
     statecollection_kws=None,
     predict_kws=None,
@@ -316,15 +315,9 @@ def train_recursive(
 
     """
 
-    if states is None:
-        states = []
-    else:
-        states = list(states)
+    states = [] if states is None else list(states)
 
-    if info is None:
-        info = []
-    else:
-        info = list(info)
+    info = [] if info is None else list(info)
 
     if depth >= maxiter:
         return states, info
@@ -342,8 +335,7 @@ def train_recursive(
         states_dict = {s.alpha0: s for s in states}
         if alpha in states_dict:
             return states_dict[alpha]
-        else:
-            return factory_state(alpha, **state_kws)
+        return factory_state(alpha, **state_kws)
 
     if state0 is None:
         state0 = get_state(alphas[0], states)
@@ -361,18 +353,17 @@ def train_recursive(
         model=model,
         states=states,
         reduce_dim=reduce_dim,
-        states_avail=states_avail,
+        # states_avail=states_avail,
         predict_kws=predict_kws,
         tol=tol,
         alpha_tol=alpha_tol,
     )
 
     info_dict["depth"] = depth
-    info = info + [info_dict]
+    info = [*info, info_dict]
 
-    if callback is not None:
-        if callback(model, alphas, info_dict, **callback_kws):
-            alpha_new = None
+    if callback is not None and callback(model, alphas, info_dict, **callback_kws):
+        alpha_new = None
 
     if alpha_new is not None:
         state_new = get_state(alpha_new, states)
@@ -389,7 +380,7 @@ def train_recursive(
             reduce_dim=reduce_dim,
             depth=depth + 1,
             maxiter=maxiter,
-            states_avail=states_avail,
+            # states_avail=states_avail,
             state_kws=state_kws,
             statecollection_kws=statecollection_kws,
             predict_kws=predict_kws,
@@ -411,7 +402,7 @@ def train_recursive(
             reduce_dim=reduce_dim,
             depth=depth + 1,
             maxiter=maxiter,
-            states_avail=states_avail,
+            # states_avail=states_avail,
             state_kws=state_kws,
             statecollection_kws=statecollection_kws,
             predict_kws=predict_kws,
@@ -435,8 +426,6 @@ def check_polynomial_consistency(
     states,
     factory_statecollection,
     reduce_dim="rep",
-    order=None,
-    statecollection_kws=None,
 ):
     """
     Check polynomial consistency across subsegments.
@@ -510,7 +499,7 @@ def factory_state_idealgas(
     seed_from_beta=True,
     nconfig=10_000,
     npart=1_000,
-):  # noqa: D417
+):
     """
     Example factory function to create single state.
 
@@ -554,8 +543,13 @@ def factory_state_idealgas(
     )
 
 
-def callback_plot_progress(  # noqa: D417
-    model, alphas, info_dict, verbose=True, maxdepth_stop=None, ax=None
+def callback_plot_progress(
+    model,
+    alphas,  # noqa: ARG001
+    info_dict,
+    verbose=True,
+    maxdepth_stop=None,
+    ax=None,
 ):
     """
     The callback function is called each iteration after model is created.
@@ -610,13 +604,15 @@ def plot_polynomial_consistency(alphas, states, factory_statecollection):
     """Plotter for polynomial consistency."""
     import matplotlib.pyplot as plt
 
-    P, models_dict = check_polynomial_consistency(states, factory_statecollection)
+    p_values, models_dict = check_polynomial_consistency(
+        states, factory_statecollection
+    )
 
     hit = set()
-    for (key0, key1), p in P.items():
+    for (key0, key1), p in p_values.items():
         print(
             "range0: {} range1:{} p01: {}".format(
-                *map(lambda x: np.round(x, 3), [key0, key1, p.values])
+                *(np.round(x, 3) for x in [key0, key1, p.values])
             )
         )
 
@@ -633,4 +629,4 @@ def plot_polynomial_consistency(alphas, states, factory_statecollection):
                 hit.add(key)
 
     plt.legend()
-    return P, models_dict
+    return p_values, models_dict

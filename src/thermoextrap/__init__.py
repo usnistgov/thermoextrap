@@ -1,17 +1,17 @@
 """Classes/routines to deal with thermodynamic extrapolation."""
 
-# TODO: move data, idealgas, models to top level.
+# TODO(wpk): move data, idealgas, models to top level.
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from . import (  # noqa: TCH004
-        beta,  # noqa: TCH004
-        data,  # noqa: TCH004
-        idealgas,  # noqa: TCH004
-        lnpi,  # noqa: TCH004
-        models,  # noqa: TCH004
-        volume,  # noqa: TCH004
-        volume_idealgas,  # noqa: TCH004
+        beta,
+        data,
+        idealgas,
+        lnpi,
+        models,
+        volume,
+        volume_idealgas,
     )
     from .core.xrutils import xrwrap_alpha, xrwrap_uv, xrwrap_xv  # noqa: TCH004
     from .data import (

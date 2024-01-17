@@ -92,7 +92,7 @@ repos:
         types_or: [python, rst, markdown, cython, c, jupyter]
         additional_dependencies: [tomli]
         args: [-I, docs/spelling_wordlist.txt]
-        exclude: "^examples"
+        # exclude: "^examples"
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen

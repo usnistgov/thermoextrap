@@ -1,10 +1,9 @@
 # Written by Jacob I. Monroe, NIST employee
 
-"""
-Tests for GP models with derivatives and active learning based on those models.
-"""
+"""Tests for GP models with derivatives and active learning based on those models."""
 
 import copy
+
 import gpflow
 import numpy as np
 import pytest
@@ -25,55 +24,55 @@ from thermoextrap.gpr_active.gp_models import (
 # For derivative kernel, test if reproduces derivatives for known functional form and values
 # Work with RBF and test up to second order derivatives
 # Will build covariance matrix with derivative orders indexing, i.e., cov[0, 1] = dk/dx2
-class RBF_covs:
-    def __init__(self, var, l):
+class RBFCovs:
+    def __init__(self, var, volume):
         self.var = var
-        self.l = l
+        self.volume = volume
 
     def d(self, x1, x2):
-        return x1 / self.l - x2 / self.l
+        return x1 / self.volume - x2 / self.volume
 
-    # k(x1, x2) = var * exp(-0.5*(x1/l - x2/l)**2)
+    # k(x1, x2) = var * exp(-0.5*(x1/volume - x2/volume)**2)
     def cov00(self, x1, x2):
         return self.var * np.exp(-0.5 * self.d(x1, x2) ** 2)
 
-    # dk/dx2 = var * exp(-0.5*(x1/l - x2/l)**2) * ((1/l)*(x1/l - x2/l)) = k(x1, x2) * ((1/l)*(x1/l - x2/l))
+    # dk/dx2 = var * exp(-0.5*(x1/volume - x2/volume)**2) * ((1/volume)*(x1/volume - x2/volume)) = k(x1, x2) * ((1/volume)*(x1/volume - x2/volume))
     def cov01(self, x1, x2):
-        return self.cov00(x1, x2) * ((1 / self.l) * self.d(x1, x2))
+        return self.cov00(x1, x2) * ((1 / self.volume) * self.d(x1, x2))
 
     # dk/dx1 = -dk/dx2
     def cov10(self, x1, x2):
         return -self.cov01(x1, x2)
 
-    # d^2k/dx1*dx2 = -dk/dx2 * ((1/l)*(x1/l - x2/l)) + k(x1, x2) * (1/l^2)
+    # d^2k/dx1*dx2 = -dk/dx2 * ((1/volume)*(x1/volume - x2/volume)) + k(x1, x2) * (1/volume^2)
     def cov11(self, x1, x2):
-        return -self.cov01(x1, x2) * ((1 / self.l) * self.d(x1, x2)) + self.cov00(
+        return -self.cov01(x1, x2) * ((1 / self.volume) * self.d(x1, x2)) + self.cov00(
             x1, x2
-        ) * (1 / self.l**2)
+        ) * (1 / self.volume**2)
 
-    # d^2k/dx1^2 = -dk/dx1 * ((1/l)*(x1/l - x2/l)) - k(x1, x2) * (1/l^2) = -d^2k/dx1*dx2
+    # d^2k/dx1^2 = -dk/dx1 * ((1/volume)*(x1/volume - x2/volume)) - k(x1, x2) * (1/volume^2) = -d^2k/dx1*dx2
     def cov02(self, x1, x2):
         return -self.cov11(x1, x2)
 
-    # d^2k/dx2^2 = dk/dx2 * ((1/l)*(x1/l - x2/l)) - k(x1, x2) * (1/l^2) = -d^2k/dx1*dx2
+    # d^2k/dx2^2 = dk/dx2 * ((1/volume)*(x1/volume - x2/volume)) - k(x1, x2) * (1/volume^2) = -d^2k/dx1*dx2
     def cov20(self, x1, x2):
         return -self.cov11(x1, x2)
 
-    # d^3k/dx2^2*dx1 = d^2k/dx2*dx1 * ((1/l)*(x1/l - x2/l)) - 2*dk/dx1 * (1/l^2)
+    # d^3k/dx2^2*dx1 = d^2k/dx2*dx1 * ((1/volume)*(x1/volume - x2/volume)) - 2*dk/dx1 * (1/volume^2)
     def cov12(self, x1, x2):
-        return self.cov11(x1, x2) * ((1 / self.l) * self.d(x1, x2)) + 2 * self.cov01(
-            x1, x2
-        ) * (1 / self.l**2)
+        return self.cov11(x1, x2) * (
+            (1 / self.volume) * self.d(x1, x2)
+        ) + 2 * self.cov01(x1, x2) * (1 / self.volume**2)
 
-    # d^3k/dx1^2*dx2 = -d^2k/dx1*dx2 * ((1/l)*(x1/l - x2/l)) + 2*dk/dx1 * (1/l^2) = -d^3k/dx2^2*dx1
+    # d^3k/dx1^2*dx2 = -d^2k/dx1*dx2 * ((1/volume)*(x1/volume - x2/volume)) + 2*dk/dx1 * (1/volume^2) = -d^3k/dx2^2*dx1
     def cov21(self, x1, x2):
         return -self.cov12(x1, x2)
 
-    # d^4k/dx1^2*dx2^2 = d^3k/dx1^2*dx2 * ((1/l)*(x1/l - x2/l)) + d^2k/dx1*dx2 * (1/l^2) - 2*d^2k/dx1^2 * (1/l^2)
+    # d^4k/dx1^2*dx2^2 = d^3k/dx1^2*dx2 * ((1/volume)*(x1/volume - x2/volume)) + d^2k/dx1*dx2 * (1/volume^2) - 2*d^2k/dx1^2 * (1/volume^2)
     def cov22(self, x1, x2):
-        return -self.cov12(x1, x2) * ((1 / self.l) * self.d(x1, x2)) + 3 * self.cov11(
-            x1, x2
-        ) * (1 / self.l**2)
+        return -self.cov12(x1, x2) * (
+            (1 / self.volume) * self.d(x1, x2)
+        ) + 3 * self.cov11(x1, x2) * (1 / self.volume**2)
 
     def __call__(self, x1, x2):
         cov_mat = [
@@ -92,37 +91,37 @@ class RBF_covs:
 
 # For multiple input dimensions with separate lengthscales, implement as product of kernels
 # Derivatives will also be products since dimensions separable as products of exponentials
-class multiD_RBF_covs(object):
+class MultiDRBFCovs:
     def __init__(self, rbf_cov_list):
         self.rbf_cov_list = rbf_cov_list
         self.n_dims = len(rbf_cov_list)
 
     def __call__(self, x1, x2):
         # Loop over dimensions and collect covariance matrices for each
-        cov_mats = []
-        for i in range(self.n_dims):
-            cov_mats.append(self.rbf_cov_list[i](x1[i], x2[i]))
+        cov_mats = [self.rbf_cov_list[i](x1[i], x2[i]) for i in range(self.n_dims)]
 
         # Put together all combinations of covariances
         out = copy.deepcopy(cov_mats[0])
         for i in range(1, self.n_dims):
-            new_out = []
-            for j in range(out.shape[0]):
-                new_out.append([c * cov_mats[i] for c in out[j, :]])
+            new_out = [
+                [c * cov_mats[i] for c in out[j, :]] for j in range(out.shape[0])
+            ]
             out = np.block(new_out)
 
         return out
 
 
-def test_deriv_kernel_manual_1D():
+def test_deriv_kernel_manual_1d():
     # Create manually implemented RBF class to use as reference
-    rbf_check = RBF_covs(1.0, 2.0)
+    rbf_check = RBFCovs(1.0, 2.0)
 
     # Create a derivative kernel to check
     kern_expr, kern_params = make_rbf_expr()
     # Overwrite transforms on kernel parameters
     with pytest.raises(ValueError):
-        deriv_kern = DerivativeKernel(kern_expr, 1, {"var": [1.0, {}], "l": [2.0, {}]})
+        deriv_kern = DerivativeKernel(
+            kern_expr, 1, {"var": [1.0, {}], "volume": [2.0, {}]}
+        )
     kern_params = {"var": [1.0, {}], "l_0": [2.0, {}]}
     deriv_kern = DerivativeKernel(kern_expr, 1, kernel_params=kern_params)
 
@@ -152,12 +151,12 @@ def test_deriv_kernel_manual_1D():
     np.testing.assert_allclose(ref, to_check)
 
 
-def test_deriv_kernel_manual_multiD():
+def test_deriv_kernel_manual_multi_d():
     # Create manually implemented RBF class to use as reference
-    rbf_check = multiD_RBF_covs(
+    rbf_check = MultiDRBFCovs(
         [
-            RBF_covs(1.0, 2.0),
-            RBF_covs(1.0, 1.0),
+            RBFCovs(1.0, 2.0),
+            RBFCovs(1.0, 1.0),
         ]
     )
 
@@ -178,11 +177,7 @@ def test_deriv_kernel_manual_multiD():
     # (1.0, 0.0) and (0.0, 0.0)
     # (0.0, 0.0) and (-1.0, -1.0)
     # Helpful to put together all combos of derivatives for each set of points
-    d_combos = []
-    for i in range(3):
-        for j in range(3):
-            d_combos.append([i, j])
-    d_combos = np.array(d_combos)
+    d_combos = np.array([(i, j) for i in range(3) for j in range(3)])
 
     for x_pair in [
         [np.array([0.0, 0.0]), np.array([0.0, 0.0])],
@@ -216,7 +211,7 @@ def test_deriv_kernel_manual_multiD():
     np.testing.assert_allclose(ref, to_check)
 
 
-def test_deriv_kernel_self_1D():
+def test_deriv_kernel_self_1d():
     # Now test for self-consistency within the derivative kernel
     kern_expr, kern_params = make_rbf_expr()
     kern_params = {"var": [1.0, {}], "l_0": [2.0, {}]}
@@ -260,7 +255,7 @@ def test_deriv_kernel_self_1D():
     np.testing.assert_allclose(output_dorder, output)
 
 
-def test_deriv_kernel_self_multiD():
+def test_deriv_kernel_self_multi_d():
     # Now test for self-consistency within the derivative kernel
     kern_expr, kern_params = make_rbf_expr(2)
     kern_params = {
@@ -271,11 +266,7 @@ def test_deriv_kernel_self_multiD():
     deriv_kern = DerivativeKernel(kern_expr, 2, kernel_params=kern_params)
 
     # Helpful to put together all combos of derivatives for each set of points
-    d_combos = []
-    for i in range(3):
-        for j in range(3):
-            d_combos.append([i, j])
-    d_combos = np.array(d_combos)
+    d_combos = np.array([(i, j) for i in range(3) for j in range(3)])
 
     # Create test input
     pt1 = np.array([0.0, 0.0])
@@ -471,14 +462,14 @@ def test_multiout_multivar_normal():
     cov_mats = np.array([cov1, cov2, cov3])
 
     # Generate Cholesky decomposition, which is required input for
-    cov_L = np.array([np.linalg.cholesky(c) for c in cov_mats])
+    cov_cholesky = np.array([np.linalg.cholesky(c) for c in cov_mats])
 
     # And need means and points to compute log probability at
     means = np.array([[0.0, 0.5, -1.0], [1.0, 1.0, 1.0]])
     points = np.array([[0.5, 1.0, 1.0], [1.0, 0.5, -1.0]])
 
     # Generate output to check
-    check_out = multioutput_multivariate_normal(points, means, cov_L).numpy()
+    check_out = multioutput_multivariate_normal(points, means, cov_cholesky).numpy()
 
     # Will compare to a loop with scipy's implementation of log probabilities for Gaussians
     from scipy.stats import multivariate_normal
@@ -489,7 +480,7 @@ def test_multiout_multivar_normal():
         np.testing.assert_allclose(ref_logp, check_out[i])
 
 
-def test_GP_likelihood():
+def test_gp_likelihood():
     # Check that handles input correctly
     cov_id = np.eye(3)
     d_orders = np.arange(3.0)[:, None]  # Add dimension since now handles nD inputs
@@ -541,8 +532,8 @@ def test_GP_likelihood():
 # Would allow for most comparisons to a "base" model created in __init__
 # But would make testing more modular and specific
 # Manually parsing and running all methods in class is a pain for testing, though
-@pytest.mark.slow
-def test_GP():
+@pytest.mark.slow()
+def test_gp():  # noqa: PLR0915
     # First create data we can use
     rng = np.random.default_rng(42)
     x_data, y_data, y_var_data = sine_active.make_data(
@@ -556,8 +547,7 @@ def test_GP():
     # Want to make sure no parameters shared across models we test
     def make_kern():
         kern_expr, kern_params = make_rbf_expr()
-        kern = DerivativeKernel(kern_expr, 1, kernel_params=kern_params)
-        return kern
+        return DerivativeKernel(kern_expr, 1, kernel_params=kern_params)
 
     like_kwargs = {"p": 1.0, "s": -2.0}
 
@@ -627,8 +617,8 @@ def test_GP():
         rtol=1e-03,
     )
     # np.testing.assert_allclose(
-    #     check_base.kernel.kernel.l.numpy(),
-    #     check_xscale.kernel.kernel.l.numpy() / (check_xscale.x_scale_fac),
+    #     check_base.kernel.kernel.volume.numpy(),
+    #     check_xscale.kernel.kernel.volume.numpy() / (check_xscale.x_scale_fac),
     #     rtol=1e-03,
     # )
     # np.testing.assert_allclose(
@@ -667,7 +657,7 @@ def test_GP():
     np.testing.assert_allclose(pred_val_base[1].numpy(), ref_pred_vars, rtol=1e-03)
 
     # Test handling of multiple outputs (extra y dimensions)
-    x_shift, y_shift, y_var_shift = sine_active.make_data(
+    _x_shift, y_shift, y_var_shift = sine_active.make_data(
         np.linspace(-np.pi, np.pi, 5),
         phase_shift=np.pi / 3.0,
         noise=0.01,
@@ -675,7 +665,7 @@ def test_GP():
         rng=rng,
     )
     cov_shift = np.diag(np.squeeze(y_var_shift))[None, ...]
-    check_multiD = HeteroscedasticGPR(
+    check_multi_d = HeteroscedasticGPR(
         (
             x_data,
             np.hstack([y_data, y_shift]),
@@ -685,15 +675,15 @@ def test_GP():
     )
 
     # Make sure wrapping works into SharedIndependent kernel works correctly
-    assert isinstance(check_multiD.kernel, gpflow.kernels.SharedIndependent)
+    assert isinstance(check_multi_d.kernel, gpflow.kernels.SharedIndependent)
 
     # Train
-    train_GPR(check_multiD)
+    train_GPR(check_multi_d)
 
     # Produce output and compare to below - will depend on optimization procedure
     # But better than nothing?
-    pred_val_multiD = check_multiD.predict_f(x_val)
-    ref_multiD_means = np.array(
+    pred_val_multi_d = check_multi_d.predict_f(x_val)
+    ref_multi_d_means = np.array(
         [
             [-0.12177132, -0.8197274],
             [0.54288101, 0.97107731],
@@ -703,7 +693,7 @@ def test_GP():
             [-1.0930425, -0.48817702],
         ]
     )
-    ref_multiD_vars = np.array(
+    ref_multi_d_vars = np.array(
         [
             [0.00461916, 0.00477108],
             [0.00430657, 0.00396219],
@@ -713,11 +703,15 @@ def test_GP():
             [0.01557182, 0.01329149],
         ]
     )
-    np.testing.assert_allclose(pred_val_multiD[0].numpy(), ref_multiD_means, rtol=1e-03)
-    np.testing.assert_allclose(pred_val_multiD[1].numpy(), ref_multiD_vars, rtol=1e-03)
+    np.testing.assert_allclose(
+        pred_val_multi_d[0].numpy(), ref_multi_d_means, rtol=1e-03
+    )
+    np.testing.assert_allclose(
+        pred_val_multi_d[1].numpy(), ref_multi_d_vars, rtol=1e-03
+    )
 
     # Make sure multiple outputs also work with separate independent kernels
-    check_sepInd = HeteroscedasticGPR(
+    check_sep_ind = HeteroscedasticGPR(
         (
             x_data,
             np.hstack([y_data, y_shift]),
@@ -727,33 +721,33 @@ def test_GP():
     )
 
     # With independent kernels, can compare first dimension to model trained on 1D data only
-    train_GPR(check_sepInd)
-    pred_sepInd = check_sepInd.predict_f(x_test)
-    np.testing.assert_allclose(pred_base[0], pred_sepInd[0][:, :1], rtol=1e-03)
-    np.testing.assert_allclose(pred_base[1], pred_sepInd[1][:, :1], rtol=1e-03)
+    train_GPR(check_sep_ind)
+    pred_sep_ind = check_sep_ind.predict_f(x_test)
+    np.testing.assert_allclose(pred_base[0], pred_sep_ind[0][:, :1], rtol=1e-03)
+    np.testing.assert_allclose(pred_base[1], pred_sep_ind[1][:, :1], rtol=1e-03)
     np.testing.assert_allclose(
         check_base.kernel.kernel.l_0.numpy(),
-        check_sepInd.kernel.kernels[0].l_0.numpy(),
+        check_sep_ind.kernel.kernels[0].l_0.numpy(),
         rtol=1e-03,
     )
     np.testing.assert_allclose(
         check_base.kernel.kernel.var.numpy(),
-        check_sepInd.kernel.kernels[0].var.numpy(),
+        check_sep_ind.kernel.kernels[0].var.numpy(),
         rtol=1e-03,
     )
 
     # Test output with full_cov (specifically variance, second output)
     # Best done with multidimensional output data
-    pred_FF = check_sepInd.predict_f(x_data, full_cov=False)[1]  # Default
-    pred_TF = check_sepInd.predict_f(x_data, full_cov=True)[1]
+    pred_ff = check_sep_ind.predict_f(x_data, full_cov=False)[1]  # Default
+    pred_tf = check_sep_ind.predict_f(x_data, full_cov=True)[1]
 
     # Assert correct shapes
-    assert pred_FF.shape == (x_data.shape[0], 2)
-    assert pred_TF.shape == (2, x_data.shape[0], x_data.shape[0])
+    assert pred_ff.shape == (x_data.shape[0], 2)
+    assert pred_tf.shape == (2, x_data.shape[0], x_data.shape[0])
 
     # And assert that diagonal of full_cov=True matches full_cov=False
     np.testing.assert_allclose(
-        pred_FF.numpy(), np.vstack([np.diag(v) for v in pred_TF]).T
+        pred_ff.numpy(), np.vstack([np.diag(v) for v in pred_tf]).T
     )
 
     # Check proper handling of mean functions

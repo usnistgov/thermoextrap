@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cmomy.docstrings import docfiller as DOCFILLER_CMOMY
+from cmomy.docstrings import docfiller as docfiller_cmomy
 
 # from .external.docfiller import DocFiller
 from module_utilities.docfiller import DocFiller
@@ -107,7 +107,7 @@ DOCFILLER_VOLUME = DocFiller.from_docstring(
 
 
 DOCFILLER_SHARED = DocFiller.concat(
-    cmomy=DOCFILLER_CMOMY,
+    cmomy=docfiller_cmomy,
     xtrap=DOCFILLER_XTRAP,
     beta=DOCFILLER_BETA,
     volume=DOCFILLER_VOLUME,

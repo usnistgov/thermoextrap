@@ -2,7 +2,6 @@ from collections import namedtuple
 
 import pytest
 
-import thermoextrap
 import thermoextrap as xtrap
 from thermoextrap.core.sputils import get_default_indexed
 
@@ -11,7 +10,7 @@ n_list = [6]
 
 @pytest.fixture(params=n_list)
 def data(request):
-    data = namedtuple("data", ["n", "u", "x1", "du", "dxdu", "xu", "ui" "subs"])
+    data = namedtuple("data", ["n", "u", "x1", "du", "dxdu", "xu", "ui" "subs"])  # pyright: ignore[reportUntypedNamedTuple]
 
     n = request.param
     data.n = n
@@ -22,7 +21,7 @@ def data(request):
     subs_central = {data.dxdu[i]: data.du[i + 1] for i in range(1, 2 * n)}
     subs_central[data.x1] = data.u
 
-    subs_raw = {data.xu[i]: data.ui[i + 1] for i in range(0, 2 * n)}
+    subs_raw = {data.xu[i]: data.ui[i + 1] for i in range(2 * n)}
 
     data.subs = {True: subs_central, False: subs_raw}
 
@@ -39,7 +38,7 @@ def central(request):
     return request.param
 
 
-def test_x_ave(data, central, post_func):
+def test_x_ave(data, central, post_func) -> None:
     n, subs = data.n, data.subs[central]
 
     f0 = xtrap.beta.factory_derivatives(
@@ -49,27 +48,27 @@ def test_x_ave(data, central, post_func):
         name="u_ave", central=central, post_func=post_func
     )
 
-    for i in range(0, n + 1):
+    for i in range(n + 1):
         assert f0.exprs[i].subs(subs) - f1.exprs[i] == 0
 
 
-def test_central_dx(data):
+def test_central_dx(data) -> None:
     n, subs = data.n, data.subs[True]
 
     for m in range(1, n):
         f0 = xtrap.beta.factory_derivatives(name="dxdun_ave", n=m, central=True)
         f1 = xtrap.beta.factory_derivatives(name="dun_ave", n=m + 1, central=True)
 
-        for i in range(0, n + 1):
+        for i in range(n + 1):
             assert f0.exprs[i].subs(subs) - f1.exprs[i] == 0
 
 
-def test_raw_un(data):
+def test_raw_un(data) -> None:
     n, subs = data.n, data.subs[False]
 
     for m in range(1, n):
         f0 = xtrap.beta.factory_derivatives(name="xun_ave", n=m, central=False)
         f1 = xtrap.beta.factory_derivatives(name="un_ave", n=m + 1, central=False)
 
-        for i in range(0, n + 1):
+        for i in range(n + 1):
             assert f0.exprs[i].subs(subs) - f1.exprs[i] == 0

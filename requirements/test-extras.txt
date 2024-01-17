@@ -9,7 +9,7 @@
 #
 gpflow>=2.6.0
 pandas
-pymbar>=4.0
+pymbar[jax]>=4.0
 pytest
 pytest-cov
 pytest-sugar

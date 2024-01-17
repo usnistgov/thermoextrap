@@ -34,7 +34,8 @@ def make_data(
     slope=0.1,
     order_scale=1.0,
     max_order=4,
-    rng=np.random.default_rng(42),
+    seed=None,
+    rng=None,
 ):
     """
     Creates data with heteroscedastic noise around sin(x).
@@ -57,6 +58,9 @@ def make_data(
         Y_err - variance in each y value - assumes all values and derivatives independent
                 (diagonal covariance matrix)
     """
+    if rng is None:
+        rng = np.random.default_rng(seed or 42)
+
     if isinstance(x_vals, (float, int)):
         x_vals = [x_vals]
     x_vals = np.array(x_vals)

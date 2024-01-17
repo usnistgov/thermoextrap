@@ -21,7 +21,7 @@ class VolumeDerivFuncsIG:
     Here W represents the virial instead of the potential energy.
     """
 
-    def __init__(self, refV=1.0):
+    def __init__(self, refV=1.0) -> None:  # noqa: N803
         # If do not set refV, assumes virial data is already divided by the reference volume
         # If this is not the case, need to set refV
         # Or if need refV to also compute custom term, need to specify
@@ -35,14 +35,13 @@ class VolumeDerivFuncsIG:
                 + " and received %i" % order
                 + "\n(because would need derivatives of forces)"
             )
-        else:
-            return self.create_deriv_func(order)
+        return self.create_deriv_func(order)
 
     def create_deriv_func(self, order):
         # Works only because of local scope
         # Even if order is defined somewhere outside of this class, won't affect returned func
 
-        def func(W, xW):
+        def func(W, xW):  # noqa: N803
             if order == 0:
                 # Zeroth order derivative
                 deriv_val = xW[0]
@@ -61,7 +60,7 @@ class VolumeDerivFuncsIG:
 
 
 @lru_cache(5)
-def factory_derivatives(refV=1.0):
+def factory_derivatives(refV=1.0):  # noqa: N803
     """
     Factory function to provide coefficients of expansion.
 
@@ -102,7 +101,8 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
     """
 
     if order != 1:
-        raise ValueError("only first order supported")
+        msg = "only first order supported"
+        raise ValueError(msg)
 
     from .data import factory_data_values
 
@@ -142,7 +142,8 @@ def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
         order = data.order
 
     if order != 1:
-        raise ValueError("only first order supported")
+        msg = "only first order supported"
+        raise ValueError(msg)
 
     assert data.order >= order
 

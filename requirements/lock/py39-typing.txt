@@ -11,7 +11,7 @@ absl-py==2.0.0
     #   tensorflow-probability
 astunparse==1.6.3
     # via tensorflow
-attrs==23.1.0
+attrs==23.2.0
     # via
     #   -r requirements/typing.txt
     #   pytype
@@ -47,7 +47,7 @@ gast==0.5.4
     # via
     #   tensorflow
     #   tensorflow-probability
-google-auth==2.25.2
+google-auth==2.26.2
     # via
     #   google-auth-oauthlib
     #   tensorboard
@@ -68,14 +68,20 @@ idna==3.6
 importlab==0.8.1
     # via pytype
 importlib-metadata==7.0.1
-    # via markdown
+    # via
+    #   jax
+    #   markdown
 iniconfig==2.0.0
     # via pytest
-jinja2==3.1.2
+jax==0.4.23
+    # via pymbar
+jaxlib==0.4.23
+    # via pymbar
+jinja2==3.1.3
     # via pytype
 keras==2.15.0
     # via tensorflow
-lark==1.1.8
+lark==1.1.9
     # via check-shapes
 lazy-loader==0.3
     # via
@@ -87,14 +93,17 @@ libcst==1.1.0
     # via pytype
 llvmlite==0.41.1
     # via numba
-markdown==3.5.1
+markdown==3.5.2
     # via tensorboard
 markupsafe==2.1.3
     # via
     #   jinja2
     #   werkzeug
 ml-dtypes==0.2.0
-    # via tensorflow
+    # via
+    #   jax
+    #   jaxlib
+    #   tensorflow
 module-utilities==0.9.0
     # via
     #   -r requirements/typing.txt
@@ -119,12 +128,14 @@ numba==0.58.1
     # via cmomy
 numexpr==2.8.8
     # via pymbar
-numpy==1.26.2
+numpy==1.26.3
     # via
     #   -r requirements/typing.txt
     #   cmomy
     #   gpflow
     #   h5py
+    #   jax
+    #   jaxlib
     #   ml-dtypes
     #   numba
     #   numexpr
@@ -139,7 +150,9 @@ numpy==1.26.2
 oauthlib==3.2.2
     # via requests-oauthlib
 opt-einsum==3.3.0
-    # via tensorflow
+    # via
+    #   jax
+    #   tensorflow
 packaging==23.2
     # via
     #   gpflow
@@ -164,17 +177,19 @@ pyasn1-modules==0.3.0
     # via google-auth
 pycnite==2023.10.11
     # via pytype
-pydot==1.4.2
+pydot==2.0.0
     # via pytype
 pymbar==4.0.2
-    # via -r requirements/typing.txt
+    # via
+    #   -r requirements/typing.txt
+    #   pymbar
 pyparsing==3.1.1
     # via pydot
-pytest==7.4.3
+pytest==7.4.4
     # via -r requirements/typing.txt
 python-dateutil==2.8.2
     # via pandas
-pytype==2023.12.18 ; python_version < "3.11"
+pytype==2024.1.5 ; python_version < "3.11"
     # via -r requirements/typing.txt
 pytz==2023.3.post1
     # via pandas
@@ -192,6 +207,8 @@ scipy==1.11.4
     # via
     #   -r requirements/typing.txt
     #   gpflow
+    #   jax
+    #   jaxlib
     #   pymbar
 six==1.16.0
     # via
@@ -243,7 +260,7 @@ typing-extensions==4.9.0
     #   typing-inspect
 typing-inspect==0.9.0
     # via libcst
-tzdata==2023.3
+tzdata==2023.4
     # via pandas
 urllib3==2.1.0
     # via requests
@@ -263,7 +280,7 @@ zipp==3.17.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==69.0.2
+setuptools==69.0.3
     # via
     #   gpflow
     #   tensorboard

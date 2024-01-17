@@ -241,7 +241,7 @@ install-dev: ## install development version (run clean?)
 ################################################################################
 # * NOTEBOOK typing/testing
 ################################################################################
-NOTEBOOKS ?= examples/usage
+NOTEBOOKS ?= examples/usage/basic
 .PHONY: mypy-notebook pyright-notebook typing-notebook
 mypy-notebook: ## run nbqa mypy
 	nbqa --nbqa-shell mypy $(NOTEBOOKS)

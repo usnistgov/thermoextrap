@@ -1,3 +1,5 @@
+from warnings import warn
+
 import numpy as np
 import xarray as xr
 
@@ -16,43 +18,42 @@ class VolumeExtrapModelIG(ExtrapModel):
 
     # Can't go to higher order in practice, so don't return any symbolic derivatives
     # Instead, just use this to check and make sure not asking for order above 1
-    def calcDerivFuncs(self):
+    def calcDerivFuncs(self) -> None:  # noqa: N802
         if self.maxOrder > 1:
-            print(
-                "Volume extrapolation cannot go above 1st order without derivatives of forces."
+            warn(
+                "Volume extrapolation cannot go above 1st order without derivatives of forces. "
+                "Setting order to 1st order.",
+                stacklevel=1,
             )
-            print("Setting order to 1st order.")
             self.maxOrder = 1
-        return None
 
     # And given data, calculate numerical values of derivatives up to maximum order
     # Will be very helpful when generalize to different extrapolation techniques
     # (and interpolation)
-    def calcDerivVals(self, refL, x, W):
-        """Calculates specific derivative values at B with data x and U up to max order.
+    @staticmethod
+    def calcDerivVals(refL, x, W):  # noqa: N802, N803
+        """
+        Calculates specific derivative values at B with data x and U up to max order.
         Returns these derivatives. Only go to first order for volume extrapolation. And
         here W represents the virial instead of the potential energy.
         """
         if x.shape[0] != W.shape[0]:
-            print(
-                "First observable dimension (%i) and size of potential energy array (%i) don't match!"
-                % (x.shape[0], W.shape[0])
-            )
-            return
-        wT = np.array([W]).T
-        avgX = np.average(x, axis=0)
-        avgW = np.average(W)
-        avgXW = np.average(x * wT, axis=0)
-        derivVals = np.zeros((2, x.shape[1]))
-        derivVals[0] = avgX
-        derivVals[1] = (avgXW - avgX * avgW) / refL
+            msg = f"First observable dimension {x.shape[0]} and size of potential energy array {W.shape[0]} don't match!"
+            raise ValueError(msg)
+        w_transpose = np.array([W]).T
+        x_ave = np.average(x, axis=0)
+        w_ave = np.average(W)
+        xw_ave = np.average(x * w_transpose, axis=0)
+        deriv_vals = np.zeros((2, x.shape[1]))
+        deriv_vals[0] = x_ave
+        deriv_vals[1] = (xw_ave - x_ave * w_ave) / refL
         # Add the unique correction for the observable <x> in the ideal gas system
         # It turns out this is just <x> itself divided by L
-        derivVals[1] += avgX / refL
-        return derivVals
+        deriv_vals[1] += x_ave / refL
+        return deriv_vals
 
 
-def test_extrapmodel_vol(fixture):
+def test_extrapmodel_vol(fixture) -> None:
     volume = 1.0
     volumes = [0.1, 0.5, 1.5, 2.0]
 

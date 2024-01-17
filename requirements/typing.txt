@@ -16,7 +16,7 @@ module-utilities>=0.2
 mypy>=1.4.1
 numpy>=1.20
 pandas
-pymbar>=4.0
+pymbar[jax]>=4.0
 pytest
 pytype;python_version<"3.11"
 scipy

@@ -29,8 +29,7 @@ def extrap_IG(beta, seed=42):
     data = DataCentralMomentsVals.from_vals(
         order=3, rec_dim="rec", xv=y_dat, uv=u_dat, central=True
     )
-    state = xpan_beta.factory_extrapmodel(beta, data)
-    return state
+    return xpan_beta.factory_extrapmodel(beta, data)
 
 
 def multiOutput_extrap_IG(beta, seed=42):
@@ -47,12 +46,11 @@ def multiOutput_extrap_IG(beta, seed=42):
     data = DataCentralMomentsVals.from_vals(
         order=3, rec_dim="rec", xv=y_dat, uv=u_dat, central=True
     )
-    state = xpan_beta.factory_extrapmodel(beta, data)
-    return state
+    return xpan_beta.factory_extrapmodel(beta, data)
 
 
 # To help test active learning, build DataWrapper and SimWrapper objects for ideal gas
-class IG_DataWrapper(DataWrapper):
+class IG_DataWrapper(DataWrapper):  # noqa: N801
     """Data object for gpr with ideal gas."""
 
     def __init__(self, beta, seed=42):
@@ -86,8 +84,7 @@ class IG_DataWrapper(DataWrapper):
         data = DataCentralMomentsVals.from_vals(
             order=max_order, rec_dim="rec", xv=x, uv=U, central=True
         )
-        state = xpan_beta.factory_extrapmodel(self.beta, data)
-        return state
+        return xpan_beta.factory_extrapmodel(self.beta, data)
 
 
 class SimulateIG:

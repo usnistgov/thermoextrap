@@ -11,7 +11,7 @@ absl-py==2.0.0
     #   tensorflow-probability
 accessible-pygments==0.0.4
     # via pydata-sphinx-theme
-alabaster==0.7.13
+alabaster==0.7.16
     # via sphinx
 appnope==0.1.3
     # via ipykernel
@@ -19,13 +19,13 @@ asttokens==2.4.1
     # via stack-data
 astunparse==1.6.3
     # via tensorflow
-attrs==23.1.0
+attrs==23.2.0
     # via
     #   -r requirements/docs.txt
     #   jsonschema
     #   jupyter-cache
     #   referencing
-autodocsumm==0.2.11
+autodocsumm==0.2.12
     # via -r requirements/docs.txt
 babel==2.14.0
     # via
@@ -49,7 +49,7 @@ cmomy==0.7.0
     # via -r requirements/docs.txt
 colorama==0.4.6
     # via sphinx-autobuild
-comm==0.2.0
+comm==0.2.1
     # via ipykernel
 contourpy==1.2.0
     # via matplotlib
@@ -78,11 +78,11 @@ dropstackframe==0.1.0
     # via check-shapes
 executing==2.0.1
     # via stack-data
-fastjsonschema==2.19.0
+fastjsonschema==2.19.1
     # via nbformat
 flatbuffers==23.5.26
     # via tensorflow
-fonttools==4.47.0
+fonttools==4.47.2
     # via matplotlib
 gast==0.5.4
     # via
@@ -90,7 +90,7 @@ gast==0.5.4
     #   tensorflow-probability
 ghp-import==2.1.0
     # via -r requirements/docs.txt
-google-auth==2.25.2
+google-auth==2.26.2
     # via
     #   google-auth-oauthlib
     #   tensorboard
@@ -116,22 +116,26 @@ importlib-metadata==7.0.1
     # via
     #   jupyter-cache
     #   myst-nb
-ipykernel==6.27.1
+ipykernel==6.28.0
     # via myst-nb
-ipython==8.19.0
+ipython==8.20.0
     # via
     #   -r requirements/docs.txt
     #   ipykernel
     #   myst-nb
+jax==0.4.23
+    # via pymbar
+jaxlib==0.4.23
+    # via pymbar
 jedi==0.19.1
     # via ipython
-jinja2==3.1.2
+jinja2==3.1.3
     # via
     #   myst-parser
     #   sphinx
 jsonschema==4.20.0
     # via nbformat
-jsonschema-specifications==2023.11.2
+jsonschema-specifications==2023.12.1
     # via jsonschema
 jupyter-cache==1.0.0
     # via myst-nb
@@ -139,7 +143,7 @@ jupyter-client==8.6.0
     # via
     #   ipykernel
     #   nbclient
-jupyter-core==5.5.1
+jupyter-core==5.7.1
     # via
     #   ipykernel
     #   jupyter-client
@@ -149,7 +153,7 @@ keras==2.15.0
     # via tensorflow
 kiwisolver==1.4.5
     # via matplotlib
-lark==1.1.8
+lark==1.1.9
     # via check-shapes
 lazy-loader==0.3
     # via
@@ -161,7 +165,7 @@ livereload==2.6.3
     # via sphinx-autobuild
 llvmlite==0.41.1
     # via numba
-markdown==3.5.1
+markdown==3.5.2
     # via tensorboard
 markdown-it-py==3.0.0
     # via
@@ -182,7 +186,10 @@ mdit-py-plugins==0.4.0
 mdurl==0.1.2
     # via markdown-it-py
 ml-dtypes==0.2.0
-    # via tensorflow
+    # via
+    #   jax
+    #   jaxlib
+    #   tensorflow
 module-utilities==0.9.0
     # via
     #   -r requirements/docs.txt
@@ -210,13 +217,15 @@ numba==0.58.1
     # via cmomy
 numexpr==2.8.8
     # via pymbar
-numpy==1.26.2
+numpy==1.26.3
     # via
     #   -r requirements/docs.txt
     #   cmomy
     #   contourpy
     #   gpflow
     #   h5py
+    #   jax
+    #   jaxlib
     #   matplotlib
     #   ml-dtypes
     #   numba
@@ -232,7 +241,9 @@ numpy==1.26.2
 oauthlib==3.2.2
     # via requests-oauthlib
 opt-einsum==3.3.0
-    # via tensorflow
+    # via
+    #   jax
+    #   tensorflow
 packaging==23.2
     # via
     #   gpflow
@@ -248,7 +259,7 @@ parso==0.8.3
     # via jedi
 pexpect==4.9.0
     # via ipython
-pillow==10.1.0
+pillow==10.2.0
     # via matplotlib
 platformdirs==4.1.0
     # via jupyter-core
@@ -270,7 +281,7 @@ pyasn1==0.5.1
     #   rsa
 pyasn1-modules==0.3.0
     # via google-auth
-pydata-sphinx-theme==0.14.4
+pydata-sphinx-theme==0.15.1
     # via sphinx-book-theme
 pyenchant==3.2.2
     # via
@@ -283,7 +294,9 @@ pygments==2.17.2
     #   pydata-sphinx-theme
     #   sphinx
 pymbar==4.0.2
-    # via -r requirements/docs.txt
+    # via
+    #   -r requirements/docs.txt
+    #   pymbar
 pyparsing==3.1.1
     # via matplotlib
 python-dateutil==2.8.2
@@ -303,7 +316,7 @@ pyzmq==25.1.2
     # via
     #   ipykernel
     #   jupyter-client
-referencing==0.32.0
+referencing==0.32.1
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -314,7 +327,7 @@ requests==2.31.0
     #   tensorboard
 requests-oauthlib==1.3.1
     # via google-auth-oauthlib
-rpds-py==0.15.2
+rpds-py==0.16.2
     # via
     #   jsonschema
     #   referencing
@@ -324,6 +337,8 @@ scipy==1.11.4
     # via
     #   -r requirements/docs.txt
     #   gpflow
+    #   jax
+    #   jaxlib
     #   pymbar
 six==1.16.0
     # via
@@ -375,7 +390,7 @@ sphinxcontrib-serializinghtml==1.1.9
     # via sphinx
 sphinxcontrib-spelling==8.0.0
     # via -r requirements/docs.txt
-sqlalchemy==2.0.23
+sqlalchemy==2.0.25
     # via jupyter-cache
 stack-data==0.6.3
     # via ipython
@@ -408,7 +423,7 @@ tornado==6.4
     #   ipykernel
     #   jupyter-client
     #   livereload
-traitlets==5.14.0
+traitlets==5.14.1
     # via
     #   comm
     #   ipykernel
@@ -427,11 +442,11 @@ typing-extensions==4.9.0
     #   pydata-sphinx-theme
     #   sqlalchemy
     #   tensorflow
-tzdata==2023.3
+tzdata==2023.4
     # via pandas
 urllib3==2.1.0
     # via requests
-wcwidth==0.2.12
+wcwidth==0.2.13
     # via prompt-toolkit
 werkzeug==3.0.1
     # via tensorboard
@@ -449,7 +464,7 @@ zipp==3.17.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==69.0.2
+setuptools==69.0.3
     # via
     #   gpflow
     #   tensorboard

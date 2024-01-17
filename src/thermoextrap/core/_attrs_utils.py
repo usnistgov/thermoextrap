@@ -8,7 +8,7 @@ import numpy as np
 
 def attrs_clear_cache(self, attribute, value):
     """Clear out _cache if setting value."""
-    setattr(self, "_cache", {})
+    self._cache = {}
     return value
 
 
@@ -16,10 +16,9 @@ def optional_converter(converter):
     """Create a converter which can pass through None."""
 
     def wrapped(value):
-        if value in [None, attrs.NOTHING]:
+        if value in {None, attrs.NOTHING}:
             return value
-        else:
-            return converter(value)
+        return converter(value)
 
     return wrapped
 
@@ -55,15 +54,10 @@ def kw_only_field(kw_only=True, **kws):
 
 
 def convert_dims_to_tuple(dims):
-    if dims is None or isinstance(dims, tuple):
-        pass
-    if isinstance(dims, str):
-        dims = (dims,)
-    else:
-        # fallback to trying to convert to tuple
-        dims = tuple(dims)
+    if dims is None:
+        return ()
 
-    return dims
+    return (dims,) if isinstance(dims, str) else tuple(dims)
 
 
 def _cache_field(init=False, repr=False, factory=dict, **kws):
@@ -102,14 +96,14 @@ class MyAttrsMixin:
     def set_params(self, **kws):
         """Set parameters of self, and return self (for chaining)."""
 
-        for name in kws.keys():
+        for name in kws:
             assert hasattr(self, name)
 
         for name, val in kws.items():
             setattr(self, name, val)
         return self
 
-    def _immutable_setattrs(self, **kws):
+    def _immutable_setattrs(self, **kws) -> None:
         """
         Set attributes of frozen attrs class.
 
@@ -178,13 +172,13 @@ class MyAttrsMixin:
             if f.name in include:
                 includes.append(f)
 
-            elif f.name in exclude:
-                pass
-
-            elif exclude_private and f.name.startswith("_"):
-                pass
-
-            elif exclude_no_init and not f.init:
+            elif (
+                f.name in exclude
+                or exclude_private
+                and f.name.startswith("_")
+                or exclude_no_init
+                and not f.init
+            ):
                 pass
 
             else:
