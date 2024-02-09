@@ -1,8 +1,9 @@
 [build-system]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
 requires = [
-    "setuptools>=61.2",
-    "setuptools_scm[toml]>=8.0",
+    "hatch-fancy-pypi-readme",
+    "hatch-vcs",
+    "hatchling",
 ]
 
 [project]
@@ -12,6 +13,7 @@ keywords = [
     "thermoextrap",
 ]
 license = { text = "NIST-PD" }
+license-files = { paths = ["LICENSE"] }
 authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" }
@@ -135,24 +137,27 @@ viz = [
 Documentation = "https://pages.nist.gov/thermoextrap/"
 Homepage = "https://github.com/usnistgov/thermoextrap"
 
-[tool.setuptools]
-zip-safe = true # if using mypy, must be False
-include-package-data = true
-license-files = ["LICENSE"]
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools.packages.find]
-namespaces = true
-where = ["src"]
+[tool.hatch.build]
+exclude = [
+  ".*_cache",
+]
 
-[tool.setuptools.dynamic]
-readme = { file = [
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE"
-], content-type = "text/markdown" }
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "examples",
+    "docs",
+]
 
-[tool.setuptools_scm]
-fallback_version = "999"
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+fragments = [
+    { path = "README.md" },
+    { path = "CHANGELOG.md" },
+    { path = "LICENSE" },
+]
 
 # * Linting --------------------------------------------------------------------
 
@@ -327,7 +332,7 @@ include = ["src/*"]
 [tool.coverage.paths]
 source = ["src/", ".nox/**/site-packages/"]
 
-# * Typing
+# * Typing ---------------------------------------------------------------------
 
 [tool.mypy]
 files = ["src", "tests"]
