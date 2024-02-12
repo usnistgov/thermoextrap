@@ -447,7 +447,7 @@ class StackedDerivatives:
         )
 
     @classmethod
-    def from_states(  # noqa: PLR0913, PLR0917
+    def from_states(  # noqa: PLR0913
         cls,
         states,
         x_dims,

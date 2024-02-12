@@ -129,7 +129,7 @@ class MyAttrsMixin:
         """
 
         for key, value in kws.items():
-            object.__setattr__(self, key, value)
+            object.__setattr__(self, key, value)  # noqa: PLC2801
 
     def _get_smart_filter(
         self, include=None, exclude=None, exclude_private=True, exclude_no_init=True
@@ -174,10 +174,8 @@ class MyAttrsMixin:
 
             elif (
                 f.name in exclude
-                or exclude_private
-                and f.name.startswith("_")
-                or exclude_no_init
-                and not f.init
+                or (exclude_private and f.name.startswith("_"))
+                or (exclude_no_init and not f.init)
             ):
                 pass
 

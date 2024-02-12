@@ -310,7 +310,6 @@ class GPRModel(StateCollection):
     # Hopefully, won't need to re-train many times with changing data
     # However, if do need to and want to keep same model, this allows for that
     def _train_GP(self, x_input, y_input, opt_steps=100, fresh_train=False):
-        from gpflow.ci_utils import ci_niter
         # Want option to continue training with same model, so adding in
         # So default behavior is fresh_train=False, so continues training if model exists
         # Might use to add extra training or if add more data
@@ -343,7 +342,7 @@ class GPRModel(StateCollection):
         adam = tf.optimizers.Adam(
             learning_rate=0.5
         )  # Can be VERY aggressive with learning
-        for _ in range(ci_niter(opt_steps)):
+        for _ in range(opt_steps):
             # Training is extremely slow for vector observables with large dimension
             # Seems to mainly be because natgrad requires matrix inversion
             natgrad.minimize(tot_loss, variational_params)

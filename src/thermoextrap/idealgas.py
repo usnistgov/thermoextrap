@@ -17,24 +17,24 @@ from .core._imports import sympy as sp
 from .docstrings import DocFiller
 
 __all__ = [
-    "x_ave",
-    "x_var",
-    "x_prob",
-    "u_prob",
-    "x_cdf",
-    "x_sample",
-    "u_sample",
     "dbeta_xave",
-    "dbeta_xave_minuslog",
     "dbeta_xave_depend",
     "dbeta_xave_depend_minuslog",
+    "dbeta_xave_minuslog",
     "dvol_xave",
+    "generate_data",
+    "u_prob",
+    "u_sample",
+    "x_ave",
     "x_beta_extrap",
-    "x_beta_extrap_minuslog",
     "x_beta_extrap_depend",
     "x_beta_extrap_depend_minuslog",
+    "x_beta_extrap_minuslog",
+    "x_cdf",
+    "x_prob",
+    "x_sample",
+    "x_var",
     "x_vol_extrap",
-    "generate_data",
 ]
 
 

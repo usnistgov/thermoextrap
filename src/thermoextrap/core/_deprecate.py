@@ -78,7 +78,7 @@ def deprecate(
         if alternative.__doc__.count("\n") < 3:
             raise AssertionError(doc_error_msg)
         empty1, summary, empty2, doc_string = alternative.__doc__.split("\n", 3)
-        if empty1 or empty2 and not summary:
+        if empty1 or (empty2 and not summary):
             raise AssertionError(doc_error_msg)
         head = dedent(
             f"""

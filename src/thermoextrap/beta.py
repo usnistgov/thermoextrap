@@ -494,7 +494,7 @@ class SymDerivBeta(SymDerivBase):
         func = getattr(cls, name, None)
 
         if func is None:
-            msg = "{name} not found"
+            msg = f"{name} not found"
             raise ValueError(msg)
 
         kws = {"expand": expand, "post_func": post_func, "central": central}

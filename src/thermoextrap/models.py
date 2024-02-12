@@ -30,6 +30,7 @@ docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
 
 
 __all__ = [
+    "Derivatives",
     "ExtrapModel",
     "ExtrapWeightedModel",
     "InterpModel",
@@ -37,7 +38,6 @@ __all__ = [
     "MBARModel",
     "PerturbModel",
     "StateCollection",
-    "Derivatives",
 ]
 
 

@@ -563,7 +563,7 @@ def test_stop_criteria() -> None:
     assert len(check_stop_1m.history) == 2
     assert check_stop_1m.history[0].shape == (1, 1000, 1)
     assert check_stop_1m.history[1].shape == (1, 1000, 1)
-    assert out_1m_bool.dtype == bool  # noqa: E721
+    assert out_1m_bool.dtype == bool
     assert isinstance(out_1m_info, dict)
     assert len(out_1m_info.keys()) == 2  # Also have key for the tolerance
     # Call again and check if updated correctly
@@ -571,7 +571,7 @@ def test_stop_criteria() -> None:
     assert len(check_stop_1m.history) == 2
     assert check_stop_1m.history[0].shape == (2, 1000, 1)
     assert check_stop_1m.history[1].shape == (2, 1000, 1)
-    assert out_1m_bool.dtype == bool  # noqa: E721
+    assert out_1m_bool.dtype == bool
     assert isinstance(out_1m_info, dict)
     assert len(out_1m_info.keys()) == 2
 
@@ -583,14 +583,14 @@ def test_stop_criteria() -> None:
     assert len(check_stop_2m.history) == 2
     assert check_stop_2m.history[0].shape == (1, 1000, 1)
     assert check_stop_2m.history[1].shape == (1, 1000, 1)
-    assert out_2m_bool.dtype == bool  # noqa: E721
+    assert out_2m_bool.dtype == bool
     assert isinstance(out_2m_info, dict)
     assert len(out_2m_info.keys()) == 4
     out_2m_bool, out_2m_info = check_stop_2m(gp, beta_list)
     assert len(check_stop_2m.history) == 2
     assert check_stop_2m.history[0].shape == (2, 1000, 1)
     assert check_stop_2m.history[1].shape == (2, 1000, 1)
-    assert out_2m_bool.dtype == bool  # noqa: E721
+    assert out_2m_bool.dtype == bool
     assert isinstance(out_2m_info, dict)
     assert len(out_2m_info.keys()) == 4
 

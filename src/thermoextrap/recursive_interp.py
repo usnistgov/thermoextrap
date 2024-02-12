@@ -100,7 +100,7 @@ class RecursiveInterp:
     @deprecate_kwarg("Bavail", "beta_avail")
     @deprecate_kwarg("doPlot", "do_plot")
     @deprecate_kwarg("plotCompareFunc", "plot_func")
-    def recursive_train(  # noqa: C901, PLR0912, PLR0915
+    def recursive_train(  # noqa: C901, PLR0912, PLR0914, PLR0915
         self,
         beta1,
         beta2,
@@ -397,7 +397,7 @@ class RecursiveInterp:
         return predict_vals
 
     @deprecate_kwarg("doPlot", "do_plot")
-    def check_poly_consistency(self, do_plot=False):  # noqa: C901, PLR0915
+    def check_poly_consistency(self, do_plot=False):  # noqa: C901, PLR0914, PLR0915
         """
         If the interpolation model is a polynomial, checks to see if the polynomials
         are locally consistent. In other words, we want the coefficients between

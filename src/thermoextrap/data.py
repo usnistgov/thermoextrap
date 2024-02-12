@@ -39,11 +39,11 @@ from .docstrings import DOCFILLER_SHARED
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
 
 __all__ = [
+    "DataCallbackABC",
     "DataCentralMoments",
     "DataCentralMomentsVals",
     "DataValues",
     "DataValuesCentral",
-    "DataCallbackABC",
     "factory_data_values",
     "resample_indices",
 ]

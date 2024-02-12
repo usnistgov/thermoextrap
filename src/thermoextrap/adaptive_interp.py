@@ -223,7 +223,7 @@ def train_iterative(
     return model, info
 
 
-def train_recursive(  # noqa: C901,PLR0913,PLR0917
+def train_recursive(  # noqa: C901,PLR0913,PLR0914,PLR0917
     alphas,
     factory_state,
     factory_statecollection,
