@@ -133,7 +133,6 @@ def apply_reduction(
     out : DataArray or list of DataArray
         if concat_dim is None and multiple funcs, then list of DataArrays corresponding to each reduction.  Otherwise, single DataArray
     """
-
     if not isinstance(funcs, (tuple, list)):
         funcs = [funcs]
 
@@ -335,8 +334,8 @@ class StackedDerivatives:
 
         df = pd.DataFrame([{'beta': 1}, {'beta': 2}, ...])
         """
-
-        assert set(df.columns) == set(self.x_dims[:-1])
+        if set(df.columns) != set(self.x_dims[:-1]):
+            raise ValueError
 
         return df.assign(**{self.order_dim: 0}).set_index(self.x_dims).index
 
@@ -354,7 +353,6 @@ class StackedDerivatives:
         concat_kws=None,
     ):
         """Create object from mean and variance."""
-
         if concat_dim is None:
             concat_dim = pd.Index(["mean", "var"], name="stats")
 
@@ -490,7 +488,6 @@ class StackedDerivatives:
         --------
         `StackedDerivatives.from_derivs`
         """
-
         if not isinstance(states, StateCollection):
             states = StateCollection(states)
 
@@ -606,7 +603,6 @@ class GPRData(StateCollection):
         states_derivs_concat, to_mean_var, stack_dataarray
 
         """
-
         kws = dict(self.deriv_kws, order_dim=self.order_dim)
         return (
             states_derivs_concat(self, order=order, **kws)
@@ -662,7 +658,7 @@ class GPRData(StateCollection):
 
         df = pd.DataFrame([{'beta': 1}, {'beta': 2}, ...])
         """
-
-        assert set(df.columns) == set(self.x_dims[:-1])
+        if set(df.columns) != set(self.x_dims[:-1]):
+            raise ValueError
 
         return df.assign(**{self.order_dim: 0}).set_index(self.x_dims).index

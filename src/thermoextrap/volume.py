@@ -57,6 +57,8 @@ class VolumeDerivFuncs:
     # TODO(wpk): move this to just a functions
     @staticmethod
     def create_deriv_func(order):
+        """Derivative function for Volume derivatives"""
+
         # Works only because of local scope
         # Even if order is defined somewhere outside of this class, won't affect returned func
         def func(W, xW, dxdq, volume, ndim=1):  # noqa: N803
@@ -176,7 +178,6 @@ def factory_extrapmodel(
     extrapmodel : :class:`thermoextrap.models.ExtrapModel`
 
     """
-
     if order != 1:
         msg = "only order=1 is supported"
         raise ValueError(msg)

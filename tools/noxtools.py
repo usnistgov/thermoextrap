@@ -107,7 +107,8 @@ def factory_virtualenv_backend(
 
 # * Top level installation functions ---------------------------------------------------
 def py_prefix(python_version: Any) -> str:
-    """Get python prefix.
+    """
+    Get python prefix.
 
     `python="3.8` -> "py38"
     """
@@ -1048,7 +1049,7 @@ def check_for_change_manager(
 
         yield changed
 
-    except Exception:
+    except Exception:  # noqa: TRY302
         raise
 
     else:

@@ -1,9 +1,16 @@
-from collections import namedtuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 import pytest
 
 import thermoextrap as xtrap
+
+if TYPE_CHECKING:
+    from typing import Any
+
+    import numpy.typing as npt
 
 
 # testing routines
@@ -37,13 +44,18 @@ def order(request):
     return request.param
 
 
+class DataNamedTuple(NamedTuple):
+    x: npt.NDArray[Any]
+    u: npt.NDArray[Any]
+    n: int
+
+
 @pytest.fixture()
-def data(nsamp):
+def data(nsamp) -> DataNamedTuple:
     x = np.random.rand(nsamp)
     u = np.random.rand(nsamp)
-    Data = namedtuple("data", ["x", "u", "n"])  # pyright: ignore[reportUntypedNamedTuple]
 
-    return Data(x=x, u=u, n=nsamp)
+    return DataNamedTuple(x=x, u=u, n=nsamp)
 
 
 @pytest.fixture(params=[True, False])

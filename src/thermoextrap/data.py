@@ -138,7 +138,6 @@ class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_m
         -------
         out : DatasetSelector
         """
-
         if dims is None:
             dims = (mom_dim, deriv_dim) if deriv_dim is not None else (mom_dim,)
 
@@ -197,9 +196,11 @@ class DataCallbackABC(
         raise NotImplementedError
 
     def block(self, data, meta_kws, **kws) -> None:
+        """Block averaging."""
         raise NotImplementedError
 
     def reduce(self, data, meta_kws, **kws) -> None:
+        """Reduce along dimension."""
         raise NotImplementedError
 
     def __repr__(self) -> str:
@@ -264,7 +265,7 @@ class AbstractData(
     def _meta_validate(self, attribute, meta) -> None:  # noqa: ARG002
         if not isinstance(meta, DataCallbackABC):
             msg = "meta must be None or subclass of DataCallbackABC"
-            raise ValueError(msg)
+            raise TypeError(msg)
         meta.check(data=self)
 
     @property
@@ -356,9 +357,12 @@ class DataValuesBase(AbstractData):
     x_is_u: bool = kw_only_field(default=False)
 
     def __attrs_post_init__(self):
-        assert isinstance(self.uv, xr.DataArray)
-        if self.xv is not None:
-            assert isinstance(self.xv, (xr.DataArray, xr.Dataset))
+        if not isinstance(self.uv, xr.DataArray):
+            msg = f"{type(self.uv)=} must be a DataArray."
+            raise TypeError(msg)
+        if self.xv is not None and not isinstance(self.xv, (xr.DataArray, xr.Dataset)):
+            msg = f"{type(self.xv)=} must be DataArray or Dataset."
+            raise TypeError(msg)
 
         if self.chunk is not None:
             if isinstance(self.chunk, int):
@@ -412,7 +416,6 @@ class DataValuesBase(AbstractData):
         {meta}
         {x_is_u}
         """
-
         # make sure "val" is a list
         if isinstance(val_dims, str):
             val_dims = [val_dims]
@@ -473,7 +476,6 @@ class DataValuesBase(AbstractData):
         {chunk}
         {compute}
         """
-
         if chunk is None:
             chunk = self.chunk
 
@@ -486,14 +488,19 @@ class DataValuesBase(AbstractData):
             rep_dim = self.rep_dim
 
         if indices is None:
-            assert nrep is not None
+            if nrep is None:
+                msg = "Must set nrep if using indices."
+                raise TypeError(msg)
             indices = resample_indices(
                 len(self), nrep, rec_dim=self.rec_dim, rep_dim=rep_dim
             )
         elif not isinstance(indices, xr.DataArray):
             indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))
 
-        assert indices.sizes[self.rec_dim] == len(self)
+        # assert indices.sizes[self.rec_dim] == len(self)
+        if indices.sizes[self.rec_dim] != len(self):
+            msg = f"{indices.sizes[self.rec_dim]=} must equal {len(self)=}"
+            raise ValueError(msg)
 
         uv = self.uv.compute()[indices]
         if self.x_isnot_u:
@@ -571,9 +578,12 @@ def build_aves_xu(
         If merge is False, return ``u`` and ``xu``, xarray objects for average energy and observable times energy.
         If merge is True, then return an :class:`xr.Dataset` containing ``u`` and ``xu``.
     """
-
-    assert isinstance(uv, xr.DataArray)
-    assert isinstance(xv, (xr.DataArray, xr.Dataset))
+    if not isinstance(uv, xr.DataArray):
+        msg = f"{type(uv)=} must be a DataArray."
+        raise TypeError(msg)
+    if not isinstance(xv, (xr.DataArray, xr.Dataset)):
+        msg = f"{type(xv)=} must be a DataArray or Dataset."
+        raise TypeError(msg)
 
     u = []
     xu = []
@@ -626,7 +636,7 @@ def build_aves_xu(
 
 
 @docfiller_shared
-def build_aves_dxdu(
+def build_aves_dxdu(  # noqa: C901
     uv,
     xv,
     order,
@@ -667,9 +677,12 @@ def build_aves_dxdu(
         xarray objects with averaged data.  If merge is True, merge output
         into single :class:`xr.Dataset` object.
     """
-
-    assert isinstance(uv, xr.DataArray)
-    assert isinstance(xv, (xr.DataArray, xr.Dataset))
+    if not isinstance(uv, xr.DataArray):
+        msg = f"{type(uv)=} must be a DataArray."
+        raise TypeError(msg)
+    if not isinstance(xv, (xr.DataArray, xr.Dataset)):
+        msg = f"{type(xv)=} must be a DataArray or Dataset."
+        raise TypeError(msg)
 
     xave = xv.mean(rec_dim, skipna=skipna)
     uave = uv.mean(rec_dim, skipna=skipna)
@@ -727,7 +740,6 @@ def build_aves_dxdu(
 
 def _xu_to_u(xu, dim="umom"):
     """For case where x = u, shift umom and add umom=0."""
-
     n = xu.sizes[dim]
 
     out = xu.assign_coords(**{dim: lambda x: x[dim] + 1}).reindex(**{dim: range(n + 1)})
@@ -794,7 +806,7 @@ class DataValues(DataValuesBase):
         )
 
     @property
-    def derivs_args(self):
+    def derivs_args(self):  # noqa: D102
         if self.x_isnot_u:
             out = (self.u_selector, self.xu_selector)
         else:
@@ -853,25 +865,25 @@ class DataValuesCentral(DataValuesBase):
         return out
 
     @cached.prop
-    def du_selector(self):
+    def du_selector(self):  # noqa: D102
         return DatasetSelector.from_defaults(
             self.du, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @cached.prop
-    def dxdu_selector(self):
+    def dxdu_selector(self):  # noqa: D102
         return DatasetSelector.from_defaults(
             self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
     @cached.prop
-    def xave_selector(self):
+    def xave_selector(self):  # noqa: D102
         if self.deriv_dim is None:
             return self.xave
         return DatasetSelector.from_defaults(self.xave, dims=[self.deriv_dim])
 
     @property
-    def derivs_args(self):
+    def derivs_args(self):  # noqa: D102
         if self.x_isnot_u:
             out = (self.xave_selector, self.du_selector, self.dxdu_selector)
         else:
@@ -930,7 +942,6 @@ def factory_data_values(
     DataValuesCentral
     DataValues
     """
-
     cls = DataValuesCentral if central else DataValues
 
     if xalpha and deriv_dim is None:
@@ -1140,7 +1151,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         **kwargs : dict
             extra arguments to :meth:`cmomy.xCentralMoments.block`
         """
-
         if dim is None and axis is None:
             dim = self.rec_dim
 
@@ -1201,7 +1211,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         resample_kws : mapping, optional
             dictionary of values to pass to self.dxduave.resample_and_reduce
         """
-
         if dim is None and axis is None:
             dim = self.rec_dim
 
@@ -1283,7 +1292,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_raw`
         """
-
         if x_is_u:
             raw = xr.concat(
                 [
@@ -1381,7 +1389,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_vals`
         """
-
         if axis is None and dim is None:
             axis = 0
 
@@ -1468,7 +1475,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_data`
         """
-
         if x_is_u:
             # convert from central moments to central co-moments
             # out_0 = data.sel(**{umom_dim: slice(None, -1)})
@@ -1675,7 +1681,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_raw`
         """
-
         if xu is None or x_is_u:
             raw = u
 
@@ -1807,7 +1812,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         :meth:`cmomy.xCentralMoments.from_data`
 
         """
-
         if dxdu is None or x_is_u:
             dxdu, du = (
                 (
@@ -1990,7 +1994,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_vals`
         """
-
         # make sure "val" is a list
         if isinstance(val_dims, str):
             val_dims = [val_dims]
@@ -2056,7 +2059,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.resample`
         """
-
         if dim is None and axis is None:
             dim = self.rec_dim
 

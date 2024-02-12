@@ -58,7 +58,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
     def __init__(  # noqa: C901,PLR0912
         self, kernel_expr, obs_dims, kernel_params=None, active_dims=None, **kwargs
-    ):
+    ) -> None:
         if kernel_params is None:
             kernel_params = {}
         if active_dims is not None:
@@ -273,7 +273,7 @@ class HetGaussianNoiseGP(gpflow.likelihoods.ScalarLikelihood):
     used is a Matern52 with separate lengthscales over the different input dimensions.
     """
 
-    def __init__(self, data, noise_kernel=None, **kwargs):
+    def __init__(self, data, noise_kernel=None, **kwargs) -> None:
         super().__init__(**kwargs)
         X_data, _Y_data = data
         if noise_kernel is not None:
@@ -364,7 +364,7 @@ class FullyHeteroscedasticGPR(
         kernel: gpflow.kernels.Kernel,
         mean_function: Optional[gpflow.mean_functions.MeanFunction] = None,
         noise_kernel: Optional[gpflow.kernels.Kernel] = None,
-    ):
+    ) -> None:
         X_data, Y_data = data
         # This is really a conditional likelihood given the output of self.noise_gp
         likelihood = HetGaussianNoiseGP(
@@ -598,7 +598,6 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
         to sum over locations as would for multivariate Gaussian over each
         dimension
     """
-
     d = tf.expand_dims(tf.transpose(x - mu), -1)
     alpha = tf.linalg.triangular_solve(L, d, lower=True)
     alpha = tf.squeeze(alpha, axis=-1)
@@ -828,7 +827,7 @@ class HeteroscedasticGPR_analytical_scale(  # noqa: N801
         kernel: gpflow.kernels.Kernel,
         mean_function: Optional[gpflow.mean_functions.MeanFunction] = None,
         scale_fac: Optional[float] = None,
-    ):
+    ) -> None:
         X_data, Y_data, noise_cov = data
 
         # To make training behave better, can try scaling covariance matrices and data
@@ -905,7 +904,6 @@ class HeteroscedasticGPR_analytical_scale(  # noqa: N801
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
         """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
-
         X_data, Y_data = self.data
         err = Y_data - (self.mean_function(X_data) / self.scale_fac)
 
@@ -1009,7 +1007,7 @@ class HeteroscedasticGPR(
         scale_fac: Optional[float] = 1.0,
         # x_scale_fac: Optional[float] = 1.0,
         likelihood_kwargs: Optional[dict] = None,
-    ):
+    ) -> None:
         if likelihood_kwargs is None:
             likelihood_kwargs = {}
         X_data, Y_data, noise_cov = data
@@ -1266,7 +1264,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         expression to start with
     """
 
-    def __init__(self, expr, x_data, y_data, params=None):  # noqa: C901
+    def __init__(self, expr, x_data, y_data, params=None) -> None:  # noqa: C901
         super().__init__()
         self.expr = expr
 
@@ -1326,7 +1324,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             method="L-BFGS-B",
             jac=jac_func,
         )
-        logging.info(f"optimization opt: {opt}")
+        logging.info("optimization opt: %s", opt)
 
         # Set parameters based on optimization
         for i, s in enumerate(self.param_syms):

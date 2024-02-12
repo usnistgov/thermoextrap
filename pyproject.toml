@@ -177,96 +177,58 @@ unsafe-fixes = true
 
 [tool.ruff.lint]
 preview = true
-select = [
-    "F",     # - pyflakes
-    "E",     # - pycodestyle
-    "W",     # - pycodestyle
-    "I",     # - isort
-    "UP",    # - pyupgrade
-    "D",     # - pydocstyle
-    "YTT",   # - flake8-2020
-    "B",     # - flake8-bugbear
-    "Q",     # - flake8-quotes
-    "PLC",   # - pylint
-    "PLE",   # - pylint
-    "PLR",   # - pylint
-    "PLW",   # - pylint
-    "PIE",   # - misc lints
-    "TID",   # - tidy imports
-    "TCH",   # - type-checking imports
-    "N",     # - pep8-naming
-    "C90",   # - mccabe
-    # "ANN",   # - flake8-annotation
-    "BLE",   # - flake8-blind-except
-    "A",     # - flake8-builtins
-    "C4",    # - flake8-comprehensions
-    "EM",    # - flake8-errmsg
-    "FA",    # - flake8-future-annotations
-    "ICN",   # - flake8-import-conventions
-    "T20",   # - flake8-print
-    "PT",    # - flake8-pytest-style
-    "RET",   # - flake8-return
-    "SIM",   # - flake8-simplify
-    "ARG",   # - flake8-unused-arguments
-    "PTH",   # - flake8-use-pathlib
-    "TD",    # - flake8-todos
-    "FIX",   # - flake8-fixme
-    "PGH",   # - pygrep-hooks
-    "FLY",   # - flynt
-    "PERF",  # - Perflint
-    "FURB",  # - refurb
-    "LOG",   # - flake8-loggin
-    "RUF",   # - ruff specific
-    # Possibly useful?
-    # "G",   # - flake8-logging-format
-    # "ERA", # - eradicate
-    # "PD",  # - pandas-vet
-    # "NPY", # - numpy-specific-rules
-    # Overkill
-    # "SLF", # - flake8-self
-    # These conflict with formatter
-    # "COM", # - flake8-commas
-    # "ISC", # - flake8-implicit-str-concat
-
-]
-# Allow autofix for all enabled rules (when `--fix`) is provided.
-# fixable = ["A", "B", "C", "D", "E", "F", "..."]
-unfixable = []
-# Exclude a variety of commonly ignored directories.
+select = ["ALL"]
+# fixable = ["ALL"]
+# unfixable = []
 ignore = [
-    "E203",   # - whitespace before punctuation messes
-    "E402",   # - module level import not at top of file
-    "E501",   # - line too long - let black worry about that
-    "E731",   # - do not assign a lambda expression, use a def
-    "D105",   # - Missing magic method docstring
-    "D202",   # - blank line after docstring
-    "D205",   # - blank line after summary
-    # this leads to errors with placing titles in module
-    "D102",   # - Missing docstring in public method
-    "D103",   # - Missing docstring in public function
-    "D400",   # - First line should end with a period
-    "D401",   # - First line of docstring should be in imperative mood: "{first_line}"
-    "D415",   # - First line should end with a period, question mark, or exclamation point
-    # these are useful, but too many errors with docfiller
-    "D107",   # - Missing docstring in __init__
-    "D203",   # - 1 blank line required before class docstring
-    "D212",   # - Multi-line docstring summary should start at the first line
-    "D417",   # - Missing argument description in the docstring for {definition}: {name}
-    "TID252", # - Allow relative imports
-    # New
-    "ANN101",
-    "ANN102",
-    "ANN401",
-    # pylint
-    "PLR2004",
-    # "PLR0913",
-    # "PLR0917",
-    "PLC0415", # - import should be at top level (leads to issues with imports in func?)
-    "TD003", "FIX002",
+    "CPY",       # - Don't require copyright
+    "ERA",       # - eradicate (want to keep some stuff)
+    "FBT",       # - bools are ok
+    # * Annotations
+    "ANN101",    # - Leads to issues with methods and self
+    "ANN102",    # - Leads to issues with classmethods and cls
+    "ANN401",    # - Any ok sometimes
+    # * Allow non top level imports
+    "PLC0415",   # - import should be at top level (leads to issues with imports in func?)
+    "TID252",    # - Allow relative imports
+    "E402",      # - module level import not at top of file
+    # * Other
+    "E501",      # - line too long - let formatter fix this
+    "E731",      # - do not assign a lambda expression, use a def
+    # * Docstrings
+    "D105",      # - Missing magic method docstring
+    "D205",      # - blank line after summary
+    # * This leads to errors with placing titles in module
+    "D400",      # - First line should end with a period
+    "D401",      # - First line of docstring should be in imperative mood: "{first_line}"
+    "D415",      # - First line should end with a period, question mark, or exclamation point
+    # * Not a fan of these.  And lead to issues with docfiller
+    "D107",      # - Missing docstring in __init__
+    "D203",      # - 1 blank line required before class docstring
+    "D212",      # - Multi-line docstring summary should start at the first line
+    "D417",      # - Missing argument description in the docstring for {definition}: {name} (bad with docfiller)
+    # * These conflict with formatter
+    "COM",       # - flake8-commas, formatter should take care of this?
+    "ISC",       # - flake8-implicit-str-concat
 ]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-
+# Use extend-ignore for project specific ignores (avoid changing ignore directly)
+extend-ignore = [
+    "PD",        # - not using pandas?
+    "NPY",       # - not using numpy?
+    # * Annotations
+    # "SLF001",  # - flake8-self (private access sometimes OK)
+    "ANN",     # - Annotations (just use mypy/pyright)
+    # * pylint
+    "PLR2004", # - numbers in comparison sometimes ok
+    # "PLR0913", # - complexity sometimes ok
+    # "PLR0917", # - complexity sometimes ok
+    # * Docstrings ymmv
+    # "D102",    # - Missing docstring in public method
+    # "D103",    # - Missing docstring in public function
+    # "D202",    # - blank line after docstring
+]
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
@@ -284,15 +246,21 @@ max-public-methods = 30
 
 [tool.ruff.lint.extend-per-file-ignores]
 # Project specific ignores (avoid changing per-file-ignores directly)
-"tests/*.py" = ["PT011", "PLR0914"]
-"**/*.ipynb" = ["F821", "T201", "N", "ARG", "PTH"]
+"tests/*.py" = ["PT011", "PLR0914", "SLF001"]
+"tests/test_lnPi.py" = ["N999"]
+"**/*.ipynb" = ["F821", "T201", "N", "ARG", "PTH", "D102", "D103"]
+"src/**/*.py" = ["TD003", "FIX002"]
 "**/adaptive_interp.py" = ["T201"]
-"**/beta.py" = ["N801", "ARG002", "A003"]
-"**/lnpi.py" = ["N801", "N802", "N815", "ARG002", "A003"]
-"**/models.py" = ["ARG002", "A003", "N803", "N815"]
+"**/beta.py" = ["N801", "ARG002", "A003", "D102"]
+"**/data/py" = ["D102"]
+"**/lnpi.py" = ["N801", "N802", "N815", "ARG002", "A003", "D102"]
+"**/models.py" = ["ARG002", "A003", "N803", "N815", "D102"]
+"**/stack.py" = ["D102"]
+"**/volume*.py" = ["D102"]
 "**/_attrs_utils.py" = ["ARG001", "A002"]
-"**/gpr_active/*.py" = ["N802", "N803", "N806", "PLR6301", "PLR0914", "ARG002", "FA100"]
+"**/gpr_active/*.py" = ["N802", "N803", "N806", "PLR6301", "PLR0914", "ARG002", "FA100", "D102", "D103"]
 "examples/usage/gpr/**/*.ipynb" = ["PLR0911", "PLR6301", "FA100", "PERF203", "PERF401", "B008"]
+"conftest.py" = ["D103"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["thermoextrap"]
@@ -330,7 +298,7 @@ testpaths = [
 branch = true
 
 [tool.coverage.report]
-show_missing = true
+# show_missing = true
 exclude_also = ["if TYPE_CHECKING:", "@overload"]
 omit = ["*/vendored/*", "*/_typing.py"]
 include = ["src/*"]

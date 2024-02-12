@@ -51,7 +51,6 @@ def test_relative_fluctuations(
     alpha_tol=0.01,
 ):
     """Test relative fluctuations of model."""
-
     if predict_kws is None:
         predict_kws = {}
 
@@ -172,7 +171,6 @@ def train_iterative(
         Information from each iteration
 
     """
-
     if state_kws is None:
         state_kws = {}
     if statecollection_kws is None:
@@ -188,7 +186,10 @@ def train_iterative(
             factory_state(alphas[-1], **state_kws),
         ]
 
-    assert maxiter > 0
+    # assert maxiter > 0
+    if maxiter <= 0:
+        msg = f"{maxiter=} must be positive"
+        raise ValueError(msg)
 
     # work with copy
     states = list(states)
@@ -314,7 +315,6 @@ def train_recursive(  # noqa: C901,PLR0913,PLR0914,PLR0917
         Information from each iteration
 
     """
-
     states = [] if states is None else list(states)
 
     info = [] if info is None else list(info)
@@ -523,7 +523,6 @@ def factory_state_idealgas(
     thermoextrap.idealgas
     thermoextrap.beta.factory_extrapmodel
     """
-
     from . import beta as xpan_beta
     from . import idealgas
     from .data import DataCentralMomentsVals
@@ -565,7 +564,6 @@ def callback_plot_progress(
         purposes
     ax : :class:`matplotlib.axes.Axes`, optional
     """
-
     import matplotlib.pyplot as plt
 
     from . import idealgas

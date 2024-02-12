@@ -147,7 +147,6 @@ def factory_derivatives(
     --------
     thermoextrap.beta.factory_derivatives
     """
-
     if name == "lnPi":
         beta = get_default_symbol("beta")
         func = lnPi_func_central(beta) if central else lnPi_func_raw(beta)
@@ -171,7 +170,7 @@ def factory_derivatives(
 def _is_xr(name, x):
     if not isinstance(x, xr.DataArray):
         msg = f"{name} must be an xr.DataArray"
-        raise ValueError(msg)
+        raise TypeError(msg)
     return x
 
 
@@ -255,7 +254,6 @@ class lnPiDataCallback(DataCallbackABC):
 
     def resample(self, data, meta_kws=None, **kws):
         """Resample lnPi0 data."""
-
         if not self.allow_resample:
             msg = (
                 "Must set `self.allow_resample` to `True` to use resampling. "
@@ -410,15 +408,17 @@ def factory_extrapmodel_lnPi(
     thermoextrap.lnpi.factory_derivatives
     ~thermoextrap.models.ExtrapModel
     """
-
     if central is None:
         central = data.central
     if order is None:
         order = data.order + 1
 
-    assert central == data.central
-    assert order <= data.order + 1
-    assert data.x_is_u
+    if central != data.central:
+        raise ValueError
+    if order > data.order + 1:
+        raise ValueError
+    if not data.x_is_u:
+        raise ValueError
 
     if derivatives is None:
         if derivatives_kws is None:

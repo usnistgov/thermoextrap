@@ -95,9 +95,10 @@ class MyAttrsMixin:
 
     def set_params(self, **kws):
         """Set parameters of self, and return self (for chaining)."""
-
         for name in kws:
-            assert hasattr(self, name)
+            if not hasattr(self, name):
+                msg = f"{name=} not an attribute."
+                raise AttributeError(msg)
 
         for name, val in kws.items():
             setattr(self, name, val)
@@ -127,7 +128,6 @@ class MyAttrsMixin:
         >>> x._derived
         10
         """
-
         for key, value in kws.items():
             object.__setattr__(self, key, value)  # noqa: PLC2801
 

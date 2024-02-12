@@ -333,12 +333,13 @@ class SymDerivBeta(SymDerivBase):
         {post_func}
         {central}
         """
+        if central is not None and not central:
+            msg = f"{central=} must be None or evaluate to True"
+            raise ValueError(msg)
 
-        if central is not None:
-            assert central
-
-        n = int(n)
-        assert n > 1
+        if (n := int(n)) <= 1:
+            msg = f"{n=} must be > 1."
+            raise ValueError(msg)
         func = du_func(cls.beta, n)
 
         # special case for args.
@@ -372,16 +373,18 @@ class SymDerivBeta(SymDerivBase):
         -----
         If xalpha is True, must also specify d.
         """
-
         # special case for args
         # for consistency between xave and dxdun_ave, also include x1
-        if central is not None:
-            assert central
+        if central is not None and not central:
+            msg = f"{central=} nust be `None` or evaluate to `True`"
+            raise ValueError(msg)
 
-        assert isinstance(n, int)
-        assert n > 0
+        if (n := int(n)) <= 0:
+            msg = f"{n=} must be positive integer."
+            raise ValueError(msg)
         if xalpha:
-            assert isinstance(d, int)
+            if not isinstance(d, int):
+                raise TypeError
             func = dxdu_func_beta(cls.beta, n, d)
             args = x_func_central_beta.deriv_args()
 
@@ -409,10 +412,13 @@ class SymDerivBeta(SymDerivBase):
         {post_func}
         {central}
         """
-        if central is not None:
-            assert not central
-        n = int(n)
-        assert n >= 1
+        if central is not None and central:
+            msg = f"{central=} must be `None` or evaluate to False"
+            raise ValueError(msg)
+
+        if (n := int(n)) < 1:
+            msg = f"{n=} must be >=1."
+            raise ValueError(msg)
 
         func = u_func(cls.beta, n)
         return cls(func=func, expand=expand, post_func=post_func)
@@ -434,16 +440,21 @@ class SymDerivBeta(SymDerivBase):
         {post_func}
         {central}
         """
+        if central is not None and central:
+            msg = f"{central=} must be `None` or False"
+            raise ValueError(msg)
 
-        if central is not None:
-            assert not central
-
-        assert isinstance(n, int)
-        assert n >= 0
+        # assert isinstance(n, int)
+        # assert n >= 0
+        if (n := int(n)) < 0:
+            msg = f"{n=} must be >= 0"
+            raise ValueError(msg)
 
         if xalpha:
-            assert isinstance(d, int)
-            assert d >= 0
+            if not isinstance(d, int):
+                raise TypeError
+            if d < 0:
+                raise ValueError
             func = xu_func(cls.beta, n, d)
         else:
             func = xu_func(cls.beta, n)
@@ -490,7 +501,6 @@ class SymDerivBeta(SymDerivBase):
         d : int, optional
             d parameter for dxdun_ave
         """
-
         func = getattr(cls, name, None)
 
         if func is None:
@@ -545,7 +555,6 @@ def factory_derivatives(
     derivatives : :class:`thermoextrap.models.Derivatives` instance
         Object used to calculate taylor series coefficients
     """
-
     derivs = SymDerivBeta.from_name(
         name=name,
         n=n,
@@ -611,7 +620,6 @@ def factory_extrapmodel(
     --------
     ~thermoextrap.models.ExtrapModel
     """
-
     if xalpha is None:
         xalpha = data.xalpha
     if central is None:
@@ -619,13 +627,23 @@ def factory_extrapmodel(
     if order is None:
         order = data.order
 
-    assert xalpha == data.xalpha
-    assert central == data.central
-    assert order <= data.order
+    # assert xalpha == data.xalpha
+    # assert central == data.central
+    # assert order <= data.order
+    if xalpha != data.xalpha:
+        msg = f"{xalpha=} must equal {data.xalpha=}"
+        raise ValueError(msg)
+    if central != data.central:
+        msg = f"{central=} must equal {data.central=}"
+        raise ValueError(msg)
+    if order > data.order:
+        msg = f"{order=} must be <= {data.order=}"
+        raise ValueError(msg)
 
     if derivatives is None:
-        if name in {"u_ave", "un_ave", "dun_ave"}:
-            assert data.x_is_u
+        if name in {"u_ave", "un_ave", "dun_ave"} and not data.x_is_u:
+            msg = "if name in [u_ave, un_ave, dun_ave] must have data.x_is_u"
+            raise ValueError(msg)
 
         if derivatives_kws is None:
             derivatives_kws = {}

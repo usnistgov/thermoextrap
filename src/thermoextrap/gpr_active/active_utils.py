@@ -8,6 +8,7 @@ import multiprocessing
 import time
 import warnings
 from pathlib import Path
+from typing import NoReturn
 
 import gpflow
 import numpy as np
@@ -186,7 +187,7 @@ class DataWrapper:
         u_col=2,
         cv_cols=None,
         x_col=None,
-    ):
+    ) -> None:
         if x_col is None:
             x_col = [1]
         if cv_cols is None:
@@ -206,7 +207,7 @@ class DataWrapper:
 
     def load_U_info(self):
         """Loads potential energies from a list of files."""
-        U = [np.loadtxt(f)[-self.n_frames :, self.u_col] for f in self.sim_info_files]
+        U = [np.loadtxt(f)[-self.n_frames :, self.u_col] for f in self.sim_info_files]  # noqa: E203
         # If eventually using MBAR, will want to vstack instead
         return np.hstack(U)
 
@@ -219,7 +220,7 @@ class DataWrapper:
         cv_vals = []
         cv_bias = []
         for f in self.cv_bias_files:
-            cv_info = np.loadtxt(f)[-self.n_frames :, self.cv_cols]
+            cv_info = np.loadtxt(f)[-self.n_frames :, self.cv_cols]  # noqa: E203
             cv_vals.append(cv_info[:, 0])
             cv_bias.append(cv_info[:, 1])
         cv_vals = np.hstack(cv_vals)
@@ -228,7 +229,7 @@ class DataWrapper:
 
     def load_x_info(self):
         """Loads observable data."""
-        x = [np.loadtxt(f)[-self.n_frames :, self.x_col] for f in self.x_files]
+        x = [np.loadtxt(f)[-self.n_frames :, self.x_col] for f in self.x_files]  # noqa: E203
         return np.vstack(x)
 
     def get_data(self):
@@ -337,7 +338,7 @@ class SimWrapper:
         post_process_out_name=None,
         post_process_kw_inputs=None,
         pre_process_func=None,
-    ):
+    ) -> None:
         if post_process_kw_inputs is None:
             post_process_kw_inputs = {}
         if data_kw_inputs is None:
@@ -598,7 +599,7 @@ class RBFDerivKernel(DerivativeKernel):
     Use it most often, so convenient to have.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         kern_expr, kern_params = make_rbf_expr()
         super().__init__(kern_expr, 1, kernel_params=kern_params, **kwargs)
 
@@ -628,7 +629,7 @@ class ChangeInnerOuterRBFDerivKernel(DerivativeKernel):
     ~thermoextrap.gpr_active.gp_models.DerivativeKernel
     """
 
-    def __init__(self, c1=-7.0, c2=-2.0, **kwargs):
+    def __init__(self, c1=-7.0, c2=-2.0, **kwargs) -> None:
         x1 = sp.symbols("x1", real=True)
         x2 = sp.symbols("x2", real=True)
 
@@ -878,7 +879,6 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs=None)
     gpr : :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Trained model.
     """
-
     # Loop over states and collect information needed for GP
     if base_kwargs is None:
         base_kwargs = {}
@@ -974,7 +974,7 @@ class UpdateStopABC:
         transform_func=identityTransform,
         log_scale=False,
         avoid_repeats=False,
-    ):
+    ) -> None:
         """
         Parameters
         ----------
@@ -1080,7 +1080,7 @@ class UpdateFuncBase(UpdateStopABC):
         save_dir="./",
         compare_func=None,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
 
         # init just sets up how update function should behave
@@ -1090,12 +1090,11 @@ class UpdateFuncBase(UpdateStopABC):
         self.save_dir = Path(save_dir)
         self.compare_func = compare_func
 
-    def do_plotting(self, x, y, err, alpha_list):
+    def do_plotting(self, x, y, err, alpha_list) -> None:
         """
         Plots output used to select new update point.
         err is expected to be length 2 list with upper and lower confidence intervals.
         """
-
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
@@ -1139,7 +1138,7 @@ class UpdateFuncBase(UpdateStopABC):
         if self.show_plot:
             plt.show()
 
-    def do_update(self, gpr, alpha_list):
+    def do_update(self, gpr, alpha_list) -> NoReturn:
         msg = "Must implement this function for specific update scheme"
         raise NotImplementedError(msg)
 
@@ -1170,7 +1169,7 @@ class UpdateALMbrute(UpdateFuncBase):
     operations) such that the uncertainty can also be adjusted in the same way.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
@@ -1228,7 +1227,7 @@ class UpdateRandom(UpdateFuncBase):
     This does not require training a GP model, but one is trained anyway for plotting, etc.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
@@ -1260,7 +1259,7 @@ class UpdateSpaceFill(UpdateFuncBase):
     This does not require training a GP model, but one is trained anyway for plotting, etc.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
@@ -1313,7 +1312,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
         deviation divided by the absolute value of the GPR-predicted mean
     """
 
-    def __init__(self, tol=0.005, **kwargs):
+    def __init__(self, tol=0.005, **kwargs) -> None:
         super().__init__(**kwargs)
         self.tol = tol
 
@@ -1423,7 +1422,7 @@ class UpdateALCbrute(UpdateFuncBase):
     new noise, this will not work)
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
@@ -1510,7 +1509,7 @@ class MetricBase:
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, name, tol):
+    def __init__(self, name, tol) -> None:
         """
         Inputs:
         name - name of metric
@@ -1520,7 +1519,7 @@ class MetricBase:
         self.name = name
         self.tol = tol
 
-    def _check_history(self, history):
+    def _check_history(self, history) -> None:
         if history is None:
             msg = "history is None."
             raise ValueError(msg)
@@ -1528,7 +1527,7 @@ class MetricBase:
             msg = "history must be list of length 2 of GP means and variances evaluated with a series of GP models"
             raise ValueError(msg)
 
-    def calc_metric(self, history, x_vals, gp):
+    def calc_metric(self, history, x_vals, gp) -> NoReturn:
         raise NotImplementedError
 
     def __call__(self, history, x_vals, gp):
@@ -1539,7 +1538,7 @@ class MetricBase:
 class MaxVar(MetricBase):
     """Metric based on maximum variance of GP output."""
 
-    def __init__(self, tol, name="MaxVar", **kwargs):
+    def __init__(self, tol, name="MaxVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1561,7 +1560,7 @@ class AvgVar(MetricBase):
         Extrap arguments to :class:`MetricBase`
     """
 
-    def __init__(self, tol, name="AvgVar", **kwargs):
+    def __init__(self, tol, name="AvgVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1586,7 +1585,7 @@ class MaxRelVar(MetricBase):
         points are ignored for purposes of calculating metric (set to zero)
     """
 
-    def __init__(self, tol, threshold=1e-12, name="MaxRelVar", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="MaxRelVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1613,7 +1612,7 @@ class MaxRelGlobalVar(MetricBase, UpdateStopABC):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="MaxRelGlobalVar", **kwargs):
+    def __init__(self, tol, name="MaxRelGlobalVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1643,7 +1642,7 @@ class AvgRelVar(MetricBase):
         points are ignored for purposes of calculating metric (set to zero)
     """
 
-    def __init__(self, tol, threshold=1e-12, name="AvgRelVar", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="AvgRelVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1669,7 +1668,7 @@ class MSD(MetricBase):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="MSD", **kwargs):
+    def __init__(self, tol, name="MSD", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1697,7 +1696,7 @@ class MaxAbsRelDeviation(MetricBase):
         points are ignored for purposes of calculating metric (set to zero)
     """
 
-    def __init__(self, tol, threshold=1e-12, name="MaxAbsRelDev", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="MaxAbsRelDev", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1730,7 +1729,7 @@ class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="MaxAbsRelGlobalDeviation", **kwargs):
+    def __init__(self, tol, name="MaxAbsRelGlobalDeviation", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1761,7 +1760,7 @@ class AvgAbsRelDeviation(MetricBase):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, threshold=1e-12, name="AvgAbsRelDev", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="AvgAbsRelDev", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1800,7 +1799,7 @@ class ErrorStability(MetricBase, UpdateStopABC):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="ErrorStability", **kwargs):
+    def __init__(self, tol, name="ErrorStability", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
         # Need to set up normalization - will just use first r calculated
@@ -1934,7 +1933,7 @@ class MaxIter(MetricBase):
         name of this metric
     """
 
-    def __init__(self, name="MaxIter", **kwargs):
+    def __init__(self, name="MaxIter", **kwargs) -> None:
         super().__init__(tol=1.0, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1961,7 +1960,7 @@ class StopCriteria(UpdateStopABC):
         this will be looped over with metrics calculated to determine stopping
     """
 
-    def __init__(self, metric_funcs, **kwargs):
+    def __init__(self, metric_funcs, **kwargs) -> None:
         """
         Inputs:
         metric_funcs - dictionary of (name, function) pairs; just nice to have names.
@@ -2101,7 +2100,6 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
         Dictionary of information about results at each training
         iteration, like GP predictions, losses, parameters, etc.
     """
-
     if gp_base_kwargs is None:
         gp_base_kwargs = {}
 
@@ -2132,7 +2130,7 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
     # Will need to keep track of alpha values
     alpha_list = [dat.beta for dat in data_list]
 
-    logger.info(f"Initial {alpha_name} values: {alpha_list}")
+    logger.info("Initial %s values: %s", alpha_name, alpha_list)
 
     # Also nice to keep track of loss and parameter values
     # Results in more robust parameter optimization, too
@@ -2176,14 +2174,17 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
                     train_history[m].append(stop_metrics[m])
             if stop_bool:
                 logger.info(
-                    f"Stopping criteria satisfied with stopping metrics of: {stop_metrics}"
+                    "Stopping criteria satisfied with stopping metrics of: %s",
+                    stop_metrics,
                 )
                 break
-            logger.info(f"Current stopping metrics: {stop_metrics}")
+            logger.info("Current stopping metrics: %s", stop_metrics)
 
         if i == max_iter:
             # Don't do update on this loop, just break
-            logger.info(f"Reached maximum iterations of {max_iter} without convergence")
+            logger.info(
+                "Reached maximum iterations of %s without convergence", max_iter
+            )
             break
 
         # If stopping criteria not satisfied, select new point
@@ -2211,7 +2212,9 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
             data_list.append(this_data)
             alpha_list.append(new_alpha)
 
-        logger.info(f"After {i + 1} updates, {alpha_name} values are: {alpha_list}")
+        logger.info(
+            "After %s updates, %s values are: %s", i + 1, alpha_name, alpha_list
+        )
 
     if save_history and (stop_criteria is not None):
         for key in train_history:

@@ -139,7 +139,7 @@ def main() -> None:
     if args.verbose:
         logger.setLevel(logging.INFO)
 
-    logging.info(f"{args=}")
+    logging.info(f"{args=}")  # noqa: G004
 
     flags: list[str] = []
     if args.yes:

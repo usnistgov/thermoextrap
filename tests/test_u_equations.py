@@ -1,31 +1,45 @@
-from collections import namedtuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
 
 import thermoextrap as xtrap
 from thermoextrap.core.sputils import get_default_indexed
 
+if TYPE_CHECKING:
+    from typing import Any
+
+    from sympy.core.symbol import Symbol
+    from sympy.tensor.indexed import IndexedBase
+
 n_list = [6]
 
 
+class DataNamedTuple(NamedTuple):
+    n: int
+    u: Symbol
+    x1: Symbol
+    du: IndexedBase
+    dxdu: IndexedBase
+    xu: IndexedBase
+    subs: dict[bool, Any]
+
+
 @pytest.fixture(params=n_list)
-def data(request):
-    data = namedtuple("data", ["n", "u", "x1", "du", "dxdu", "xu", "ui" "subs"])  # pyright: ignore[reportUntypedNamedTuple]
-
+def data(request) -> DataNamedTuple:
     n = request.param
-    data.n = n
-    data.u, data.x1 = xtrap.models.get_default_symbol("u", "x1")
-    data.du, data.dxdu = get_default_indexed("du", "dxdu")
-    data.xu, data.ui = get_default_indexed("xu", "u")
+    u, x1 = xtrap.models.get_default_symbol("u", "x1")
+    du, dxdu = get_default_indexed("du", "dxdu")
+    xu, ui = get_default_indexed("xu", "u")
 
-    subs_central = {data.dxdu[i]: data.du[i + 1] for i in range(1, 2 * n)}
-    subs_central[data.x1] = data.u
+    subs_central = {dxdu[i]: du[i + 1] for i in range(1, 2 * n)}
+    subs_central[x1] = u
+    subs_raw = {xu[i]: ui[i + 1] for i in range(2 * n)}
 
-    subs_raw = {data.xu[i]: data.ui[i + 1] for i in range(2 * n)}
+    subs = {True: subs_central, False: subs_raw}
 
-    data.subs = {True: subs_central, False: subs_raw}
-
-    return data
+    return DataNamedTuple(n=n, u=u, x1=x1, du=du, dxdu=dxdu, xu=xu, subs=subs)
 
 
 @pytest.fixture(params=[None, "minus_log"])

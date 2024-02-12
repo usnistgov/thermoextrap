@@ -99,7 +99,6 @@ def factory_extrapmodel(volume, uv, xv, order=1, alpha_name="volume", **kws):
     -------
     extrapmodel : ExtrapModel
     """
-
     if order != 1:
         msg = "only first order supported"
         raise ValueError(msg)
@@ -137,7 +136,6 @@ def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
     -------
     extrapmodel : ExtrapModel
     """
-
     if order is None:
         order = data.order
 
@@ -145,10 +143,13 @@ def factory_extrapmodel_data(volume, data, order=1, alpha_name="volume"):
         msg = "only first order supported"
         raise ValueError(msg)
 
-    assert data.order >= order
-
-    assert not data.central
-    assert data.deriv is None
+    if order > data.order:
+        raise ValueError
+    if data.central:
+        msg = "Only works with raw moments."
+        raise ValueError
+    if data.deriv is not None:
+        raise ValueError
 
     derivatives = factory_derivatives(refV=volume)
     return ExtrapModel(

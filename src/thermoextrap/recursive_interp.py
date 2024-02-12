@@ -82,7 +82,6 @@ class RecursiveInterp:
         only one dimension.
         This function just uses the toy ideal gas model that comes with lib_extrap.
         """
-
         npart, nconfig = 1000, 10000
         xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
 
@@ -121,7 +120,6 @@ class RecursiveInterp:
         used instead. This is useful when data has already been generated at
         specific state points and you do not wish to generate more.
         """
-
         if do_plot:
             plt = _get_plt()
 
@@ -133,8 +131,8 @@ class RecursiveInterp:
         if verbose:
             logger.setLevel(logging.INFO)
 
-        logger.info(f"Interpolating from points {beta1:f} and {beta2:f}")
-        logger.info(f"Recursion depth on this branch: {recurse_depth}")
+        logger.info("Interpolating from points %f and %f", beta1, beta2)
+        logger.info("Recursion depth on this branch: %s", recurse_depth)
 
         # Generate data somehow if not provided
         if data1 is None:
@@ -177,7 +175,7 @@ class RecursiveInterp:
         check_ind = np.unravel_index(rel_err.argmax(), rel_err.shape)
         check_val = rel_err[check_ind]
 
-        logger.info(f"Maximum bootstrapped error within interval: {check_val}")
+        logger.info("Maximum bootstrapped error within interval: %s", check_val)
 
         # Check if bootstrapped uncertainty in estimate is small enough
         # If so, we're done
@@ -194,7 +192,7 @@ class RecursiveInterp:
             ]  # First dimension of prediction is along beta values
 
         if new_beta is not None:
-            logger.info(f"Selected new extrapolation point: {new_beta}")
+            logger.info("Selected new extrapolation point: %f", new_beta)
         else:
             logger.info(
                 "No additional extrapolation points necessary on this interval."
@@ -265,7 +263,6 @@ class RecursiveInterp:
         Trains sequentially without recursion. List of state point values is provided and
         training happens just on those without adding points.
         """
-
         # Check for overlap in self.edge_beta and beta_train and merge as needed
         # Fill in None in self.states where we have not yet trained
         for beta_val in beta_train:
@@ -283,7 +280,7 @@ class RecursiveInterp:
 
             if verbose:
                 logger.setLevel(logging.INFO)
-            logger.info(f"\nInterpolating from points {beta1:f} and {beta2:f}")
+            logger.info("Interpolating from points %f and %f", beta1, beta2)
 
             # Check if already have ExtrapModel with data for beta1
             if self.states[i] is None:
@@ -337,10 +334,8 @@ class RecursiveInterp:
                 # (if observable is a vector, use element with maximum error
                 check_ind = np.unravel_index(rel_err.argmax(), rel_err.shape)
                 check_val = rel_err[check_ind]
-                logger.info(
-                    "Maximum bootstrapped error within interval: %f" % check_val
-                )
-                logger.info("At point: %f" % beta_vals[check_ind[0]])
+                logger.info("Maximum bootstrapped error within interval: %f", check_val)
+                logger.info("At point: %f", beta_vals[check_ind[0]])
 
     sequentialTrain = deprecate("sequentialTrain", sequential_train, "0.2.0")  # noqa: N815
 
@@ -481,11 +476,14 @@ class RecursiveInterp:
 
             all_pvals.append(np.vstack((p12, p1full, p2full)))
             logger.info(
-                f"Interval with edges {self.edge_beta[aset]!s} (indices {aset!s}):"
+                # f"Interval with edges {self.edge_beta[aset]!s} (indices {aset!s}):"
+                "Interval with edges %s (indices %s):",
+                self.edge_beta[aset],
+                aset,
             )
-            logger.info(f"P-values between regions: {p12}")
-            logger.info(f"P-values for full and 1 : {p1full}")
-            logger.info(f"P-values for full and 2 : {p2full}")
+            logger.info("P-values between regions: %s", p12)
+            logger.info("P-values for full and 1 : %s", p1full)
+            logger.info("P-values for full and 2 : %s", p2full)
 
             if do_plot:
                 plotpoints = np.linspace(

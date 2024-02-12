@@ -340,7 +340,6 @@ class Derivatives(MyAttrsMixin):
         output : list of xarray.DataArray
             See above for nature of output
         """
-
         if data is not None:
             args = data.derivs_args
             if order is None:
@@ -378,7 +377,6 @@ class Derivatives(MyAttrsMixin):
         --------
         derivs
         """
-
         return self.derivs(
             data=data,
             args=args,
@@ -601,13 +599,17 @@ class StateCollection(MyAttrsMixin):
         if indices is None:
             indices = [None] * len(self)
 
-        assert len(indices) == len(self)
+        if len(indices) != len(self):
+            msg = f"{len(indices)=} must equal {len(self)=}"
+            raise ValueError(msg)
 
         if "freq" in kws:
             freq = kws.pop("freq")
             if freq is None:
                 freq = [None] * len(self)
-            assert len(freq) == len(self)
+            if len(freq) != len(self):
+                msg = f"{len(freq)=} must equal {len(self)=}"
+                raise ValueError(msg)
 
             return type(self)(
                 states=tuple(
@@ -633,7 +635,6 @@ class StateCollection(MyAttrsMixin):
         if func is a str, then
         ``out = [getattr(s, func)(*args, **kwargs) for s in self]``
         """
-
         if isinstance(func, str):
             out = [getattr(s, func)(*args, **kwargs) for s in self]
         else:
@@ -647,7 +648,6 @@ class StateCollection(MyAttrsMixin):
 
         defaults to concat with dim=pd.Index(self.alpha0, name=self.alpha_name)
         """
-
         out = self.map(func, *args, **kwargs)
         if isinstance(out[0], (xr.DataArray, xr.Dataset)):
             if concat_dim is None:
@@ -679,7 +679,6 @@ class StateCollection(MyAttrsMixin):
         out : object
             same type as `self` with new states added to `states` list
         """
-
         new_states = list(self.states) + list(states)
 
         if sort:
@@ -785,7 +784,6 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
         -----
         This requires that `states` are ordered in ascending `alpha0` order
         """
-
         self._check_alpha(alpha, bounded)
 
         if order is None:
@@ -946,7 +944,6 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
         alpha : float or sequence of float
 
         """
-
         self._check_alpha(alpha, bounded)
 
         if alpha_name is None:

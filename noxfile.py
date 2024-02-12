@@ -949,7 +949,7 @@ def get_package_wheel(
 
         # save that this was called:
         if reuse:
-            get_package_wheel._called = True  # type: ignore[attr-defined]
+            get_package_wheel._called = True  # type: ignore[attr-defined]  # noqa: SLF001
 
     paths = list(dist_location.glob("*.whl"))
     if len(paths) != 1:

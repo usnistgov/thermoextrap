@@ -25,7 +25,7 @@ from thermoextrap.gpr_active.gp_models import (
 # Work with RBF and test up to second order derivatives
 # Will build covariance matrix with derivative orders indexing, i.e., cov[0, 1] = dk/dx2
 class RBFCovs:
-    def __init__(self, var, volume):
+    def __init__(self, var, volume) -> None:
         self.var = var
         self.volume = volume
 
@@ -92,7 +92,7 @@ class RBFCovs:
 # For multiple input dimensions with separate lengthscales, implement as product of kernels
 # Derivatives will also be products since dimensions separable as products of exponentials
 class MultiDRBFCovs:
-    def __init__(self, rbf_cov_list):
+    def __init__(self, rbf_cov_list) -> None:
         self.rbf_cov_list = rbf_cov_list
         self.n_dims = len(rbf_cov_list)
 
@@ -111,7 +111,7 @@ class MultiDRBFCovs:
         return out
 
 
-def test_deriv_kernel_manual_1d():
+def test_deriv_kernel_manual_1d() -> None:
     # Create manually implemented RBF class to use as reference
     rbf_check = RBFCovs(1.0, 2.0)
 
@@ -151,7 +151,7 @@ def test_deriv_kernel_manual_1d():
     np.testing.assert_allclose(ref, to_check)
 
 
-def test_deriv_kernel_manual_multi_d():
+def test_deriv_kernel_manual_multi_d() -> None:
     # Create manually implemented RBF class to use as reference
     rbf_check = MultiDRBFCovs(
         [
@@ -211,7 +211,7 @@ def test_deriv_kernel_manual_multi_d():
     np.testing.assert_allclose(ref, to_check)
 
 
-def test_deriv_kernel_self_1d():
+def test_deriv_kernel_self_1d() -> None:
     # Now test for self-consistency within the derivative kernel
     kern_expr, kern_params = make_rbf_expr()
     kern_params = {"var": [1.0, {}], "l_0": [2.0, {}]}
@@ -255,7 +255,7 @@ def test_deriv_kernel_self_1d():
     np.testing.assert_allclose(output_dorder, output)
 
 
-def test_deriv_kernel_self_multi_d():
+def test_deriv_kernel_self_multi_d() -> None:
     # Now test for self-consistency within the derivative kernel
     kern_expr, kern_params = make_rbf_expr(2)
     kern_params = {
@@ -344,7 +344,7 @@ def mean_funcs_check_data():
 
 
 # For constant, just make sure that zeroth order derivatives have constant and all others are zero
-def test_constant_mean_func():
+def test_constant_mean_func() -> None:
     x_check, y_check = mean_funcs_check_data()
 
     # Generate constant mean function to test
@@ -367,7 +367,7 @@ def test_constant_mean_func():
 
 
 # For linear, just make sure it returns correct linear fit for provided test case
-def test_linear_mean_func():
+def test_linear_mean_func() -> None:
     x_check, y_check = mean_funcs_check_data()
 
     # Generate linear mean function to test
@@ -399,7 +399,7 @@ def test_linear_mean_func():
 
 
 # Testing sympy mean function is more difficult - mainly testing sympy stuff
-def test_sympy_mean_func():
+def test_sympy_mean_func() -> None:
     import sympy as sp
 
     # Will work with logistic because relevant derivatives can be computed in terms of 0 order
@@ -452,7 +452,7 @@ def test_sympy_mean_func():
 
 # Need to test all components of the GP model
 # Start with testing the multioutput_multivariate_normal function
-def test_multiout_multivar_normal():
+def test_multiout_multivar_normal() -> None:
     # Idea of this function is to parallelize assessment of multivariate Gaussians in tensorflow
     # First need valid covariance matrices
     cov1 = np.array([[1.0, 0.0], [0.0, 1.0]])
@@ -480,7 +480,7 @@ def test_multiout_multivar_normal():
         np.testing.assert_allclose(ref_logp, check_out[i])
 
 
-def test_gp_likelihood():
+def test_gp_likelihood() -> None:
     # Check that handles input correctly
     cov_id = np.eye(3)
     d_orders = np.arange(3.0)[:, None]  # Add dimension since now handles nD inputs
@@ -533,7 +533,7 @@ def test_gp_likelihood():
 # But would make testing more modular and specific
 # Manually parsing and running all methods in class is a pain for testing, though
 @pytest.mark.slow()
-def test_gp():  # noqa: PLR0915
+def test_gp() -> None:  # noqa: PLR0915
     # First create data we can use
     rng = np.random.default_rng(42)
     x_data, y_data, y_var_data = sine_active.make_data(

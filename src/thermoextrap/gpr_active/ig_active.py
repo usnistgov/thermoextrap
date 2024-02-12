@@ -7,6 +7,8 @@ Generates ideal gas (1D in external potential) data to test GP models and active
 learning strategies.
 """
 
+from typing import NoReturn
+
 import numpy as np
 import xarray as xr
 
@@ -53,18 +55,18 @@ def multiOutput_extrap_IG(beta, seed=42):
 class IG_DataWrapper(DataWrapper):  # noqa: N801
     """Data object for gpr with ideal gas."""
 
-    def __init__(self, beta, seed=42):
+    def __init__(self, beta, seed=42) -> None:
         self.beta = beta
         self.seed = 42
         self.rng = np.random.default_rng(self.seed)
 
-    def load_U_info(self):
+    def load_U_info(self) -> NoReturn:
         raise NotImplementedError
 
-    def load_CV_info(self):
+    def load_CV_info(self) -> NoReturn:
         raise NotImplementedError
 
-    def load_x_info(self):
+    def load_x_info(self) -> NoReturn:
         raise NotImplementedError
 
     def get_data(self, n_conf=10000, n_part=1000):
@@ -90,7 +92,7 @@ class IG_DataWrapper(DataWrapper):  # noqa: N801
 class SimulateIG:
     """Simulation object for ideal gas."""
 
-    def __init__(self, sim_func=None):
+    def __init__(self, sim_func=None) -> None:
         self.sim_func = sim_func  # Will not perform any simulations
 
     def run_sim(self, unused, beta, n_repeats=None):
