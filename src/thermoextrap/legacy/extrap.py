@@ -1,6 +1,6 @@
 """Main extrapolation classes
 """
-
+import math
 import numpy as np
 
 from .utilities import buildAvgFuncs, symDerivAvgX
@@ -113,7 +113,7 @@ class ExtrapModel:
         for o in range(order + 1):
             predictVals += np.tensordot(
                 (dBeta**o), params[o], axes=0
-            ) / np.math.factorial(o)
+            ) / math.factorial(o)
 
         return predictVals
 
@@ -121,13 +121,15 @@ class ExtrapModel:
         """Function to resample the data, mainly for use in providing bootstrapped estimates.
         Should be adjusted to match the data structure.
         """
+        from thermoextrap.random import default_rng
+
         if self.x is None:
             raise TypeError(
                 "self.x is None - need to define data in model (i.e. train)"
             )
 
         sampSize = self.x.shape[0]
-        randInds = np.random.choice(sampSize, size=sampSize, replace=True)
+        randInds = default_rng().choice(sampSize, size=sampSize, replace=True)
         sampX = self.x[randInds]
         sampU = self.U[randInds]
         return (sampX, sampU)

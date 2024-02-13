@@ -1,7 +1,7 @@
 """Holds analytic ideal gas model.
 Useful for testing and examining fundamental behavior.
 """
-
+import math
 import numpy as np
 import sympy as sym
 from scipy.stats import norm
@@ -56,7 +56,10 @@ class IGmodel:
         """Samples s samples of x from the probability density at inverse temperature B
         Does sampling based on inversion of cumulative distribution function
         """
-        randvec = np.random.rand(s)
+        from thermoextrap.random import default_rng
+
+        # to make sure using same rng as new code...
+        randvec = default_rng().random(s)
         randx = -(1.0 / B) * np.log(1.0 - randvec * (1.0 - np.exp(-B * L)))
         return randx
 
@@ -107,7 +110,7 @@ class IGmodel:
         for k in range(order + 1):
             thisdiff = sym.diff(self.avgXsym, self.b, k)
             outvec[k] = thisdiff.subs({self.b: B0, self.l: L})
-            outval += outvec[k] * (dBeta**k) / np.math.factorial(k)
+            outval += outvec[k] * (dBeta**k) / math.factorial(k)
         return (outval, outvec)
 
     def extrapAnalyticVolume(self, L, L0, order, B=1.0):
@@ -120,7 +123,7 @@ class IGmodel:
         for k in range(order + 1):
             thisdiff = sym.diff(self.avgXsym, self.l, k)
             outvec[k] = thisdiff.subs({self.b: B, self.l: L0})
-            outval += outvec[k] * (dL**k) / np.math.factorial(k)
+            outval += outvec[k] * (dL**k) / math.factorial(k)
         return (outval, outvec)
 
     # Want to be able to create sample data set we can work with at a reference beta

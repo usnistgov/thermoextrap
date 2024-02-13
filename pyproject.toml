@@ -216,7 +216,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Use extend-ignore for project specific ignores (avoid changing ignore directly)
 extend-ignore = [
     "PD",        # - not using pandas?
-    "NPY",       # - not using numpy?
+    # "NPY",       # - not using numpy?
     # * Annotations
     # "SLF001",  # - flake8-self (private access sometimes OK)
     "ANN",     # - Annotations (just use mypy/pyright)

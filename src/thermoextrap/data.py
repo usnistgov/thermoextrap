@@ -27,6 +27,8 @@ from attrs import validators as attv
 from custom_inherit import DocInheritMeta
 from module_utilities import cached
 
+from thermoextrap.random import default_rng
+
 from .core._attrs_utils import (
     MyAttrsMixin,
     _cache_field,
@@ -50,7 +52,14 @@ __all__ = [
 
 
 @docfiller_shared
-def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
+def resample_indices(
+    size,
+    nrep,
+    rec_dim="rec",
+    rep_dim="rep",
+    replace=True,
+    rng: np.random.Generator | None = None,
+):
     """
     Get indexing DataArray.
 
@@ -72,8 +81,10 @@ def resample_indices(size, nrep, rec_dim="rec", rep_dim="rep", replace=True):
         if transpose, shape=(size, nrep)
         else, shape=(nrep, size)
     """
+    rng = rng or default_rng()
+
     return xr.DataArray(
-        data=np.random.choice(size, size=(nrep, size), replace=replace),
+        data=rng.choice(size, size=(nrep, size), replace=replace),
         dims=[rep_dim, rec_dim],
     )
 
@@ -464,6 +475,7 @@ class DataValuesBase(AbstractData):
         chunk=None,
         compute="None",
         meta_kws=None,
+        rng: np.random.Generator | None = None,
     ):
         """
         Resample object.
@@ -492,7 +504,7 @@ class DataValuesBase(AbstractData):
                 msg = "Must set nrep if using indices."
                 raise TypeError(msg)
             indices = resample_indices(
-                len(self), nrep, rec_dim=self.rec_dim, rep_dim=rep_dim
+                len(self), nrep, rec_dim=self.rec_dim, rep_dim=rep_dim, rng=rng
             )
         elif not isinstance(indices, xr.DataArray):
             indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))

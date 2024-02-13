@@ -10,6 +10,7 @@ if TYPE_CHECKING:
         idealgas,
         lnpi,
         models,
+        random,
         volume,
         volume_idealgas,
     )
@@ -45,6 +46,7 @@ else:
             "idealgas",
             "lnpi",
             "models",
+            "random",
             "volume",
             "volume_idealgas",
         ],
@@ -102,6 +104,7 @@ __all__ = [
     "idealgas",
     "lnpi",
     "models",
+    "random",
     "resample_indices",
     "volume",
     "volume_idealgas",

@@ -2,6 +2,8 @@
 GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
 ------------------------------------------------------------
 """
+from __future__ import annotations
+
 import contextlib
 import logging
 import multiprocessing
@@ -974,6 +976,7 @@ class UpdateStopABC:
         transform_func=identityTransform,
         log_scale=False,
         avoid_repeats=False,
+        rng: np.random.Generator | None = None,
     ) -> None:
         """
         Parameters
@@ -992,10 +995,14 @@ class UpdateStopABC:
         avoid_repeats : bool, default=False
             Whether or not to randomize grid of new locations.
         """
+        from thermoextrap.random import default_rng
+
         self.d_order_pred = d_order_pred
         self.transform_func = transform_func
         self.log_scale = log_scale
         self.avoid_repeats = avoid_repeats
+
+        self.rng = rng or default_rng()
 
     def create_alpha_grid(self, alpha_list):
         """
@@ -1022,7 +1029,7 @@ class UpdateStopABC:
                     [0.0],
                     2.0
                     * (alpha_grid[1] - alpha_grid[0])
-                    * (np.random.random(len(alpha_grid) - 2) - 0.5),
+                    * (self.rng.random(len(alpha_grid) - 2) - 0.5),
                     [0.0],
                 ]
             )
@@ -1243,7 +1250,7 @@ class UpdateRandom(UpdateFuncBase):
             self.do_plotting(alpha_select, gpr_mu, gpr_conf, alpha_list)
 
         # Randomly select new alpha
-        new_ind = np.random.choice(alpha_select.shape[0])
+        new_ind = self.rng.choice(alpha_select.shape[0])
         new_alpha = alpha_select[new_ind]
         out_mu = gpr_mu[new_ind, ...]
         out_std = gpr_std[new_ind, ...]
@@ -1284,7 +1291,7 @@ class UpdateSpaceFill(UpdateFuncBase):
         # Note avoiding round-off issues with isclose rather than ==
         max_int = np.max(intervals)
         max_int_inds = np.where(np.isclose(intervals, max_int))[0]
-        sel_int_ind = np.random.choice(max_int_inds)
+        sel_int_ind = self.rng.choice(max_int_inds)
 
         # Take alpha as halfway point in this interval
         new_alpha = sorted_alpha[sel_int_ind] + 0.5 * intervals[sel_int_ind]
@@ -1384,7 +1391,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
             intervals = sorted_alpha[1:] - sorted_alpha[:-1]
             max_int = np.max(intervals)
             max_int_inds = np.where(np.isclose(intervals, max_int))[0]
-            sel_int_ind = np.random.choice(max_int_inds)
+            sel_int_ind = self.rng.choice(max_int_inds)
             # Take alpha as halfway point in this interval
             new_alpha = sorted_alpha[sel_int_ind] + 0.5 * intervals[sel_int_ind]
         # Otherwise, select new alpha as described
@@ -1488,7 +1495,7 @@ class UpdateALCbrute(UpdateFuncBase):
         alpha_select[new_ind]
 
         # Randomly select new alpha
-        return np.random.choice(alpha_select)
+        return self.rng.choice(alpha_select)
 
 
 class MetricBase:

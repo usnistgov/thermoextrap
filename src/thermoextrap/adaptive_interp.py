@@ -9,6 +9,7 @@ See :ref:`examples/usage/basic/temperature_interp:adaptive interpolation` for ex
 
 """
 
+from __future__ import annotations
 
 from itertools import chain, islice
 
@@ -499,6 +500,7 @@ def factory_state_idealgas(
     seed_from_beta=True,
     nconfig=10_000,
     npart=1_000,
+    rng: np.random.Generator | None = None,
 ):
     """
     Example factory function to create single state.
@@ -515,28 +517,35 @@ def factory_state_idealgas(
     Parameters
     ----------
     seed_from_beta : bool, default=True
-        If `True`, then set `np.random.seed` based on beta value.
-        For testing purposes
+        If `True`, then set rng seed based on beta value.
+        For testing purposes.  Only applies if `rng = None`.
+    rng: :class:`numpy.random.Generator`, optional
 
     See Also
     --------
     thermoextrap.idealgas
     thermoextrap.beta.factory_extrapmodel
     """
+    from thermoextrap.random import default_rng
+
     from . import beta as xpan_beta
     from . import idealgas
     from .data import DataCentralMomentsVals
 
     # NOTE: this is for reproducible results.
-    if seed_from_beta:
-        np.random.seed(int(beta * 1000))
+    if rng is None:
+        if seed_from_beta:
+            rng = np.random.default_rng(seed=int(beta * 1000))
+        else:
+            rng = default_rng()
 
+    # TODO(wpk): convert this call to use rng
     xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
     data = DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
 
     # use indices for reproducibility
     nrec = len(xdata)
-    indices = np.random.choice(nrec, (nrep, nrec))
+    indices = rng.choice(nrec, (nrep, nrec))
     return xpan_beta.factory_extrapmodel(beta=beta, data=data).resample(
         indices=indices, rep_dim=rep_dim
     )

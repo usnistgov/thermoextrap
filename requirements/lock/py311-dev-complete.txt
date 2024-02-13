@@ -27,8 +27,6 @@ autopep8==2.0.4
     # via nbqa
 bottleneck==1.3.7
     # via -r requirements/dev-complete.txt
-build==1.0.3
-    # via pip-tools
 cachetools==5.3.2
     # via google-auth
 certifi==2023.11.17
@@ -42,7 +40,6 @@ check-shapes==1.1.1
 click==8.1.7
     # via
     #   click-log
-    #   pip-tools
     #   scriv
 click-log==0.4.0
     # via scriv
@@ -243,7 +240,6 @@ opt-einsum==3.3.0
     #   tensorflow
 packaging==23.2
     # via
-    #   build
     #   gpflow
     #   ipykernel
     #   matplotlib
@@ -262,8 +258,6 @@ pexpect==4.9.0
     # via ipython
 pillow==10.2.0
     # via matplotlib
-pip-tools==7.3.0
-    # via -r requirements/dev-complete.txt
 platformdirs==4.1.0
     # via
     #   jupyter-core
@@ -300,8 +294,6 @@ pymbar==4.0.2
     #   pymbar
 pyparsing==3.1.1
     # via matplotlib
-pyproject-hooks==1.0.0
-    # via build
 pyright==1.1.345
     # via -r requirements/dev-complete.txt
 pytest==7.4.4
@@ -431,9 +423,7 @@ wcwidth==0.2.13
 werkzeug==3.0.1
     # via tensorboard
 wheel==0.42.0
-    # via
-    #   astunparse
-    #   pip-tools
+    # via astunparse
 wrapt==1.14.1
     # via
     #   deprecated
@@ -444,12 +434,9 @@ xarray==2023.12.0
     #   cmomy
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==23.3.2
-    # via pip-tools
 setuptools==69.0.3
     # via
     #   gpflow
     #   nodeenv
-    #   pip-tools
     #   tensorboard
     #   tensorflow

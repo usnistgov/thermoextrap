@@ -9,6 +9,7 @@ This is a useful test system with analytical solutions coded alongside the abili
 """
 
 
+import math
 from functools import lru_cache
 
 import numpy as np
@@ -156,6 +157,7 @@ def x_cdf(x, beta, vol=1.0):
     return (1.0 - np.exp(-beta * x)) / (1.0 - np.exp(-beta * vol))
 
 
+# TODO(wpk): convert this to using rng instead of random array...
 @docfiller_shared
 def x_sample(shape, beta, vol=1.0, r=None):
     """
@@ -180,9 +182,9 @@ def x_sample(shape, beta, vol=1.0, r=None):
     If pass ``r``, then use these to build ``output``.  Otherwise, build random array of shape ``shape``.
     """
     if r is None:
-        if isinstance(shape, int):
-            shape = (shape,)
-        r = np.random.rand(*shape)
+        from thermoextrap.random import default_rng
+
+        r = default_rng().random(shape)
     return (-1.0 / beta) * np.log(1.0 - r * (1.0 - np.exp(-beta * vol)))
 
 
@@ -284,7 +286,7 @@ def x_beta_extrap(order, beta0, beta, vol=1.0):
     for k in range(order + 1):
         val = dbeta_xave(k)(beta0, vol)
         out.append(val)
-        tot += val / np.math.factorial(k) * (dbeta**k)
+        tot += val / math.factorial(k) * (dbeta**k)
     return tot, np.array(out)
 
 
@@ -306,7 +308,7 @@ def x_beta_extrap_minuslog(order, beta0, beta, vol=1.0):
     tot = 0.0
     for o in range(order + 1):
         out[o] = dbeta_xave_minuslog(o)(beta0, vol)
-        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+        tot += out[o] * ((dbeta) ** o) / math.factorial(o)
 
     return tot, out
 
@@ -334,7 +336,7 @@ def x_beta_extrap_depend(order, beta0, beta, vol=1.0):
         #     out[o] = beta0*(x_ave(beta0, vol))
         # else:
         #     out[o] = (o * dbeta_xave(o-1)(beta0, vol) + beta0 * dbeta_xave(o)(beta0, vol))
-        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+        tot += out[o] * ((dbeta) ** o) / math.factorial(o)
 
     return tot, out
 
@@ -361,11 +363,11 @@ def x_beta_extrap_depend_minuslog(order, beta0, beta, vol=1.0):
         # if o == 0:
         #     out[o] = -np.log(beta0 * x_ave(beta0, vol))
         # else:
-        #     out[o] += np.math.factorial(o-1)*((-1.0/beta0)**o)
+        #     out[o] += math.factorial(o-1)*((-1.0/beta0)**o)
         #     for k in range(1,o+1):
         #         this_diffs = np.array([dbeta_xave(kk)(beta0, vol) for kk in range(1, o-k+2)])
-        #         out[o] += (np.math.factorial(k-1) * (-1/x_ave(beta0, vol))**k) *  sp.bell(o, k, this_diffs)
-        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+        #         out[o] += (math.factorial(k-1) * (-1/x_ave(beta0, vol))**k) *  sp.bell(o, k, this_diffs)
+        tot += out[o] * ((dbeta) ** o) / math.factorial(o)
 
     return tot, out
 
@@ -392,7 +394,7 @@ def x_vol_extrap(order, vol0, vol, beta=1.0):
     for k in range(order + 1):
         val = dvol_xave(k)(beta, vol0)
         out.append(val)
-        tot += val / np.math.factorial(k) * (dvol**k)
+        tot += val / math.factorial(k) * (dvol**k)
     return tot, np.array(out)
 
 

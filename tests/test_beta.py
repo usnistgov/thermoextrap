@@ -1,9 +1,16 @@
+import math
+
 import numpy as np
 import pytest
 import xarray as xr
 
 import thermoextrap as xtrap
 import thermoextrap.legacy
+
+
+@pytest.fixture(scope="module")
+def rng() -> np.random.Generator:
+    return xtrap.random.default_rng()
 
 
 @pytest.mark.slow()
@@ -120,12 +127,13 @@ def test_extrapmodel_ig() -> None:
         )
 
 
-def test_extrapmodel_resample(fixture) -> None:
+def test_extrapmodel_resample(fixture, rng: np.random.Generator) -> None:
     betas = [0.3, 0.4]
 
     ndat = len(fixture.u)
     nrep = 10
-    idx = np.random.choice(ndat, (nrep, ndat), replace=True)
+
+    idx = rng.choice(ndat, (nrep, ndat), replace=True)
 
     xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
     a = xem0.resample(indices=idx).predict(betas, order=3)
@@ -233,7 +241,7 @@ def test_extrapmodel_weighted(fixture) -> None:
     fixture.xr_test(a, b)
 
 
-def test_extrapmodel_weighted_multi(fixture) -> None:
+def test_extrapmodel_weighted_multi(fixture, rng: np.random.Generator) -> None:
     beta0 = [0.05, 0.2, 1.0]
     betas = [0.3, 0.4, 0.6, 0.7]
 
@@ -241,8 +249,8 @@ def test_extrapmodel_weighted_multi(fixture) -> None:
         xtrap.beta.factory_extrapmodel(
             beta=beta,
             data=xtrap.factory_data_values(
-                xv=np.random.rand(*fixture.x.shape),
-                uv=np.random.rand(*fixture.u.shape),
+                xv=rng.random(fixture.x.shape),
+                uv=rng.random(fixture.u.shape),
                 central=False,
                 order=fixture.order,
             ),
@@ -294,7 +302,7 @@ def test_extrapmodel_weighted_multi(fixture) -> None:
     indices = []
     for xem in xems_c:
         ndat = xem.data.uv.shape[0]
-        indices.append(np.random.choice(ndat, (nrep, ndat), True))
+        indices.append(rng.choice(ndat, (nrep, ndat), True))
 
     a = xemw_c.resample(indices=indices)
     b = xemw_x.resample(indices=indices)
@@ -302,11 +310,11 @@ def test_extrapmodel_weighted_multi(fixture) -> None:
 
 
 @pytest.mark.slow()
-def test_interpmodel_slow(fixture) -> None:
+def test_interpmodel_slow(fixture, rng: np.random.Generator) -> None:
     beta0 = [0.05, 0.5, 1.0]
 
-    observable = np.array([np.random.rand(*fixture.x.shape) for _ in beta0])
-    energy = np.array([np.random.rand(*fixture.u.shape) for _ in beta0])
+    observable = np.array([rng.random(fixture.x.shape) for _ in beta0])
+    energy = np.array([rng.random(fixture.u.shape) for _ in beta0])
     emi = thermoextrap.legacy.InterpModel(
         fixture.order, beta0, xData=observable, uData=energy
     )
@@ -329,7 +337,7 @@ def test_interpmodel_slow(fixture) -> None:
     np.testing.assert_allclose(emi.predict(betas), xemi.predict(betas))
 
 
-def test_interpmodel(fixture) -> None:
+def test_interpmodel(fixture, rng: np.random.Generator) -> None:
     beta0 = [0.05, 0.5, 1.0]
     betas = [0.3, 0.4, 0.6, 0.7]
 
@@ -337,8 +345,8 @@ def test_interpmodel(fixture) -> None:
         xtrap.beta.factory_extrapmodel(
             beta=beta,
             data=xtrap.factory_data_values(
-                xv=np.random.rand(*fixture.x.shape),
-                uv=np.random.rand(*fixture.u.shape),
+                xv=rng.random(fixture.x.shape),
+                uv=rng.random(fixture.u.shape),
                 central=False,
                 order=fixture.order,
             ),
@@ -378,22 +386,22 @@ def test_interpmodel(fixture) -> None:
     indices = []
     for xem in xems_c:
         ndat = xem.data.uv.shape[0]
-        indices.append(np.random.choice(ndat, (nrep, ndat), True))
+        indices.append(rng.choice(ndat, (nrep, ndat), True))
 
     a = xemi_c.resample(indices=indices)
     b = xemi_x.resample(indices=indices)
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
-def test_interpmodelpiecewise(fixture) -> None:
+def test_interpmodelpiecewise(fixture, rng: np.random.Generator) -> None:
     beta0 = [0.05, 0.2, 1.0]
 
     xems_r = [
         xtrap.beta.factory_extrapmodel(
             beta=beta,
             data=xtrap.factory_data_values(
-                xv=np.random.rand(*fixture.x.shape),
-                uv=np.random.rand(*fixture.u.shape),
+                xv=rng.random(fixture.x.shape),
+                uv=rng.random(fixture.u.shape),
                 central=False,
                 order=fixture.order,
             ),
@@ -494,7 +502,7 @@ class LogAvgExtrapModel(thermoextrap.legacy.ExtrapModel):
                 # Loop to apply the chain rule to each element of the observable array
                 for v in range(x.shape[1]):
                     deriv_vals[o, v] += (
-                        np.math.factorial(k - 1)
+                        math.factorial(k - 1)
                         * ((-1 / avg_xufunc(0)[v]) ** k)
                         * bell(o, k, this_diffs[:, v])
                     )
@@ -638,7 +646,7 @@ class ExtrapModelDependent(thermoextrap.legacy.ExtrapModel):
 
 
 @pytest.mark.slow()
-def test_extrapmodel_alphadep_slow(fixture) -> None:
+def test_extrapmodel_alphadep_slow(fixture, rng: np.random.Generator) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
 
@@ -646,7 +654,7 @@ def test_extrapmodel_alphadep_slow(fixture) -> None:
     # x[rec, deriv, val]
     n, nv = fixture.x.shape
     order = fixture.order
-    x = np.random.rand(n, fixture.order + 1, nv) + fixture.xoff
+    x = rng.random((n, fixture.order + 1, nv)) + fixture.xoff
     u = fixture.u
 
     em = ExtrapModelDependent(order, beta0, xData=x, uData=u)
@@ -662,15 +670,14 @@ def test_extrapmodel_alphadep_slow(fixture) -> None:
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
 
 
-def test_extrapmodel_alphadep(fixture) -> None:
+def test_extrapmodel_alphadep(fixture, rng: np.random.Generator) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
-
     # need new data
     # x[rec, deriv, val]
     n, nv = fixture.x.shape
     order = fixture.order
-    x = np.random.rand(n, fixture.order + 1, nv) + fixture.xoff
+    x = rng.random((n, fixture.order + 1, nv)) + fixture.xoff
     u = fixture.u
 
     # by passign a derivative name, we are
@@ -795,7 +802,7 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
                 # Loop to apply the chain rule to each element of the observable array
                 for v in range(x.shape[2]):
                     deriv_vals[o, v] += (
-                        np.math.factorial(k - 1)
+                        math.factorial(k - 1)
                         * ((-1 / avg_xufunc(0, 0)[v]) ** k)
                         * bell(o, k, this_diffs[:, v])
                     )
@@ -804,15 +811,14 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
 
 
 @pytest.mark.slow()
-def test_extrapmodel_alphadep_minuslog_slow(fixture) -> None:
+def test_extrapmodel_alphadep_minuslog_slow(fixture, rng: np.random.Generator) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
-
     # need new data
     # x[rec, deriv, val]
     n, nv = fixture.x.shape
     order = fixture.order
-    x = np.random.rand(n, fixture.order + 1, nv) + fixture.xoff
+    x = rng.random((n, fixture.order + 1, nv)) + fixture.xoff
     u = fixture.u
 
     em = LogAvgExtrapModelDependent(order, beta0, xData=x, uData=u)
@@ -850,15 +856,14 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture) -> None:
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
 
 
-def test_extrapmodel_alphadep_minuslog(fixture) -> None:
+def test_extrapmodel_alphadep_minuslog(fixture, rng: np.random.Generator) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
-
     # need new data
     # x[rec, deriv, val]
     n, nv = fixture.x.shape
     order = fixture.order
-    x = np.random.rand(n, fixture.order + 1, nv) + fixture.xoff
+    x = rng.random((n, fixture.order + 1, nv)) + fixture.xoff
     u = fixture.u
 
     # by passign a derivative name, we are

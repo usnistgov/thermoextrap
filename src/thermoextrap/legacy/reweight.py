@@ -18,13 +18,19 @@ class PerturbModel:
     """Class to hold information about a perturbation."""
 
     # Otherwise, it just needs to define some variables
-    def __init__(self, refB=None, xData=None, uData=None):
+    def __init__(self, refB=None, xData=None, uData=None, rng=None):
         self.refB = refB
         self.x = xData
         self.U = uData
         self.params = None
         if (refB is not None) and (xData is not None) and (uData is not None):
             self.params = self.train(refB, xData, uData, saveParams=True)
+
+        if rng is None:
+            from thermoextrap.random import default_rng
+            rng = default_rng()
+
+        self.rng = rng
 
     def train(self, refB, xData, uData, saveParams=True):
         """This is the function used to set the parameters of the model. For perturbation
@@ -112,7 +118,7 @@ class PerturbModel:
             )
 
         sampSize = self.x.shape[0]
-        randInds = np.random.choice(sampSize, size=sampSize, replace=True)
+        randInds = self.rng.choice(sampSize, size=sampSize, replace=True)
         sampX = self.x[randInds, :]
         sampU = self.U[randInds]
         return (sampX, sampU)

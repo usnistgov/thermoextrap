@@ -4,6 +4,7 @@ General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
 """
 from __future__ import annotations
 
+import math
 from functools import lru_cache
 from typing import Any, Callable, Mapping, Sequence
 
@@ -359,7 +360,7 @@ class Derivatives(MyAttrsMixin):
             out = self._apply_minus_log(X=out, order=order)
 
         if norm:
-            out = [x / np.math.factorial(i) for i, x in enumerate(out)]
+            out = [x / math.factorial(i) for i, x in enumerate(out)]
 
         if order_dim is not None:
             if concat_kws is None:
@@ -409,7 +410,7 @@ class Derivatives(MyAttrsMixin):
 @lru_cache(10)
 def taylor_series_norm(order, order_dim="order"):
     """``taylor_series_coefficients = derivs * taylor_series_norm``."""
-    out = np.array([1 / np.math.factorial(i) for i in range(order + 1)])
+    out = np.array([1 / math.factorial(i) for i in range(order + 1)])
     if order_dim is not None:
         out = xr.DataArray(out, dims=order_dim)
     return out

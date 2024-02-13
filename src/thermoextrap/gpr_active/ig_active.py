@@ -12,9 +12,10 @@ from typing import NoReturn
 import numpy as np
 import xarray as xr
 
-from .. import beta as xpan_beta
-from .. import idealgas
-from ..data import DataCentralMomentsVals
+from thermoextrap import beta as xpan_beta
+from thermoextrap import idealgas
+from thermoextrap.data import DataCentralMomentsVals
+
 from .active_utils import DataWrapper
 
 

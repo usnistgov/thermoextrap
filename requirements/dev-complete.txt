@@ -23,7 +23,6 @@ nbval
 nox
 numpy>=1.20
 pandas
-pip-tools
 pre-commit
 pymbar[jax]>=4.0
 pyright

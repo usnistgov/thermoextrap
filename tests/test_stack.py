@@ -11,13 +11,14 @@ from thermoextrap import stack
 def states():
     shape = (3, 2, 4)
     dims = ["rec", "pair", "position"]
-
     coords = {"position": np.linspace(0, 2, shape[-1])}
+
+    rng = xtrap.random.default_rng()
 
     xems = []
     for beta in [0.1, 10.0]:
-        x = xr.DataArray(np.random.rand(*shape), dims=dims, coords=coords)
-        u = xr.DataArray(np.random.rand(shape[0]), dims=dims[0])
+        x = xr.DataArray(rng.random(shape), dims=dims, coords=coords)
+        u = xr.DataArray(rng.random(shape[0]), dims=dims[0])
         data = xtrap.DataCentralMomentsVals.from_vals(x, u, order=3, central=True)
         xems.append(xtrap.beta.factory_extrapmodel(beta, data))
     s = xtrap.StateCollection(xems)

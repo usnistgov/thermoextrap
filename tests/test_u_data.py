@@ -52,8 +52,10 @@ class DataNamedTuple(NamedTuple):
 
 @pytest.fixture()
 def data(nsamp) -> DataNamedTuple:
-    x = np.random.rand(nsamp)
-    u = np.random.rand(nsamp)
+    rng = xtrap.random.default_rng()
+
+    x = rng.random(nsamp)
+    u = rng.random(nsamp)
 
     return DataNamedTuple(x=x, u=u, n=nsamp)
 

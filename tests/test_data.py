@@ -85,7 +85,9 @@ def test_resample(fixture) -> None:
     nrep = 10
     ndat = fixture.x.shape[0]
 
-    idx = np.random.choice(ndat, (nrep, ndat), replace=True)
+    rng = xtrap.random.default_rng()
+
+    idx = rng.choice(ndat, (nrep, ndat), replace=True)
 
     b = fixture.xdata_val.resample(indices=idx)
 

@@ -2,13 +2,16 @@ import numpy as np
 
 from thermoextrap import idealgas
 from thermoextrap.legacy.ig import IGmodel
+from thermoextrap.random import default_rng
 
 
 def test_idealgas() -> None:
     model = IGmodel(1000)
 
     b = np.linspace(0.1, 10, 5)
-    x = np.random.rand()
+    rng = default_rng()
+
+    x = rng.random()
     np.testing.assert_allclose(idealgas.x_ave(b), model.avgX(b))
     np.testing.assert_allclose(idealgas.x_var(b), model.varX(b))
     np.testing.assert_allclose(idealgas.x_prob(x, b), model.PofX(x, b))
@@ -18,10 +21,10 @@ def test_idealgas() -> None:
 
     np.testing.assert_allclose(idealgas.x_cdf(x, b), model.cdfX(x, b))
 
-    np.random.seed(0)
+    rng = default_rng(seed=0)
     _a = idealgas.x_sample(5, b[:, None])
 
-    np.random.seed(0)
+    rng = default_rng(seed=0)
     _b = model.sampleX(b[:, None], 5)
     np.testing.assert_allclose(_a, _b)
 
@@ -30,11 +33,11 @@ def test_idealgas() -> None:
     np.testing.assert_allclose(tota, totb)
     np.testing.assert_allclose(coefa, coefb)
 
-    beta = np.random.rand()
-    np.random.seed(0)
+    beta = rng.random()
+    rng = default_rng(seed=0)
     _xa, _ua = model.genData(beta, 100)
 
-    np.random.seed(0)
+    rng = default_rng(seed=0)
     _xb, _ub = idealgas.generate_data((100, 1000), beta, 1.0)
 
     np.testing.assert_allclose(_xa, _xb)

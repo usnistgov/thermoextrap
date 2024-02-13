@@ -26,7 +26,6 @@ dependencies:
   - nox
   - numpy>=1.20
   - pandas
-  - pip-tools
   - pre-commit
   - pymbar>=4.0
   - pyright

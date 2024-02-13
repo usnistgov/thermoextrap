@@ -2,7 +2,7 @@
 Mainly this is the code to automatically compute derivatives with sympy.
 Also includes other useful functions.
 """
-
+import math
 
 import numpy as np
 import sympy as sym
@@ -255,7 +255,7 @@ def extrapToPoly(B0, derivs):
     coeffs = np.zeros(len(derivs))
     for k, d in enumerate(derivs):
         for l in range(k + 1):
-            coeffs[l] += ((-B0) ** (k - l)) * d * binom(k, l) / np.math.factorial(k)
+            coeffs[l] += ((-B0) ** (k - l)) * d * binom(k, l) / math.factorial(k)
     return coeffs
 
 
