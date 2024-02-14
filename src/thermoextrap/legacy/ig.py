@@ -5,6 +5,7 @@ import math
 import numpy as np
 import sympy as sym
 from scipy.stats import norm
+from thermoextrap.random import validate_rng
 
 
 class IGmodel:
@@ -52,25 +53,23 @@ class IGmodel:
     def __init__(self, nParticles=1000):
         self.nP = nParticles  # Number of particles
 
-    def sampleX(self, B, s, L=1.0):
+    def sampleX(self, B, s, L=1.0, rng=None):
         """Samples s samples of x from the probability density at inverse temperature B
         Does sampling based on inversion of cumulative distribution function
         """
-        from thermoextrap.random import default_rng
-
         # to make sure using same rng as new code...
-        randvec = default_rng().random(s)
+        randvec = validate_rng(rng).random(s)
         randx = -(1.0 / B) * np.log(1.0 - randvec * (1.0 - np.exp(-B * L)))
         return randx
 
-    def sampleU(self, B, s=1000, L=1.0):
+    def sampleU(self, B, s=1000, L=1.0, rng=None):
         """Samples s (=1000 by default) potential energy values from a system self.nP particles.
         Particle positions are randomly sampled with sampleX at the inverse temperature B.
         """
         # Really just resampling the sum of x values many times to get distribution of U for large N
         randu = np.zeros(s)
         for i in range(s):
-            randu[i] = np.sum(self.sampleX(B, self.nP, L=L))
+            randu[i] = np.sum(self.sampleX(B, self.nP, L=L, rng=rng))
         return randu
 
     def PofU(self, U, B, L=1.0):
@@ -127,11 +126,11 @@ class IGmodel:
         return (outval, outvec)
 
     # Want to be able to create sample data set we can work with at a reference beta
-    def genData(self, B, nConfigs=100000, L=1.0):
+    def genData(self, B, nConfigs=100000, L=1.0, rng=None):
         """Generates nConfigs data points of the model at inverse temperature beta.
         Returns are the average x values and the potential energy values of each data point.
         """
-        allX = self.sampleX(B, nConfigs * self.nP, L=L)
+        allX = self.sampleX(B, nConfigs * self.nP, L=L, rng=rng)
         allConfigs = np.reshape(allX, (nConfigs, self.nP))
         obsX = np.average(allConfigs, axis=1)
         obsU = np.sum(allConfigs, axis=1)

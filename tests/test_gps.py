@@ -657,6 +657,7 @@ def test_gp() -> None:  # noqa: PLR0915
     np.testing.assert_allclose(pred_val_base[1].numpy(), ref_pred_vars, rtol=1e-03)
 
     # Test handling of multiple outputs (extra y dimensions)
+    rng = np.random.default_rng(42)
     _x_shift, y_shift, y_var_shift = sine_active.make_data(
         np.linspace(-np.pi, np.pi, 5),
         phase_shift=np.pi / 3.0,

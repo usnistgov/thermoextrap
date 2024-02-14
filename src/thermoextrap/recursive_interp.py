@@ -14,6 +14,8 @@ import logging
 
 import numpy as np
 
+from thermoextrap.random import validate_rng
+
 from . import idealgas
 from .core._deprecate import deprecate, deprecate_kwarg
 from .data import factory_data_values
@@ -55,7 +57,13 @@ class RecursiveInterp:
     @deprecate_kwarg("maxOrder", "max_order")
     @deprecate_kwarg("errTol", "tol")
     def __init__(
-        self, model_cls, derivatives, edge_beta, max_order=1, tol=0.01
+        self,
+        model_cls,
+        derivatives,
+        edge_beta,
+        max_order=1,
+        tol=0.01,
+        rng=None,
     ) -> None:
         self.model_cls = (
             model_cls  # The model CLASS used for interpolation, like InterpModel
@@ -70,6 +78,8 @@ class RecursiveInterp:
         self.tol = tol  # Default bootstrap absolute relative error tolerance of 1%
         # i.e. sigma_bootstrap/|interpolated value| <= 0.01
 
+        self.rng = validate_rng(rng)
+
     @deprecate_kwarg("B", "beta")
     def get_data(self, beta):
         """
@@ -83,7 +93,9 @@ class RecursiveInterp:
         This function just uses the toy ideal gas model that comes with lib_extrap.
         """
         npart, nconfig = 1000, 10000
-        xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
+        xdata, udata = idealgas.generate_data(
+            shape=(nconfig, npart), beta=beta, rng=self.rng
+        )
 
         # datModel = IGmodel(nParticles=1000)
         # xdata, udata = datModel.genData(B, nConfigs=10000)

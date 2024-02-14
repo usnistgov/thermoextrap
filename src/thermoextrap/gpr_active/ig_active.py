@@ -7,6 +7,8 @@ Generates ideal gas (1D in external potential) data to test GP models and active
 learning strategies.
 """
 
+from __future__ import annotations
+
 from typing import NoReturn
 
 import numpy as np
@@ -15,6 +17,7 @@ import xarray as xr
 from thermoextrap import beta as xpan_beta
 from thermoextrap import idealgas
 from thermoextrap.data import DataCentralMomentsVals
+from thermoextrap.random import validate_rng
 
 from .active_utils import DataWrapper
 
@@ -22,11 +25,8 @@ from .active_utils import DataWrapper
 # Work with fixed ideal gas test set in thermoextrap
 # Define function to create ExtrapModel of ideal gas data
 # This will be handy later on
-def extrap_IG(beta, seed=42):
-    # Use fixed random number
-    rng = np.random.default_rng(seed)
-    r = rng.random((10000, 1000))
-    y_dat, u_dat = idealgas.generate_data((10000, 1000), beta, r=r)
+def extrap_IG(beta, rng: np.random.Generator | None = None):
+    y_dat, u_dat = idealgas.generate_data((10000, 1000), beta, rng=validate_rng(rng))
     y_dat = xr.DataArray(y_dat[:, None], dims=["rec", "val"])
     u_dat = xr.DataArray(u_dat, dims=["rec"])
     data = DataCentralMomentsVals.from_vals(
@@ -35,11 +35,9 @@ def extrap_IG(beta, seed=42):
     return xpan_beta.factory_extrapmodel(beta, data)
 
 
-def multiOutput_extrap_IG(beta, seed=42):
+def multiOutput_extrap_IG(beta, rng: np.random.Generator | None = None):
     # Use fixed random number
-    rng = np.random.default_rng(seed)
-    r = rng.random((10000, 1000))
-    positions = idealgas.x_sample((10000, 1000), beta, r=r)
+    positions = idealgas.x_sample((10000, 1000), beta, rng=validate_rng(rng))
     y = positions.mean(axis=-1)
     ysq = (positions**2).mean(axis=-1)
     u_dat = positions.sum(axis=-1)
@@ -56,10 +54,10 @@ def multiOutput_extrap_IG(beta, seed=42):
 class IG_DataWrapper(DataWrapper):  # noqa: N801
     """Data object for gpr with ideal gas."""
 
-    def __init__(self, beta, seed=42) -> None:
+    def __init__(self, beta, rng: np.random.Generator | None = None) -> None:
         self.beta = beta
         self.seed = 42
-        self.rng = np.random.default_rng(self.seed)
+        self.rng = validate_rng(rng)
 
     def load_U_info(self) -> NoReturn:
         raise NotImplementedError
@@ -72,8 +70,7 @@ class IG_DataWrapper(DataWrapper):  # noqa: N801
 
     def get_data(self, n_conf=10000, n_part=1000):
         # Call thermoextrap.idealgas methods
-        r = self.rng.random((n_conf, n_part))
-        x, U = idealgas.generate_data((n_conf, n_part), self.beta, r=r)
+        x, U = idealgas.generate_data((n_conf, n_part), self.beta, rng=self.rng)
         x = xr.DataArray(x[:, None], dims=["rec", "val"])
         U = xr.DataArray(U, dims=["rec"])
         return U, x, np.ones_like(U.values)

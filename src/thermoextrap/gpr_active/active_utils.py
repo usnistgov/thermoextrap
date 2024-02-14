@@ -21,9 +21,11 @@ import xarray as xr
 from pymbar import timeseries
 from scipy import integrate, linalg, special
 
-from .. import beta as xpan_beta
-from ..data import DataCentralMomentsVals
-from ..models import ExtrapModel
+from thermoextrap import beta as xpan_beta
+from thermoextrap.data import DataCentralMomentsVals
+from thermoextrap.models import ExtrapModel
+from thermoextrap.random import validate_rng
+
 from .gp_models import (
     ConstantMeanWithDerivs,
     DerivativeKernel,
@@ -995,14 +997,12 @@ class UpdateStopABC:
         avoid_repeats : bool, default=False
             Whether or not to randomize grid of new locations.
         """
-        from thermoextrap.random import default_rng
-
         self.d_order_pred = d_order_pred
         self.transform_func = transform_func
         self.log_scale = log_scale
         self.avoid_repeats = avoid_repeats
 
-        self.rng = rng or default_rng()
+        self.rng = validate_rng(rng)
 
     def create_alpha_grid(self, alpha_list):
         """

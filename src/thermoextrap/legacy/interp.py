@@ -5,6 +5,7 @@ import numpy as np
 from scipy.special import factorial
 
 from .extrap import ExtrapModel
+from thermoextrap.random import validate_rng
 
 
 class ExtrapWeightedModel(ExtrapModel):
@@ -123,12 +124,11 @@ class ExtrapWeightedModel(ExtrapModel):
 
         return outVals
 
-    def resampleData(self):
+    def resampleData(self, rng: np.random.Generator | None = None):
         """Function to resample the data, mainly for use in providing bootstrapped estimates.
         Should be adjusted to match the data structure.
         """
-        from thermoextrap.random import default_rng
-        rng = default_rng()
+        rng = validate_rng(rng)
 
         if self.x is None:
             raise TypeError(
@@ -274,11 +274,11 @@ class InterpModel(ExtrapModel):
 
         return outvals
 
-    def resampleData(self):
+    def resampleData(self, rng: np.random.Generator | None = None):
         """Function to resample the data, mainly for use in providing bootstrapped estimates.
         Should be adjusted to match the data structure.
         """
-        from thermoextrap.random import default_rng
+        rng = validate_rng(rng)
 
         if self.x is None:
             raise TypeError(
@@ -287,8 +287,6 @@ class InterpModel(ExtrapModel):
 
         sampX = np.zeros(self.x.shape)
         sampU = np.zeros(self.U.shape)
-
-        rng = default_rng()
 
         for i in range(self.x.shape[0]):
             sampSize = self.x[i].shape[0]

@@ -16,6 +16,8 @@ except ImportError:
 from .ig import IGmodel
 from .interp import InterpModel
 
+from thermoextrap.random import validate_rng
+
 
 class RecursiveInterp:
     """Class to perform a recursive interpolation (maybe using weighted extrapolation)
@@ -24,7 +26,7 @@ class RecursiveInterp:
     Prediction uses the learned piecewise function.
     """
 
-    def __init__(self, model, edgeB, maxOrder=1, errTol=0.01):
+    def __init__(self, model, edgeB, maxOrder=1, errTol=0.01, rng=None):
         self.model = (
             model  # The model object used for interpolation, like ExtrapWeightedModel
         )
@@ -42,6 +44,8 @@ class RecursiveInterp:
         self.tol = errTol  # Default bootstrap absolute relative error tolerance of 1%
         # i.e. sigma_bootstrap/|interpolated value| <= 0.01
 
+        self.rng = validate_rng(rng)
+
     def getData(self, B):
         """Obtains data at the specified state point.
         Can modify to run MD or MC simulation, load trajectory or data files, etc.
@@ -53,7 +57,7 @@ class RecursiveInterp:
         This function just uses the toy ideal gas model that comes with lib_extrap.
         """
         datModel = IGmodel(nParticles=1000)
-        xdata, udata = datModel.genData(B, nConfigs=10000)
+        xdata, udata = datModel.genData(B, nConfigs=10000, rng=self.rng)
         return xdata, udata
 
     def recursiveTrain(

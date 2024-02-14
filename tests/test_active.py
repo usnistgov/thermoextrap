@@ -50,7 +50,7 @@ def test_rbf_expr() -> None:
 # (representing thermodynamic states)
 def test_make_gp_input() -> None:
     beta = 5.6
-    state = ig_active.extrap_IG(beta)
+    state = ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
 
     # Test without logarithm on x
     check_x, check_y, check_cov = active_utils.input_GP_from_state(state)
@@ -104,7 +104,7 @@ def test_make_gp_input() -> None:
             "numpy",
         )
 
-    state_mult = ig_active.multiOutput_extrap_IG(beta)
+    state_mult = ig_active.multiOutput_extrap_IG(beta, rng=np.random.default_rng(42))
     check_x_mult, check_y_mult, check_cov_mult = active_utils.input_GP_from_state(
         state_mult
     )
@@ -129,7 +129,7 @@ def test_base_gp_creation() -> None:
     raw_y_data = []
     raw_cov_data = []
     for beta in [1.0, 5.6, 9.0]:
-        s = ig_active.extrap_IG(beta)
+        s = ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
         this_x, this_y, this_cov = active_utils.input_GP_from_state(s)
         raw_x_data.append(this_x)
         raw_y_data.append(this_y)
@@ -255,7 +255,7 @@ def test_train_gp() -> None:
     raw_y_data = []
     raw_cov_data = []
     for beta in [1.0, 5.6, 9.0]:
-        s = ig_active.extrap_IG(beta)
+        s = ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
         this_x, this_y, this_cov = active_utils.input_GP_from_state(s)
         raw_x_data.append(this_x)
         raw_y_data.append(this_y)
@@ -291,7 +291,10 @@ def test_train_gp() -> None:
 @pytest.mark.slow()
 def test_create_gp_from_states() -> None:
     # Need data to work with
-    states = [ig_active.extrap_IG(beta) for beta in [1.0, 5.6, 9.0]]
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
+        for beta in [1.0, 5.6, 9.0]
+    ]
 
     n_gp_points = np.sum([s.order + 1 for s in states])
 
@@ -301,7 +304,10 @@ def test_create_gp_from_states() -> None:
     assert gp.likelihood.cov.shape == (gp.data[1].shape[1], n_gp_points, n_gp_points)
 
     # Also test with multidimensional data
-    states_mult = [ig_active.multiOutput_extrap_IG(beta) for beta in [1.0, 5.6, 9.0]]
+    states_mult = [
+        ig_active.multiOutput_extrap_IG(beta, rng=np.random.default_rng(42))
+        for beta in [1.0, 5.6, 9.0]
+    ]
     gp_mult = active_utils.create_GPR(states_mult)
     assert gp_mult.data[0].shape == (n_gp_points, 2)
     assert gp_mult.data[1].shape == (n_gp_points, 2)
@@ -317,7 +323,9 @@ def test_create_gp_from_states() -> None:
 def test_update_stop_abc() -> None:
     # Need data to work with
     beta_list = [1.0, 5.6, 9.0]
-    states = [ig_active.extrap_IG(beta) for beta in beta_list]
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp = active_utils.create_GPR(states)
 
@@ -386,7 +394,9 @@ def test_update_stop_abc() -> None:
 def test_update_classes() -> None:
     # Need data to work with
     beta_list = [1.0, 5.6, 9.0]
-    states = [ig_active.extrap_IG(beta) for beta in beta_list]
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp = active_utils.create_GPR(states)
 
@@ -426,7 +436,10 @@ def test_update_classes() -> None:
 def test_update_classes_multioutput() -> None:
     # Need data to work with
     beta_list = [1.0, 5.6, 9.0]
-    states = [ig_active.multiOutput_extrap_IG(beta) for beta in beta_list]
+    states = [
+        ig_active.multiOutput_extrap_IG(beta, rng=np.random.default_rng(42))
+        for beta in beta_list
+    ]
     # And trained GP
     gp = active_utils.create_GPR(states)
 
@@ -511,7 +524,9 @@ def test_metrics() -> None:
 
     # For special ErrorStability class, actually need a GP model
     beta_list = [1.0, 2.3, 5.6, 9.0]
-    states = [ig_active.extrap_IG(beta) for beta in beta_list]
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp_2 = active_utils.create_GPR([states[0], states[-1]])
     gp_3 = active_utils.create_GPR([states[0], states[2], states[-1]])
@@ -544,7 +559,9 @@ def test_metrics() -> None:
 def test_stop_criteria() -> None:
     # Need data to work with
     beta_list = [1.0, 5.6, 9.0]
-    states = [ig_active.extrap_IG(beta) for beta in beta_list]
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp_prev = active_utils.create_GPR([states[0], states[-1]])
     gp = active_utils.create_GPR(states)

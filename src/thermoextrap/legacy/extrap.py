@@ -117,11 +117,13 @@ class ExtrapModel:
 
         return predictVals
 
-    def resampleData(self):
+    def resampleData(self, rng=None):
         """Function to resample the data, mainly for use in providing bootstrapped estimates.
         Should be adjusted to match the data structure.
         """
-        from thermoextrap.random import default_rng
+        from thermoextrap.random import validate_rng
+
+        rng = validate_rng(rng)
 
         if self.x is None:
             raise TypeError(
@@ -129,7 +131,7 @@ class ExtrapModel:
             )
 
         sampSize = self.x.shape[0]
-        randInds = default_rng().choice(sampSize, size=sampSize, replace=True)
+        randInds = rng.choice(sampSize, size=sampSize, replace=True)
         sampX = self.x[randInds]
         sampU = self.U[randInds]
         return (sampX, sampU)

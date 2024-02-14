@@ -13,6 +13,8 @@ except ImportError:
 
 from .interp import InterpModel
 
+from thermoextrap.random import validate_rng
+
 
 class PerturbModel:
     """Class to hold information about a perturbation."""
@@ -26,11 +28,7 @@ class PerturbModel:
         if (refB is not None) and (xData is not None) and (uData is not None):
             self.params = self.train(refB, xData, uData, saveParams=True)
 
-        if rng is None:
-            from thermoextrap.random import default_rng
-            rng = default_rng()
-
-        self.rng = rng
+        self.rng = validate_rng(rng)
 
     def train(self, refB, xData, uData, saveParams=True):
         """This is the function used to set the parameters of the model. For perturbation

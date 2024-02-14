@@ -27,8 +27,6 @@ from attrs import validators as attv
 from custom_inherit import DocInheritMeta
 from module_utilities import cached
 
-from thermoextrap.random import default_rng
-
 from .core._attrs_utils import (
     MyAttrsMixin,
     _cache_field,
@@ -81,10 +79,10 @@ def resample_indices(
         if transpose, shape=(size, nrep)
         else, shape=(nrep, size)
     """
-    rng = rng or default_rng()
+    from thermoextrap.random import validate_rng
 
     return xr.DataArray(
-        data=rng.choice(size, size=(nrep, size), replace=replace),
+        data=validate_rng(rng).choice(size, size=(nrep, size), replace=replace),
         dims=[rep_dim, rec_dim],
     )
 

@@ -8,11 +8,14 @@ As a result, the potential energy of a system of :math:`N` particles with positi
 This is a useful test system with analytical solutions coded alongside the ability to randomly generate data.
 """
 
+from __future__ import annotations
 
 import math
 from functools import lru_cache
 
 import numpy as np
+
+from thermoextrap.random import validate_rng
 
 from .core._imports import sympy as sp
 from .docstrings import DocFiller
@@ -55,6 +58,8 @@ npart : int
 r : float or ndarray, optional
     Random number(s). If passed, use these random numbers to build distribution.
     Useful for reproducibility.
+rng : :class:`numpy.random.Generator`, optional
+    Random number generator to use.  Defaults to :func:`thermoextrap.random.default_rng`
 k : int
     Derivative order.
 order : int
@@ -157,9 +162,8 @@ def x_cdf(x, beta, vol=1.0):
     return (1.0 - np.exp(-beta * x)) / (1.0 - np.exp(-beta * vol))
 
 
-# TODO(wpk): convert this to using rng instead of random array...
 @docfiller_shared
-def x_sample(shape, beta, vol=1.0, r=None):
+def x_sample(shape, beta, vol=1.0, rng: np.random.Generator | None = None):
     """
     Sample positions from distribution at `beta` and `vol`.
 
@@ -170,7 +174,7 @@ def x_sample(shape, beta, vol=1.0, r=None):
     {shape}
     {beta}
     {vol}
-    {r}
+    {rng}
 
     Returns
     -------
@@ -181,15 +185,12 @@ def x_sample(shape, beta, vol=1.0, r=None):
     -----
     If pass ``r``, then use these to build ``output``.  Otherwise, build random array of shape ``shape``.
     """
-    if r is None:
-        from thermoextrap.random import default_rng
-
-        r = default_rng().random(shape)
+    r = validate_rng(rng).random(shape)
     return (-1.0 / beta) * np.log(1.0 - r * (1.0 - np.exp(-beta * vol)))
 
 
 @docfiller_shared
-def u_sample(shape, beta, vol=1.0, r=None):
+def u_sample(shape, beta, vol=1.0, rng: np.random.Generator | None = None):
     """
     Samples potential energy values from a system.
 
@@ -202,9 +203,9 @@ def u_sample(shape, beta, vol=1.0, r=None):
     {shape}
     {beta}
     {vol}
-    {r}
+    {rng}
     """
-    return x_sample(shape=shape, beta=beta, vol=vol, r=r).sum(axis=-1)
+    return x_sample(shape=shape, beta=beta, vol=vol, rng=rng).sum(axis=-1)
 
 
 @lru_cache(maxsize=100)
@@ -394,12 +395,12 @@ def x_vol_extrap(order, vol0, vol, beta=1.0):
     for k in range(order + 1):
         val = dvol_xave(k)(beta, vol0)
         out.append(val)
-        tot += val / math.factorial(k) * (dvol**k)
+        tot += val * (dvol**k) / math.factorial(k)
     return tot, np.array(out)
 
 
 @docfiller_shared
-def generate_data(shape, beta, vol=1.0, r=None):
+def generate_data(shape, beta, vol=1.0, rng: np.random.Generator | None = None):
     """
     Generates data points in specified shape, where the first index is the number of samples and the second is the number of independent IG particles
     Sample will be at beta with L=vol
@@ -412,9 +413,9 @@ def generate_data(shape, beta, vol=1.0, r=None):
     {shape}
     {beta}
     {vol}
-    {r}
+    {rng}
     """
-    positions = x_sample(shape, beta, vol, r=r)
+    positions = x_sample(shape=shape, beta=beta, vol=vol, rng=rng)
     x = positions.mean(axis=-1)
     u = positions.sum(axis=-1)
     return (x, u)

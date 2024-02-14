@@ -497,7 +497,6 @@ def factory_state_idealgas(
     order,
     nrep=100,
     rep_dim="rep",
-    seed_from_beta=True,
     nconfig=10_000,
     npart=1_000,
     rng: np.random.Generator | None = None,
@@ -526,21 +525,15 @@ def factory_state_idealgas(
     thermoextrap.idealgas
     thermoextrap.beta.factory_extrapmodel
     """
-    from thermoextrap.random import default_rng
+    from thermoextrap.random import validate_rng
 
     from . import beta as xpan_beta
     from . import idealgas
     from .data import DataCentralMomentsVals
 
-    # NOTE: this is for reproducible results.
-    if rng is None:
-        if seed_from_beta:
-            rng = np.random.default_rng(seed=int(beta * 1000))
-        else:
-            rng = default_rng()
-
-    # TODO(wpk): convert this call to use rng
-    xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta)
+    xdata, udata = idealgas.generate_data(
+        shape=(nconfig, npart), beta=beta, rng=validate_rng(rng)
+    )
     data = DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
 
     # use indices for reproducibility
