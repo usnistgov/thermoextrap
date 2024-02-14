@@ -70,8 +70,7 @@ def resample_indices(
     {rep_dim}
     replace : bool, default=True
         If True, sample with replacement.
-    transpose : bool, default=False
-        Output format.
+    {rng}
 
     Returns
     -------
@@ -85,9 +84,6 @@ def resample_indices(
         data=validate_rng(rng).choice(size, size=(nrep, size), replace=replace),
         dims=[rep_dim, rec_dim],
     )
-
-    # if transpose:
-    #     indices = indices.transpose(rec_dim, rep_dim)
 
 
 @attrs.frozen
@@ -485,6 +481,8 @@ class DataValuesBase(AbstractData):
         {rep_dim}
         {chunk}
         {compute}
+        {meta_kws}
+        {rng}
         """
         if chunk is None:
             chunk = self.chunk

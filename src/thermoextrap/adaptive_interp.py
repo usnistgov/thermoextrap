@@ -531,9 +531,9 @@ def factory_state_idealgas(
     from . import idealgas
     from .data import DataCentralMomentsVals
 
-    xdata, udata = idealgas.generate_data(
-        shape=(nconfig, npart), beta=beta, rng=validate_rng(rng)
-    )
+    rng = validate_rng(rng)
+
+    xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta, rng=rng)
     data = DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
 
     # use indices for reproducibility

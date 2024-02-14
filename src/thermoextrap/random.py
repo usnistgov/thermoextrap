@@ -2,60 +2,94 @@
 
 from __future__ import annotations
 
-from functools import lru_cache
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-_DATA: dict[str, np.random.Generator | np.random.RandomState] = {}
+if TYPE_CHECKING:
+    from typing import Optional, Sequence
+
+    SEED_TYPES = Optional[
+        int,
+        Sequence[int],
+        np.random.SeedSequence,
+        np.random.BitGenerator,
+        np.random.Generator,
+    ]
 
 
-@lru_cache
-def _use_random_state() -> bool:
-    import os
-
-    return os.getenv("THERMOEXTRAP_TEST", "false").lower() in {"1", "t", "true"}
+_DATA: dict[str, np.random.Generator] = {}
 
 
-def default_rng(
-    seed: int | np.random.Generator | np.random.RandomState | None = None,
-) -> np.random.Generator | np.random.RandomState:
+def set_internal_rng(rng: np.random.Generator) -> None:
+    """
+    Set the internal random number :class:`~numpy.random.Generator`.
+
+    The function :func:`default_rng` will call `rng` if called with a new seed
+    (or when called the first time). However, if want to override the internal
+    rng, you can use this function.
+
+    Parameters
+    ----------
+    force: bool, default=False
+        If false, only set internal rng if not already set
+    If true, set internal rng
+
+    """
+    _DATA["rng"] = rng
+
+
+def get_internal_rng() -> np.random.Generator:
+    """Get the internal random number :class:`~numpy.random.Generator`."""
+    if "rng" not in _DATA:
+        msg = "must set rng."
+        raise ValueError(msg)
+    return _DATA["rng"]
+
+
+def _missing_internal_rng() -> bool:
+    return "rng" not in _DATA
+
+
+def default_rng(seed: SEED_TYPES = None) -> np.random.Generator:
     """
     Get default random number generator.
 
     Parameters
     ----------
-    seed: int, optional
-        If specified, set the internal seed to this value.
+    seed: int, sequence of int, :class:`~numpy.random.SeedSequence`, :class:`~numpy.random.BitGenerator`, Generator, optional
+        If specified, set the internal seed to this value. If pass in a
+        :class:`numpy.random.Generator`, return that object.
 
     Returns
     -------
-    :class:`numpy.random.Generator`
-        If called with `seed=None` (default), return the previously created rng (if already created).
-        This means you can call `default_rng(seed=...)` and subsequent calls of form `default_rng()`
-        or `default_rng(None)` will continue rng sequence from first call with `seed=...`.  If
-        New call with `seed` set will create a new rng sequence.
+    Generator
+        If called with `seed=None` (default), return the previously created rng
+        (if already created). This means you can call `default_rng(seed=...)`
+        and subsequent calls of form `default_rng()` or `default_rng(None)`
+        will continue rng sequence from first call with `seed=...`. If New call
+        with `seed` set will create a new rng sequence. Note that if you pass a
+        :class:`~numpy.random.Generator` for seed, that object will be
+        returned, but in this case, the internal generator will not be altered.
+
+
     """
-    if isinstance(seed, (np.random.Generator, np.random.RandomState)):
+    if isinstance(seed, np.random.Generator):
         return seed
 
     if seed is None:
-        if "rng" not in _DATA:
-            if _use_random_state():
-                _DATA["rng"] = np.random.RandomState()
-            else:
-                _DATA["rng"] = np.random.default_rng()
+        if _missing_internal_rng():
+            set_internal_rng(np.random.default_rng())
 
-    elif _use_random_state():
-        _DATA["rng"] = np.random.RandomState(seed=seed)
     else:
-        _DATA["rng"] = np.random.default_rng(seed=seed)
+        set_internal_rng(np.random.default_rng(seed=seed))
 
-    return _DATA["rng"]
+    return get_internal_rng()
 
 
 def validate_rng(
-    rng: np.random.Generator | np.random.RandomState | None, seed: int | None = None
-) -> np.random.Generator | np.random.RandomState:
+    rng: np.random.Generator | None, seed: int | None = None
+) -> np.random.Generator:
     """
     Validate rng.
 

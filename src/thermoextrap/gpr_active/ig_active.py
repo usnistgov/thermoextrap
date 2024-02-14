@@ -56,7 +56,6 @@ class IG_DataWrapper(DataWrapper):  # noqa: N801
 
     def __init__(self, beta, rng: np.random.Generator | None = None) -> None:
         self.beta = beta
-        self.seed = 42
         self.rng = validate_rng(rng)
 
     def load_U_info(self) -> NoReturn:

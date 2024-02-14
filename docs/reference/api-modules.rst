@@ -9,6 +9,7 @@
     :toctree: generated/
     :template: autodocsumm/module.rst
 
+    thermoextrap.random
     thermoextrap.idealgas
     thermoextrap.beta
     thermoextrap.volume

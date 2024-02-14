@@ -51,6 +51,7 @@ class RecursiveInterp:
         Maximum order.
     tol : float, default=0.01
         Error tolerance.
+    rng : :class:`numpy.random.Generator`, optional
     """
 
     @deprecate_kwarg("edgeB", "edge_beta")

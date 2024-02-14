@@ -220,6 +220,9 @@ napoleon_type_aliases = {
     "Symbol": "~sympy.core.symbol.Symbol",
     "symFunction": "~sympy.core.function.Function",
     "ExtrapModel": "~thermoextrap.models.ExtrapModel",
+    "Generator": "~numpy.random.Generator",
+    # "SeedSequence": "~numpy.random.SeedSequence",
+    # "BitGenerator": "~numpy.random.BitGenerator",
     # "DataCentralMoments": "~cmomy.DataCentralMoments"
 }
 

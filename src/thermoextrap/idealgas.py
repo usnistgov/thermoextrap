@@ -58,8 +58,6 @@ npart : int
 r : float or ndarray, optional
     Random number(s). If passed, use these random numbers to build distribution.
     Useful for reproducibility.
-rng : :class:`numpy.random.Generator`, optional
-    Random number generator to use.  Defaults to :func:`thermoextrap.random.default_rng`
 k : int
     Derivative order.
 order : int
@@ -70,6 +68,9 @@ vol0 : float
     Reference volume.
 shape : int or tuple of int
     Shape of output.  Ignored if ``r`` is not ``None``.
+rng : Generator, optional
+    Random number generator object.
+    Defaults to result of :func:`thermoextrap.random.default_rng`.
 """
 
 

@@ -64,7 +64,9 @@ post_func : str or callable
 
     * minus_log : post_func = -sympy.log
     * pow_i : post_func = lambda f: pow(f, i).  E.g., `pow_2` => pow(f, 2)
-
+rng : Generator, optional
+    Random number generator object.
+    Defaults to result of :func:`thermoextrap.random.default_rng`.
 """
 
 DOCFILLER_XTRAP = DocFiller.from_docstring(

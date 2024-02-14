@@ -18,6 +18,7 @@ Modules
 .. autosummary::
 
     thermoextrap
+    thermoextrap.random
     thermoextrap.data
     thermoextrap.models
     thermoextrap.idealgas
