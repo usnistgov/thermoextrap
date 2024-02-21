@@ -38,7 +38,7 @@ dynamic = [
 ]
 dependencies = [
     "attrs",
-    "cmomy >= 0.5",
+    "cmomy >= 0.8",
     "custom-inherit",
     "lazy_loader",
     "module-utilities >= 0.2",

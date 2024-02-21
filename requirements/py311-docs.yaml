@@ -13,7 +13,7 @@ dependencies:
   - python=3.11
   - attrs
   - autodocsumm
-  - cmomy>=0.5
+  - cmomy>=0.8
   - custom-inherit
   - ghp-import
   - ipython

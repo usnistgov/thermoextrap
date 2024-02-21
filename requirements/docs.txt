@@ -9,7 +9,7 @@
 #
 attrs
 autodocsumm
-cmomy>=0.5
+cmomy>=0.8
 custom-inherit
 ghp-import
 gpflow>=2.6.0

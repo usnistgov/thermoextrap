@@ -4,14 +4,14 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements/lock/py311-dev-complete.txt --strip-extras requirements/dev-complete.txt
 #
-absl-py==2.0.0
+absl-py==2.1.0
     # via
     #   tensorboard
     #   tensorflow
     #   tensorflow-probability
-appnope==0.1.3
+appnope==0.1.4
     # via ipykernel
-argcomplete==3.2.1
+argcomplete==3.2.2
     # via nox
 asttokens==2.4.1
     # via stack-data
@@ -29,7 +29,7 @@ bottleneck==1.3.7
     # via -r requirements/dev-complete.txt
 cachetools==5.3.2
     # via google-auth
-certifi==2023.11.17
+certifi==2024.2.2
     # via requests
 cfgv==3.4.0
     # via pre-commit
@@ -45,15 +45,15 @@ click-log==0.4.0
     # via scriv
 cloudpickle==3.0.0
     # via tensorflow-probability
-cmomy==0.7.0
+cmomy==0.8.0
     # via -r requirements/dev-complete.txt
-colorlog==6.8.0
+colorlog==6.8.2
     # via nox
 comm==0.2.1
     # via ipykernel
 contourpy==1.2.0
     # via matplotlib
-coverage==7.4.0
+coverage==7.4.2
     # via
     #   nbval
     #   pytest-cov
@@ -61,7 +61,7 @@ custom-inherit==2.4.1
     # via -r requirements/dev-complete.txt
 cycler==0.12.1
     # via matplotlib
-debugpy==1.8.0
+debugpy==1.8.1
     # via ipykernel
 decorator==5.1.1
     # via
@@ -87,13 +87,13 @@ filelock==3.13.1
     # via virtualenv
 flatbuffers==23.5.26
     # via tensorflow
-fonttools==4.47.2
+fonttools==4.49.0
     # via matplotlib
 gast==0.5.4
     # via
     #   tensorflow
     #   tensorflow-probability
-google-auth==2.26.2
+google-auth==2.28.0
     # via
     #   google-auth-oauthlib
     #   tensorboard
@@ -101,38 +101,38 @@ google-auth-oauthlib==1.2.0
     # via tensorboard
 google-pasta==0.2.0
     # via tensorflow
-gpflow==2.9.0
+gpflow==2.9.1
     # via -r requirements/dev-complete.txt
-grpcio==1.60.0
+grpcio==1.60.1
     # via
     #   tensorboard
     #   tensorflow
 h5py==3.10.0
     # via tensorflow
-identify==2.5.33
+identify==2.5.35
     # via pre-commit
 idna==3.6
     # via requests
 iniconfig==2.0.0
     # via pytest
-ipykernel==6.28.0
+ipykernel==6.29.2
     # via
     #   -r requirements/dev-complete.txt
     #   nbval
-ipython==8.20.0
+ipython==8.21.0
     # via
     #   -r requirements/dev-complete.txt
     #   ipykernel
     #   nbqa
-jax==0.4.23
+jax==0.4.24
     # via pymbar
-jaxlib==0.4.23
+jaxlib==0.4.24
     # via pymbar
 jedi==0.19.1
     # via ipython
 jinja2==3.1.3
     # via scriv
-jsonschema==4.20.0
+jsonschema==4.21.1
     # via nbformat
 jsonschema-specifications==2023.12.1
     # via jsonschema
@@ -157,17 +157,17 @@ lazy-loader==0.3
     #   cmomy
 libclang==16.0.6
     # via tensorflow
-llvmlite==0.41.1
+llvmlite==0.42.0
     # via numba
 markdown==3.5.2
     # via tensorboard
 markdown-it-py==3.0.0
     # via scriv
-markupsafe==2.1.3
+markupsafe==2.1.5
     # via
     #   jinja2
     #   werkzeug
-matplotlib==3.8.2
+matplotlib==3.8.3
     # via -r requirements/dev-complete.txt
 matplotlib-inline==0.1.6
     # via
@@ -198,7 +198,7 @@ nbqa==1.7.1
     # via -r requirements/dev-complete.txt
 nbval==0.10.0
     # via -r requirements/dev-complete.txt
-nest-asyncio==1.5.8
+nest-asyncio==1.6.0
     # via ipykernel
 nodeenv==1.8.0
     # via
@@ -206,11 +206,11 @@ nodeenv==1.8.0
     #   pyright
 nox==2023.4.22
     # via -r requirements/dev-complete.txt
-numba==0.58.1
+numba==0.59.0
     # via cmomy
-numexpr==2.8.8
+numexpr==2.9.0
     # via pymbar
-numpy==1.26.3
+numpy==1.26.4
     # via
     #   -r requirements/dev-complete.txt
     #   bottleneck
@@ -248,7 +248,7 @@ packaging==23.2
     #   pytest-sugar
     #   tensorflow
     #   xarray
-pandas==2.1.4
+pandas==2.2.0
     # via
     #   -r requirements/dev-complete.txt
     #   xarray
@@ -258,21 +258,21 @@ pexpect==4.9.0
     # via ipython
 pillow==10.2.0
     # via matplotlib
-platformdirs==4.1.0
+platformdirs==4.2.0
     # via
     #   jupyter-core
     #   virtualenv
-pluggy==1.3.0
+pluggy==1.4.0
     # via pytest
-pre-commit==3.6.0
+pre-commit==3.6.2
     # via -r requirements/dev-complete.txt
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==4.23.4
+protobuf==4.25.3
     # via
     #   tensorboard
     #   tensorflow
-psutil==5.9.7
+psutil==5.9.8
     # via ipykernel
 ptyprocess==0.7.0
     # via pexpect
@@ -294,9 +294,9 @@ pymbar==4.0.2
     #   pymbar
 pyparsing==3.1.1
     # via matplotlib
-pyright==1.1.345
+pyright==1.1.351
     # via -r requirements/dev-complete.txt
-pytest==7.4.4
+pytest==8.0.1
     # via
     #   -r requirements/dev-complete.txt
     #   nbval
@@ -304,11 +304,11 @@ pytest==7.4.4
     #   pytest-cov
     #   pytest-sugar
     #   pytest-xdist
-pytest-accept==0.1.9
+pytest-accept==0.1.10
     # via -r requirements/dev-complete.txt
 pytest-cov==4.1.0
     # via -r requirements/dev-complete.txt
-pytest-sugar==0.9.7
+pytest-sugar==1.0.0
     # via -r requirements/dev-complete.txt
 pytest-xdist==3.5.0
     # via -r requirements/dev-complete.txt
@@ -317,7 +317,7 @@ python-dateutil==2.8.2
     #   jupyter-client
     #   matplotlib
     #   pandas
-pytz==2023.3.post1
+pytz==2024.1
     # via pandas
 pyyaml==6.0.1
     # via pre-commit
@@ -325,7 +325,7 @@ pyzmq==25.1.2
     # via
     #   ipykernel
     #   jupyter-client
-referencing==0.32.1
+referencing==0.33.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -336,13 +336,13 @@ requests==2.31.0
     #   tensorboard
 requests-oauthlib==1.3.1
     # via google-auth-oauthlib
-rpds-py==0.16.2
+rpds-py==0.18.0
     # via
     #   jsonschema
     #   referencing
 rsa==4.9
     # via google-auth
-scipy==1.11.4
+scipy==1.12.0
     # via
     #   -r requirements/dev-complete.txt
     #   gpflow
@@ -366,7 +366,7 @@ sympy==1.12
     # via -r requirements/dev-complete.txt
 tabulate==0.9.0
     # via gpflow
-tensorboard==2.15.1
+tensorboard==2.15.2
     # via tensorflow
 tensorboard-data-server==0.7.2
     # via tensorboard
@@ -376,7 +376,7 @@ tensorflow==2.15.0
     #   gpflow
 tensorflow-estimator==2.15.0
     # via tensorflow
-tensorflow-io-gcs-filesystem==0.35.0
+tensorflow-io-gcs-filesystem==0.36.0
     # via tensorflow
 tensorflow-probability==0.23.0
     # via
@@ -405,14 +405,13 @@ traitlets==5.14.1
     #   nbformat
 typing-extensions==4.9.0
     # via
-    #   cmomy
     #   gpflow
     #   module-utilities
     #   mypy
     #   tensorflow
-tzdata==2023.4
+tzdata==2024.1
     # via pandas
-urllib3==2.1.0
+urllib3==2.2.1
     # via requests
 virtualenv==20.25.0
     # via
@@ -428,13 +427,13 @@ wrapt==1.14.1
     # via
     #   deprecated
     #   tensorflow
-xarray==2023.12.0
+xarray==2024.2.0
     # via
     #   -r requirements/dev-complete.txt
     #   cmomy
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==69.0.3
+setuptools==69.1.0
     # via
     #   gpflow
     #   nodeenv

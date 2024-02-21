@@ -8,7 +8,7 @@
 # Instead edit the corresponding pyproject.toml file.
 #
 attrs
-cmomy>=0.5
+cmomy>=0.8
 custom-inherit
 gpflow>=2.6.0
 lazy_loader
