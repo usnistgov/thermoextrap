@@ -6,8 +6,7 @@ models and active learning strategies.
 """
 
 import numpy as np
-
-from thermoextrap.random import validate_rng
+from cmomy.random import validate_rng
 
 
 def noise_func(x, s, n):

@@ -78,7 +78,7 @@ def resample_indices(
         if transpose, shape=(size, nrep)
         else, shape=(nrep, size)
     """
-    from thermoextrap.random import validate_rng
+    from cmomy.random import validate_rng
 
     return xr.DataArray(
         data=validate_rng(rng).choice(size, size=(nrep, size), replace=replace),

@@ -66,7 +66,7 @@ post_func : str or callable
     * pow_i : post_func = lambda f: pow(f, i).  E.g., `pow_2` => pow(f, 2)
 rng : Generator, optional
     Random number generator object.
-    Defaults to result of :func:`thermoextrap.random.default_rng`.
+    Defaults to result of :func:`cmomy.random.default_rng`.
 """
 
 DOCFILLER_XTRAP = DocFiller.from_docstring(

@@ -13,7 +13,7 @@ except ImportError:
 
 from .interp import InterpModel
 
-from thermoextrap.random import validate_rng
+from cmomy.random import validate_rng
 
 
 class PerturbModel:

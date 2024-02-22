@@ -1,3 +1,4 @@
+import cmomy
 import numpy as np
 import pandas as pd
 import pytest
@@ -13,7 +14,7 @@ def states():
     dims = ["rec", "pair", "position"]
     coords = {"position": np.linspace(0, 2, shape[-1])}
 
-    rng = xtrap.random.default_rng()
+    rng = cmomy.random.default_rng()
 
     xems = []
     for beta in [0.1, 10.0]:

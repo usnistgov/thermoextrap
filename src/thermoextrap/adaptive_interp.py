@@ -525,7 +525,7 @@ def factory_state_idealgas(
     thermoextrap.idealgas
     thermoextrap.beta.factory_extrapmodel
     """
-    from thermoextrap.random import validate_rng
+    from cmomy.random import validate_rng
 
     from . import beta as xpan_beta
     from . import idealgas

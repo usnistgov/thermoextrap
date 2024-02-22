@@ -5,7 +5,7 @@ import math
 import numpy as np
 import sympy as sym
 from scipy.stats import norm
-from thermoextrap.random import validate_rng
+from cmomy.random import validate_rng
 
 
 class IGmodel:

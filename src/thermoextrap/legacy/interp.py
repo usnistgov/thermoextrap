@@ -6,7 +6,7 @@ import numpy as np
 from scipy.special import factorial
 
 from .extrap import ExtrapModel
-from thermoextrap.random import validate_rng
+from cmomy.random import validate_rng
 
 
 class ExtrapWeightedModel(ExtrapModel):

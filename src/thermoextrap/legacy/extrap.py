@@ -121,7 +121,7 @@ class ExtrapModel:
         """Function to resample the data, mainly for use in providing bootstrapped estimates.
         Should be adjusted to match the data structure.
         """
-        from thermoextrap.random import validate_rng
+        from cmomy.random import validate_rng
 
         rng = validate_rng(rng)
 

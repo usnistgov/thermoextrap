@@ -14,8 +14,7 @@ import math
 from functools import lru_cache
 
 import numpy as np
-
-from thermoextrap.random import validate_rng
+from cmomy.random import validate_rng
 
 from .core._imports import sympy as sp
 from .docstrings import DocFiller
@@ -70,7 +69,7 @@ shape : int or tuple of int
     Shape of output.  Ignored if ``r`` is not ``None``.
 rng : Generator, optional
     Random number generator object.
-    Defaults to result of :func:`thermoextrap.random.default_rng`.
+    Defaults to result of :func:`cmomy.random.default_rng`.
 """
 
 

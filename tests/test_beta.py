@@ -1,5 +1,6 @@
 import math
 
+import cmomy
 import numpy as np
 import pytest
 import xarray as xr
@@ -10,7 +11,7 @@ import thermoextrap.legacy
 
 @pytest.fixture(scope="module")
 def rng() -> np.random.Generator:
-    return xtrap.random.default_rng()
+    return cmomy.random.default_rng()
 
 
 @pytest.mark.slow()

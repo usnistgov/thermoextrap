@@ -13,8 +13,7 @@ See :ref:`examples/usage/basic/temperature_interp:recursive interpolation` for e
 import logging
 
 import numpy as np
-
-from thermoextrap.random import validate_rng
+from cmomy.random import validate_rng
 
 from . import idealgas
 from .core._deprecate import deprecate, deprecate_kwarg

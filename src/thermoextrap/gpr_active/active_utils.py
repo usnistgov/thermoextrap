@@ -18,13 +18,13 @@ import sympy as sp
 
 # import tensorflow as tf
 import xarray as xr
+from cmomy.random import validate_rng
 from pymbar import timeseries
 from scipy import integrate, linalg, special
 
 from thermoextrap import beta as xpan_beta
 from thermoextrap.data import DataCentralMomentsVals
 from thermoextrap.models import ExtrapModel
-from thermoextrap.random import validate_rng
 
 from .gp_models import (
     ConstantMeanWithDerivs,

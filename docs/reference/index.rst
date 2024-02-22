@@ -10,6 +10,7 @@ API Reference
     api-modules
     api-gpr
     api-baseclasses
+    api-random
 
 
 Modules

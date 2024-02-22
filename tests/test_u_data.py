@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, NamedTuple
 
+import cmomy
 import numpy as np
 import pytest
 
@@ -52,7 +53,7 @@ class DataNamedTuple(NamedTuple):
 
 @pytest.fixture()
 def data(nsamp) -> DataNamedTuple:
-    rng = xtrap.random.default_rng()
+    rng = cmomy.random.default_rng()
 
     x = rng.random(nsamp)
     u = rng.random(nsamp)

@@ -1,3 +1,4 @@
+import cmomy
 import numpy as np
 
 import thermoextrap as xtrap
@@ -85,7 +86,7 @@ def test_resample(fixture) -> None:
     nrep = 10
     ndat = fixture.x.shape[0]
 
-    rng = xtrap.random.default_rng()
+    rng = cmomy.random.default_rng()
 
     idx = rng.choice(ndat, (nrep, ndat), replace=True)
 

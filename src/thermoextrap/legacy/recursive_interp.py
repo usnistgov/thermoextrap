@@ -16,7 +16,7 @@ except ImportError:
 from .ig import IGmodel
 from .interp import InterpModel
 
-from thermoextrap.random import validate_rng
+from cmomy.random import validate_rng
 
 
 class RecursiveInterp:
