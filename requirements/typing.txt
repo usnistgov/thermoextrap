@@ -9,10 +9,9 @@
 #
 attrs
 cmomy>=0.8
-custom-inherit
 gpflow>=2.6.0
 lazy_loader
-module-utilities>=0.2
+module-utilities[inherit]>=0.2
 mypy>=1.4.1
 numpy>=1.20
 pandas

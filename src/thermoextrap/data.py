@@ -24,21 +24,21 @@ import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
-from custom_inherit import DocInheritMeta
 from module_utilities import cached
 
 from .core._attrs_utils import (
     MyAttrsMixin,
-    _cache_field,
+    cache_field,
     convert_dims_to_tuple,
     kw_only_field,
 )
 from .core.xrutils import xrwrap_uv, xrwrap_xv
 from .docstrings import DOCFILLER_SHARED
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
 __all__ = [
+    "DataCallback",
     "DataCallbackABC",
     "DataCentralMoments",
     "DataCentralMomentsVals",
@@ -49,7 +49,7 @@ __all__ = [
 ]
 
 
-@docfiller_shared
+@docfiller_shared.decorate
 def resample_indices(
     size,
     nrep,
@@ -87,7 +87,7 @@ def resample_indices(
 
 
 @attrs.frozen
-class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_merge")):
+class DatasetSelector(MyAttrsMixin):
     """
     Wrap xarray object so can index like ds[i, j].
 
@@ -164,7 +164,6 @@ class DatasetSelector(MyAttrsMixin, metaclass=DocInheritMeta(style="numpy_with_m
 @attrs.define
 class DataCallbackABC(
     MyAttrsMixin,
-    metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True),
 ):
     """
     Base class for handling callbacks to adjust data.
@@ -221,22 +220,12 @@ class DataCallback(DataCallbackABC):
     """
 
     def check(self, data) -> None:
-        """Perform any consistency checks between self and data."""
+        pass
 
     def derivs_args(self, data, derivs_args):  # noqa: PLR6301,ARG002
-        """
-        Adjust derivs args from data class.
-
-        should return a tuple
-        """
         return derivs_args
 
     def resample(self, data, meta_kws, **kws):  # noqa: ARG002
-        """
-        Adjust create new object.
-
-        Should return new instance of class or self no change
-        """
         return self
 
     def block(self, data, meta_kws, **kws):  # noqa: ARG002
@@ -255,7 +244,6 @@ def _meta_converter(meta):
 @attrs.define
 class AbstractData(
     MyAttrsMixin,
-    metaclass=DocInheritMeta(style="numpy_with_merge", abstract_base_class=True),
 ):
     """Abstract class for data."""
 
@@ -264,7 +252,7 @@ class AbstractData(
         kw_only=True,
         converter=_meta_converter,
     )
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     @meta.validator  # pyright: ignore[reportUntypedFunctionDecorator]
     def _meta_validate(self, attribute, meta) -> None:  # noqa: ARG002
@@ -308,20 +296,15 @@ class AbstractData(
         return func(self, *args, **kwargs)
 
 
-# NOTE : custom_inherit doesn't play super will with docfiller.
-# the first argument to a class with custom_inherit must be an explicit parameter
-
-
 @attrs.define
-@docfiller_shared
+@docfiller_shared.decorate
 class DataValuesBase(AbstractData):
     """
     Base class to work with data based on values (non-cmomy).
 
     Parameters
     ----------
-    uv : xarray.DataArray
-        raw values of u (energy)
+    {uv}
     {xv}
     {order}
     {rec_dim}
@@ -387,7 +370,7 @@ class DataValuesBase(AbstractData):
             self.xv = self.uv
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def from_vals(
         cls,
         xv,
@@ -460,7 +443,7 @@ class DataValuesBase(AbstractData):
     def __len__(self) -> int:
         return len(self.uv[self.rec_dim])
 
-    @docfiller_shared
+    @docfiller_shared.decorate
     def resample(
         self,
         indices=None,
@@ -545,7 +528,7 @@ class DataValuesBase(AbstractData):
 ###############################################################################
 # Data
 ###############################################################################
-@docfiller_shared
+@docfiller_shared.decorate
 def build_aves_xu(
     uv,
     xv,
@@ -643,7 +626,7 @@ def build_aves_xu(
     return u, xu
 
 
-@docfiller_shared
+@docfiller_shared.decorate
 def build_aves_dxdu(  # noqa: C901
     uv,
     xv,
@@ -758,6 +741,7 @@ def _xu_to_u(xu, dim="umom"):
 
 
 @attrs.define
+@docfiller_shared.inherit(DataValuesBase)
 class DataValues(DataValuesBase):
     """Class to hold uv/xv data."""
 
@@ -814,7 +798,7 @@ class DataValues(DataValuesBase):
         )
 
     @property
-    def derivs_args(self):  # noqa: D102
+    def derivs_args(self):
         if self.x_isnot_u:
             out = (self.u_selector, self.xu_selector)
         else:
@@ -823,6 +807,7 @@ class DataValues(DataValuesBase):
 
 
 @attrs.define
+@docfiller_shared.inherit(DataValuesBase)
 class DataValuesCentral(DataValuesBase):
     """Data class using values and central moments."""
 
@@ -873,25 +858,25 @@ class DataValuesCentral(DataValuesBase):
         return out
 
     @cached.prop
-    def du_selector(self):  # noqa: D102
+    def du_selector(self):
         return DatasetSelector.from_defaults(
             self.du, deriv_dim=None, mom_dim=self.umom_dim
         )
 
     @cached.prop
-    def dxdu_selector(self):  # noqa: D102
+    def dxdu_selector(self):
         return DatasetSelector.from_defaults(
             self.dxdu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
     @cached.prop
-    def xave_selector(self):  # noqa: D102
+    def xave_selector(self):
         if self.deriv_dim is None:
             return self.xave
         return DatasetSelector.from_defaults(self.xave, dims=[self.deriv_dim])
 
     @property
-    def derivs_args(self):  # noqa: D102
+    def derivs_args(self):
         if self.x_isnot_u:
             out = (self.xave_selector, self.du_selector, self.dxdu_selector)
         else:
@@ -899,7 +884,7 @@ class DataValuesCentral(DataValuesBase):
         return self.meta.derivs_args(self, out)
 
 
-@docfiller_shared
+@docfiller_shared.decorate
 def factory_data_values(
     order,
     uv,
@@ -977,15 +962,14 @@ def factory_data_values(
 # StatsCov objects
 ################################################################################
 @attrs.define
-@docfiller_shared
+@docfiller_shared.decorate
 class DataCentralMomentsBase(AbstractData):
     """
     Data object based on central co-moments array.
 
     Parameters
     ----------
-    dxduave : xCentralMoments
-        Central moments object.
+    {dxduave}
     {rec_dim}
     {umom_dim}
     {xmom_dim}
@@ -1137,13 +1121,14 @@ class DataCentralMomentsBase(AbstractData):
 
 
 @attrs.define(slots=True)
+@docfiller_shared.inherit(DataCentralMomentsBase)
 class DataCentralMoments(DataCentralMomentsBase):
     """Data class using :class:`cmomy.xCentralMoments` to handle central moments."""
 
     def __len__(self) -> int:
         return self.values.sizes[self.rec_dim]
 
-    @docfiller_shared
+    @docfiller_shared.decorate
     def block(self, block_size, dim=None, axis=None, meta_kws=None, **kwargs):
         """
         Block resample along axis.
@@ -1154,9 +1139,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             number of sample to block average together
         {dim}
         {axis}
-        axis : int or str, default=:attr:`rec_dim`
-            axis or dimension to block average along
-        **kwargs : dict
+        **kwargs
             extra arguments to :meth:`cmomy.xCentralMoments.block`
         """
         if dim is None and axis is None:
@@ -1168,7 +1151,7 @@ class DataCentralMoments(DataCentralMomentsBase):
             meta=self.meta.block(data=self, meta_kws=meta_kws, **kws),
         )
 
-    @docfiller_shared
+    @docfiller_shared.decorate
     def reduce(self, dim=None, axis=None, meta_kws=None, **kwargs):
         """
         Reduce along axis.
@@ -1177,6 +1160,9 @@ class DataCentralMoments(DataCentralMomentsBase):
         ----------
         {dim}
         {axis}
+        {meta_kws}
+        **kwargs
+            Keyword arguments to :meth:`cmomy.xCentralMoments.reduce`
         """
         if dim is None and axis is None:
             dim = self.rec_dim
@@ -1187,12 +1173,12 @@ class DataCentralMoments(DataCentralMomentsBase):
             meta=self.meta.reduce(data=self, meta_kws=meta_kws, **kws),
         )
 
-    @docfiller_shared
+    @docfiller_shared.decorate
     def resample(
         self,
+        nrep=None,
         freq=None,
         indices=None,
-        nrep=None,
         dim=None,
         axis=None,
         rep_dim="rep",
@@ -1212,8 +1198,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         {dim}
         {axis}
         {rep_dim}
-        parallel : bool, default=True
-            If true, perform resampling in parallel
+        {parallel}
         meta_kws : mapping, optional
             Parameters to `self.meta.resample`
         resample_kws : mapping, optional
@@ -1247,7 +1232,7 @@ class DataCentralMoments(DataCentralMomentsBase):
     # so if things are in wrong order, stuff still works out
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def from_raw(  # noqa: PLR0913,PLR0917
         cls,
         raw,
@@ -1340,7 +1325,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def from_vals(  # noqa: PLR0913,PLR0917
         cls,
         xv,
@@ -1432,7 +1417,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def from_data(  # noqa: PLR0913,PLR0917
         cls,
         data,
@@ -1629,7 +1614,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def from_ave_raw(  # noqa: PLR0913,PLR0917
         cls,
         u,
@@ -1749,7 +1734,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def from_ave_central(  # noqa: C901,PLR0912,PLR0913,PLR0917
         cls,
         du,
@@ -1898,7 +1883,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
 
 @attrs.define
-@docfiller_shared
+@docfiller_shared.inherit(DataCentralMomentsBase)
 class DataCentralMomentsVals(DataCentralMomentsBase):
     """
     Parameters
@@ -1954,7 +1939,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def from_vals(
         cls,
         xv,
@@ -2037,35 +2022,40 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     def __len__(self) -> int:
         return len(self.uv[self.rec_dim])
 
+    @docfiller_shared.inherit(DataCentralMoments.resample)
     def resample(
         self,
-        indices=None,
         nrep=None,
         freq=None,
-        resample_kws=None,
-        parallel=True,
-        axis=None,
+        indices=None,
         dim=None,
+        axis=None,
         rep_dim="rep",
+        parallel: bool = True,
+        resample_kws=None,
         meta_kws=None,
+        **kwargs,
     ):
         """
         Resample data.
 
         Parameters
         ----------
-        {indices}
         {nrep}
         {freq}
-        {resample_kws}
-        {rep_dim}
-        {axis}
+        {indices}
         {dim}
+        {axis}
+        {rep_dim}
+        {parallel}
+        {resample_kws}
         {meta_kws}
+        **kwargs
+            Keyword arguments to :meth:`cmomy.xCentralMoments.from_resample_vals`
 
         See Also
         --------
-        :meth:`cmomy.xCentralMoments.resample`
+        :meth:`cmomy.xCentralMoments.from_resample_vals`
         """
         if dim is None and axis is None:
             dim = self.rec_dim
@@ -2079,6 +2069,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             "axis": axis,
             "dim": dim,
             "rep_dim": rep_dim,
+            **kwargs,
         }
 
         dxduave = cmomy.xCentralMoments.from_resample_vals(

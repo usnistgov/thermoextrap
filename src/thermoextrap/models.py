@@ -16,10 +16,9 @@ import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
-from custom_inherit import DocInheritMeta
 from module_utilities import cached
 
-from .core._attrs_utils import MyAttrsMixin, _cache_field
+from .core._attrs_utils import MyAttrsMixin, cache_field
 from .core._imports import has_pymbar
 from .core._imports import sympy as sp
 from .core.sputils import get_default_indexed, get_default_symbol
@@ -27,7 +26,7 @@ from .core.xrutils import xrwrap_alpha
 from .data import AbstractData, kw_only_field
 from .docstrings import DOCFILLER_SHARED
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
 
 __all__ = [
@@ -87,8 +86,8 @@ class SymFuncBase(sp.Function):
         raise NotImplementedError(msg)
 
 
-@docfiller_shared
-class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
+@docfiller_shared.decorate
+class SymDerivBase:
     """
     Base class for working with recursive derivatives in expansions.
 
@@ -169,7 +168,7 @@ class SymSubs:
     simplify: bool = field(default=False)
     expand: bool = field(default=True)
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     @cached.meth
     def __getitem__(self, order):
@@ -222,7 +221,7 @@ class Lambdify:
         default=None, converter=attc.default_if_none(factory=dict)
     )
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     @cached.meth
     def __getitem__(self, order):
@@ -438,7 +437,7 @@ class ExtrapModel(MyAttrsMixin):
     #: Name of `alpha`
     alpha_name: str = kw_only_field(default="alpha", converter=str)
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     @cached.meth
     def _derivs(self, order, order_dim, minus_log):
@@ -580,7 +579,7 @@ class StateCollection(MyAttrsMixin):
         default=None, converter=attc.default_if_none(factory=dict)
     )
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -746,6 +745,7 @@ class PiecewiseMixin:
 
 
 @attrs.define
+@docfiller_shared.inherit(StateCollection)
 class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
     """
     Weighted extrapolation model.
@@ -838,6 +838,7 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
 
 
 @attrs.define
+@docfiller_shared.inherit(StateCollection)
 class InterpModel(StateCollection):
     """Interpolation model."""
 
@@ -918,6 +919,7 @@ class InterpModel(StateCollection):
         return (prefac * coefs).sum(order_dim)
 
 
+@docfiller_shared.inherit(StateCollection)
 class InterpModelPiecewise(StateCollection, PiecewiseMixin):
     """Apposed to the multiple model InterpModel, perform a piecewise interpolation."""
 
@@ -1032,6 +1034,7 @@ class PerturbModel(MyAttrsMixin):
 
 
 @attrs.define
+@docfiller_shared.inherit(StateCollection)
 class MBARModel(StateCollection):
     """Sadly, this doesn't work as beautifully."""
 

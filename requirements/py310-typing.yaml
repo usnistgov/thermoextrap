@@ -13,7 +13,7 @@ dependencies:
   - python=3.10
   - attrs
   - cmomy>=0.8
-  - custom-inherit
+  - docstring-inheritance
   - lazy_loader
   - module-utilities>=0.2
   - mypy>=1.4.1

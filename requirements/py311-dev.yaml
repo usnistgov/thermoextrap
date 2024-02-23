@@ -14,7 +14,7 @@ dependencies:
   - attrs
   - bottleneck
   - cmomy>=0.8
-  - custom-inherit
+  - docstring-inheritance
   - ipykernel
   - ipython
   - lazy_loader

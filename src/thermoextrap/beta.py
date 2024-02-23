@@ -19,7 +19,7 @@ from .models import (
     get_default_symbol,
 )
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta")
 
 ##############################################################################
 # recursive deriatives for beta expansion
@@ -163,7 +163,7 @@ class dxdu_func_beta(SymFuncBase):
 
 
 class x_func_central_nobeta(SymFuncBase):
-    r"""Sympy functionn to evaluate derivatives of observable :math:`\langle x \rangle` using central moments."""
+    r"""Sympy function to evaluate derivatives of observable :math:`\langle x \rangle` using central moments."""
 
     nargs = 1
     x1_symbol = get_default_symbol("x1")
@@ -267,13 +267,14 @@ class xu_func(SymFuncBase):
         return out
 
 
+@docfiller_shared.inherit(SymDerivBase)
 class SymDerivBeta(SymDerivBase):
     r"""Provide symbolic expressions for :math:`d^n \langle x \rangle /d\beta^n`."""
 
     beta = get_default_symbol("beta")
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def x_ave(cls, xalpha=False, central=None, expand=True, post_func=None):
         r"""
         General method to find derivatives of :math:`\langle x \rangle`.
@@ -301,7 +302,7 @@ class SymDerivBeta(SymDerivBase):
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def u_ave(cls, central=None, expand=True, post_func=None):
         r"""
         General constructor for symbolic derivatives of :math:`\langle u \rangle`.
@@ -321,7 +322,7 @@ class SymDerivBeta(SymDerivBase):
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def dun_ave(cls, n, expand=True, post_func=None, central=None):
         r"""
         Constructor for derivatives of :math:`\langle (\delta u)^n\rangle`.
@@ -353,7 +354,7 @@ class SymDerivBeta(SymDerivBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def dxdun_ave(
         cls, n, xalpha=False, expand=True, post_func=None, d=None, central=None
     ):
@@ -400,7 +401,7 @@ class SymDerivBeta(SymDerivBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def un_ave(cls, n, expand=True, post_func=None, central=None):
         r"""
         Constructor for derivatives of :math:`\langle u^n\rangle`.
@@ -424,7 +425,7 @@ class SymDerivBeta(SymDerivBase):
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def xun_ave(
         cls, n, d=None, xalpha=False, expand=True, post_func=None, central=None
     ):
@@ -530,7 +531,7 @@ class SymDerivBeta(SymDerivBase):
 
 
 @lru_cache(5)
-@docfiller_shared
+@docfiller_shared.decorate
 def factory_derivatives(
     name="x_ave",
     n=None,
@@ -573,7 +574,7 @@ def factory_derivatives(
     return Derivatives.from_sympy(exprs, args=derivs.args)
 
 
-@docfiller_shared
+@docfiller_shared.decorate
 def factory_extrapmodel(
     beta,
     data,
@@ -666,7 +667,7 @@ def factory_extrapmodel(
     )
 
 
-@docfiller_shared
+@docfiller_shared.decorate
 def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     """
     Factory function to create PerturbModel for beta expansion.

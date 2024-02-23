@@ -14,7 +14,7 @@ dependencies:
   - attrs
   - autodocsumm
   - cmomy>=0.8
-  - custom-inherit
+  - docstring-inheritance
   - ghp-import
   - ipython
   - lazy_loader

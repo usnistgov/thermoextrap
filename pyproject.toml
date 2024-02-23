@@ -39,9 +39,8 @@ dynamic = [
 dependencies = [
     "attrs",
     "cmomy >= 0.8",
-    "custom-inherit",
     "lazy_loader",
-    "module-utilities >= 0.2",
+    "module-utilities[inherit] >= 0.2",
     "numpy >= 1.20",
     "scipy",
     "sympy",
@@ -252,7 +251,7 @@ max-public-methods = 30
 "src/**/*.py" = ["TD003", "FIX002"]
 "**/adaptive_interp.py" = ["T201"]
 "**/beta.py" = ["N801", "ARG002", "A003", "D102"]
-"**/data/py" = ["D102"]
+"**/data.py" = ["D102"]
 "**/lnpi.py" = ["N801", "N802", "N815", "ARG002", "A003", "D102"]
 "**/models.py" = ["ARG002", "A003", "N803", "N815", "D102"]
 "**/stack.py" = ["D102"]
@@ -376,6 +375,7 @@ matplotlib = { skip = true, packages = "matplotlib-base" }
 gpflow = { pip = true }
 tensorflow = { pip = true }
 tensorflow-probability = { pip = true }
+module-utilities = { packages = "docstring-inheritance"}
 
 [tool.pyproject2conda.envs.build]
 extras = "build-system.requires"

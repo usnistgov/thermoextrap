@@ -9,11 +9,10 @@
 #
 attrs
 cmomy>=0.8
-custom-inherit
 gpflow>=2.6.0
 lazy_loader
 matplotlib
-module-utilities>=0.2
+module-utilities[inherit]>=0.2
 nbval
 numpy>=1.20
 pandas

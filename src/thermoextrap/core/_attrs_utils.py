@@ -3,8 +3,6 @@ from __future__ import annotations
 import attrs
 import numpy as np
 
-# from custom_inherit import DocInheritMeta
-
 
 def attrs_clear_cache(self, attribute, value):
     """Clear out _cache if setting value."""
@@ -60,7 +58,7 @@ def convert_dims_to_tuple(dims):
     return (dims,) if isinstance(dims, str) else tuple(dims)
 
 
-def _cache_field(init=False, repr=False, factory=dict, **kws):
+def cache_field(init=False, repr=False, factory=dict, **kws):
     return attrs.field(init=False, repr=False, factory=dict, **kws)
 
 

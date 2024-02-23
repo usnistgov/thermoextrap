@@ -10,13 +10,12 @@
 attrs
 bottleneck
 cmomy>=0.8
-custom-inherit
 gpflow>=2.6.0
 ipykernel
 ipython
 lazy_loader
 matplotlib
-module-utilities>=0.2
+module-utilities[inherit]>=0.2
 mypy>=1.4.1
 nbqa
 nbval
