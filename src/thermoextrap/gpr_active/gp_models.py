@@ -1184,18 +1184,22 @@ class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
     ----------
     y_data : array-like
         The data for which the mean should be taken
+    x_dim : int, default 1
+        The number of dimensions for inputs
     """
 
-    def __init__(self, y_data) -> None:
+    def __init__(self, y_data, x_dim=1) -> None:
         super().__init__()
         c = np.average(y_data, axis=0)
         self.c = c  # gpflow.Parameter(c, trainable=False)
         self.dim = y_data.shape[1]
+        self.x_dim = int(x_dim)
 
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
         filled_mean = tf.ones([tf.shape(X)[0], self.dim], dtype=X.dtype) * self.c
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
-        return tf.where((X[:, -1:] == 0), filled_mean, filled_zeros)
+        deriv_zero_bool = tf.math.reduce_all((X[:, -self.x_dim:] == 0.0), axis=-1, keepdims=True)
+        return tf.where(deriv_zero_bool, filled_mean, filled_zeros)
 
 
 class LinearWithDerivs(gpflow.functions.MeanFunction):
