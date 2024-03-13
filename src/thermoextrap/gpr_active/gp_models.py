@@ -1198,7 +1198,7 @@ class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
         filled_mean = tf.ones([tf.shape(X)[0], self.dim], dtype=X.dtype) * self.c
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
-        deriv_zero_bool = tf.math.reduce_all((X[:, -self.x_dim:] == 0.0), axis=-1, keepdims=True)
+        deriv_zero_bool = tf.math.reduce_all((X[:, self.x_dim:] == 0.0), axis=-1, keepdims=True)
         return tf.where(deriv_zero_bool, filled_mean, filled_zeros)
 
 
@@ -1213,9 +1213,9 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
     Parameters
     ----------
     x_data : array-like
-        input locations of data points
+        input locations of data points (excluding derivative information)
     y_data : array-like
-        output data to learn linear function for based on input locations
+        output data to learn linear function for based on input locations (only zeroth order)
     """
 
     def __init__(self, x_data, y_data) -> None:
@@ -1245,14 +1245,14 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
         filled_mean_0 = tf.tensordot(X[:, :self.x_dim], self.slope, 1) + self.b
         # Fill in mean function for 1st order for all X
         # complicated, though, because need to find specific derivatives in each direction of X...
-        filled_mean_1 = tf.tensordot(X[:, -self.x_dim:], self.slope, 1)
+        filled_mean_1 = tf.tensordot(X[:, self.x_dim:], self.slope, 1)
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
         # Set conditions to fill in mean values for just 0th and 1st derivatives
         # For 1st derivative boolean, must be where have at least one 1 (first derivative)
         # and no derivatives higher than 1
-        deriv_zero_bool = tf.math.reduce_all((X[:, -self.x_dim:] == 0.0), axis=-1, keepdims=True)
-        deriv_one_bool = tf.math.logical_or(tf.math.reduce_any((X[:, -self.x_dim:] == 1.0), axis=-1, keepdims=True),
-                                            tf.math.reduce_all((X[:, -self.x_dim:] < 2.0), axis=-1, keepdims=True),
+        deriv_zero_bool = tf.math.reduce_all((X[:, self.x_dim:] == 0.0), axis=-1, keepdims=True)
+        deriv_one_bool = tf.math.logical_or(tf.math.reduce_any((X[:, self.x_dim:] == 1.0), axis=-1, keepdims=True),
+                                            tf.math.reduce_all((X[:, self.x_dim:] < 2.0), axis=-1, keepdims=True),
                                             )
         output_0 = tf.where(deriv_zero_bool, filled_mean_0, filled_zeros)
         output_1 = tf.where(deriv_one_bool, filled_mean_1, filled_zeros)
@@ -1263,37 +1263,50 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
 class SympyMeanFunc(gpflow.functions.MeanFunction):
     """
     Mean function based on sympy expression. This way, can take derivatives up
-    to any order. In the provided expression, the input variable should be 'x'
-    or 'X', otherwise this will not work. For consistency with other mean
-    functions, only fit based on zero-order data, rather than fitting during
-    training of full GP model. params is an optional dictionary specifying
-    starting parameter values.
+    to any order. In the provided expression, the input variables should be 'x_0',
+    'x_1', or 'X_0', 'X_1', etc. otherwise this will not work. For consistency
+    with other mean functions, only fit based on zero-order data, rather than
+    fitting during training of full GP model. params is an optional dictionary
+    specifying starting parameter values. For multidimensional kernels,
+    the dimensions of 'x' should be indexed such as 'x_0', 'x_1',
+    These will be identified from the provided expression and sorted to
+    guarantee specific ordering when taking derivatives.
 
     Parameters
     ----------
     expr : Expr
         Representing the functional form of the mean function.
     x_data : array-like
-        the input locations of the data
+        the input locations of the data (excluding derivative information)
     y_data : array-like
-        the output values of the data to fit the mean function to
+        the output values of the data to fit the mean function to (only zeroth order)
     params : dict, optional
         dictionary specifying starting parameter values for the mean function;
         in other words, these values will be substituted into the sympy
         expression to start with
     """
 
-    def __init__(self, expr, x_data, y_data, params=None) -> None:  # noqa: C901
+    def __init__(self, expr, x_data, y_data, params=None, x_dim=1) -> None:  # noqa: C901
         super().__init__()
+        # Set dimensions of y data and x data
+        self.dim = y_data.shape[1]
+        self.x_dim = x_data.shape[1]
+
         self.expr = expr
 
         expr_syms = tuple(expr.free_symbols)
-        self.param_syms = []
+        x_syms = []
+        param_syms = []
         for s in expr_syms:
             if s.name.casefold() == "x":
-                self.x_sym = s
+                x_syms.append(s)
             else:
-                self.param_syms.append(s)
+                param_syms.append(s)
+
+        # Ensure x are sorted for consistency of derivative order
+        x_syms.sort(key=lambda s: s.name)
+        self.x_syms = x_syms
+        self.param_syms = param_syms
 
         # Make sure that parameters here match those in params, if it's provided
         if bool(params):
@@ -1309,31 +1322,26 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             for s in self.param_syms:
                 setattr(self, s.name, 1.0)
 
-        # Collect only zeroth-order data for training mean function
-        zero_bool = x_data[:, 1] == 0
-        x_zero = x_data[zero_bool, 0]
-        y_zero = y_data[zero_bool, 0]
-
         # Create function at zeroth order
         mean_func = sp.lambdify(
-            (self.x_sym, *self.param_syms), self.expr, modules="numpy"
+            (*self.x_syms, *self.param_syms), self.expr, modules="numpy"
         )
         # And also wrap derivatives w.r.t. parameters for Jacobian
         deriv_funcs = []
         for p_sym in self.param_syms:
             this_jac = sp.diff(self.expr, p_sym, 1)
             deriv_funcs.append(
-                sp.lambdify((self.x_sym, *self.param_syms), this_jac, modules="numpy")
+                sp.lambdify((*self.x_syms, *self.param_syms), this_jac, modules="numpy")
             )
 
         # Create loss function
         def loss_func(params):
-            return np.sum((mean_func(x_zero, *params) - y_zero) ** 2)
+            return np.sum((mean_func(*np.split(x_data, self.x_dim, axis=-1), *params) - y_data) ** 2)
 
         # And create Jacobian function
         def jac_func(params):
-            prefac = 2.0 * (mean_func(x_zero, *params) - y_zero)
-            jac = [np.sum(prefac * deriv(x_zero, *params)) for deriv in deriv_funcs]
+            prefac = 2.0 * (mean_func(x_data, *params) - y_data)
+            jac = [np.sum(prefac * deriv(*np.split(x_data, self.x_dim, axis=-1), *params)) for deriv in deriv_funcs]
             return np.array(jac)
 
         # Perform optimization with scipy
@@ -1351,26 +1359,32 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
 
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
         """Closely follows K_diag from DerivativeKernel."""
-        x_vals = X[:, :1]
-        d_vals = X[:, 1:]
-        unique_d = tf.unique(tf.reshape(d_vals, (-1,)))[0]
+        x_vals = X[:, :self.x_dim]
+        d_vals = X[:, self.x_dim:]
+        unique_d = tf.raw_ops.UniqueV2(x=d_vals, axis=[0])[0]
+        unique_d = tf.cast(unique_d, tf.int32)
         f_list = []
         inds_list = []
         for d in unique_d:
-            this_inds = tf.cast(tf.where(d_vals == d)[:, :1], tf.int32)
-            this_expr = sp.diff(self.expr, self.x_sym, int(d))
+            this_inds = tf.cast(
+                tf.where(tf.reduce_all(d_vals == d, axis=1))[:, :1], tf.int32
+            )
+            this_expr = sp.diff(
+                self.expr,
+                *zip(self.x_syms, d.numpy()),
+            )
             this_func = sp.lambdify(
-                (self.x_sym, *self.param_syms),
+                (*self.x_syms, *self.param_syms),
                 this_expr,
                 modules="tensorflow",
             )
             f_list.append(
                 this_func(
-                    tf.gather_nd(x_vals, this_inds),
+                    *tf.split(tf.gather_nd(x_vals, this_inds), self.x_dim, axis=-1),
                     *[getattr(self, s.name) for s in self.param_syms],
                 )
             )
             inds_list.append(this_inds)
 
         f_list = tf.dynamic_stitch(inds_list, f_list)
-        return tf.reshape(f_list, (x_vals.shape[0], 1))  # Really, just for 1D functions
+        return tf.reshape(f_list, (x_vals.shape[0], self.dim)) 
