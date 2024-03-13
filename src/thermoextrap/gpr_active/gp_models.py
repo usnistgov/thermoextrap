@@ -1220,28 +1220,42 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
 
     def __init__(self, x_data, y_data) -> None:
         super().__init__()
-        # First define "center" of data to fit around
-        mean_x = np.average(x_data, axis=0)
-        mean_y = np.average(y_data, axis=0)
-        # And compute slope
+        # Shift data so centered around means
+        # Constant shifts won't change fit, but may improve stability
+        mean_x = np.mean(x_data, axis=0, keepdims=True)
+        mean_y = np.mean(y_data, axis=0, keepdims=True)
         x_mat = x_data - mean_x
         y_mat = y_data - mean_y
-        slope = np.linalg.inv(x_mat.T @ x_mat) @ (x_mat.T @ y_mat)
-        # And intercept
-        b = mean_y - slope * mean_x
+        # Compute best fit parameters including slope and constant offsets
+        # To do in one step, augmenting x data with ones in first column
+        x_mat = np.concatenate([np.ones((x_data.shape[0], 1)), x_mat], axis=1)
+        params = np.linalg.inv(x_mat.T @ x_mat) @ (x_mat.T @ y_mat)
+        # All be the first row of params will be slopes with respect to each x
+        slope = params[1:, :]
+        # The first  row of params will be the intercepts (in each y dimension)
+        # Though need to add mean_y back in and linear change in y over distance of mean_x
+        b = params[0, :] + mean_y - (mean_x @ slope)
         self.slope = slope  # gpflow.Parameter(slope, trainable=False)
         self.b = b  # gpflow.Parameter(b, trainable=False)
         self.dim = y_data.shape[1]
+        self.x_dim = x_data.shape[1]
 
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
         # Fill in mean function for 0th order for all X
-        filled_mean_0 = self.slope * X[:, :1] + self.b
+        filled_mean_0 = tf.tensordot(X[:, :self.x_dim], self.slope, 1) + self.b
         # Fill in mean function for 1st order for all X
-        filled_mean_1 = tf.ones([tf.shape(X)[0], self.dim], dtype=X.dtype) * self.slope
+        # complicated, though, because need to find specific derivatives in each direction of X...
+        filled_mean_1 = tf.tensordot(X[:, -self.x_dim:], self.slope, 1)
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
         # Set conditions to fill in mean values for just 0th and 1st derivatives
-        output_0 = tf.where((X[:, -1:] == 0), filled_mean_0, filled_zeros)
-        output_1 = tf.where((X[:, -1:] == 1), filled_mean_1, filled_zeros)
+        # For 1st derivative boolean, must be where have at least one 1 (first derivative)
+        # and no derivatives higher than 1
+        deriv_zero_bool = tf.math.reduce_all((X[:, -self.x_dim:] == 0.0), axis=-1, keepdims=True)
+        deriv_one_bool = tf.math.logical_or(tf.math.reduce_any((X[:, -self.x_dim:] == 1.0), axis=-1, keepdims=True),
+                                            tf.math.reduce_all((X[:, -self.x_dim:] < 2.0), axis=-1, keepdims=True),
+                                            )
+        output_0 = tf.where(deriv_zero_bool, filled_mean_0, filled_zeros)
+        output_1 = tf.where(deriv_one_bool, filled_mean_1, filled_zeros)
         # Return sum so that has mean values for only 0th and 1st derivatives and rest 0
         return output_0 + output_1
 
