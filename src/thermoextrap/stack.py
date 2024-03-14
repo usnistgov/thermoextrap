@@ -1,4 +1,5 @@
 """A set of routines to stack data for gpflow analysis."""
+
 from __future__ import annotations
 
 from typing import Any

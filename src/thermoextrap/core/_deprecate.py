@@ -3,6 +3,7 @@ Deprecation utilities.
 
 Note that this was taken from pandas at https://github.com/pandas-dev/pandas/blob/main/pandas/util/_decorators.py
 """
+
 from __future__ import annotations
 
 import inspect

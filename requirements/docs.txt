@@ -10,16 +10,15 @@
 attrs
 autodocsumm
 cmomy>=0.8
-ghp-import
 gpflow>=2.6.0
-ipython
+jax[cpu]<0.4.25
 lazy_loader
 matplotlib
 module-utilities[inherit]>=0.2
 myst-nb
 numpy>=1.20
 pyenchant
-pymbar[jax]>=4.0
+pymbar>=4.0
 scipy
 sphinx-autobuild
 sphinx-book-theme
@@ -27,6 +26,6 @@ sphinx-copybutton
 sphinx>=5.3.0
 sphinxcontrib-spelling
 sympy
-tensorflow
-tensorflow-probability
+tensorflow-probability[tf]
+tensorflow>=2.13
 xarray>=0.16

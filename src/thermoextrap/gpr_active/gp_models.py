@@ -2,6 +2,7 @@
 Models for Gaussian process regression (:mod:`~thermoextrap.gpr_active.gp_models`)
 ----------------------------------------------------------------------------------
 """
+
 import logging
 import warnings
 from typing import Any, Optional

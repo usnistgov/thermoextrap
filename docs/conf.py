@@ -17,6 +17,7 @@
 # absolute, like shown here.
 #
 """Build docs."""
+
 from __future__ import annotations
 
 import os
@@ -44,8 +45,8 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosectionlabel",
-    "IPython.sphinxext.ipython_directive",
-    "IPython.sphinxext.ipython_console_highlighting",
+    # "IPython.sphinxext.ipython_directive",
+    # "IPython.sphinxext.ipython_console_highlighting",
     # "nbsphinx",
     # - easier external links
     # "sphinx.ext.extlinks",
@@ -61,6 +62,7 @@ extensions = [
     # "sphinx_design"
     # - myst stuff
     "myst_nb",
+    # "myst_parser",
 ]
 
 nitpicky = True

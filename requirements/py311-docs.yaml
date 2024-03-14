@@ -15,15 +15,12 @@ dependencies:
   - autodocsumm
   - cmomy>=0.8
   - docstring-inheritance
-  - ghp-import
-  - ipython
   - lazy_loader
   - matplotlib-base
   - module-utilities>=0.2
   - myst-nb
   - numpy>=1.20
   - pyenchant
-  - pymbar>=4.0
   - scipy
   - sphinx-autobuild
   - sphinx-book-theme
@@ -35,5 +32,7 @@ dependencies:
   - pip
   - pip:
       - gpflow>=2.6.0
-      - tensorflow
-      - tensorflow-probability
+      - jax[cpu]<0.4.25
+      - pymbar>=4.0
+      - tensorflow-probability[tf]
+      - tensorflow>=2.13

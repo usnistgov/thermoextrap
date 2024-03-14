@@ -20,12 +20,14 @@ dependencies:
   - lazy_loader
   - matplotlib-base
   - module-utilities>=0.2
-  - mypy>=1.4.1
+  - mypy>=1.9.0
+  - nbclient>=0.10.0
   - nbval
-  - nox
+  - nox>=2024.3.2
   - numpy>=1.20
+  - packaging
   - pandas
-  - pymbar>=4.0
+  - pandas-stubs
   - pytest
   - pytest-cov
   - pytest-sugar
@@ -36,6 +38,8 @@ dependencies:
   - pip
   - pip:
       - gpflow>=2.6.0
+      - jax[cpu]<0.4.25
+      - pymbar>=4.0
       - pytest-accept
-      - tensorflow
-      - tensorflow-probability
+      - tensorflow-probability[tf]
+      - tensorflow>=2.13

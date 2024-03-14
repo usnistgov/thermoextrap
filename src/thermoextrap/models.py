@@ -2,6 +2,7 @@
 General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
 ========================================================================
 """
+
 from __future__ import annotations
 
 import math

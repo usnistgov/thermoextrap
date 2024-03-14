@@ -8,7 +8,6 @@ This includes the recursive training algorithm and consistency checks.
 See :ref:`examples/usage/basic/temperature_interp:recursive interpolation` for example usage.
 """
 
-
 # TODO(wpk): rework this code to be cleaner
 import logging
 

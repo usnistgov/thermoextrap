@@ -2,6 +2,7 @@
 GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
 ------------------------------------------------------------
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -211,7 +212,7 @@ class DataWrapper:
 
     def load_U_info(self):
         """Loads potential energies from a list of files."""
-        U = [np.loadtxt(f)[-self.n_frames :, self.u_col] for f in self.sim_info_files]  # noqa: E203
+        U = [np.loadtxt(f)[-self.n_frames :, self.u_col] for f in self.sim_info_files]
         # If eventually using MBAR, will want to vstack instead
         return np.hstack(U)
 
@@ -224,7 +225,7 @@ class DataWrapper:
         cv_vals = []
         cv_bias = []
         for f in self.cv_bias_files:
-            cv_info = np.loadtxt(f)[-self.n_frames :, self.cv_cols]  # noqa: E203
+            cv_info = np.loadtxt(f)[-self.n_frames :, self.cv_cols]
             cv_vals.append(cv_info[:, 0])
             cv_bias.append(cv_info[:, 1])
         cv_vals = np.hstack(cv_vals)
@@ -233,7 +234,7 @@ class DataWrapper:
 
     def load_x_info(self):
         """Loads observable data."""
-        x = [np.loadtxt(f)[-self.n_frames :, self.x_col] for f in self.x_files]  # noqa: E203
+        x = [np.loadtxt(f)[-self.n_frames :, self.x_col] for f in self.x_files]
         return np.vstack(x)
 
     def get_data(self):
@@ -359,9 +360,9 @@ class SimWrapper:
         self.kw_inputs = (
             kw_inputs  # Dictionary of other key-word args for the simulation
         )
-        self.kw_inputs[
-            "info_name"
-        ] = self.info_name  # Restricts naming convention for sim_func
+        self.kw_inputs["info_name"] = (
+            self.info_name
+        )  # Restricts naming convention for sim_func
         self.kw_inputs["bias_name"] = self.bias_name
         self.data_kw_inputs = data_kw_inputs
         self.data_class = data_class

@@ -3,7 +3,6 @@ Volume expansion for ideal gas (:mod:`~thermoextrap.volume_idealgas`)
 =====================================================================
 """
 
-
 from functools import lru_cache
 
 from .docstrings import DOCFILLER_SHARED

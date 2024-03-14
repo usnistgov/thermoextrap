@@ -6,7 +6,6 @@ Note: This only handles volume expansion to first order.
 Also, Only DataValues like objects are supported.
 """
 
-
 from functools import lru_cache
 
 import attrs

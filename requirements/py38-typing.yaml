@@ -16,17 +16,17 @@ dependencies:
   - docstring-inheritance
   - lazy_loader
   - module-utilities>=0.2
-  - mypy>=1.4.1
   - numpy>=1.20
-  - pandas
-  - pymbar>=4.0
+  - packaging
+  - pandas-stubs
   - pytest
-  - pytype
   - scipy
   - sympy
   - xarray>=0.16
   - pip
   - pip:
       - gpflow>=2.6.0
-      - tensorflow
-      - tensorflow-probability
+      - jax[cpu]<0.4.25
+      - pymbar>=4.0
+      - tensorflow-probability[tf]
+      - tensorflow>=2.13

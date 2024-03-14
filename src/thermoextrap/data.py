@@ -11,7 +11,6 @@ The general scheme is to use the following:
 * xu[i, j] = <d^i x/d beta^i * u**j
 """
 
-
 from __future__ import annotations
 
 from abc import abstractmethod

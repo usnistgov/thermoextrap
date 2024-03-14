@@ -8,11 +8,12 @@
 # Instead edit the corresponding pyproject.toml file.
 #
 gpflow>=2.6.0
+jax[cpu]<0.4.25
 pandas
-pymbar[jax]>=4.0
+pymbar>=4.0
 pytest
 pytest-cov
 pytest-sugar
 pytest-xdist
-tensorflow
-tensorflow-probability
+tensorflow-probability[tf]
+tensorflow>=2.13

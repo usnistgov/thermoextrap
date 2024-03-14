@@ -3,7 +3,6 @@ Inverse temperature (beta) extrapolation (:mod:`~thermoextrap.beta`)
 ====================================================================
 """
 
-
 from functools import lru_cache
 from typing import Literal
 
