@@ -9,30 +9,30 @@
 #
 attrs
 bottleneck
-cmomy >= 0.5
-custom-inherit
-gpflow >= 2.6.0
+cmomy>=0.8
+gpflow>=2.6.0
 ipykernel
 ipython
+jax[cpu]<0.4.25
 lazy_loader
 matplotlib
-module-utilities >= 0.2
-mypy >= 1.4.1
-nox
-noxopt
-numpy >= 1.20
+module-utilities[inherit]>=0.2
+mypy>=1.9.0
+nbclient>=0.10.0
+nbval
+nox>=2024.3.2
+numpy>=1.20
+packaging
 pandas
+pandas-stubs
 pymbar>=4.0
 pytest
 pytest-accept
 pytest-cov
 pytest-sugar
 pytest-xdist
-pytype; python_version < '3.11'
-ruamel.yaml
 scipy
-setuptools-scm
 sympy
-tensorflow
-tensorflow-probability
-xarray >= 0.16
+tensorflow-probability[tf]
+tensorflow>=2.13
+xarray>=0.16

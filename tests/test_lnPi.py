@@ -1,6 +1,7 @@
 """test lnPi stuff"""
 
 import json
+import locale
 from pathlib import Path
 
 import numpy as np
@@ -12,7 +13,7 @@ import thermoextrap as xtrap
 
 # Equations
 @pytest.mark.parametrize("order", [6])
-def test_equations(central, order):
+def test_equations(central, order) -> None:
     f0 = xtrap.beta.factory_derivatives("u_ave", central=central)
     f1 = xtrap.lnpi.factory_derivatives(central=central)
 
@@ -29,33 +30,35 @@ data_path = Path(__file__).parent / "lnpi_data"
 
 
 def load_data():
-    with open(data_path / "sample_data.json") as f:
+    with (data_path / "sample_data.json").open(
+        encoding=locale.getpreferredencoding(False)
+    ) as f:
         d = json.load(f)
 
     ref, samples = d["ref"], d["samples"]
-    for x in [ref] + samples:
+    for x in [ref, *samples]:
         # cleanup data
-        x["lnPi"] = np.array(x["lnPi"])
-        x["energy"] = np.array(x["energy"])
+        x["lnpi_data"] = np.array(x.pop("lnPi"))
+        x["energy"] = np.array(x.pop("energy"))
 
     return ref, samples
 
 
-def prepare_data(lnPi, energy, mu, temp, order, beta):
+def prepare_data(lnpi_data, energy, mu, temp, order, beta):
     beta = 1.0 / temp
     mu = xr.DataArray(np.atleast_1d(mu), dims=["comp"])
-    lnPi = xr.DataArray(lnPi, dims=["n"])
+    lnpi_data = xr.DataArray(lnpi_data, dims=["n"])
 
-    # adjust lnPi to have lnPi[n=0] = 0
-    lnPi = lnPi - lnPi.sel(n=0)
+    # adjust lnpi_data to have lnpi_data[n=0] = 0
+    lnpi_data = lnpi_data - lnpi_data.sel(n=0)
 
     # have to include mom = 0
-    a = np.ones_like(lnPi)
+    a = np.ones_like(lnpi_data)
     energy = np.concatenate((a[:, None], energy), axis=-1)
     energy = xr.DataArray(energy, dims=["n", "umom"])
 
     return {
-        "lnPi": lnPi,
+        "lnpi_data": lnpi_data,
         "energy": energy,
         "mu": mu,
         "beta": beta,
@@ -64,7 +67,7 @@ def prepare_data(lnPi, energy, mu, temp, order, beta):
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def sample_data():
     ref, samples = load_data()
     ref = prepare_data(**ref)
@@ -72,74 +75,74 @@ def sample_data():
     return ref, samples
 
 
-@pytest.fixture
+@pytest.fixture()
 def ref(sample_data):
     return sample_data[0]
 
 
-@pytest.fixture
+@pytest.fixture()
 def samples(sample_data):
     return sample_data[1]
 
 
-@pytest.fixture
+@pytest.fixture()
 def betas(samples):
     return np.unique([s["beta"] for s in samples])
 
 
-@pytest.fixture
+@pytest.fixture()
 def temps(betas):
     return np.round(1.0 / betas, 3)
 
 
-def test_data(ref, samples, betas, temps):
+def test_data(ref, samples, betas) -> None:
     assert isinstance(ref, dict)
     assert isinstance(samples, list)
     assert isinstance(betas, np.ndarray)
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_u(ref, central):
     return xtrap.DataCentralMoments.from_ave_raw(
         u=ref["energy"], xu=None, x_is_u=True, central=central, meta=None
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_u(data_u, ref):
     return xtrap.beta.factory_extrapmodel(beta=ref["beta"], data=data_u, name="u_ave")
 
 
-@pytest.fixture
+@pytest.fixture()
 def out_u(em_u, betas):
     return em_u.predict(betas, cumsum=True)
 
 
-def test_out_u(samples, out_u):
+def test_out_u(samples, out_u) -> None:
     for s in samples:
         a = s["energy"].sel(umom=1)
         b = out_u.sel(beta=s["beta"], order=s["order"])
         np.testing.assert_allclose(a, b, rtol=1e-5)
 
 
-@pytest.fixture
+@pytest.fixture()
 def meta_lnpi(ref):
     return xtrap.lnpi.lnPiDataCallback(
-        ref["lnPi"], ref["mu"], dims_n=["n"], dims_comp="comp"
+        ref["lnpi_data"], ref["mu"], dims_n=["n"], dims_comp="comp"
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_lnpi(data_u, meta_lnpi):
     return data_u.new_like(meta=meta_lnpi)
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_lnpi(data_lnpi, ref):
     return xtrap.lnpi.factory_extrapmodel_lnPi(beta=ref["beta"], data=data_lnpi)
 
 
-@pytest.fixture
+@pytest.fixture()
 def out_lnpi(em_lnpi, betas):
     return (
         em_lnpi.predict(betas, cumsum=True)
@@ -148,8 +151,8 @@ def out_lnpi(em_lnpi, betas):
     )
 
 
-def test_out_lnpi(samples, out_lnpi):
+def test_out_lnpi(samples, out_lnpi) -> None:
     for s in samples:
-        a = s["lnPi"]
+        a = s["lnpi_data"]
         b = out_lnpi.sel(beta=s["beta"], order=s["order"])
         np.testing.assert_allclose(a, b)

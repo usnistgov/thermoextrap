@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cmomy.docstrings import docfiller as DOCFILLER_CMOMY
+from cmomy.docstrings import docfiller as docfiller_cmomy
 
 # from .external.docfiller import DocFiller
 from module_utilities.docfiller import DocFiller
@@ -64,7 +64,9 @@ post_func : str or callable
 
     * minus_log : post_func = -sympy.log
     * pow_i : post_func = lambda f: pow(f, i).  E.g., `pow_2` => pow(f, 2)
-
+rng : Generator, optional
+    Random number generator object.
+    Defaults to result of :func:`cmomy.random.default_rng`.
 """
 
 DOCFILLER_XTRAP = DocFiller.from_docstring(
@@ -107,7 +109,7 @@ DOCFILLER_VOLUME = DocFiller.from_docstring(
 
 
 DOCFILLER_SHARED = DocFiller.concat(
-    cmomy=DOCFILLER_CMOMY,
+    cmomy=docfiller_cmomy,
     xtrap=DOCFILLER_XTRAP,
     beta=DOCFILLER_BETA,
     volume=DOCFILLER_VOLUME,

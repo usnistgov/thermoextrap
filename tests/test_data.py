@@ -1,10 +1,11 @@
+import cmomy
 import numpy as np
 
 import thermoextrap as xtrap
 
 
-def test_rdata(fixture):
-    """testing new interface against old interface"""
+def test_rdata(fixture) -> None:
+    """Testing new interface against old interface"""
     ufunc, xufunc = fixture.u_xu_funcs
 
     # ufunc = lambda x: float(_ufunc(x))
@@ -28,17 +29,17 @@ def test_rdata(fixture):
     )
 
 
-def test_xdata(fixture):
+def test_xdata(fixture) -> None:
     fixture.xr_test_raw(fixture.xdata)
     fixture.xr_test_central(fixture.xdata)
 
 
-def test_xdata_val(fixture):
+def test_xdata_val(fixture) -> None:
     fixture.xr_test_raw(fixture.xdata_val)
     fixture.xr_test_central(fixture.xdata_val)
 
 
-def test_xdata_from_ave_raw(fixture):
+def test_xdata_from_ave_raw(fixture) -> None:
     a = fixture.rdata
 
     # base on raw arrays
@@ -57,7 +58,7 @@ def test_xdata_from_ave_raw(fixture):
     fixture.xr_test_raw(b)
 
 
-def test_xdata_from_ave_central(fixture):
+def test_xdata_from_ave_central(fixture) -> None:
     a = fixture.cdata
 
     # base on raw values
@@ -81,11 +82,13 @@ def test_xdata_from_ave_central(fixture):
     fixture.xr_test_central(b)
 
 
-def test_resample(fixture):
+def test_resample(fixture) -> None:
     nrep = 10
     ndat = fixture.x.shape[0]
 
-    idx = np.random.choice(ndat, (nrep, ndat), replace=True)
+    rng = cmomy.random.default_rng()
+
+    idx = rng.choice(ndat, (nrep, ndat), replace=True)
 
     b = fixture.xdata_val.resample(indices=idx)
 

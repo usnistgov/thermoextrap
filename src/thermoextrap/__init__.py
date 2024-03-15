@@ -1,17 +1,18 @@
 """Classes/routines to deal with thermodynamic extrapolation."""
 
-# TODO: move data, idealgas, models to top level.
+# TODO(wpk): move data, idealgas, models to top level.
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from . import (  # noqa: TCH004
-        beta,  # noqa: TCH004
-        data,  # noqa: TCH004
-        idealgas,  # noqa: TCH004
-        lnpi,  # noqa: TCH004
-        models,  # noqa: TCH004
-        volume,  # noqa: TCH004
-        volume_idealgas,  # noqa: TCH004
+        beta,
+        data,
+        idealgas,
+        lnpi,
+        models,
+        random,
+        volume,
+        volume_idealgas,
     )
     from .core.xrutils import xrwrap_alpha, xrwrap_uv, xrwrap_xv  # noqa: TCH004
     from .data import (
@@ -45,6 +46,7 @@ else:
             "idealgas",
             "lnpi",
             "models",
+            "random",
             "volume",
             "volume_idealgas",
         ],
@@ -73,13 +75,21 @@ else:
 
 
 # updated versioning scheme
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _version
+
 try:
-    from ._version import __version__
-except Exception:
+    __version__ = _version("thermoextrap")
+except PackageNotFoundError:  # pragma: no cover
     __version__ = "999"
 
 
 __all__ = [
+    "DataCentralMoments",
+    "DataCentralMomentsVals",
+    "DataValues",
+    "DataValuesCentral",
+    "Derivatives",
     "ExtrapModel",
     "ExtrapWeightedModel",
     "InterpModel",
@@ -87,22 +97,18 @@ __all__ = [
     "MBARModel",
     "PerturbModel",
     "StateCollection",
-    "Derivatives",
-    "DataCentralMoments",
-    "DataCentralMomentsVals",
-    "DataValues",
-    "DataValuesCentral",
-    "factory_data_values",
-    "resample_indices",
-    "xrwrap_xv",
-    "xrwrap_uv",
-    "xrwrap_alpha",
-    "idealgas",
-    "data",
-    "models",
+    "__version__",
     "beta",
+    "data",
+    "factory_data_values",
+    "idealgas",
     "lnpi",
+    "models",
+    "random",
+    "resample_indices",
     "volume",
     "volume_idealgas",
-    "__version__",
+    "xrwrap_alpha",
+    "xrwrap_uv",
+    "xrwrap_xv",
 ]

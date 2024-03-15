@@ -2,10 +2,12 @@
 General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
 ========================================================================
 """
+
 from __future__ import annotations
 
+import math
 from functools import lru_cache
-from typing import Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import attrs
 import numpy as np
@@ -15,10 +17,9 @@ import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
-from custom_inherit import DocInheritMeta
 from module_utilities import cached
 
-from .core._attrs_utils import MyAttrsMixin, _cache_field
+from .core._attrs_utils import MyAttrsMixin, cache_field
 from .core._imports import has_pymbar
 from .core._imports import sympy as sp
 from .core.sputils import get_default_indexed, get_default_symbol
@@ -26,10 +27,11 @@ from .core.xrutils import xrwrap_alpha
 from .data import AbstractData, kw_only_field
 from .docstrings import DOCFILLER_SHARED
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap").decorate
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
 
 __all__ = [
+    "Derivatives",
     "ExtrapModel",
     "ExtrapWeightedModel",
     "InterpModel",
@@ -37,7 +39,6 @@ __all__ = [
     "MBARModel",
     "PerturbModel",
     "StateCollection",
-    "Derivatives",
 ]
 
 
@@ -56,7 +57,7 @@ class SymFuncBase(sp.Function):
     """
 
     @classmethod
-    def deriv_args(cls):
+    def deriv_args(cls) -> None:
         """
         Symbol arguments of function.
 
@@ -66,25 +67,28 @@ class SymFuncBase(sp.Function):
         --------
         sympy.utilities.lambdify.lambdify
         """
-        raise NotImplementedError("must specify in sublcass")
+        msg = "must specify in subclass"
+        raise NotImplementedError(msg)
 
-    def fdiff(self, argindex=1):
+    def fdiff(self, argindex=1) -> None:  # noqa: PLR6301
         """Derivative of function.  This will be used by :class:`thermoextrap.models.SymDerivBase`."""
-        raise NotImplementedError("must specify in subclass")
+        msg = "must specify in subclass"
+        raise NotImplementedError(msg)
 
     @classmethod
-    def eval(cls, beta):
+    def eval(cls, beta) -> None:  # noqa: ARG003
         """
         Evaluate function.
 
         We use the convention of passing in `beta='None'` to evaluate the
         function to an indexed variable.
         """
-        raise NotImplementedError("must specify in subclass")
+        msg = "must specify in subclass"
+        raise NotImplementedError(msg)
 
 
-@docfiller_shared
-class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
+@docfiller_shared.decorate
+class SymDerivBase:
     """
     Base class for working with recursive derivatives in expansions.
 
@@ -99,7 +103,7 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
     {post_func}
     """
 
-    def __init__(self, func, args=None, expand=True, post_func=None):
+    def __init__(self, func, args=None, expand=True, post_func=None) -> None:
         if args is None:
             args = func.deriv_args()
 
@@ -114,14 +118,14 @@ class SymDerivBase(metaclass=DocInheritMeta(style="numpy_with_merge")):
                     i = int(post_func.split("_")[-1])
                     post_func = lambda f: pow(f, i)
                 else:
-                    raise ValueError(
-                        "post_func must be callable or in {minus_log, pow_1, pow_2, ...}"
-                    )
+                    msg = "post_func must be callable or in {minus_log, pow_1, pow_2, ...}"
+                    raise ValueError(msg)
             func = post_func(func)
 
         self.func = func
         self.args = args
         self.expand = expand
+        self._cache: dict[str, Any] = {}
 
     @cached.meth
     def __getitem__(self, order):
@@ -154,7 +158,7 @@ class SymSubs:
     simplify : bool, default=False
         If True, simplify result.
     expand : bool, default=True
-        If True, try to exapand result.
+        If True, try to expand result.
     """
 
     funcs: Sequence[sp.Function] = field()
@@ -165,7 +169,7 @@ class SymSubs:
     simplify: bool = field(default=False)
     expand: bool = field(default=True)
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     @cached.meth
     def __getitem__(self, order):
@@ -218,7 +222,7 @@ class Lambdify:
         default=None, converter=attc.default_if_none(factory=dict)
     )
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     @cached.meth
     def __getitem__(self, order):
@@ -234,10 +238,7 @@ class Lambdify:
     @classmethod
     def from_du_dxdu(cls, exprs, xalpha=False, **lambdify_kws):
         """Factory for du/dxdu args."""
-        if xalpha:
-            x1 = get_default_indexed("x1")
-        else:
-            x1 = get_default_symbol("x1")
+        x1 = get_default_indexed("x1") if xalpha else get_default_symbol("x1")
         du, dxdu = get_default_indexed("du", "dxdu")
         return cls(exprs=exprs, args=(x1, du, dxdu), lambdify_kws=lambdify_kws)
 
@@ -247,6 +248,9 @@ class SymMinusLog:
     """Class to compute derivatives of Y = -log(<X>)."""
 
     X, dX = get_default_indexed("X", "dX")
+
+    def __init__(self) -> None:
+        self._cache: dict[str, Any] = {}
 
     @cached.meth
     def __getitem__(self, order):
@@ -281,7 +285,7 @@ class Derivatives(MyAttrsMixin):
         ``funcs[i](*args)`` gives the ith derivative
     exprs : sequence of Expr, optional
         expressions corresponding to the `funcs`
-        Mostly for debuggin purposes.
+        Mostly for debugging purposes.
     """
 
     #: Sequence of callable functions
@@ -291,7 +295,8 @@ class Derivatives(MyAttrsMixin):
     #: Arguments
     args: Sequence | None = kw_only_field(default=None)
 
-    def _apply_minus_log(self, X, order):
+    @staticmethod
+    def _apply_minus_log(X, order):
         func = factory_minus_log()
         return [func[i](X) for i in range(order + 1)]
 
@@ -336,17 +341,18 @@ class Derivatives(MyAttrsMixin):
         output : list of xarray.DataArray
             See above for nature of output
         """
-
         if data is not None:
             args = data.derivs_args
             if order is None:
                 order = data.order
 
         if args is None:
-            raise ValueError("must specify args or data")
+            msg = "must specify args or data"
+            raise ValueError(msg)
 
         if order is None:
-            raise ValueError("must specify order or data")
+            msg = "must specify order or data"
+            raise ValueError(msg)
 
         out = [self.funcs[i](*args) for i in range(order + 1)]
 
@@ -354,7 +360,7 @@ class Derivatives(MyAttrsMixin):
             out = self._apply_minus_log(X=out, order=order)
 
         if norm:
-            out = [x / np.math.factorial(i) for i, x in enumerate(out)]
+            out = [x / math.factorial(i) for i, x in enumerate(out)]
 
         if order_dim is not None:
             if concat_kws is None:
@@ -372,7 +378,6 @@ class Derivatives(MyAttrsMixin):
         --------
         derivs
         """
-
         return self.derivs(
             data=data,
             args=args,
@@ -405,7 +410,7 @@ class Derivatives(MyAttrsMixin):
 @lru_cache(10)
 def taylor_series_norm(order, order_dim="order"):
     """``taylor_series_coefficients = derivs * taylor_series_norm``."""
-    out = np.array([1 / np.math.factorial(i) for i in range(order + 1)])
+    out = np.array([1 / math.factorial(i) for i in range(order + 1)])
     if order_dim is not None:
         out = xr.DataArray(out, dims=order_dim)
     return out
@@ -415,7 +420,7 @@ def taylor_series_norm(order, order_dim="order"):
 class ExtrapModel(MyAttrsMixin):
     """Apply taylor series extrapolation."""
 
-    #: Alpha value data is evalulated at
+    #: Alpha value data is evaluated at
     alpha0: float = field(converter=float)
 
     #: Data object
@@ -433,7 +438,7 @@ class ExtrapModel(MyAttrsMixin):
     #: Name of `alpha`
     alpha_name: str = kw_only_field(default="alpha", converter=str)
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     @cached.meth
     def _derivs(self, order, order_dim, minus_log):
@@ -518,7 +523,7 @@ class ExtrapModel(MyAttrsMixin):
         p = xr.DataArray(np.arange(order + 1), dims=order_dim)
         prefac = dalpha**p
 
-        # TODO : this should be an option, same for derivs
+        # TODO(wpk): this should be an option, same for derivs
         coords = {}
         if dalpha_coords is not None:
             coords[dalpha_coords] = dalpha
@@ -555,9 +560,7 @@ class ExtrapModel(MyAttrsMixin):
         )
 
 
-# TODO: rename StateCollection to ModelSequence?
-
-
+# TODO(wpk): rename StateCollection to ModelSequence?
 @attrs.define
 class StateCollection(MyAttrsMixin):
     """
@@ -577,12 +580,12 @@ class StateCollection(MyAttrsMixin):
         default=None, converter=attc.default_if_none(factory=dict)
     )
 
-    _cache: dict = _cache_field()
+    _cache: dict = cache_field()
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.states)
 
     def __getitem__(self, idx):
@@ -590,24 +593,24 @@ class StateCollection(MyAttrsMixin):
 
     @property
     def alpha_name(self):
-        try:
-            alpha_name = self[0].alpha_name
-        except Exception:
-            alpha_name = "alpha"
-        return alpha_name
+        return getattr(self[0], "alpha_name", "alpha")
 
     def resample(self, indices=None, nrep=None, **kws):
         """Resample underlying models."""
         if indices is None:
             indices = [None] * len(self)
 
-        assert len(indices) == len(self)
+        if len(indices) != len(self):
+            msg = f"{len(indices)=} must equal {len(self)=}"
+            raise ValueError(msg)
 
         if "freq" in kws:
             freq = kws.pop("freq")
             if freq is None:
                 freq = [None] * len(self)
-            assert len(freq) == len(self)
+            if len(freq) != len(self):
+                msg = f"{len(freq)=} must equal {len(self)=}"
+                raise ValueError(msg)
 
             return type(self)(
                 states=tuple(
@@ -617,14 +620,13 @@ class StateCollection(MyAttrsMixin):
                 **self.kws,
             )
 
-        else:
-            return self.__class__(
-                states=tuple(
-                    state.resample(indices=idx, nrep=nrep, **kws)
-                    for state, idx in zip(self.states, indices)
-                ),
-                **self.kws,
-            )
+        return type(self)(
+            states=tuple(
+                state.resample(indices=idx, nrep=nrep, **kws)
+                for state, idx in zip(self.states, indices)
+            ),
+            **self.kws,
+        )
 
     def map(self, func, *args, **kwargs):
         """
@@ -634,7 +636,6 @@ class StateCollection(MyAttrsMixin):
         if func is a str, then
         ``out = [getattr(s, func)(*args, **kwargs) for s in self]``
         """
-
         if isinstance(func, str):
             out = [getattr(s, func)(*args, **kwargs) for s in self]
         else:
@@ -648,7 +649,6 @@ class StateCollection(MyAttrsMixin):
 
         defaults to concat with dim=pd.Index(self.alpha0, name=self.alpha_name)
         """
-
         out = self.map(func, *args, **kwargs)
         if isinstance(out[0], (xr.DataArray, xr.Dataset)):
             if concat_dim is None:
@@ -680,7 +680,6 @@ class StateCollection(MyAttrsMixin):
         out : object
             same type as `self` with new states added to `states` list
         """
-
         new_states = list(self.states) + list(states)
 
         if sort:
@@ -697,7 +696,7 @@ class StateCollection(MyAttrsMixin):
     def alpha0(self):
         return [m.alpha0 for m in self]
 
-    def _check_alpha(self, alpha, bounded=False):
+    def _check_alpha(self, alpha, bounded=False) -> None:
         if bounded:
             try:
                 seq = iter(alpha)
@@ -708,7 +707,8 @@ class StateCollection(MyAttrsMixin):
 
             for a in seq:
                 if a < lb or a > ub:
-                    raise ValueError(f"{a} outside of bounds [{lb}, {ub}]")
+                    msg = f"{a} outside of bounds [{lb}, {ub}]"
+                    raise ValueError(msg)
 
 
 def xr_weights_minkowski(deltas, m=20, dim="state"):
@@ -731,22 +731,22 @@ class PiecewiseMixin:
     def _indices_nearest_alpha(self, alpha):
         dalpha = np.abs(np.array(self.alpha0) - alpha)
         # two lowest
-        idx = np.argsort(dalpha)[:2]
-        return idx
+        return np.argsort(dalpha)[:2]
 
     def _indices_alpha(self, alpha, method):
         if method is None or method == "between":
             return self._indices_between_alpha(alpha)
-        elif method == "nearest":
+        if method == "nearest":
             return self._indices_nearest_alpha(alpha)
-        else:
-            raise ValueError(f"unknown method {method}")
+        msg = f"unknown method {method}"
+        raise ValueError(msg)
 
     def _states_alpha(self, alpha, method):
         return [self[i] for i in self._indices_alpha(alpha, method)]
 
 
 @attrs.define
+@docfiller_shared.inherit(StateCollection)
 class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
     """
     Weighted extrapolation model.
@@ -786,7 +786,6 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
         -----
         This requires that `states` are ordered in ascending `alpha0` order
         """
-
         self._check_alpha(alpha, bounded)
 
         if order is None:
@@ -836,11 +835,11 @@ class ExtrapWeightedModel(StateCollection, PiecewiseMixin):
         )
 
         w = xr_weights_minkowski(np.abs(out.dalpha))
-        out = (out * w).sum("state") / w.sum("state")
-        return out
+        return (out * w).sum("state") / w.sum("state")
 
 
 @attrs.define
+@docfiller_shared.inherit(StateCollection)
 class InterpModel(StateCollection):
     """Interpolation model."""
 
@@ -918,10 +917,10 @@ class InterpModel(StateCollection):
         p = xr.DataArray(np.arange(porder + 1), dims=order_dim)
         prefac = alpha**p
 
-        out = (prefac * coefs).sum(order_dim)
-        return out
+        return (prefac * coefs).sum(order_dim)
 
 
+@docfiller_shared.inherit(StateCollection)
 class InterpModelPiecewise(StateCollection, PiecewiseMixin):
     """Apposed to the multiple model InterpModel, perform a piecewise interpolation."""
 
@@ -949,7 +948,6 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
         alpha : float or sequence of float
 
         """
-
         self._check_alpha(alpha, bounded)
 
         if alpha_name is None:
@@ -991,10 +989,7 @@ class InterpModelPiecewise(StateCollection, PiecewiseMixin):
                     )
                 )
 
-            if len(out) == 1:
-                out = out[0]
-            else:
-                out = xr.concat(out, dim=alpha_name)
+            out = out[0] if len(out) == 1 else xr.concat(out, dim=alpha_name)
 
         return out
 
@@ -1040,12 +1035,14 @@ class PerturbModel(MyAttrsMixin):
 
 
 @attrs.define
+@docfiller_shared.inherit(StateCollection)
 class MBARModel(StateCollection):
     """Sadly, this doesn't work as beautifully."""
 
     def __attrs_pre_init__(self):
         if not has_pymbar():
-            raise ImportError("need pymbar to use this")
+            msg = "need pymbar to use this"
+            raise ImportError(msg)
 
     @cached.meth
     def _default_params(self, state_dim="state", alpha_name="alpha"):
@@ -1060,9 +1057,9 @@ class MBARModel(StateCollection):
         uv = uv.transpose(state_dim, rec_dim, ...)
 
         # alpha[alpha] * uv[state, rec_dim] = out[alpha, state, rec_dim]
-        Ukn = (alpha0 * uv).values.reshape(len(self), -1)
-        N = np.ones(len(self)) * len(xv[rec_dim])
-        mbar_obj = pymbar.mbar.MBAR(Ukn, N)
+        ukn = (alpha0 * uv).values.reshape(len(self), -1)
+        n = np.ones(len(self)) * len(xv[rec_dim])
+        mbar_obj = pymbar.mbar.MBAR(ukn, n)
 
         return uv, xv, alpha0, mbar_obj
 
@@ -1074,26 +1071,27 @@ class MBARModel(StateCollection):
         if alpha.ndim == 0:
             alpha = alpha.expand_dims(alpha.name)
 
-        uv, xv, alpha0, mbar_obj = self._default_params("state", alpha.name)
+        uv, xv, _alpha0, mbar_obj = self._default_params("state", alpha.name)
 
         dims = xv.dims
         x = np.array(xv, order="c")
         x_flat = x.reshape(x.shape[0] * x.shape[1], -1)
 
-        U = uv.values.reshape(-1)
+        u = uv.values.reshape(-1)
 
-        out = []
-        for b in alpha.values:
-            out.append(mbar_obj.compute_multiple_expectations(x_flat.T, b * U)["mu"])
+        out = np.array(
+            [
+                mbar_obj.compute_multiple_expectations(x_flat.T, b * u)["mu"]
+                for b in alpha.values
+            ]
+        )
 
-        out = np.array(out)
         # reshape
         shape = (out.shape[0],) + x.shape[2:]
-        out = xr.DataArray(
+        return xr.DataArray(
             out.reshape(shape), dims=(alpha.name,) + dims[2:]
         ).assign_coords(alpha=alpha)
 
-        return out
-
-    def resample(self, *args, **kwargs):
-        raise NotImplementedError("resample not implemented for this class")
+    def resample(self, *args, **kwargs) -> None:  # noqa: PLR6301
+        msg = "resample not implemented for this class"
+        raise NotImplementedError(msg)

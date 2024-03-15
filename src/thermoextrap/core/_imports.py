@@ -16,4 +16,4 @@ def has_pymbar():
     return find_spec("pymbar") is not None
 
 
-__all__ = ["sympy", "has_pymbar"]
+__all__ = ["has_pymbar", "sympy"]

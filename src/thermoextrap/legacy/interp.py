@@ -1,10 +1,12 @@
-"""Interpolation classes
-"""
+"""Interpolation class."""
+from __future__ import annotations
 
+import math
 import numpy as np
 from scipy.special import factorial
 
 from .extrap import ExtrapModel
+from cmomy.random import validate_rng
 
 
 class ExtrapWeightedModel(ExtrapModel):
@@ -109,10 +111,10 @@ class ExtrapWeightedModel(ExtrapModel):
         for o in range(order + 1):
             predictVals[0] += np.tensordot(
                 (dBeta[0] ** o), params[0, o], axes=0
-            ) / np.math.factorial(o)
+            ) / math.factorial(o)
             predictVals[1] += np.tensordot(
                 (dBeta[1] ** o), params[1, o], axes=0
-            ) / np.math.factorial(o)
+            ) / math.factorial(o)
 
         w1, w2 = weightsMinkowski(abs(dBeta[0]), abs(dBeta[1]))
 
@@ -123,10 +125,12 @@ class ExtrapWeightedModel(ExtrapModel):
 
         return outVals
 
-    def resampleData(self):
+    def resampleData(self, rng: np.random.Generator | None = None):
         """Function to resample the data, mainly for use in providing bootstrapped estimates.
         Should be adjusted to match the data structure.
         """
+        rng = validate_rng(rng)
+
         if self.x is None:
             raise TypeError(
                 "self.x is None - need to define data in model (i.e. train)"
@@ -137,7 +141,7 @@ class ExtrapWeightedModel(ExtrapModel):
 
         for i in range(self.x.shape[0]):
             sampSize = self.x[i].shape[0]
-            randInds = np.random.choice(sampSize, size=sampSize, replace=True)
+            randInds = rng.choice(sampSize, size=sampSize, replace=True)
             sampX[i] = self.x[i, randInds, :]
             sampU[i] = self.U[i, randInds]
 
@@ -271,10 +275,12 @@ class InterpModel(ExtrapModel):
 
         return outvals
 
-    def resampleData(self):
+    def resampleData(self, rng: np.random.Generator | None = None):
         """Function to resample the data, mainly for use in providing bootstrapped estimates.
         Should be adjusted to match the data structure.
         """
+        rng = validate_rng(rng)
+
         if self.x is None:
             raise TypeError(
                 "self.x is None - need to define data in model (i.e. train)"
@@ -285,7 +291,7 @@ class InterpModel(ExtrapModel):
 
         for i in range(self.x.shape[0]):
             sampSize = self.x[i].shape[0]
-            randInds = np.random.choice(sampSize, size=sampSize, replace=True)
+            randInds = rng.choice(sampSize, size=sampSize, replace=True)
             sampX[i] = self.x[i, randInds, :]
             sampU[i] = self.U[i, randInds]
 

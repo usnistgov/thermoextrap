@@ -1,8 +1,6 @@
 # Written by Jacob I. Monroe, NIST employee
 
-"""
-Tests for active learning based on those GP models with derivatives.
-"""
+"""Tests for active learning based on those GP models with derivatives."""
 
 import gpflow
 import numpy as np
@@ -18,7 +16,7 @@ from thermoextrap.gpr_active import active_utils, gp_models, ig_active
 
 
 # First test some simple utility functions, starting with sympy expressions for RBF
-def test_rbf_expr():
+def test_rbf_expr() -> None:
     l_sym = sp.symbols("l_0", real=True)
     var_sym = sp.symbols("var", real=True)
     x1_sym = sp.symbols("x1_0", real=True)
@@ -29,30 +27,30 @@ def test_rbf_expr():
     assert var_sym in check_expr.free_symbols
     assert x1_sym in check_expr.free_symbols
     assert x2_sym in check_expr.free_symbols
-    assert "l_0" in check_params.keys()
-    assert "var" in check_params.keys()
+    assert "l_0" in check_params
+    assert "var" in check_params
 
-    def rbf(var, l, x1, x2):
-        return var * np.exp(-0.5 * (x1 / l - x2 / l) ** 2)
+    def rbf(var, volume, x1, x2):
+        return var * np.exp(-0.5 * (x1 / volume - x2 / volume) ** 2)
 
     check_var = np.array([0.0, 1.0, 2.0, -1.0])
     check_l = np.array([1.0, 2.0])
     check_x = np.array([0.0, 0.5, 1.0, 2.0, -0.5, -1.0, -2.0])
     for v in check_var:
-        for l in check_l:
+        for volume in check_l:
             for x1 in check_x:
                 for x2 in check_x:
                     out_expr = check_expr.subs(
-                        [(var_sym, v), (l_sym, l), (x1_sym, x1), (x2_sym, x2)]
+                        [(var_sym, v), (l_sym, volume), (x1_sym, x1), (x2_sym, x2)]
                     )
-                    assert out_expr == rbf(v, l, x1, x2)
+                    assert out_expr == rbf(v, volume, x1, x2)
 
 
 # Next test function for building GP inputs from thermoextrap ExtrapModel objects
 # (representing thermodynamic states)
-def test_make_GP_input():
+def test_make_gp_input() -> None:
     beta = 5.6
-    state = ig_active.extrap_IG(beta)
+    state = ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
 
     # Test without logarithm on x
     check_x, check_y, check_cov = active_utils.input_GP_from_state(state)
@@ -106,7 +104,7 @@ def test_make_GP_input():
             "numpy",
         )
 
-    state_mult = ig_active.multiOutput_extrap_IG(beta)
+    state_mult = ig_active.multiOutput_extrap_IG(beta, rng=np.random.default_rng(42))
     check_x_mult, check_y_mult, check_cov_mult = active_utils.input_GP_from_state(
         state_mult
     )
@@ -125,13 +123,13 @@ def test_make_GP_input():
 
 
 # Next want to test creation of a GP model
-def test_base_GP_creation():
+def test_base_gp_creation() -> None:
     # Need data to work with
     raw_x_data = []
     raw_y_data = []
     raw_cov_data = []
     for beta in [1.0, 5.6, 9.0]:
-        s = ig_active.extrap_IG(beta)
+        s = ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
         this_x, this_y, this_cov = active_utils.input_GP_from_state(s)
         raw_x_data.append(this_x)
         raw_y_data.append(this_y)
@@ -249,15 +247,15 @@ def test_base_GP_creation():
 
 # Simple test for checking training of GP model
 # Test is a bit slow, though
-@pytest.mark.slow
-def test_train_GP():
+@pytest.mark.slow()
+def test_train_gp() -> None:
     # Will compare training results to a reference
     # Need data to work with
     raw_x_data = []
     raw_y_data = []
     raw_cov_data = []
     for beta in [1.0, 5.6, 9.0]:
-        s = ig_active.extrap_IG(beta)
+        s = ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
         this_x, this_y, this_cov = active_utils.input_GP_from_state(s)
         raw_x_data.append(this_x)
         raw_y_data.append(this_y)
@@ -290,12 +288,13 @@ def test_train_GP():
 
 # Simple test for creating a GP model from list of states
 # Also a bit slow
-@pytest.mark.slow
-def test_create_GP_from_states():
+@pytest.mark.slow()
+def test_create_gp_from_states() -> None:
     # Need data to work with
-    states = []
-    for beta in [1.0, 5.6, 9.0]:
-        states.append(ig_active.extrap_IG(beta))
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42))
+        for beta in [1.0, 5.6, 9.0]
+    ]
 
     n_gp_points = np.sum([s.order + 1 for s in states])
 
@@ -305,9 +304,10 @@ def test_create_GP_from_states():
     assert gp.likelihood.cov.shape == (gp.data[1].shape[1], n_gp_points, n_gp_points)
 
     # Also test with multidimensional data
-    states_mult = []
-    for beta in [1.0, 5.6, 9.0]:
-        states_mult.append(ig_active.multiOutput_extrap_IG(beta))
+    states_mult = [
+        ig_active.multiOutput_extrap_IG(beta, rng=np.random.default_rng(42))
+        for beta in [1.0, 5.6, 9.0]
+    ]
     gp_mult = active_utils.create_GPR(states_mult)
     assert gp_mult.data[0].shape == (n_gp_points, 2)
     assert gp_mult.data[1].shape == (n_gp_points, 2)
@@ -319,13 +319,13 @@ def test_create_GP_from_states():
 
 
 # Testing update and stopping function classes
-@pytest.mark.slow
-def test_update_stop_ABC():
+@pytest.mark.slow()
+def test_update_stop_abc() -> None:
     # Need data to work with
-    states = []
     beta_list = [1.0, 5.6, 9.0]
-    for beta in beta_list:
-        states.append(ig_active.extrap_IG(beta))
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp = active_utils.create_GPR(states)
 
@@ -381,22 +381,22 @@ def test_update_stop_ABC():
 
     # Check to make sure GP used properly for default case (just runs the function)
     (
-        out_default_mu,
-        out_default_std,
-        out_default_conf,
+        _out_default_mu,
+        _out_default_std,
+        _out_default_conf,
     ) = check_default.get_transformed_GP_output(gp, out_default_grid)
 
 
 # For update classes, all have different update criteria
 # Rather than check all of these (hard for random...)
 # just check to make sure satisfy correct input/output structure
-@pytest.mark.slow
-def test_update_classes():
+@pytest.mark.slow()
+def test_update_classes() -> None:
     # Need data to work with
-    states = []
     beta_list = [1.0, 5.6, 9.0]
-    for beta in beta_list:
-        states.append(ig_active.extrap_IG(beta))
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp = active_utils.create_GPR(states)
 
@@ -419,10 +419,10 @@ def test_update_classes():
     assert isinstance(out_space[0], float)
 
     # ALM (max variance) update function
-    check_ALM = active_utils.UpdateALMbrute()
-    out_ALM = check_ALM(gp, beta_list)
-    assert len(out_ALM) == 3
-    assert isinstance(out_ALM[0], float)
+    check_alm = active_utils.UpdateALMbrute()
+    out_alm = check_alm(gp, beta_list)
+    assert len(out_alm) == 3
+    assert isinstance(out_alm[0], float)
 
     # Adaptive integration updates
     # (furthest point satisfying error tolerance)
@@ -432,13 +432,14 @@ def test_update_classes():
     assert isinstance(out_adapt[0], float)
 
 
-@pytest.mark.slow
-def test_update_classes_multioutput():
+@pytest.mark.slow()
+def test_update_classes_multioutput() -> None:
     # Need data to work with
-    states = []
     beta_list = [1.0, 5.6, 9.0]
-    for beta in beta_list:
-        states.append(ig_active.multiOutput_extrap_IG(beta))
+    states = [
+        ig_active.multiOutput_extrap_IG(beta, rng=np.random.default_rng(42))
+        for beta in beta_list
+    ]
     # And trained GP
     gp = active_utils.create_GPR(states)
 
@@ -457,11 +458,11 @@ def test_update_classes_multioutput():
     assert out_space[1].shape[0] == 2
 
     # ALM (max variance) update function
-    check_ALM = active_utils.UpdateALMbrute()
-    out_ALM = check_ALM(gp, beta_list)
-    assert len(out_ALM) == 3
-    assert isinstance(out_ALM[0], float)
-    assert out_ALM[1].shape[0] == 2
+    check_alm = active_utils.UpdateALMbrute()
+    out_alm = check_alm(gp, beta_list)
+    assert len(out_alm) == 3
+    assert isinstance(out_alm[0], float)
+    assert out_alm[1].shape[0] == 2
 
     # Adaptive integration updates
     # (furthest point satisfying error tolerance)
@@ -474,8 +475,8 @@ def test_update_classes_multioutput():
 
 # Same for metric classes
 # just check mechanics for taking inputs and generic features of outputs
-@pytest.mark.slow
-def test_metrics():
+@pytest.mark.slow()
+def test_metrics() -> None:
     # Need to create inputs to work with
     # Expects "history" which is a list of array-likes
     # where index zero is GP means over time and index one is vars
@@ -522,10 +523,10 @@ def test_metrics():
     assert check_maxiter(hist, x, None) > check_maxiter.tol
 
     # For special ErrorStability class, actually need a GP model
-    states = []
     beta_list = [1.0, 2.3, 5.6, 9.0]
-    for beta in beta_list:
-        states.append(ig_active.extrap_IG(beta))
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp_2 = active_utils.create_GPR([states[0], states[-1]])
     gp_3 = active_utils.create_GPR([states[0], states[2], states[-1]])
@@ -554,13 +555,13 @@ def test_metrics():
 
 
 # Test class for implementing stopping criteria
-@pytest.mark.slow
-def test_stop_criteria():
+@pytest.mark.slow()
+def test_stop_criteria() -> None:
     # Need data to work with
-    states = []
     beta_list = [1.0, 5.6, 9.0]
-    for beta in beta_list:
-        states.append(ig_active.extrap_IG(beta))
+    states = [
+        ig_active.extrap_IG(beta, rng=np.random.default_rng(42)) for beta in beta_list
+    ]
     # And trained GP
     gp_prev = active_utils.create_GPR([states[0], states[-1]])
     gp = active_utils.create_GPR(states)
@@ -617,14 +618,14 @@ def test_stop_criteria():
         conf = [x * (y - 2.0 * y_std), x * (y + 2.0 * y_std)]
         return out, y_std, conf
 
-    check_stop_withES = active_utils.StopCriteria(
+    check_stop_with_es = active_utils.StopCriteria(
         [m_var, m_msd, m_es],
         d_order_pred=1,
         transform_func=check_transform,
         log_scale=True,
     )
     assert m_es.d_order_pred == 1
-    assert m_es.transform_func == check_stop_withES.transform_func
+    assert m_es.transform_func == check_stop_with_es.transform_func
     assert m_es.log_scale is True
 
 
@@ -633,12 +634,24 @@ def test_stop_criteria():
 # Specifically, need to be able to set random seed for all parts of process
 # Includes bootstrapping of data in thermoextrap/cmomy
 # Just need to carefully check where calling np.random throughout all code
-import io
-from contextlib import redirect_stdout
+# import io
+# from contextlib import redirect_stdout
+import logging
+
+# def test_thing_1(caplog) -> None:
+#     with caplog.at_level(logging.INFO):
+#         active_utils.thing("max")
+#     assert "Reached maximum iterations" in caplog.text
 
 
-@pytest.mark.slow
-def test_active_learning():
+# def test_thing_2(caplog) -> None:
+#     with caplog.at_level(logging.INFO):
+#         active_utils.thing("stop")
+#     assert "Stopping criteria satisfied" in caplog.text
+
+
+@pytest.mark.slow()
+def test_active_learning(caplog) -> None:
     # Starting beta values
     init_states = [1.0, 9.6]
     sims = ig_active.SimulateIG()
@@ -651,7 +664,7 @@ def test_active_learning():
         active_utils.MaxIter(),
     ]
 
-    with io.StringIO() as buf, redirect_stdout(buf):
+    with caplog.at_level(logging.INFO):
         # Once where should reach maximum iterations
         stops = active_utils.StopCriteria(metrics)
         active_utils.active_learning(
@@ -661,10 +674,25 @@ def test_active_learning():
             stop_criteria=stops,
             max_iter=4,
         )
-        output = buf.getvalue()
-    assert "Reached maximum iterations" in output
 
-    with io.StringIO() as buf, redirect_stdout(buf):
+    assert "Reached maximum iterations" in caplog.text
+
+
+@pytest.mark.slow()
+def test_active_learning_2(caplog) -> None:
+    # Starting beta values
+    init_states = [1.0, 9.6]
+    sims = ig_active.SimulateIG()
+    updates = active_utils.UpdateALMbrute()
+    metrics = [
+        active_utils.MaxVar(1e-03),
+        active_utils.MaxRelVar(1e-02),
+        active_utils.MSD(1.0),
+        active_utils.MaxAbsRelDeviation(1e-02),
+        active_utils.MaxIter(),
+    ]
+
+    with caplog.at_level(logging.INFO):
         # And once where expect to stop early
         stops_early = active_utils.StopCriteria(metrics[:-1])
         active_utils.active_learning(
@@ -674,5 +702,4 @@ def test_active_learning():
             stop_criteria=stops_early,
             max_iter=4,
         )
-        output = buf.getvalue()
-    assert "Stopping criteria satisfied" in output
+    assert "Stopping criteria satisfied" in caplog.text

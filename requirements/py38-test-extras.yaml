@@ -12,13 +12,14 @@ channels:
 dependencies:
   - python=3.8
   - pandas
-  - pymbar>=4.0
   - pytest
   - pytest-cov
   - pytest-sugar
   - pytest-xdist
   - pip
   - pip:
-      - gpflow >= 2.6.0
-      - tensorflow
-      - tensorflow-probability
+      - gpflow>=2.6.0
+      - jax[cpu]<0.4.25
+      - pymbar>=4.0
+      - tensorflow-probability[tf]
+      - tensorflow>=2.13

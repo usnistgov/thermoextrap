@@ -15,9 +15,9 @@ from thermoextrap.gpr_active import active_utils
 
 
 def parse_bool(astr):
-    if astr in ["True", "true", "Yes", "yes", "Y", "y"]:
+    if astr in {"True", "true", "Yes", "yes", "Y", "y"}:
         return True
-    elif astr in ["False", "false", "No", "no", "N", "n"]:
+    elif astr in {"False", "false", "No", "no", "N", "n"}:
         return False
     else:
         raise ValueError("Provided string %s is not convertible to boolean." % astr)
@@ -72,8 +72,7 @@ class DataWrapPsat(active_utils.DataWrapper):
         dat = []
         for f in self.x_files:
             dat.append(np.loadtxt(f))
-        dat = np.vstack(dat)
-        return dat
+        return np.vstack(dat)
 
     def build_state(self, max_order=None):
         """Builds a state that provides derivs."""
@@ -113,7 +112,7 @@ class DensityGPModel:
 
     def __call__(self, beta):
         gpr_pred = self.gp.predict_f(np.vstack([beta, np.zeros_like(beta)]).T)
-        pred_mu, pred_std, pred_conf_int = self.transform_func(
+        pred_mu, _pred_std, _pred_conf_int = self.transform_func(
             beta,
             gpr_pred[0].numpy(),
             gpr_pred[1].numpy(),
@@ -199,8 +198,9 @@ def find_phase_boundary(lnPi, pad=20):
         else:
             break
     if len(local_mins) > 1 and pad > len(lnPi) // 2:
+        msg = ">1 local minima found, even with padding of full width of lnPi"
         raise AttributeError(
-            ">1 local minima found, even with padding of full width of lnPi"
+            msg
         )
 
     # Looking for a local minimum in between two local maxima, ideally
@@ -362,7 +362,7 @@ def main(inp_files, output_dir, mcf_file, ff_file, pdb_file, no_stop):
                 u=avg_pot_moms1, xu=avg_xpot_moms1, central=True
             )
             state1 = thermoextrap.beta.factory_extrapmodel(
-                beta=b, data=data1, post_func=lambda x: sp.log(x)
+                beta=b, data=data1, post_func=sp.log
             )
             derivs1 = state1.derivs(norm=False)
             # Phase 2
@@ -410,7 +410,7 @@ def main(inp_files, output_dir, mcf_file, ff_file, pdb_file, no_stop):
                 u=avg_pot_moms2, xu=avg_xpot_moms2, central=True
             )
             state2 = thermoextrap.beta.factory_extrapmodel(
-                beta=b, data=data2, post_func=lambda x: sp.log(x)
+                beta=b, data=data2, post_func=sp.log
             )
             derivs2 = state2.derivs(norm=False)
             this_derivs.append(xr.concat([derivs1, derivs2], dim="val"))

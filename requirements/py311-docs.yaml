@@ -10,30 +10,29 @@
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.11
   - attrs
   - autodocsumm
-  - cmomy >= 0.5
-  - custom-inherit
-  - ghp-import
-  - ipython
+  - cmomy>=0.8
+  - docstring-inheritance
   - lazy_loader
-  - matplotlib
-  - module-utilities >= 0.2
+  - matplotlib-base
+  - module-utilities>=0.2
   - myst-nb
-  - numpy >= 1.20
+  - numpy>=1.20
   - pyenchant
-  - pymbar>=4.0
   - scipy
-  - sphinx >= 5.3.0
   - sphinx-autobuild
   - sphinx-book-theme
   - sphinx-copybutton
+  - sphinx>=5.3.0
   - sphinxcontrib-spelling
   - sympy
-  - xarray >= 0.16
+  - xarray>=0.16
   - pip
   - pip:
-      - gpflow >= 2.6.0
-      - tensorflow
-      - tensorflow-probability
+      - gpflow>=2.6.0
+      - jax[cpu]<0.4.25
+      - pymbar>=4.0
+      - tensorflow-probability[tf]
+      - tensorflow>=2.13

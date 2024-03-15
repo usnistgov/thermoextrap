@@ -1,27 +1,41 @@
 """Script to create pythons for use with virtualenvs"""
+
 from __future__ import annotations
 
+import sys
 from functools import lru_cache
+
+if sys.version_info < (3, 9):
+    msg = "Requires python >= 3.9"
+    raise RuntimeError(msg)
+
+import logging
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
 
 @lru_cache
 def conda_cmd() -> str:
+    """Get conda/mamba command."""
     import shutil
 
     if shutil.which("mamba"):
-        return "mamba"
+        out = "mamba"
     elif shutil.which("conda"):
-        return "conda"
+        out = "conda"
     else:
-        raise ValueError("must have mamba or conda on path")
+        msg = "must have mamba or conda on path"
+        raise ValueError(msg)
+    return out
 
 
 def create_env_from_spec(
     env_name: str,
     spec: str | list[str],
-    verbose: bool = True,
     flags: str | list[str] | None = None,
 ) -> None:
+    """Create environment from spec."""
     import shlex
     import subprocess
 
@@ -32,21 +46,21 @@ def create_env_from_spec(
         flags = " ".join(flags)
 
     cmd = f"{conda_cmd()} create -n {env_name} {flags} {spec} "
-    if verbose:
-        print(cmd)
+    logging.info("running %s", cmd)
 
     out = subprocess.check_call(shlex.split(cmd))
     if out != 0:
-        raise RuntimeError(f"failed {cmd}")
+        msg = f"failed {cmd}"
+        raise RuntimeError(msg)
 
 
 def create_environments(
     template: str = "test-{version}",
     versions: str | list[str] | None = None,
-    verbose: bool = True,
     flags: str | list[str] | None = None,
     env_map: dict[str, str] | None = None,
 ) -> None:
+    """Create environment."""
     if versions is None:
         versions = ["3.8", "3.9", "3.10", "3.11"]
 
@@ -58,25 +72,27 @@ def create_environments(
 
         if env_map and env_name in env_map:
             # environment exists
-            if verbose:
-                print(
-                    f"Skipping environment {env_name}.  Pass `--no-skip` to force recreation."
-                )
+            logging.info(
+                "Skipping environment %s.  Pass `--no-skip` to force recreation.",
+                env_name,
+            )
         else:
-            if verbose:
-                print(f"Creating environment {env_name}.")
+            logging.info("Creating environment %s.", env_name)
 
             spec = f"python={version}"
             create_env_from_spec(
-                env_name=env_name, spec=spec, flags=flags, verbose=verbose
+                env_name=env_name,
+                spec=spec,
+                flags=flags,
             )
 
 
 def main() -> None:
+    """Main runner."""
     import argparse
 
     p = argparse.ArgumentParser(
-        description="Create conda environments for creating virtualenvs"
+        description="Create conda environments for creating virtualenvs",
     )
 
     p.add_argument(
@@ -100,11 +116,18 @@ def main() -> None:
         """,
     )
     p.add_argument(
-        "--yes", default=False, action="store_true", help="pass `--yes` to conda create"
+        "--yes",
+        default=False,
+        action="store_true",
+        help="pass `--yes` to conda create",
     )
     p.add_argument("--dry", default=False, action="store_true", help="Do dry run.")
     p.add_argument(
-        "-v", dest="verbose", default=False, action="store_true", help="verbose"
+        "-v",
+        dest="verbose",
+        default=False,
+        action="store_true",
+        help="verbose",
     )
     p.add_argument(
         "--skip",
@@ -114,9 +137,12 @@ def main() -> None:
 
     args = p.parse_args()
 
-    print(args)
+    if args.verbose:
+        logger.setLevel(logging.INFO)
 
-    flags = []
+    logging.info(f"{args=}")  # noqa: G004
+
+    flags: list[str] = []
     if args.yes:
         flags.append("--yes")
     if args.dry:
@@ -132,14 +158,13 @@ def main() -> None:
     create_environments(
         versions=args.python_version,
         template=args.template,
-        verbose=args.verbose,
         flags=flags,
         env_map=env_map,
     )
 
 
 if __name__ == "__main__":
-    if __package__ is None:
+    if __package__ is None:  # pyright: ignore[reportUnnecessaryComparison]
         # Magic to be able to run script as either
         #   $ python -m tools.create_python
         # or

@@ -10,32 +10,36 @@
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.11
   - attrs
   - bottleneck
-  - cmomy >= 0.5
-  - custom-inherit
+  - cmomy>=0.8
+  - docstring-inheritance
   - ipykernel
   - ipython
   - lazy_loader
-  - matplotlib
-  - module-utilities >= 0.2
-  - mypy >= 1.4.1
-  - numpy >= 1.20
+  - matplotlib-base
+  - module-utilities>=0.2
+  - mypy>=1.9.0
+  - nbclient>=0.10.0
+  - nbval
+  - nox>=2024.3.2
+  - numpy>=1.20
+  - packaging
   - pandas
-  - pymbar>=4.0
+  - pandas-stubs
   - pytest
   - pytest-cov
   - pytest-sugar
   - pytest-xdist
-  - pytype
   - scipy
-  - setuptools-scm
   - sympy
-  - xarray >= 0.16
+  - xarray>=0.16
   - pip
   - pip:
-      - gpflow >= 2.6.0
+      - gpflow>=2.6.0
+      - jax[cpu]<0.4.25
+      - pymbar>=4.0
       - pytest-accept
-      - tensorflow
-      - tensorflow-probability
+      - tensorflow-probability[tf]
+      - tensorflow>=2.13

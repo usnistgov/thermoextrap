@@ -8,4 +8,6 @@
 # Instead edit the corresponding pyproject.toml file.
 #
 build
-twine
+hatch-fancy-pypi-readme
+hatch-vcs
+hatchling

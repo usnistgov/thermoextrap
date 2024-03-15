@@ -6,6 +6,7 @@ models and active learning strategies.
 """
 
 import numpy as np
+from cmomy.random import validate_rng
 
 
 def noise_func(x, s, n):
@@ -34,7 +35,8 @@ def make_data(
     slope=0.1,
     order_scale=1.0,
     max_order=4,
-    rng=np.random.default_rng(42),
+    # seed=None,
+    rng=None,
 ):
     """
     Creates data with heteroscedastic noise around sin(x).
@@ -57,6 +59,8 @@ def make_data(
         Y_err - variance in each y value - assumes all values and derivatives independent
                 (diagonal covariance matrix)
     """
+    rng = validate_rng(rng)
+
     if isinstance(x_vals, (float, int)):
         x_vals = [x_vals]
     x_vals = np.array(x_vals)
