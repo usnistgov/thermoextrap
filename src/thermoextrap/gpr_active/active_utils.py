@@ -2,10 +2,16 @@
 GPR utilities (:mod:`~thermoextrap.gpr_active.active_utils`)
 ------------------------------------------------------------
 """
-import glob
+
+from __future__ import annotations
+
+import contextlib
+import logging
 import multiprocessing
-import os
 import time
+import warnings
+from pathlib import Path
+from typing import NoReturn
 
 import gpflow
 import numpy as np
@@ -13,18 +19,24 @@ import sympy as sp
 
 # import tensorflow as tf
 import xarray as xr
+from cmomy.random import validate_rng
 from pymbar import timeseries
 from scipy import integrate, linalg, special
 
-from .. import beta as xpan_beta
-from ..data import DataCentralMomentsVals
-from ..models import ExtrapModel
+from thermoextrap import beta as xpan_beta
+from thermoextrap.data import DataCentralMomentsVals
+from thermoextrap.models import ExtrapModel
+
 from .gp_models import (
     ConstantMeanWithDerivs,
     DerivativeKernel,
     HeteroscedasticGPR,
     LinearWithDerivs,
 )
+
+logger = logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 # from typing import Optional
 
@@ -39,10 +51,9 @@ def get_logweights(bias):
     log_denom = (
         np.log(np.sum(np.exp(bias - bias_max))) + bias_max
     )  # - np.log(bias.shape[0])
-    logw = (
+    return (
         bias - log_denom
     )  # - np.log(bias.shape[0]) # Acts as weight summing to 1 this way
-    return logw
 
 
 def input_GP_from_state(state, n_rep=100, log_scale=False):
@@ -100,30 +111,34 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
         log_derivs = np.zeros_like(derivs)
         log_derivs[0, :] = derivs[0, :]
         resamp_log_derivs = xr.zeros_like(resamp_derivs)
-        resamp_log_derivs[dict(order=0)] = resamp_derivs[dict(order=0)].values
+        resamp_log_derivs[{"order": 0}] = resamp_derivs[{"order": 0}].values
         for n in range(1, derivs.shape[0]):
             for k in range(1, n + 1):
                 bell_fac = sp.bell(
                     n, k, state.alpha0 * (np.log(10.0) ** np.arange(1, n - k + 2))
                 )
                 log_derivs[n, :] = log_derivs[n, :] + derivs[k, :] * bell_fac
-                resamp_log_derivs[dict(order=n)] = (
-                    resamp_log_derivs[dict(order=n)].values
-                    + resamp_derivs[dict(order=k)].values * bell_fac
+                resamp_log_derivs[{"order": n}] = (
+                    resamp_log_derivs[{"order": n}].values
+                    + resamp_derivs[{"order": k}].values * bell_fac
                 )
         y_data = log_derivs
         # Compute full covariance matrix
         # Note loop over output dimensions since will have independent covariance for each
-        cov_data = []
-        for k in range(resamp_log_derivs.shape[-1]):
-            cov_data.append(np.cov(resamp_log_derivs.values[..., k]))
-        cov_data = np.array(cov_data)
+        cov_data = np.array(
+            [
+                np.cov(resamp_log_derivs.values[..., k])
+                for k in range(resamp_log_derivs.shape[-1])
+            ]
+        )
     else:
         y_data = derivs
-        cov_data = []
-        for k in range(resamp_derivs.shape[-1]):
-            cov_data.append(np.cov(resamp_derivs.values[..., k]))
-        cov_data = np.array(cov_data)
+        cov_data = np.array(
+            [
+                np.cov(resamp_derivs.values[..., k])
+                for k in range(resamp_derivs.shape[-1])
+            ]
+        )
 
     return x_data, y_data, cov_data
 
@@ -175,11 +190,13 @@ class DataWrapper:
         x_files=None,
         n_frames=10000,
         u_col=2,
-        cv_cols=[1, 2],
-        x_col=[
-            1,
-        ],
-    ):
+        cv_cols=None,
+        x_col=None,
+    ) -> None:
+        if x_col is None:
+            x_col = [1]
+        if cv_cols is None:
+            cv_cols = [1, 2]
         self.sim_info_files = sim_info_files
         self.cv_bias_files = cv_bias_files
         self.beta = beta
@@ -195,12 +212,9 @@ class DataWrapper:
 
     def load_U_info(self):
         """Loads potential energies from a list of files."""
-        U = []
-        for f in self.sim_info_files:
-            U.append(np.loadtxt(f)[-self.n_frames :, self.u_col])
+        U = [np.loadtxt(f)[-self.n_frames :, self.u_col] for f in self.sim_info_files]
         # If eventually using MBAR, will want to vstack instead
-        U = np.hstack(U)
-        return U
+        return np.hstack(U)
 
     def load_CV_info(self):
         """
@@ -220,11 +234,8 @@ class DataWrapper:
 
     def load_x_info(self):
         """Loads observable data."""
-        x = []
-        for f in self.x_files:
-            x.append(np.loadtxt(f)[-self.n_frames :, self.x_col])
-        x = np.vstack(x)
-        return x
+        x = [np.loadtxt(f)[-self.n_frames :, self.x_col] for f in self.x_files]
+        return np.vstack(x)
 
     def get_data(self):
         """
@@ -235,10 +246,7 @@ class DataWrapper:
         cv, bias = self.load_CV_info()
         # If the cv we bias along is the x of interest for extrapolation, return that
         # Otherwise, load x generically (if x_file specified)
-        if self.x_files is not None:
-            x = self.load_x_info()
-        else:
-            x = cv[:, None]
+        x = self.load_x_info() if self.x_files is not None else cv[:, None]
         # Need to subtract bias from total potential energy
         pot = tot_pot - bias
         # Extract statistical inefficiencies for x and pot and pick largest
@@ -282,8 +290,7 @@ class DataWrapper:
         state_data = DataCentralMomentsVals.from_vals(
             uv=u_vals, xv=x_vals, w=weights, order=max_order
         )
-        state = xpan_beta.factory_extrapmodel(self.beta, state_data)
-        return state
+        return xpan_beta.factory_extrapmodel(self.beta, state_data)
 
 
 class SimWrapper:
@@ -329,14 +336,20 @@ class SimWrapper:
         sys_name,
         info_name,
         bias_name,
-        kw_inputs={},
-        data_kw_inputs={},
+        kw_inputs=None,
+        data_kw_inputs=None,
         data_class=DataWrapper,
         post_process_func=None,
         post_process_out_name=None,
-        post_process_kw_inputs={},
+        post_process_kw_inputs=None,
         pre_process_func=None,
-    ):
+    ) -> None:
+        if post_process_kw_inputs is None:
+            post_process_kw_inputs = {}
+        if data_kw_inputs is None:
+            data_kw_inputs = {}
+        if kw_inputs is None:
+            kw_inputs = {}
         self.sim_func = sim_func  # Function for running a simulation
         self.struc_file = (
             struc_name  # Name of structure file for positions and topology
@@ -347,9 +360,9 @@ class SimWrapper:
         self.kw_inputs = (
             kw_inputs  # Dictionary of other key-word args for the simulation
         )
-        self.kw_inputs[
-            "info_name"
-        ] = self.info_name  # Restricts naming convention for sim_func
+        self.kw_inputs["info_name"] = (
+            self.info_name
+        )  # Restricts naming convention for sim_func
         self.kw_inputs["bias_name"] = self.bias_name
         self.data_kw_inputs = data_kw_inputs
         self.data_class = data_class
@@ -367,8 +380,9 @@ class SimWrapper:
         right files. By default only one, but will run n_repeats in parallel if specified.
         """
         # Create directory if does not exist
-        if not os.path.isdir(sim_dir):
-            os.mkdir(sim_dir)
+        sim_dir = Path(sim_dir)
+        if not sim_dir.is_dir():
+            sim_dir.mkdir()
 
         # Pre-processing function output
         if self.pre_func is not None:
@@ -376,7 +390,8 @@ class SimWrapper:
             extra_kwargs = {**extra_kwargs, **pre_output}
 
         # Determine numbering of runs so can keep track if parallel
-        curr_sim_num = len(glob.glob(os.path.join(sim_dir, self.info_name + "*")))
+        # curr_sim_num = len(glob.glob(os.path.join(sim_dir, self.info_name + "*")))
+        curr_sim_num = len(list(sim_dir.glob(rf"{self.info_name}*")))
 
         # Will now kick off n_repeats simulations in parallel
         job_list = []
@@ -404,9 +419,8 @@ class SimWrapper:
         # Check that jobs finished successfully
         for p in job_list:
             if p.exitcode != 0:
-                raise RuntimeError(
-                    "At least one parallel simulation did not terminate cleanly."
-                )
+                msg = "At least one parallel simulation did not terminate cleanly."
+                raise RuntimeError(msg)
 
         # Loop over post-processing functions (not costly, so no need for parallel)
         if self.pp_func is not None:
@@ -417,15 +431,13 @@ class SimWrapper:
                     sim_num=curr_sim_num + i,
                     **self.pp_kw_inputs,
                 )
-            sim_x_files = sorted(
-                glob.glob(os.path.join(sim_dir, self.pp_out_name + "*"))
-            )
+            sim_x_files = sorted(sim_dir.glob(rf"{self.pp_out_name}*"))
         else:
             sim_x_files = None
 
         # Retrieve all files in lists and create self.data_class object
-        sim_info_files = sorted(glob.glob(os.path.join(sim_dir, self.info_name + "*")))
-        sim_bias_files = sorted(glob.glob(os.path.join(sim_dir, self.bias_name + "*")))
+        sim_info_files = sorted(sim_dir.glob(rf"{self.info_name}*"))
+        sim_bias_files = sorted(sim_dir.glob(rf"{self.bias_name}*"))
         sim_dat = self.data_class(
             sim_info_files,
             sim_bias_files,
@@ -437,15 +449,13 @@ class SimWrapper:
         # If have pre-processing function provide sim info to update it
         # Ignore if pre_func has no update() method, though
         if self.pre_func is not None:
-            try:
+            with contextlib.suppress(AttributeError):
                 self.pre_func.update(alpha, sim_info_files, sim_bias_files, sim_x_files)
-            except AttributeError:
-                pass
 
         return sim_dat
 
 
-# FIXME: replace l with v
+# TODO(wpk): replace l with v
 
 
 def make_matern_expr(p):
@@ -485,7 +495,45 @@ def make_matern_expr(p):
     return var * full_expr.subs(d, distance), kern_params
 
 
-def make_rbf_expr():
+def make_rbf_expr(n_dims=1):
+    """
+    Creates a sympy expression for an RBF kernel.
+
+    Parameters
+    ----------
+    n_dims : int, default 1
+        the number of input dimensions for this kernel
+
+    Returns
+    -------
+    expr : Expr
+        sympy expression representing the kernel
+    kern_params : dict
+        parameters matching naming in sympy expression
+    """
+    var = sp.symbols("var", real=True)
+    l = sp.Matrix(  # noqa: E741
+        [sp.symbols("l_%i" % i, real=True) for i in range(n_dims)]
+    )
+    l_inv = sp.Matrix([1 / k for k in l])
+    x1 = sp.Matrix([sp.symbols("x1_%i" % i, real=True) for i in range(n_dims)])
+    x2 = sp.Matrix([sp.symbols("x2_%i" % i, real=True) for i in range(n_dims)])
+
+    scaled_diff = sp.hadamard_product((x2 - x1), l_inv)
+    scaled_diff_sq = scaled_diff.dot(scaled_diff)
+    rbf_kern_expr = var * sp.exp(-0.5 * scaled_diff_sq)
+
+    kern_params = {
+        "var": [1.0, {"transform": gpflow.utilities.positive()}],
+    }
+
+    for k in l:
+        kern_params[k.name] = [1.0, {"transform": gpflow.utilities.positive()}]
+
+    return rbf_kern_expr, kern_params
+
+
+def make_rbf_expr_old():
     """
     Creates a sympy expression for an RBF kernel.
 
@@ -556,7 +604,7 @@ class RBFDerivKernel(DerivativeKernel):
     Use it most often, so convenient to have.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         kern_expr, kern_params = make_rbf_expr()
         super().__init__(kern_expr, 1, kernel_params=kern_params, **kwargs)
 
@@ -586,7 +634,7 @@ class ChangeInnerOuterRBFDerivKernel(DerivativeKernel):
     ~thermoextrap.gpr_active.gp_models.DerivativeKernel
     """
 
-    def __init__(self, c1=-7.0, c2=-2.0, **kwargs):
+    def __init__(self, c1=-7.0, c2=-2.0, **kwargs) -> None:
         x1 = sp.symbols("x1", real=True)
         x2 = sp.symbols("x2", real=True)
 
@@ -633,7 +681,7 @@ def create_base_GP_model(
     shared_kernel=True,
     kernel=RBFDerivKernel,
     mean_func=None,
-    likelihood_kwargs={},
+    likelihood_kwargs=None,
 ):
     """
     Creates just the base GP model without any training,just sets up sympy and
@@ -675,10 +723,9 @@ def create_base_GP_model(
     """
     # Will be helpful to know where have zero-order derivatives in data
     # Or more generally may want to specify which order to pay attention to rather than just 0
+    if likelihood_kwargs is None:
+        likelihood_kwargs = {}
     ref_d_bool = gpr_data[0][:, 1] == d_order_ref
-
-    # Have played with scaling x data to change length scales without major success
-    x_scale = 1.0
 
     # Create mean function, if not provided
     if mean_func is None:
@@ -688,7 +735,7 @@ def create_base_GP_model(
             # By default, fit linear model to help get rid of monotonicity
             if len(np.unique(gpr_data[0][ref_d_bool, :1])) > 2:
                 mean_func = LinearWithDerivs(
-                    x_scale * gpr_data[0][ref_d_bool, :1], gpr_data[1][ref_d_bool, :]
+                    gpr_data[0][ref_d_bool, :1], gpr_data[1][ref_d_bool, :]
                 )
             # Linear mean only meaningful if have at least 3 different input locations
             # If just have 1 or 2, just fit constant mean function
@@ -706,8 +753,7 @@ def create_base_GP_model(
     # doing it with 2 won't hurt, will just scale by mean, technically
     if len(np.unique(gpr_data[0][ref_d_bool, :1])) > 1:
         std_scale = np.std(
-            gpr_data[1][ref_d_bool, :]
-            - mean_func(x_scale * gpr_data[0][ref_d_bool, :]),
+            gpr_data[1][ref_d_bool, :] - mean_func(gpr_data[0][ref_d_bool, :]),
             axis=0,
         )
     else:
@@ -721,30 +767,33 @@ def create_base_GP_model(
             not issubclass(type(kernel), gpflow.kernels.MultioutputKernel)
             and not shared_kernel
         ):
-            print(
-                "WARNING: A kernel object (not class) of %s has been provided. Since this is not a subclass of gpflow.kernels.MultioutputKernel, it will be wrapped in a SharedIndependent kernel by HeteroscedasticGPR. However, you have set shared_kernel=False, so this may not be the behavior you wanted."
-                % str(kernel)
+            warnings.warn(
+                f"""\
+                WARNING: A kernel object (not class) of {kernel} has been
+                provided. Since this is not a subclass of
+                gpflow.kernels.MultioutputKernel, it will be wrapped in a
+                SharedIndependent kernel by HeteroscedasticGPR. However, you
+                have set shared_kernel=False, so this may not be the behavior
+                you wanted.
+                """,
+                stacklevel=1,
             )
+    elif shared_kernel:
+        full_kernel = gpflow.kernels.SharedIndependent(
+            kernel(), output_dim=gpr_data[1].shape[-1]
+        )
     else:
-        if shared_kernel:
-            full_kernel = gpflow.kernels.SharedIndependent(
-                kernel(), output_dim=gpr_data[1].shape[-1]
-            )
-        else:
-            full_kernel = gpflow.kernels.SeparateIndependent(
-                [kernel() for k in range(gpr_data[1].shape[-1])]
-            )
+        full_kernel = gpflow.kernels.SeparateIndependent(
+            [kernel() for k in range(gpr_data[1].shape[-1])]
+        )
 
-    gpr = HeteroscedasticGPR(
+    return HeteroscedasticGPR(
         gpr_data,
         kernel=full_kernel,
         scale_fac=std_scale,
-        x_scale_fac=x_scale,
         mean_function=mean_func,
         likelihood_kwargs=likelihood_kwargs,
     )
-
-    return gpr
 
 
 def train_GPR(gpr, record_loss=False, start_params=None):
@@ -790,12 +839,8 @@ def train_GPR(gpr, record_loss=False, start_params=None):
         # Make sure one or both losses are not NaN
         check_nan = np.isnan([loss_info.fun, loss_info_new.fun])
         if np.all(check_nan):
-            print(
-                "All optimizations resulted in NaN with respective loss information: "
-            )
-            print(loss_info)
-            print(loss_info_new)
-            raise ValueError("Had NaNs in loss!")
+            msg = f"All optimizations resulted in NaN with respective loss information. {loss_info=}, {loss_info_new=} "
+            raise ValueError(msg)
 
         # If optimization with default values better, reassign values back
         # Checked above if BOTH losses gave NaNs
@@ -812,11 +857,10 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 
     if record_loss:
         return loss_info
-    else:
-        return None
+    return None
 
 
-def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
+def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs=None):
     """
     Generates and trains a GPR model based on a list of ExtrapModel objects or a
     StateCollection object from thermoextrap. If a list of another type of
@@ -840,8 +884,9 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
     gpr : :class:`thermoextrap.gpr_active.gp_models.HeteroscedasticGPR`
         Trained model.
     """
-
     # Loop over states and collect information needed for GP
+    if base_kwargs is None:
+        base_kwargs = {}
     x_data = []
     y_data = []
     cov_data = []
@@ -862,10 +907,12 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
     # Derivatives from same simulation correlated, between independent
     # And different outputs are also independent in their likelihood model (covariance matrix)
     # So loop to treat each dimension separately
-    noise_cov_mat = []
-    for k in range(y_data.shape[1]):
-        noise_cov_mat.append(linalg.block_diag(*[cov[k, ...] for cov in cov_data]))
-    noise_cov_mat = np.array(noise_cov_mat)
+    noise_cov_mat = np.array(
+        [
+            linalg.block_diag(*[cov[k, ...] for cov in cov_data])
+            for k in range(y_data.shape[1])
+        ]
+    )
     data_input = (x_data, y_data, noise_cov_mat)
 
     # Create GPR
@@ -911,7 +958,7 @@ def create_GPR(state_list, log_scale=False, start_params=None, base_kwargs={}):
 # (preferably around 95%)
 # Here only implement the simplest (and default) transformation, the identity transform
 # (which also computes std given variance and upper and lower confidence interval values)
-def identityTransform(x, y, y_var):
+def identityTransform(x, y, y_var):  # noqa: ARG001
     y_std = np.sqrt(y_var)
     conf_int = [y - 2.0 * y_std, y + 2.0 * y_std]
     return y, y_std, conf_int
@@ -932,7 +979,8 @@ class UpdateStopABC:
         transform_func=identityTransform,
         log_scale=False,
         avoid_repeats=False,
-    ):
+        rng: np.random.Generator | None = None,
+    ) -> None:
         """
         Parameters
         ----------
@@ -954,6 +1002,8 @@ class UpdateStopABC:
         self.transform_func = transform_func
         self.log_scale = log_scale
         self.avoid_repeats = avoid_repeats
+
+        self.rng = validate_rng(rng)
 
     def create_alpha_grid(self, alpha_list):
         """
@@ -980,7 +1030,7 @@ class UpdateStopABC:
                     [0.0],
                     2.0
                     * (alpha_grid[1] - alpha_grid[0])
-                    * (np.random.random(len(alpha_grid) - 2) - 0.5),
+                    * (self.rng.random(len(alpha_grid) - 2) - 0.5),
                     [0.0],
                 ]
             )
@@ -1038,22 +1088,21 @@ class UpdateFuncBase(UpdateStopABC):
         save_dir="./",
         compare_func=None,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
 
         # init just sets up how update function should behave
         # If want to change behavior on call, can adjust these variables
         self.show_plot = show_plot
         self.save_plot = save_plot
-        self.save_dir = save_dir
+        self.save_dir = Path(save_dir)
         self.compare_func = compare_func
 
-    def do_plotting(self, x, y, err, alpha_list):
+    def do_plotting(self, x, y, err, alpha_list) -> None:
         """
         Plots output used to select new update point.
         err is expected to be length 2 list with upper and lower confidence intervals.
         """
-
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
@@ -1092,15 +1141,14 @@ class UpdateFuncBase(UpdateStopABC):
         fig.tight_layout()
         if self.save_plot:
             # save_dir = os.path.split(data_list[-1].sim_info_files[0])[0]
-            num_figs = len(glob.glob("%s/GP_v_alpha*.png" % self.save_dir))
-            fig.savefig("%s/GP_v_alpha%i.png" % (self.save_dir, num_figs))
+            num_figs = len(list(self.save_dir.glob("GP_v_alpha*.png")))
+            fig.savefig(f"{self.save_dir}/GP_v_alpha{num_figs}.png")
         if self.show_plot:
             plt.show()
 
-    def do_update(self, gpr, alpha_list):
-        raise NotImplementedError(
-            "Must implement this function for specific update scheme"
-        )
+    def do_update(self, gpr, alpha_list) -> NoReturn:
+        msg = "Must implement this function for specific update scheme"
+        raise NotImplementedError(msg)
 
     def __call__(self, gpr, alpha_list):
         new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)
@@ -1111,7 +1159,7 @@ class UpdateFuncBase(UpdateStopABC):
         return new_alpha, pred_mu, pred_std
 
 
-# TODO: update structure to inherit docstrings.  Can simplify a bunch of stuff.
+# TODO(wpk): update structure to inherit docstrings.  Can simplify a bunch of stuff.
 
 
 class UpdateALMbrute(UpdateFuncBase):
@@ -1129,12 +1177,12 @@ class UpdateALMbrute(UpdateFuncBase):
     operations) such that the uncertainty can also be adjusted in the same way.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
         # Create grid of alpha values to interogate GP model and select new values
-        alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
+        _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
         gpr_mu, gpr_std, gpr_conf = self.get_transformed_GP_output(gpr, alpha_select)
@@ -1187,12 +1235,12 @@ class UpdateRandom(UpdateFuncBase):
     This does not require training a GP model, but one is trained anyway for plotting, etc.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
         # Create grid of alpha values to interogate GP model and select new values
-        alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
+        _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
         # Don't actually need to here, but nice to see progress
@@ -1203,7 +1251,7 @@ class UpdateRandom(UpdateFuncBase):
             self.do_plotting(alpha_select, gpr_mu, gpr_conf, alpha_list)
 
         # Randomly select new alpha
-        new_ind = np.random.choice(alpha_select.shape[0])
+        new_ind = self.rng.choice(alpha_select.shape[0])
         new_alpha = alpha_select[new_ind]
         out_mu = gpr_mu[new_ind, ...]
         out_std = gpr_std[new_ind, ...]
@@ -1219,12 +1267,12 @@ class UpdateSpaceFill(UpdateFuncBase):
     This does not require training a GP model, but one is trained anyway for plotting, etc.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
         # Create grid of alpha values to interogate GP model and select new values
-        alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
+        _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
         # Don't actually need to here, but nice to see progress
@@ -1244,7 +1292,7 @@ class UpdateSpaceFill(UpdateFuncBase):
         # Note avoiding round-off issues with isclose rather than ==
         max_int = np.max(intervals)
         max_int_inds = np.where(np.isclose(intervals, max_int))[0]
-        sel_int_ind = np.random.choice(max_int_inds)
+        sel_int_ind = self.rng.choice(max_int_inds)
 
         # Take alpha as halfway point in this interval
         new_alpha = sorted_alpha[sel_int_ind] + 0.5 * intervals[sel_int_ind]
@@ -1272,13 +1320,13 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
         deviation divided by the absolute value of the GPR-predicted mean
     """
 
-    def __init__(self, tol=0.005, **kwargs):
+    def __init__(self, tol=0.005, **kwargs) -> None:
         super().__init__(**kwargs)
         self.tol = tol
 
-    def do_update(self, gpr, alpha_list):
+    def do_update(self, gpr, alpha_list):  # noqa: C901
         # Create grid of alpha values to interogate GP model and select new values
-        alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
+        _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
         # Don't actually need to here, but nice to see progress
@@ -1331,13 +1379,12 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
 
         # Have to handle case where no current points satisfy tolerance
         if max_dist == -1:
-            raise RuntimeError(
-                "No points used to train GP model satisfy tolerance, meaning more simulation is needed at those points to perform adaptive sampling within tolerance."
-            )
+            msg = "No points used to train GP model satisfy tolerance, meaning more simulation is needed at those points to perform adaptive sampling within tolerance."
+            raise RuntimeError(msg)
 
         # And handle case where an end-point is chosen (because all points satisfy tolerance)
-        if (max_ind == 0) or (max_ind == (alpha_select.shape[0] - 1)):
-            print(
+        if max_ind in {0, alpha_select.shape[0] - 1}:
+            logger.info(
                 "Tolerance satisfied for all points in interval. Selecting new point with space-filling design."
             )
             # Will now pick largest interval
@@ -1345,7 +1392,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
             intervals = sorted_alpha[1:] - sorted_alpha[:-1]
             max_int = np.max(intervals)
             max_int_inds = np.where(np.isclose(intervals, max_int))[0]
-            sel_int_ind = np.random.choice(max_int_inds)
+            sel_int_ind = self.rng.choice(max_int_inds)
             # Take alpha as halfway point in this interval
             new_alpha = sorted_alpha[sel_int_ind] + 0.5 * intervals[sel_int_ind]
         # Otherwise, select new alpha as described
@@ -1383,7 +1430,7 @@ class UpdateALCbrute(UpdateFuncBase):
     new noise, this will not work)
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
@@ -1399,7 +1446,7 @@ class UpdateALCbrute(UpdateFuncBase):
         # do not help reduce overall integrated uncertainty
         # Working with predict_f, still get benefit of estimating uncertainty at new point
         # But encourage better exploration
-        gpr_mu, gpr_std, gpr_conf = self.get_transformed_GP_output(gpr, alpha_select)
+        gpr_mu, _gpr_std, gpr_conf = self.get_transformed_GP_output(gpr, alpha_select)
 
         # Plot if desired
         if self.save_plot or self.show_plot:
@@ -1438,7 +1485,7 @@ class UpdateALCbrute(UpdateFuncBase):
                     axis=1,
                 )
             )
-            # TODO: fix parameter definitions
+            # TODO(wpk): fix parameter definitions
             this_std = transform_func(  # noqa: F821
                 alpha_grid, np.sqrt(np.squeeze(this_pred[1].numpy()))
             )
@@ -1446,12 +1493,10 @@ class UpdateALCbrute(UpdateFuncBase):
 
         # Identify point where get minimum integrated uncertainty
         new_ind = np.argmin(new_int_std)
-        new_alpha = alpha_select[new_ind]
+        alpha_select[new_ind]
 
         # Randomly select new alpha
-        new_alpha = np.random.choice(alpha_select)
-
-        return new_alpha
+        return self.rng.choice(alpha_select)
 
 
 class MetricBase:
@@ -1472,7 +1517,7 @@ class MetricBase:
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, name, tol):
+    def __init__(self, name, tol) -> None:
         """
         Inputs:
         name - name of metric
@@ -1482,15 +1527,15 @@ class MetricBase:
         self.name = name
         self.tol = tol
 
-    def _check_history(self, history):
+    def _check_history(self, history) -> None:
         if history is None:
-            raise ValueError("history is None.")
-        elif len(history) != 2:
-            raise ValueError(
-                "history must be list of length 2 of GP means and variances evaluated with a series of GP models"
-            )
+            msg = "history is None."
+            raise ValueError(msg)
+        if len(history) != 2:
+            msg = "history must be list of length 2 of GP means and variances evaluated with a series of GP models"
+            raise ValueError(msg)
 
-    def calc_metric(self, history, x_vals, gp):
+    def calc_metric(self, history, x_vals, gp) -> NoReturn:
         raise NotImplementedError
 
     def __call__(self, history, x_vals, gp):
@@ -1501,13 +1546,12 @@ class MetricBase:
 class MaxVar(MetricBase):
     """Metric based on maximum variance of GP output."""
 
-    def __init__(self, tol, name="MaxVar", **kwargs):
+    def __init__(self, tol, name="MaxVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
         gp_std = history[1][-1, ...]
-        max_var = np.max(gp_std)
-        return max_var
+        return np.max(gp_std)
 
 
 class AvgVar(MetricBase):
@@ -1524,13 +1568,12 @@ class AvgVar(MetricBase):
         Extrap arguments to :class:`MetricBase`
     """
 
-    def __init__(self, tol, name="AvgVar", **kwargs):
+    def __init__(self, tol, name="AvgVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
         gp_std = history[1][-1, ...]
-        avg_var = np.average(gp_std)
-        return avg_var
+        return np.average(gp_std)
 
 
 class MaxRelVar(MetricBase):
@@ -1550,7 +1593,7 @@ class MaxRelVar(MetricBase):
         points are ignored for purposes of calculating metric (set to zero)
     """
 
-    def __init__(self, tol, threshold=1e-12, name="MaxRelVar", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="MaxRelVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1561,8 +1604,7 @@ class MaxRelVar(MetricBase):
         # So for points with gp_mu <= self.threshold, just checks if std is tol of threshold
         small_bool = abs(gp_mu) <= self.threshold
         gp_mu[small_bool] = self.threshold
-        max_rel_var = np.max(gp_std / abs(gp_mu))
-        return max_rel_var
+        return np.max(gp_std / abs(gp_mu))
 
 
 class MaxRelGlobalVar(MetricBase, UpdateStopABC):
@@ -1578,7 +1620,7 @@ class MaxRelGlobalVar(MetricBase, UpdateStopABC):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="MaxRelGlobalVar", **kwargs):
+    def __init__(self, tol, name="MaxRelGlobalVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1589,8 +1631,7 @@ class MaxRelGlobalVar(MetricBase, UpdateStopABC):
         # (works better with transformations of output)
         std_y = np.std(history[0][-1, ...])
         gp_std = history[1][-1, ...].copy()
-        max_rel_var = np.max(gp_std / std_y)
-        return max_rel_var
+        return np.max(gp_std / std_y)
 
 
 class AvgRelVar(MetricBase):
@@ -1609,7 +1650,7 @@ class AvgRelVar(MetricBase):
         points are ignored for purposes of calculating metric (set to zero)
     """
 
-    def __init__(self, tol, threshold=1e-12, name="AvgRelVar", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="AvgRelVar", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1620,8 +1661,7 @@ class AvgRelVar(MetricBase):
         # So for points with gp_mu <= self.threshold, just checks if std is tol of threshold
         small_bool = abs(gp_mu) <= self.threshold
         gp_mu[small_bool] = self.threshold
-        avg_rel_var = np.average(gp_std / abs(gp_mu))
-        return avg_rel_var
+        return np.average(gp_std / abs(gp_mu))
 
 
 class MSD(MetricBase):
@@ -1636,7 +1676,7 @@ class MSD(MetricBase):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="MSD", **kwargs):
+    def __init__(self, tol, name="MSD", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1645,8 +1685,7 @@ class MSD(MetricBase):
             gp_mu_prev = np.zeros_like(gp_mu)
         else:
             gp_mu_prev = history[0][-2, ...]
-        msd = np.average((gp_mu - gp_mu_prev) ** 2)
-        return msd
+        return np.average((gp_mu - gp_mu_prev) ** 2)
 
 
 class MaxAbsRelDeviation(MetricBase):
@@ -1665,7 +1704,7 @@ class MaxAbsRelDeviation(MetricBase):
         points are ignored for purposes of calculating metric (set to zero)
     """
 
-    def __init__(self, tol, threshold=1e-12, name="MaxAbsRelDev", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="MaxAbsRelDev", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1682,8 +1721,7 @@ class MaxAbsRelDeviation(MetricBase):
             small_prev = abs(gp_mu_prev) <= self.threshold
             gp_mu_prev[small_prev] = self.threshold
         dev = abs(gp_mu - gp_mu_prev)
-        rel_max_dev = np.max(dev / abs(gp_mu))
-        return rel_max_dev
+        return np.max(dev / abs(gp_mu))
 
 
 class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
@@ -1699,7 +1737,7 @@ class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="MaxAbsRelGlobalDeviation", **kwargs):
+    def __init__(self, tol, name="MaxAbsRelGlobalDeviation", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1715,8 +1753,7 @@ class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
         else:
             gp_mu_prev = history[0][-2, ...].copy()
         dev = abs(gp_mu - gp_mu_prev)
-        rel_max_dev = np.max(dev / std_y)
-        return rel_max_dev
+        return np.max(dev / std_y)
 
 
 class AvgAbsRelDeviation(MetricBase):
@@ -1731,7 +1768,7 @@ class AvgAbsRelDeviation(MetricBase):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, threshold=1e-12, name="AvgAbsRelDev", **kwargs):
+    def __init__(self, tol, threshold=1e-12, name="AvgAbsRelDev", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
         self.threshold = threshold
 
@@ -1748,8 +1785,7 @@ class AvgAbsRelDeviation(MetricBase):
             small_prev = gp_mu_prev <= self.threshold
             gp_mu_prev[small_prev] = self.threshold
         dev = abs(gp_mu - gp_mu_prev)
-        rel_avg_dev = np.average(dev / abs(gp_mu))
-        return rel_avg_dev
+        return np.average(dev / abs(gp_mu))
 
 
 class ErrorStability(MetricBase, UpdateStopABC):
@@ -1771,7 +1807,7 @@ class ErrorStability(MetricBase, UpdateStopABC):
         tolerance threshold for defining stopping
     """
 
-    def __init__(self, tol, name="ErrorStability", **kwargs):
+    def __init__(self, tol, name="ErrorStability", **kwargs) -> None:
         super().__init__(tol=tol, name=name, **kwargs)
 
         # Need to set up normalization - will just use first r calculated
@@ -1781,15 +1817,9 @@ class ErrorStability(MetricBase, UpdateStopABC):
         # Get input data points for current active learning step (current GP model)
         input_x = gp.data[0].numpy()
         input_y = gp.data[1].numpy()
-        input_x = np.concatenate(
-            [input_x[:, :1] / gp.x_scale_fac, input_x[:, 1:]], axis=-1
-        )
-        input_y = input_y * (gp.x_scale_fac ** input_x[:, 1:])
+        input_x = np.concatenate([input_x[:, :1], input_x[:, 1:]], axis=-1)
         input_y = input_y * gp.scale_fac
         input_cov = gp.likelihood.cov.copy()
-        input_cov = input_cov * gp.x_scale_fac ** (
-            np.add(*np.meshgrid(input_x[:, 1:], input_x[:, 1:]))
-        )
         input_cov = input_cov * (
             np.expand_dims(
                 gp.scale_fac, axis=tuple(range(gp.scale_fac.ndim, input_cov.ndim))
@@ -1895,8 +1925,7 @@ class ErrorStability(MetricBase, UpdateStopABC):
         if self.r1 is None:
             self.r1 = r_curr_prev + r_prev_curr
 
-        out = (r_curr_prev + r_prev_curr) / self.r1
-        return out
+        return (r_curr_prev + r_prev_curr) / self.r1
 
 
 class MaxIter(MetricBase):
@@ -1912,7 +1941,7 @@ class MaxIter(MetricBase):
         name of this metric
     """
 
-    def __init__(self, name="MaxIter", **kwargs):
+    def __init__(self, name="MaxIter", **kwargs) -> None:
         super().__init__(tol=1.0, name=name, **kwargs)
 
     def calc_metric(self, history, x_vals, gp):
@@ -1939,7 +1968,7 @@ class StopCriteria(UpdateStopABC):
         this will be looped over with metrics calculated to determine stopping
     """
 
-    def __init__(self, metric_funcs, **kwargs):
+    def __init__(self, metric_funcs, **kwargs) -> None:
         """
         Inputs:
         metric_funcs - dictionary of (name, function) pairs; just nice to have names.
@@ -1989,7 +2018,7 @@ class StopCriteria(UpdateStopABC):
         alpha_grid, _ = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
-        gpr_mu, gpr_std, gpr_conf = self.get_transformed_GP_output(gpr, alpha_grid)
+        gpr_mu, gpr_std, _gpr_conf = self.get_transformed_GP_output(gpr, alpha_grid)
 
         # Update history
         if self.history is None:
@@ -2009,7 +2038,15 @@ class StopCriteria(UpdateStopABC):
         return np.all(tol_bools), out_dict
 
 
-def active_learning(
+# def thing(value):
+#     if value == "max":
+#         logger.info("Reached maximum iterations")
+
+#     elif value == "stop":
+#         logger.info("Stopping criteria satisfied")
+
+
+def active_learning(  # noqa: C901, PLR0912, PLR0915
     init_states,
     sim_wrapper,
     update_func,
@@ -2071,21 +2108,19 @@ def active_learning(
         Dictionary of information about results at each training
         iteration, like GP predictions, losses, parameters, etc.
     """
-
     if gp_base_kwargs is None:
         gp_base_kwargs = {}
 
     if log_scale ^ update_func.log_scale:  # Bitwise XOR
-        print(
-            "WARNING: Usage of log scale in x for GPs is set to %s but %s for updates. Typically these should match, so make sure you know what you're doing!"
-            % (str(log_scale), str(update_func.log_scale))
+        warnings.warn(
+            f"WARNING: Usage of log scale in x for GPs is set to {log_scale!s} but {update_func.log_scale!s} for updates. Typically these should match, so make sure you know what you're doing!",
+            stacklevel=1,
         )
-    if stop_criteria is not None:
-        if log_scale ^ stop_criteria.log_scale:
-            print(
-                "WARNING: Usage of log scale in x for GPs is set to %s but %s for stopping criteria. Typically these should match, so make sure you know what you're doing!"
-                % (str(log_scale), str(stop_criteria.log_scale))
-            )
+    if stop_criteria is not None and log_scale ^ stop_criteria.log_scale:
+        warnings.warn(
+            f"WARNING: Usage of log scale in x for GPs is set to {log_scale!s} but {stop_criteria.log_scale!s} for stopping criteria. Typically these should match, so make sure you know what you're doing!",
+            stacklevel=1,
+        )
 
     data_list = [None] * len(init_states)
     for i, state in enumerate(init_states):
@@ -2103,7 +2138,7 @@ def active_learning(
     # Will need to keep track of alpha values
     alpha_list = [dat.beta for dat in data_list]
 
-    print("\n\nInitial %s values: " % alpha_name, alpha_list)
+    logger.info("Initial %s values: %s", alpha_name, alpha_list)
 
     # Also nice to keep track of loss and parameter values
     # Results in more robust parameter optimization, too
@@ -2130,7 +2165,7 @@ def active_learning(
                 base_kwargs=gp_base_kwargs,
                 start_params=train_history["params"][-1],
             )
-        print("\nCurrent GP info: ")
+        logger.info("Current GP info:")
         gpflow.utilities.print_summary(this_GP)
         # Add to training history
         train_history["loss"].append(this_GP.training_loss().numpy())
@@ -2142,21 +2177,22 @@ def active_learning(
         if stop_criteria is not None:
             stop_bool, stop_metrics = stop_criteria(this_GP, alpha_list)
             # Add to training history
-            for m in stop_metrics.keys():
+            for m in stop_metrics:
                 if "tol" not in m:
                     train_history[m].append(stop_metrics[m])
             if stop_bool:
-                print("\nStopping criteria satisfied with stopping metrics of: ")
-                print(stop_metrics)
-                print("\n")
+                logger.info(
+                    "Stopping criteria satisfied with stopping metrics of: %s",
+                    stop_metrics,
+                )
                 break
-            else:
-                print("\nCurrent stopping metrics: ")
-                print(stop_metrics)
+            logger.info("Current stopping metrics: %s", stop_metrics)
 
         if i == max_iter:
             # Don't do update on this loop, just break
-            print("\nReached maximum iterations of %i without convergence\n" % max_iter)
+            logger.info(
+                "Reached maximum iterations of %s without convergence", max_iter
+            )
             break
 
         # If stopping criteria not satisfied, select new point
@@ -2184,11 +2220,12 @@ def active_learning(
             data_list.append(this_data)
             alpha_list.append(new_alpha)
 
-        print("\nAfter %i updates, %s values are: " % (i + 1, alpha_name))
-        print(alpha_list)
+        logger.info(
+            "After %s updates, %s values are: %s", i + 1, alpha_name, alpha_list
+        )
 
     if save_history and (stop_criteria is not None):
-        for key in train_history.keys():
+        for key in train_history:
             train_history[key] = np.array(train_history[key])
         np.savez(
             "%s/active_history.npz" % base_dir,

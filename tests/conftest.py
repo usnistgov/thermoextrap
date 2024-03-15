@@ -1,7 +1,10 @@
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
 import pytest
 import xarray as xr
-
 from module_utilities import cached
 
 import thermoextrap as xtrap
@@ -9,12 +12,7 @@ import thermoextrap.legacy
 
 
 class FixtureData:
-    def __init__(self, n, nv, order=5, uoff=0.0, xoff=0.0, seed=0):
-        print(
-            "init data with:",
-            dict(n=n, nv=nv, order=order, uoff=uoff, xoff=xoff, seed=seed),
-        )
-
+    def __init__(self, n, nv, order=5, uoff=0.0, xoff=0.0, seed=0) -> None:
         self.order = order
 
         self.rs = np.random.RandomState(seed)
@@ -26,54 +24,7 @@ class FixtureData:
 
         self.ub = self.rs.rand(n) + uoff
         self.xb = self.rs.rand(n, nv) + xoff
-
-    # bunch of things to test
-    @cached.prop
-    def rdata(self):
-        return xtrap.factory_data_values(
-            uv=self.u, xv=self.x, order=self.order, central=False
-        )
-
-    @cached.prop
-    def cdata(self):
-        return xtrap.factory_data_values(
-            uv=self.u, xv=self.x, order=self.order, central=True
-        )
-
-    @cached.prop
-    def xdata(self):
-        return xtrap.DataCentralMoments.from_vals(
-            xv=self.x,
-            uv=self.u,
-            order=self.order,
-            central=True,
-            dims=["val"],
-        )
-
-    @cached.prop
-    def xdata_val(self):
-        return xtrap.DataCentralMomentsVals.from_vals(
-            xv=self.x, uv=self.u, order=self.order, central=True
-        )
-
-    @cached.prop
-    def xrdata(self):
-        return xtrap.DataCentralMoments.from_vals(
-            xv=self.x,
-            uv=self.u,
-            order=self.order,
-            central=False,
-            dims=["val"],
-        )
-
-    @cached.prop
-    def xrdata_val(self):
-        return xtrap.DataCentralMomentsVals.from_vals(
-            xv=self.x,
-            uv=self.u,
-            order=self.order,
-            central=False,
-        )
+        self._cache: dict[str, Any] = {}
 
     # bunch of things to test
     @cached.prop
@@ -126,7 +77,7 @@ class FixtureData:
         )
 
     @property
-    def beta0(self):
+    def beta0(self) -> float:
         return 0.5
 
     @property
@@ -135,7 +86,7 @@ class FixtureData:
 
     @cached.prop
     def em(self):
-        """extrapolation model fixture"""
+        """Extrapolation model fixture"""
 
         em = thermoextrap.legacy.ExtrapModel(maxOrder=self.order)
         em.train(self.beta0, xData=self.x, uData=self.u, saveParams=True)
@@ -162,7 +113,7 @@ class FixtureData:
 
         return [fs[i](ufunc, xufunc) for i in range(self.order + 1)]
 
-    def xr_test_raw(self, b, a=None):
+    def xr_test_raw(self, b, a=None) -> None:
         if a is None:
             a = self.rdata
 
@@ -173,7 +124,7 @@ class FixtureData:
             self.xr_test(a.u_selector[i], b.u_selector[i].sel(val=0))
             self.xr_test(a.xu_selector[i], b.xu_selector[i])
 
-    def xr_test_central(self, b, a=None):
+    def xr_test_central(self, b, a=None) -> None:
         if a is None:
             a = self.cdata
 
@@ -187,7 +138,7 @@ class FixtureData:
             self.xr_test(a.xave_selector[i], b.xave_selector[i])
 
     @staticmethod
-    def xr_test(a, b):
+    def xr_test(a, b) -> None:
         xr.testing.assert_allclose(a, b.transpose(*a.dims))
 
 
@@ -196,21 +147,21 @@ def fixture(request):
     return FixtureData(*request.param)
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser) -> None:
     parser.addoption(
-        "--runslow", action="store_true", default=False, help="run slow tests"
+        "--run-slow", action="store_true", default=False, help="run slow tests"
     )
 
 
-def pytest_configure(config):
+def pytest_configure(config) -> None:
     config.addinivalue_line("markers", "slow: mark test as slow to run")
 
 
-def pytest_collection_modifyitems(config, items):
-    if config.getoption("--runslow"):
-        # --runslow given in cli: do not skip slow tests
+def pytest_collection_modifyitems(config, items) -> None:
+    if config.getoption("--run-slow"):
+        # --run-slow given in cli: do not skip slow tests
         return
-    skip_slow = pytest.mark.skip(reason="need --runslow option to run")
+    skip_slow = pytest.mark.skip(reason="need --run-slow option to run")
     for item in items:
         if "slow" in item.keywords:
             item.add_marker(skip_slow)

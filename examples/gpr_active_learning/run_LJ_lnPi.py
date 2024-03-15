@@ -24,7 +24,7 @@ SRS_base_dir = os.path.expanduser("~/bin/thermoextrap/docs/notebooks/gpr/SRS_dat
 def get_sim_activity(Tr):
     if Tr == 0.700:
         return -6.250
-    elif Tr == 0.730 or Tr == 0.740:
+    elif Tr in {0.73, 0.74}:
         return -5.500
     elif Tr == 0.770:
         return -5.800
@@ -36,6 +36,7 @@ def get_sim_activity(Tr):
         return -3.380
     elif Tr == 1.200:
         return -3.000
+    return None
 
 
 def load_lnPi_info(Tr, ref_mu=-4.0, run_num=None):
@@ -152,7 +153,8 @@ def tag_phases(list_of_phases):
 
     """
     if len(list_of_phases) > 2:
-        raise ValueError("bad tag function")
+        msg = "bad tag function"
+        raise ValueError(msg)
     argmax0 = np.array([xx.local_argmax()[0] for xx in list_of_phases])
 
     if len(list_of_phases) == 2:
@@ -197,23 +199,23 @@ def get_VLE_info(lnPi, ref_activity, beta, vol=512.0, efac=10.0):
         # May get unlucky with particular sample with too many wiggles, etc.
         try:
             # Find the spinodal
-            spino, spino_info = c.spinodal(
+            spino, _spino_info = c.spinodal(
                 phase_ids=2,
                 build_phases=build_phases,
                 inplace=False,
                 as_dict=False,
-                build_kws=dict(efac=efac * 0.5),
+                build_kws={"efac": efac * 0.5},
                 efac=efac * 0.5,
             )
 
             # Find the binodal
-            bino, bino_info = c.binodal(
+            bino, _bino_info = c.binodal(
                 spinodals=spino,  # lnz_min=lnzs[0], lnz_max=lnzs[-1],
                 phase_ids=[0, 1],
                 build_phases=build_phases,
                 inplace=False,
                 as_dict=False,
-                build_kws=dict(efac=efac * 0.5),
+                build_kws={"efac": efac * 0.5},
             )
 
             return bino

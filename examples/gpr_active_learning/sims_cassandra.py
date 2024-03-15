@@ -1,5 +1,6 @@
 import copy
 import glob
+import locale
 import os
 import shutil
 import subprocess
@@ -26,7 +27,7 @@ def set_inp_param(inp_file, out_file, **kwargs):
     """
 
     # Read original file
-    with open(inp_file) as f:
+    with open(inp_file, encoding=locale.getpreferredencoding(False)) as f:
         orig_contents = f.read()
     # Split into list by line
     orig_contents = orig_contents.splitlines()
@@ -67,7 +68,7 @@ def set_inp_param(inp_file, out_file, **kwargs):
         )
 
     # Write new file
-    with open(out_file, "w") as f:
+    with open(out_file, "w", encoding=locale.getpreferredencoding(False)) as f:
         f.write("\n".join(new_contents))
 
 
@@ -103,8 +104,7 @@ def calc_pressure(p_red, eps=1.0 * unit.kilojoule_per_mole, sigma=1.0 * unit.ang
     """Calculates pressure in bar given reduced pressure and LJ parameters."""
     p = p_red * eps / (sigma**3)
     p /= unit.AVOGADRO_CONSTANT_NA
-    p = p.value_in_unit(unit.bar)
-    return p
+    return p.value_in_unit(unit.bar)
 
 
 def calc_mu(lnz, T_red):
@@ -112,8 +112,7 @@ def calc_mu(lnz, T_red):
     Given a ln(z) value, where z is the activity, and a reduced temperature,
     compute the chemical potential.
     """
-    mu = lnz * T_red
-    return mu
+    return lnz * T_red
 
 
 def calc_length(dens_red, N_mols, sigma=1.0 * unit.angstrom):
@@ -123,8 +122,7 @@ def calc_length(dens_red, N_mols, sigma=1.0 * unit.angstrom):
     """
     dens = dens_red / (sigma**3)
     vols = N_mols / dens
-    lengths = (vols ** (1 / 3)).value_in_unit(unit.angstrom)
-    return lengths
+    return (vols ** (1 / 3)).value_in_unit(unit.angstrom)
 
 
 def setup_sim_dir(output_dir, ff_file, pdb_file):
@@ -142,7 +140,7 @@ def setup_sim_dir(output_dir, ff_file, pdb_file):
 def update_mcf_file(output_dir, mcf_file, mass):
     """Opens a .mcf file and replaces mass with new mass"""
     # Read lines of input mcf
-    with open(mcf_file) as f:
+    with open(mcf_file, encoding=locale.getpreferredencoding(False)) as f:
         mcf_lines = f.read().splitlines()
 
     # Replace line we care about
@@ -159,7 +157,7 @@ def update_mcf_file(output_dir, mcf_file, mass):
 
     # Save new mcf file
     mcf_name = os.path.split(mcf_file)[-1]
-    with open(os.path.join(output_dir, mcf_name), "w") as f:
+    with open(os.path.join(output_dir, mcf_name), "w", encoding=locale.getpreferredencoding(False)) as f:
         f.write("\n".join(mcf_lines))
 
 
@@ -173,13 +171,15 @@ def run_NVT(
     pdb_file="LJ.pdb",
     output_base_dir="./",
     output_prefix="nvt",
-    inp_kwargs={},
+    inp_kwargs=None,
 ):
     """
     Given a temperature and density, in reduced units for an LJ system, and run input
     files, runs an NVT simulation with Cassandra.
     """
     # Create directory for this run and copy files into it
+    if inp_kwargs is None:
+        inp_kwargs = {}
     output_path = os.path.join(
         output_base_dir, f"{output_prefix}_T{T_red:1.1f}_rho{dens_red:1.2f}"
     )
@@ -244,13 +244,15 @@ def run_NPT(
     pdb_file="LJ.pdb",
     output_base_dir="./",
     output_prefix="npt",
-    inp_kwargs={},
+    inp_kwargs=None,
 ):
     """
     Given a temperature, density, and pressure, all in reduced units for an LJ system,
     and necessary input files runs an NPT simulation with Cassandra.
     """
     # Create directory for this run and copy files into it
+    if inp_kwargs is None:
+        inp_kwargs = {}
     output_path = os.path.join(
         output_base_dir,
         f"{output_prefix}_T{T_red:1.1f}_p{p_red:1.3f}_rho{dens_red:1.2f}",
@@ -320,13 +322,15 @@ def run_GCMC(
     pdb_file="LJ.pdb",
     output_base_dir="./",
     output_prefix="gcmc",
-    inp_kwargs={},
+    inp_kwargs=None,
 ):
     """
     Given a temperature, density, and log-activity, all in reduced units for an LJ system,
     and necessary input files, runs a GCMC simulation with Cassandra.
     """
     # Create directory for this run and copy files into it
+    if inp_kwargs is None:
+        inp_kwargs = {}
     output_path = os.path.join(
         output_base_dir,
         f"{output_prefix}_T{T_red:1.1f}_lnz{lnz:1.3f}_rho{dens_red:1.2f}",
@@ -389,20 +393,24 @@ def run_GEMC(
     T_red,
     dens_low,
     dens_hi,
-    N_mols=[50, 500],
+    N_mols=None,
     inp_file="equil_gemc.inp",
     mcf_file="LJ.mcf",
     ff_file="LJ.ff",
     pdb_file="LJ.pdb",
     output_base_dir="./",
     output_prefix="gemc",
-    inp_kwargs={},
+    inp_kwargs=None,
 ):
     """
     Given a temperature and low and high densities, all in reduced units for an LJ system,
     and necessary input files, runs a GEMC simulation with Cassandra.
     """
     # Create directory for this run and copy files into it
+    if inp_kwargs is None:
+        inp_kwargs = {}
+    if N_mols is None:
+        N_mols = [50, 500]
     output_path = os.path.join(output_base_dir, f"{output_prefix}_T{T_red:1.1f}")
     ff_file, pdb_file = setup_sim_dir(output_path, ff_file, pdb_file)
 
@@ -458,7 +466,7 @@ def sim_VLE_GEMC(
     input_file_list,
     unused_arg,  # Needed to fit with SimWrapper expectations
     beta,
-    densities=[0.05, 0.70],
+    densities=None,
     model_pred=None,
     model_std=None,
     file_prefix="./",
@@ -467,7 +475,7 @@ def sim_VLE_GEMC(
     mcf_file="LJ.mcf",
     ff_file="LJ.ff",
     pdb_file="LJ.pdb",
-    N_mols=[50, 500],
+    N_mols=None,
     sim_num=None,
 ):
     """
@@ -485,6 +493,10 @@ def sim_VLE_GEMC(
         prod.out* for production GEMC simulations
     """
     # Ignore unused argument just for compatibility with SimWrapper
+    if N_mols is None:
+        N_mols = [50, 500]
+    if densities is None:
+        densities = [0.05, 0.7]
     del unused_arg
 
     # Also ignore model_std, which don't need here
@@ -516,9 +528,7 @@ def sim_VLE_GEMC(
         run_dirs = glob.glob(os.path.join(file_prefix, run_prefix + "*_T*"))
         sim_num = len(run_dirs)
     run_prefix = run_prefix + "%i" % sim_num
-    this_run_dir = "{}_T{:1.1f}".format(
-        run_prefix, Tr
-    )  # Should match naming in run_GEMC
+    this_run_dir = f"{run_prefix}_T{Tr:1.1f}"  # Should match naming in run_GEMC
 
     # Run NVT equilibrations for both densities
     for i, dens in enumerate(densities):
@@ -534,13 +544,13 @@ def sim_VLE_GEMC(
             inp_kwargs={"Start_Type": "make_config %i" % N_mols[i]},
         )
         # And set up outputs so .xyz inputs match expected naming for GEMC
-        with open(os.path.join(this_path, "equil_nvt.out.xyz")) as f:
+        with open(os.path.join(this_path, "equil_nvt.out.xyz"), encoding=locale.getpreferredencoding(False)) as f:
             xyz_lines = f.read().splitlines()
         with open(
             os.path.join(
                 file_prefix, this_run_dir, "equil_nvt.out.box%i.xyz" % (i + 1)
             ),
-            "w",
+            "w", encoding=locale.getpreferredencoding(False),
         ) as f:
             f.write("\n".join(xyz_lines[-(N_mols[i] + 2) :]))
 
@@ -588,7 +598,7 @@ def sim_VLE_GEMC(
         this_prop_file = os.path.join(
             file_prefix, this_run_dir, "prod.out.box%i.prp" % (i + 1)
         )
-        with open(this_prop_file) as f:
+        with open(this_prop_file, encoding=locale.getpreferredencoding(False)) as f:
             f.readline()
             this_header = f.readline()
             this_units = f.readline().strip()
@@ -625,7 +635,7 @@ def sim_VLE_NPT(
     unused_arg,  # Needed to fit with SimWrapper expectations
     beta,
     psat_red=1.0,
-    densities=[0.05, 0.70],
+    densities=None,
     model_pred=None,
     model_std=None,
     file_prefix="./",
@@ -635,7 +645,7 @@ def sim_VLE_NPT(
     mcf_file="LJ.mcf",
     ff_file="LJ.ff",
     pdb_file="LJ.pdb",
-    N_mols=[350, 350],
+    N_mols=None,
     sim_num=None,
 ):
     """
@@ -654,6 +664,10 @@ def sim_VLE_NPT(
         prod.out* for production NPT simulations
     """
     # Ignore unused argument just for compatibility with SimWrapper
+    if N_mols is None:
+        N_mols = [350, 350]
+    if densities is None:
+        densities = [0.05, 0.7]
     del unused_arg
 
     # Also ignore model_std, which don't need here
@@ -708,13 +722,13 @@ def sim_VLE_NPT(
             inp_kwargs={"Start_Type": "make_config %i" % N_mols[i]},
         )
         # And set up outputs so .xyz inputs match expected naming for GEMC
-        with open(os.path.join(this_path, "equil_nvt.out.xyz")) as f:
+        with open(os.path.join(this_path, "equil_nvt.out.xyz"), encoding=locale.getpreferredencoding(False)) as f:
             xyz_lines = f.read().splitlines()
         this_equil_xyz = os.path.join(
             file_prefix, this_run_dir, "equil_nvt.out.box%i.xyz" % (i + 1)
         )
         this_equil_xyz = os.path.abspath(this_equil_xyz)
-        with open(this_equil_xyz, "w") as f:
+        with open(this_equil_xyz, "w", encoding=locale.getpreferredencoding(False)) as f:
             f.write("\n".join(xyz_lines[-(N_mols[i] + 2) :]))
 
         # Run NPT equilibration
@@ -748,7 +762,7 @@ def sim_VLE_NPT(
 
         # Collect necessary output info
         this_prop_file = os.path.join(this_path, "prod.out.prp")
-        with open(this_prop_file) as f:
+        with open(this_prop_file, encoding=locale.getpreferredencoding(False)) as f:
             f.readline()
             this_header = f.readline()
             this_units = f.readline().strip()

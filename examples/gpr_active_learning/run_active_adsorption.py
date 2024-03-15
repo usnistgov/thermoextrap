@@ -44,7 +44,7 @@ def get_bulk_P(mu):
     refFile = os.path.expanduser(
         "~/GPR_Extrapolation/Adsorption/sw_t125/t125.v729.b.lnpi.dat"
     )
-    Nvals, lnPi = get_lnPi(mu, file_str=refFile)
+    _Nvals, lnPi = get_lnPi(mu, file_str=refFile)
     lnPi = (
         lnPi - lnPi[:, :1]
     )  # Remove value at zero particles, making this value exactly 1 as it should be
@@ -56,11 +56,10 @@ def get_bulk_P(mu):
     # Compute log-sum-exp of lnPi
     maxVal = np.max(lnPi)
     betaPV = np.log(np.sum(np.exp(lnPi - maxVal))) + maxVal
-    P = (
+    return (
         betaPV * kBT_over_eps / V
     )  # / (beta*V) #Should be pascals since have J/m^3 #Now reduced units
 
-    return P
 
 
 class Adsorption_DataWrapper(active_utils.DataWrapper):
@@ -111,8 +110,7 @@ class Adsorption_DataWrapper(active_utils.DataWrapper):
             moments[:, np.newaxis, :, :], dims=["rec", "val", "xmom", "umom"]
         )
         state_data = thermoextrap.DataCentralMoments.from_raw(moments)
-        state = thermoextrap.beta.factory_extrapmodel(self.beta, state_data)
-        return state
+        return thermoextrap.beta.factory_extrapmodel(self.beta, state_data)
 
 
 class SimulateAdsorption:
@@ -129,10 +127,12 @@ def run_active(
     active_dir,
     ground_truth_func,
     change_points=False,
-    init_mu=[-12.0, 3.8],
+    init_mu=None,
     max_order=2,
 ):
     # Create directory for this run
+    if init_mu is None:
+        init_mu = [-12.0, 3.8]
     os.mkdir(active_dir)
 
     # Define update functions - will share kwargs, but will use different types
@@ -149,8 +149,9 @@ def run_active(
     elif "rand" in active_dir:
         update_func = active_utils.UpdateRandom(**update_kwargs)
     else:
+        msg = "Must have 'alm', 'space', or 'rand' in active_dir argument or cannot pick update strategy."
         raise ValueError(
-            "Must have 'alm', 'space', or 'rand' in active_dir argument or cannot pick update strategy."
+            msg
         )
 
     # Set up list of metrics to compute
@@ -229,10 +230,10 @@ def main():
     # Define maximum order of derivatives to use with GP models
     max_order = 2
 
-    ####################### GP models with change points kernels ########################
+    # GP models with change points kernels ########################
 
     # Update by selecting point with maximum variance (uncertainty) predicted by model
-    dat_list_cp_alm, train_hist_cp_alm = run_active(
+    _dat_list_cp_alm, _train_hist_cp_alm = run_active(
         "changepoints_alm",
         ground_truth_ads,
         change_points=True,
@@ -241,7 +242,7 @@ def main():
     )
 
     # Update by selecting point to fill space
-    dat_list_cp_space, train_hist_cp_space = run_active(
+    _dat_list_cp_space, _train_hist_cp_space = run_active(
         "changepoints_space",
         ground_truth_ads,
         change_points=True,
@@ -249,7 +250,7 @@ def main():
         max_order=max_order,
     )
 
-    ####################### GP models with standard RBF kernels ########################
+    # GP models with standard RBF kernels ########################
 
     # Update by selecting point with maximum variance (uncertainty) predicted by model
     dat_list_out, train_history = run_active(
@@ -291,8 +292,7 @@ def main():
         default_loss = this_gp.training_loss()
         default_params = tuple([par.numpy() for par in this_gp.trainable_parameters])
         print(
-            "\t Unbiased opt from default: loss %f, l %f, var %f, p %f"
-            % ((default_loss,) + default_params)
+            "\t Unbiased opt from default: loss {:f}, l {:f}, var {:f}, p {:f}".format(default_loss, *default_params)
         )
 
         for j, train_hist in enumerate(
@@ -302,11 +302,7 @@ def main():
                 this_gp.trainable_parameters[k].assign(tpar)
             this_loss = this_gp.training_loss()
             print(
-                "\t W/ params from %s: loss %f, l %f, var %f, p %f"
-                % (
-                    (train_labels[j].ljust(10), this_loss)
-                    + tuple(train_hist["params"][-1])
-                )
+                "\t W/ params from {}: loss {:f}, l {:f}, var {:f}, p {:f}".format(train_labels[j].ljust(10), this_loss, *tuple(train_hist["params"][-1]))
             )
 
         print("\n")

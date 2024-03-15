@@ -1,5 +1,6 @@
 import copy
 import glob
+import locale
 import os
 import sys
 
@@ -22,8 +23,7 @@ def calc_Rg2(mc):
         pos = conf.particle(0).site(i).position()
         for j in range(i + 1, conf.particle(0).num_sites()):
             rg2_sum += pos.squared_distance(conf.particle(0).site(j).position())
-    rg2 = rg2_sum / (conf.particle(0).num_sites() ** 2)
-    return rg2
+    return rg2_sum / (conf.particle(0).num_sites() ** 2)
 
 
 def poly_sim_NVT(
@@ -97,7 +97,7 @@ def poly_sim_NVT(
     #                                          "particle_type": "0",
     #                                          "num_steps": "10"})))
     # Below defines moves partially regrowing the chain (TrialGrowLinear is complete chain)
-    grows = list()
+    grows = []
     n_bonds = mc.system().configuration().particle(0).num_sites() - 1
     for i in range(n_bonds):
         for_grow = [{"bond": "true", "mobile_site": str(i), "anchor_site": str(i + 1)}]
@@ -109,19 +109,16 @@ def poly_sim_NVT(
             }
         ]
         if i == 0:
-            grows.append(for_grow)
-            grows.append(rev_grow)
+            grows.extend((for_grow, rev_grow))
         else:
-            grows.append(for_grow + copy.deepcopy(grows[-2]))
-            grows.append(rev_grow + copy.deepcopy(grows[-2]))
+            grows.extend((for_grow + copy.deepcopy(grows[-2]), rev_grow + copy.deepcopy(grows[-2])))
 
     # Only use a subset of the possible partial regrowth moves
     n_regrow = [1, 2, 3, 4, 9, 19]
     use_list = []
     for n in n_regrow:
         if n <= n_bonds:
-            use_list.append(n * 2 - 2)
-            use_list.append(n * 2 - 1)
+            use_list.extend((n * 2 - 2, n * 2 - 1))
     grows = [grows[i] for i in use_list]
     for grow in grows:
         grow[0]["weight"] = "1"  # str(1.0/len(grow))
@@ -179,7 +176,7 @@ def poly_sim_NVT(
 
     # Set up file to hold CV info (RG^2)
     header = "#Step     Rg^2 (nm^2)    Bias (kJ/mole)"
-    rg_file = open(os.path.join(file_prefix, bias_name + "%i.txt" % sim_num), "w")
+    rg_file = open(os.path.join(file_prefix, bias_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False))
     rg_file.write("%s\n" % header)
 
     # Loop over
@@ -197,11 +194,11 @@ def poly_sim_NVT(
     rg_file.close()
 
     # Need to modify some files to fit with expected formatting/naming
-    with open(os.path.join(file_prefix, "mc_info%i.txt" % sim_num)) as f:
+    with open(os.path.join(file_prefix, "mc_info%i.txt" % sim_num), encoding=locale.getpreferredencoding(False)) as f:
         log = f.readlines()
     log = [line.strip(",").replace(",", "  ") for line in log]
     log[0] = "#" + log[0]
-    with open(os.path.join(file_prefix, info_name + "%i.txt" % sim_num), "w") as f:
+    with open(os.path.join(file_prefix, info_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False)) as f:
         f.writelines(log)
 
 
@@ -308,7 +305,7 @@ def poly_sim_ExpandedBeta(
     #                                          "particle_type": "0",
     #                                          "num_steps": "10"})))
     # Below defines moves partially regrowing the chain (TrialGrowLinear is complete chain)
-    grows = list()
+    grows = []
     n_bonds = mc.system().configuration().particle(0).num_sites() - 1
     for i in range(n_bonds):
         for_grow = [{"bond": "true", "mobile_site": str(i), "anchor_site": str(i + 1)}]
@@ -320,19 +317,16 @@ def poly_sim_ExpandedBeta(
             }
         ]
         if i == 0:
-            grows.append(for_grow)
-            grows.append(rev_grow)
+            grows.extend((for_grow, rev_grow))
         else:
-            grows.append(for_grow + copy.deepcopy(grows[-2]))
-            grows.append(rev_grow + copy.deepcopy(grows[-2]))
+            grows.extend((for_grow + copy.deepcopy(grows[-2]), rev_grow + copy.deepcopy(grows[-2])))
 
     # Only use a subset of the possible partial regrowth moves
     n_regrow = [1, 2, 4, 9, 19]
     use_list = []
     for n in n_regrow:
         if n <= n_bonds:
-            use_list.append(n * 2 - 2)
-            use_list.append(n * 2 - 1)
+            use_list.extend((n * 2 - 2, n * 2 - 1))
     grows = [grows[i] for i in use_list]
     for grow in grows:
         grow[0]["weight"] = "1"  # str(1.0/len(grow))
@@ -419,7 +413,7 @@ def poly_sim_ExpandedBeta(
 
     # Set up file to hold CV info (RG^2)
     header = "#Step     Rg^2 (nm^2)    Bias (kJ/mole)"
-    rg_file = open(os.path.join(file_prefix, bias_name + "%i.txt" % sim_num), "w")
+    rg_file = open(os.path.join(file_prefix, bias_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False))
     rg_file.write("%s\n" % header)
 
     # Loop over
@@ -437,11 +431,11 @@ def poly_sim_ExpandedBeta(
     rg_file.close()
 
     # Need to modify some files to fit with expected formatting/naming
-    with open(os.path.join(file_prefix, "mc_info%i.txt" % sim_num)) as f:
+    with open(os.path.join(file_prefix, "mc_info%i.txt" % sim_num), encoding=locale.getpreferredencoding(False)) as f:
         log = f.readlines()
     log = [line.strip(",").replace(",", "  ") for line in log]
     log[0] = "#" + log[0]
-    with open(os.path.join(file_prefix, info_name + "%i.txt" % sim_num), "w") as f:
+    with open(os.path.join(file_prefix, info_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False)) as f:
         f.writelines(log)
 
 

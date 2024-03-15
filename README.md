@@ -25,6 +25,8 @@ https://naereen.github.io/badges/
 [license-badge]: https://img.shields.io/pypi/l/cmomy?color=informational
 [license-link]: https://github.com/usnistgov/thermoextrap/blob/main/LICENSE
 
+<!-- prettier-ignore-end -->
+
 <!-- other links -->
 
 [cmomy]: https://github.com/usnistgov/cmomy
@@ -79,7 +81,9 @@ request for wanted features and suggestions!
 
 ## Quick start
 
-`thermoextrap` may be installed with either (recommended)
+<!-- start-installation -->
+
+Use one of the following to install `thermoextrap`:
 
 ```bash
 conda install -c conda-forge thermoextrap
@@ -91,40 +95,35 @@ or
 pip install thermoextrap
 ```
 
-If you use pip, then you can include additional dependencies using
+## Additional dependencies
+
+To utilize the full potential of `thermoextrap`, additional dependencies are
+needed. This can be done via pip by using:
 
 ```bash
 pip install thermoextrap[all]
 ```
 
-If you install `thermoextrap` with conda, there are additional optional
-dependencies that take some care for installation. We recommend installing the
-following via `pip`, as the versions on the conda/conda-forge channels are often
-a bit old.
+If using conda, then you'll have to manually install some dependencies. For
+example, you can run:
 
 ```bash
-pip install tensorflow tensorflow-probability gpflow
+conda install bottleneck dask "pymbar>=4.0"
 ```
 
-To install from source do the following:
+At this time, it is recommended to install the Gaussian Process Regression (GPR)
+dependencies via pip, as the conda-forge recipes are slightly out of date:
 
 ```bash
-git clone git@github.com:usnistgov/thermoextrap.git
-cd thermoextrap
-pip install . [-e]
+pip install tensorflow tensorflow-probability "gpflow>=2.6.0"
 ```
 
-To (optionally) include the example data do the following:
-
-```bash
-git submodule update --init  --recursive
-```
+<!-- end-installation -->
 
 ## Example usage
 
 ```python
 import thermoextrap
-
 ```
 
 <!-- end-docs -->
@@ -147,13 +146,12 @@ This package extensively uses the [cmomy] package to handle central comoments.
 
 ## Contact
 
-Questions may be addressed to Bill Krekelberg at william.krekelberg@nist.gov or
-Jacob Monroe at jacob.monroe@uark.edu.
+Questions may be addressed to Bill Krekelberg at <william.krekelberg@nist.gov>
+or Jacob Monroe at <jacob.monroe@uark.edu>.
 
 ## Credits
 
-This package was created with
-[Cookiecutter](https://github.com/audreyr/cookiecutter) and the
-[wpk-nist-gov/cookiecutter-pypackage](https://github.com/wpk-nist-gov/cookiecutter-pypackage)
-Project template forked from
-[audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage).
+This package was created using
+[Cookiecutter](https://github.com/audreyr/cookiecutter) with the
+[usnistgov/cookiecutter-nist-python](https://github.com/usnistgov/cookiecutter-nist-python)
+template.

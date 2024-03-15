@@ -8,33 +8,36 @@ As a result, the potential energy of a system of :math:`N` particles with positi
 This is a useful test system with analytical solutions coded alongside the ability to randomly generate data.
 """
 
+from __future__ import annotations
 
+import math
 from functools import lru_cache
 
 import numpy as np
-import sympy as sp
+from cmomy.random import validate_rng
 
+from .core._imports import sympy as sp
 from .docstrings import DocFiller
 
 __all__ = [
-    "x_ave",
-    "x_var",
-    "x_prob",
-    "u_prob",
-    "x_cdf",
-    "x_sample",
-    "u_sample",
     "dbeta_xave",
-    "dbeta_xave_minuslog",
     "dbeta_xave_depend",
     "dbeta_xave_depend_minuslog",
+    "dbeta_xave_minuslog",
     "dvol_xave",
+    "generate_data",
+    "u_prob",
+    "u_sample",
+    "x_ave",
     "x_beta_extrap",
-    "x_beta_extrap_minuslog",
     "x_beta_extrap_depend",
     "x_beta_extrap_depend_minuslog",
+    "x_beta_extrap_minuslog",
+    "x_cdf",
+    "x_prob",
+    "x_sample",
+    "x_var",
     "x_vol_extrap",
-    "generate_data",
 ]
 
 
@@ -64,6 +67,9 @@ vol0 : float
     Reference volume.
 shape : int or tuple of int
     Shape of output.  Ignored if ``r`` is not ``None``.
+rng : Generator, optional
+    Random number generator object.
+    Defaults to result of :func:`cmomy.random.default_rng`.
 """
 
 
@@ -157,7 +163,7 @@ def x_cdf(x, beta, vol=1.0):
 
 
 @docfiller_shared
-def x_sample(shape, beta, vol=1.0, r=None):
+def x_sample(shape, beta, vol=1.0, rng: np.random.Generator | None = None):
     """
     Sample positions from distribution at `beta` and `vol`.
 
@@ -168,7 +174,7 @@ def x_sample(shape, beta, vol=1.0, r=None):
     {shape}
     {beta}
     {vol}
-    {r}
+    {rng}
 
     Returns
     -------
@@ -179,15 +185,12 @@ def x_sample(shape, beta, vol=1.0, r=None):
     -----
     If pass ``r``, then use these to build ``output``.  Otherwise, build random array of shape ``shape``.
     """
-    if r is None:
-        if isinstance(shape, int):
-            shape = (shape,)
-        r = np.random.rand(*shape)
+    r = validate_rng(rng).random(shape)
     return (-1.0 / beta) * np.log(1.0 - r * (1.0 - np.exp(-beta * vol)))
 
 
 @docfiller_shared
-def u_sample(shape, beta, vol=1.0, r=None):
+def u_sample(shape, beta, vol=1.0, rng: np.random.Generator | None = None):
     """
     Samples potential energy values from a system.
 
@@ -200,9 +203,9 @@ def u_sample(shape, beta, vol=1.0, r=None):
     {shape}
     {beta}
     {vol}
-    {r}
+    {rng}
     """
-    return x_sample(shape=shape, beta=beta, vol=vol, r=r).sum(axis=-1)
+    return x_sample(shape=shape, beta=beta, vol=vol, rng=rng).sum(axis=-1)
 
 
 @lru_cache(maxsize=100)
@@ -284,7 +287,7 @@ def x_beta_extrap(order, beta0, beta, vol=1.0):
     for k in range(order + 1):
         val = dbeta_xave(k)(beta0, vol)
         out.append(val)
-        tot += val / np.math.factorial(k) * (dbeta**k)
+        tot += val / math.factorial(k) * (dbeta**k)
     return tot, np.array(out)
 
 
@@ -306,7 +309,7 @@ def x_beta_extrap_minuslog(order, beta0, beta, vol=1.0):
     tot = 0.0
     for o in range(order + 1):
         out[o] = dbeta_xave_minuslog(o)(beta0, vol)
-        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+        tot += out[o] * ((dbeta) ** o) / math.factorial(o)
 
     return tot, out
 
@@ -334,7 +337,7 @@ def x_beta_extrap_depend(order, beta0, beta, vol=1.0):
         #     out[o] = beta0*(x_ave(beta0, vol))
         # else:
         #     out[o] = (o * dbeta_xave(o-1)(beta0, vol) + beta0 * dbeta_xave(o)(beta0, vol))
-        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+        tot += out[o] * ((dbeta) ** o) / math.factorial(o)
 
     return tot, out
 
@@ -361,11 +364,11 @@ def x_beta_extrap_depend_minuslog(order, beta0, beta, vol=1.0):
         # if o == 0:
         #     out[o] = -np.log(beta0 * x_ave(beta0, vol))
         # else:
-        #     out[o] += np.math.factorial(o-1)*((-1.0/beta0)**o)
+        #     out[o] += math.factorial(o-1)*((-1.0/beta0)**o)
         #     for k in range(1,o+1):
         #         this_diffs = np.array([dbeta_xave(kk)(beta0, vol) for kk in range(1, o-k+2)])
-        #         out[o] += (np.math.factorial(k-1) * (-1/x_ave(beta0, vol))**k) *  sp.bell(o, k, this_diffs)
-        tot += out[o] * ((dbeta) ** o) / np.math.factorial(o)
+        #         out[o] += (math.factorial(k-1) * (-1/x_ave(beta0, vol))**k) *  sp.bell(o, k, this_diffs)
+        tot += out[o] * ((dbeta) ** o) / math.factorial(o)
 
     return tot, out
 
@@ -392,12 +395,12 @@ def x_vol_extrap(order, vol0, vol, beta=1.0):
     for k in range(order + 1):
         val = dvol_xave(k)(beta, vol0)
         out.append(val)
-        tot += val / np.math.factorial(k) * (dvol**k)
+        tot += val * (dvol**k) / math.factorial(k)
     return tot, np.array(out)
 
 
 @docfiller_shared
-def generate_data(shape, beta, vol=1.0, r=None):
+def generate_data(shape, beta, vol=1.0, rng: np.random.Generator | None = None):
     """
     Generates data points in specified shape, where the first index is the number of samples and the second is the number of independent IG particles
     Sample will be at beta with L=vol
@@ -410,9 +413,9 @@ def generate_data(shape, beta, vol=1.0, r=None):
     {shape}
     {beta}
     {vol}
-    {r}
+    {rng}
     """
-    positions = x_sample(shape, beta, vol, r=r)
+    positions = x_sample(shape=shape, beta=beta, vol=vol, rng=rng)
     x = positions.mean(axis=-1)
     u = positions.sum(axis=-1)
     return (x, u)

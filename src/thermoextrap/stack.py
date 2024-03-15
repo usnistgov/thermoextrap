@@ -1,5 +1,8 @@
 """A set of routines to stack data for gpflow analysis."""
 
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -9,7 +12,7 @@ from module_utilities import cached
 from .models import StateCollection
 
 
-def stack_dataarray(
+def stack_dataarray(  # noqa: C901
     da,
     x_dims,
     y_dims=None,
@@ -46,7 +49,8 @@ def stack_dataarray(
     dims = da.dims
     for name in [xstack_dim, ystack_dim]:
         if name in dims:
-            raise ValueError(f"{xstack_dim} conflicts with existing {dims}")
+            msg = f"{xstack_dim} conflicts with existing {dims}"
+            raise ValueError(msg)
 
     if isinstance(x_dims, str):
         x_dims = (x_dims,)
@@ -67,7 +71,8 @@ def stack_dataarray(
     if policy == "raise":
         for dim in x_dims:
             if dim not in da.coords:
-                raise ValueError(f"da.coords[{dim}] not set")
+                msg = f"da.coords[{dim}] not set"
+                raise ValueError(msg)
 
     out = da.stack(**stacker)
 
@@ -97,7 +102,13 @@ def multiindex_to_array(idx):
 
 
 def apply_reduction(
-    da, dim, funcs, concat=True, concat_dim=None, concat_kws=None, **kws
+    da,
+    dim,
+    funcs,
+    concat=True,  # noqa: ARG001
+    concat_dim=None,
+    concat_kws=None,
+    **kws,
 ):
     """
     Apply multiple reductions to DataArray.
@@ -123,7 +134,6 @@ def apply_reduction(
     out : DataArray or list of DataArray
         if concat_dim is None and multiple funcs, then list of DataArrays corresponding to each reduction.  Otherwise, single DataArray
     """
-
     if not isinstance(funcs, (tuple, list)):
         funcs = [funcs]
 
@@ -190,6 +200,7 @@ def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
     kws : dict
         extra arguments to `states[i].derivs` method
         Note, default is `norm = False`
+
     Returns
     -------
     out : DataArray
@@ -243,7 +254,7 @@ class StackedDerivatives:
         ystack_dim="ystack",
         stats_dim="stats",
         policy="infer",
-    ):
+    ) -> None:
         if isinstance(x_dims, str):
             x_dims = [x_dims]
         if isinstance(y_dims, str):
@@ -256,6 +267,7 @@ class StackedDerivatives:
         self.ystack_dim = ystack_dim
         self.stats_dim = stats_dim
         self.policy = policy
+        self._cache: dict[str, Any] = {}
 
     @property
     def order_dim(self):
@@ -323,11 +335,10 @@ class StackedDerivatives:
 
         df = pd.DataFrame([{'beta': 1}, {'beta': 2}, ...])
         """
+        if set(df.columns) != set(self.x_dims[:-1]):
+            raise ValueError
 
-        assert set(df.columns) == set(self.x_dims[:-1])
-
-        index = df.assign(**{self.order_dim: 0}).set_index(self.x_dims).index
-        return index
+        return df.assign(**{self.order_dim: 0}).set_index(self.x_dims).index
 
     @classmethod
     def from_mean_var(
@@ -343,7 +354,6 @@ class StackedDerivatives:
         concat_kws=None,
     ):
         """Create object from mean and variance."""
-
         if concat_dim is None:
             concat_dim = pd.Index(["mean", "var"], name="stats")
 
@@ -352,7 +362,8 @@ class StackedDerivatives:
         elif hasattr(concat_dim, "name"):
             stats_dim = concat_dim.name
         else:
-            raise ValueError("concat_dim must be string, pandas.Index, order DataArray")
+            msg = "concat_dim must be string, pandas.Index, order DataArray"
+            raise ValueError(msg)
 
         if concat_kws is None:
             concat_kws = {}
@@ -409,10 +420,7 @@ class StackedDerivatives:
         if concat_dim is None:
             concat_dim = pd.Index(["mean", "var"], name="stats")
 
-        if isinstance(concat_dim, str):
-            stats_dim = concat_dim
-        else:
-            stats_dim = concat_dim.name
+        stats_dim = concat_dim if isinstance(concat_dim, str) else concat_dim.name
 
         if reduce_kws is None:
             reduce_kws = {}
@@ -438,7 +446,7 @@ class StackedDerivatives:
         )
 
     @classmethod
-    def from_states(
+    def from_states(  # noqa: PLR0913
         cls,
         states,
         x_dims,
@@ -481,7 +489,6 @@ class StackedDerivatives:
         --------
         `StackedDerivatives.from_derivs`
         """
-
         if not isinstance(states, StateCollection):
             states = StateCollection(states)
 
@@ -546,7 +553,7 @@ class GPRData(StateCollection):
         stats_dim="stats",
         reduce_dim="rep",
         deriv_kws=None,
-    ):
+    ) -> None:
         if x_dims is None:
             x_dims = [states[0].alpha_name, "order"]
         if deriv_kws is None:
@@ -597,7 +604,6 @@ class GPRData(StateCollection):
         states_derivs_concat, to_mean_var, stack_dataarray
 
         """
-
         kws = dict(self.deriv_kws, order_dim=self.order_dim)
         return (
             states_derivs_concat(self, order=order, **kws)
@@ -653,8 +659,7 @@ class GPRData(StateCollection):
 
         df = pd.DataFrame([{'beta': 1}, {'beta': 2}, ...])
         """
+        if set(df.columns) != set(self.x_dims[:-1]):
+            raise ValueError
 
-        assert set(df.columns) == set(self.x_dims[:-1])
-
-        index = df.assign(**{self.order_dim: 0}).set_index(self.x_dims).index
-        return index
+        return df.assign(**{self.order_dim: 0}).set_index(self.x_dims).index

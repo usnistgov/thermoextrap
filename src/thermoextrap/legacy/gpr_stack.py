@@ -8,7 +8,6 @@ import numpy as np
 import sympy as sp
 import tensorflow as tf
 import xarray as xr
-from gpflow.ci_utils import ci_niter
 from module_utilities import cached
 
 
@@ -375,7 +374,7 @@ class GPRModel:
         trainable_params = params["trainable_params"]
 
         # Run optimization
-        for _ in range(ci_niter(opt_steps)):
+        for _ in range(opt_steps):
             # Training is extremely slow for vector observables with large dimension
             # Seems to mainly be because natgrad requires matrix inversion
             natgrad.minimize(tot_loss, variational_params)

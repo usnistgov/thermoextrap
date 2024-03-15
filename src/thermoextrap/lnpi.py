@@ -14,17 +14,17 @@ from functools import lru_cache
 from typing import Hashable, Sequence
 
 import attrs
+import cmomy
 import numpy as np
 import xarray as xr
 
 # from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
-from cmomy import xCentralMoments
 from module_utilities import cached
 
 from . import beta as beta_xpan
-from .core._attrs_utils import _cache_field, convert_dims_to_tuple
+from .core._attrs_utils import cache_field, convert_dims_to_tuple
 from .core.sputils import get_default_indexed, get_default_symbol
 from .data import DataCallbackABC
 from .docstrings import DOCFILLER_SHARED
@@ -77,7 +77,7 @@ class lnPi_func_central(SymFuncBase):
 
     @classmethod
     def deriv_args(cls):
-        return beta_xpan.u_func_central.deriv_args() + [cls.lnPi0, cls.mudotN]
+        return [*beta_xpan.u_func_central.deriv_args(), cls.lnPi0, cls.mudotN]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
@@ -87,9 +87,7 @@ class lnPi_func_central(SymFuncBase):
     def eval(cls, beta):
         if beta is None:
             return cls.lnPi0
-        else:
-            out = None
-        return out
+        return None
 
 
 class lnPi_func_raw(SymFuncBase):
@@ -102,7 +100,7 @@ class lnPi_func_raw(SymFuncBase):
 
     @classmethod
     def deriv_args(cls):
-        return beta_xpan.u_func.deriv_args() + [cls.lnPi0, cls.mudotN]
+        return [*beta_xpan.u_func.deriv_args(), cls.lnPi0, cls.mudotN]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
@@ -112,9 +110,7 @@ class lnPi_func_raw(SymFuncBase):
     def eval(cls, beta):
         if beta is None:
             return cls.lnPi0
-        else:
-            out = None
-        return out
+        return None
 
 
 @lru_cache(5)
@@ -151,34 +147,30 @@ def factory_derivatives(
     --------
     thermoextrap.beta.factory_derivatives
     """
-
     if name == "lnPi":
         beta = get_default_symbol("beta")
-        if central:
-            func = lnPi_func_central(beta)
-        else:
-            func = lnPi_func_raw(beta)
+        func = lnPi_func_central(beta) if central else lnPi_func_raw(beta)
         derivs = beta_xpan.SymDerivBeta(func=func, expand=expand, post_func=post_func)
 
         exprs = SymSubs(
             derivs, subs_all={derivs.beta: "None"}, expand=False, simplify=False
         )
         return Derivatives.from_sympy(exprs, args=derivs.args)
-    else:
-        return beta_xpan.factory_derivatives(
-            name=name,
-            n=n,
-            d=d,
-            xalpha=xalpha,
-            central=central,
-            post_func=post_func,
-            expand=expand,
-        )
+    return beta_xpan.factory_derivatives(
+        name=name,
+        n=n,
+        d=d,
+        xalpha=xalpha,
+        central=central,
+        post_func=post_func,
+        expand=expand,
+    )
 
 
 def _is_xr(name, x):
     if not isinstance(x, xr.DataArray):
-        raise ValueError(f"{name} must be an xr.DataArray")
+        msg = f"{name} must be an xr.DataArray"
+        raise TypeError(msg)
     return x
 
 
@@ -205,7 +197,7 @@ class lnPiDataCallback(DataCallbackABC):
 
     """
 
-    # TODO: rename dims_comp to dim_comp.
+    # TODO(wpk): rename dims_comp to dim_comp.
 
     #: lnPi data
     lnPi0: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
@@ -220,8 +212,8 @@ class lnPiDataCallback(DataCallbackABC):
     #: Flag to allow/disallow resampling of ``lnPi0``.
     allow_resample: bool = field(default=False)
 
-    _cache: dict = _cache_field()
-    # FIXME: using dims_n, dims_comp naming because this is what is used in lnPi module
+    _cache: dict = cache_field()
+    # TODO(wpk): using dims_n, dims_comp naming because this is what is used in lnPi module
 
     # def __init__(self, lnPi0, mu, dims_n, dims_comp, ncoords=None):
 
@@ -237,7 +229,7 @@ class lnPiDataCallback(DataCallbackABC):
     #         ncoords = self.get_ncoords()
     #     self.ncoords = _is_xr("ncoords", ncoords)
 
-    def check(self, data):
+    def check(self, data) -> None:
         pass
 
     @ncoords.default
@@ -246,16 +238,14 @@ class lnPiDataCallback(DataCallbackABC):
         ncoords = np.meshgrid(
             *tuple(self.lnPi0[x].values for x in self.dims_n), indexing="ij"
         )
-        ncoords = xr.DataArray(np.array(ncoords), dims=(self.dims_comp,) + self.dims_n)
-        return ncoords
+        return xr.DataArray(np.array(ncoords), dims=(self.dims_comp, *self.dims_n))
 
     @property
     def lnPi0_ave(self):
         if isinstance(self.lnPi0, xr.DataArray):
             return self.lnPi0
-        else:
-            # assume lnPi0 is an averaging object ala cmomy
-            return self.lnPi0.values
+        # assume lnPi0 is an averaging object ala cmomy
+        return self.lnPi0.values
 
     @cached.prop
     def mudotN(self):
@@ -264,13 +254,13 @@ class lnPiDataCallback(DataCallbackABC):
 
     def resample(self, data, meta_kws=None, **kws):
         """Resample lnPi0 data."""
-
         if not self.allow_resample:
-            raise ValueError(
+            msg = (
                 "Must set `self.allow_resample` to `True` to use resampling. "
                 "Resampling here is handled in an ad-hoc way, and should be "
                 "used with care."
             )
+            raise ValueError(msg)
 
         warnings.warn(
             "'Correct' resampling of lnPi should be handled externally. "
@@ -282,7 +272,7 @@ class lnPiDataCallback(DataCallbackABC):
         )
 
         # wrap in xarray object:
-        dc = xCentralMoments.from_vals(
+        dc = cmomy.xCentralMoments.from_vals(
             self.lnPi0.expand_dims(dim="_new", axis=0),
             axis="_new",
             mom_dims="_mom",
@@ -294,7 +284,7 @@ class lnPiDataCallback(DataCallbackABC):
         return self.new_like(lnPi0=dc.values.sel(_mom=1))
 
     def derivs_args(self, data, derivs_args):
-        return tuple(derivs_args) + (self.lnPi0_ave, self.mudotN)
+        return (*tuple(derivs_args), self.lnPi0_ave, self.mudotN)
 
 
 # def factory_data_values(
@@ -418,15 +408,17 @@ def factory_extrapmodel_lnPi(
     thermoextrap.lnpi.factory_derivatives
     ~thermoextrap.models.ExtrapModel
     """
-
     if central is None:
         central = data.central
     if order is None:
         order = data.order + 1
 
-    assert central == data.central
-    assert order <= data.order + 1
-    assert data.x_is_u
+    if central != data.central:
+        raise ValueError
+    if order > data.order + 1:
+        raise ValueError
+    if not data.x_is_u:
+        raise ValueError
 
     if derivatives is None:
         if derivatives_kws is None:

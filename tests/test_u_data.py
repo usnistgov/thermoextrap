@@ -1,13 +1,21 @@
-from collections import namedtuple
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, NamedTuple
+
+import cmomy
 import numpy as np
 import pytest
 
 import thermoextrap as xtrap
 
+if TYPE_CHECKING:
+    from typing import Any
+
+    import numpy.typing as npt
+
 
 # testing routines
-def do_testing(attrs, obj0, obj1, **kwargs):
+def do_testing(attrs, obj0, obj1, **kwargs) -> None:
     for attr in attrs:
         val0, val1 = (getattr(obj, attr) for obj in (obj0, obj1))
         val1 = val1.transpose(*val0.dims)
@@ -22,11 +30,8 @@ def do_testing_c(*args, **kwargs):
     return do_testing(["du", "dxdu", "xave"], *args, **kwargs)
 
 
-def do_testing_gen(central, *args, **kwargs):
-    if central:
-        f = do_testing_c
-    else:
-        f = do_testing_r
+def do_testing_gen(central, *args, **kwargs) -> None:
+    f = do_testing_c if central else do_testing_r
     f(*args, **kwargs)
 
 
@@ -40,14 +45,20 @@ def order(request):
     return request.param
 
 
-@pytest.fixture
-def data(nsamp):
-    x = np.random.rand(nsamp)
-    u = np.random.rand(nsamp)
-    Data = namedtuple("data", ["x", "u", "n"])
+class DataNamedTuple(NamedTuple):
+    x: npt.NDArray[Any]
+    u: npt.NDArray[Any]
+    n: int
 
-    data = Data(**{"x": x, "u": u, "n": nsamp})
-    return data
+
+@pytest.fixture()
+def data(nsamp) -> DataNamedTuple:
+    rng = cmomy.random.default_rng()
+
+    x = rng.random(nsamp)
+    u = rng.random(nsamp)
+
+    return DataNamedTuple(x=x, u=u, n=nsamp)
 
 
 @pytest.fixture(params=[True, False])
@@ -56,7 +67,7 @@ def central(request):
 
 
 # test all other data constructors
-@pytest.fixture
+@pytest.fixture()
 def data_x(data, order, central):
     return xtrap.factory_data_values(xv=data.u, uv=data.u, order=order, central=central)
 
@@ -65,8 +76,7 @@ def data_x(data, order, central):
 def xv_fixture(request, data):
     if request:
         return data.u
-    else:
-        return None
+    return None
 
 
 @pytest.fixture(params=["factory", "cmom", "cmom_vals"])
@@ -82,7 +92,7 @@ def data_other(request, data, xv_fixture, order, central):
     return factory(xv=xv_fixture, uv=data.u, order=order, central=central)
 
 
-def test_factory_0(data_x, data_other, order, central):
+def test_factory_0(data_x, data_other, central) -> None:
     do_testing_gen(central, data_x, data_other)
 
 
@@ -97,27 +107,27 @@ def betas_extrap(request):
     return request.param
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_x(data_x, central, beta):
     return xtrap.beta.factory_extrapmodel(beta=beta, data=data_x, central=central)
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_x_out(em_x, betas_extrap):
     return em_x.predict(betas_extrap, cumsum=True)
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_other(data_other, central, beta):
     return xtrap.beta.factory_extrapmodel(beta=beta, data=data_other, central=central)
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_other_out(em_other, betas_extrap):
     return em_other.predict(betas_extrap, cumsum=True)
 
 
-def test_em_other(em_x_out, em_other_out):
+def test_em_other(em_x_out, em_other_out) -> None:
     np.testing.assert_allclose(em_x_out, em_other_out)
 
 
@@ -135,19 +145,19 @@ def data_x_is_u(request, data, order, central):
     return factory(xv=None, uv=data.u, order=order, central=central, x_is_u=True)
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_x_is_u(data_x_is_u, central, beta):
     return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_x_is_u, central=central, name="u_ave"
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_x_is_u_out(em_x_is_u, betas_extrap):
     return em_x_is_u.predict(betas_extrap, cumsum=True)
 
 
-def test_em_x_is_u(em_x_out, em_x_is_u_out):
+def test_em_x_is_u(em_x_out, em_x_is_u_out) -> None:
     np.testing.assert_allclose(em_x_out, em_x_is_u_out)
 
 
@@ -156,49 +166,49 @@ def test_em_x_is_u(em_x_out, em_x_is_u_out):
 # <du**2> = <u**2> - <u>**2
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_u(data, order, central):
     return xtrap.factory_data_values(
         xv=None, uv=data.u, order=order, central=central, x_is_u=True
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_u(data_u, central, beta):
     return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u, central=central, name="u_ave"
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_u_out(em_u, betas_extrap):
     return em_u.predict(betas_extrap, cumsum=True)
 
 
-def test_data_u(em_u_out, em_x_is_u_out):
+def test_data_u(em_u_out, em_x_is_u_out) -> None:
     np.testing.assert_allclose(em_u_out, em_x_is_u_out)
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_x2(data, order, central):
     return xtrap.factory_data_values(
         xv=data.u**2, uv=data.u, order=order, central=central
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_x2(beta, order, central, data_x2):
     return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_x2, order=order - 1, central=central, name="x_ave"
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_x2_out(em_x2, betas_extrap):
     return em_x2.predict(betas_extrap, cumsum=True)
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_u2(beta, data_u, order, central):
     if not central:
         return xtrap.beta.factory_extrapmodel(
@@ -210,24 +220,22 @@ def em_u2(beta, data_u, order, central):
             n=2,
         )
 
-    else:
-        return None
+    return None
 
 
-@pytest.fixture
+@pytest.fixture()
 def em_u2_out(em_u2, betas_extrap, central):
     if not central:
         return em_u2.predict(betas_extrap, cumsum=True)
-    else:
-        return None
+    return None
 
 
-def test_x2_u2(em_x2_out, em_u2_out, central):
+def test_x2_u2(em_x2_out, em_u2_out, central) -> None:
     if not central:
         np.testing.assert_allclose(em_x2_out, em_u2_out)
 
 
-def test_du2_3(beta, order, data, betas_extrap):
+def test_du2_3(beta, order, data, betas_extrap) -> None:
     data_u = xtrap.factory_data_values(
         uv=data.u, xv=None, x_is_u=True, order=order, central=True
     )
@@ -278,7 +286,7 @@ def test_du2_3(beta, order, data, betas_extrap):
     np.testing.assert_allclose(a, b)
 
     # <du**3> = <u**3> - 3 * <u**2><u> + 2<u>**3
-    # need to be carful with product <u**2> * <u>
+    # need to be careful with product <u**2> * <u>
     # <u**2> * <u>
     o = order - (3 - 1)
     kws = {"alpha": betas_extrap, "no_sum": True, "order": o}

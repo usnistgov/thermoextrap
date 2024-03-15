@@ -3,7 +3,6 @@ Inverse temperature (beta) extrapolation (:mod:`~thermoextrap.beta`)
 ====================================================================
 """
 
-
 from functools import lru_cache
 from typing import Literal
 
@@ -19,7 +18,7 @@ from .models import (
     get_default_symbol,
 )
 
-docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
+docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta")
 
 ##############################################################################
 # recursive deriatives for beta expansion
@@ -52,8 +51,7 @@ class du_func(SymFuncBase):
 
     def fdiff(self, argindex=1):
         beta, n = self.args
-        out = -(+du_func(beta, n + 1) - n * du_func(beta, n - 1) * du_func(beta, 2))
-        return out
+        return -(+du_func(beta, n + 1) - n * du_func(beta, n - 1) * du_func(beta, 2))
 
     @classmethod
     def eval(cls, beta, n):
@@ -80,20 +78,17 @@ class u_func_central(SymFuncBase):
 
     @classmethod
     def deriv_args(cls):
-        return [cls.u] + du_func.deriv_args()
+        return [cls.u, *du_func.deriv_args()]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
-        out = -du_func(beta, 2)
-        return out
+        return -du_func(beta, 2)
 
     @classmethod
     def eval(cls, beta):
         if beta is None:
             return cls.u
-        else:
-            out = None
-        return out
+        return None
 
 
 class dxdu_func_nobeta(SymFuncBase):
@@ -110,16 +105,15 @@ class dxdu_func_nobeta(SymFuncBase):
 
     @classmethod
     def deriv_args(cls):
-        return du_func.deriv_args() + [cls.dxdu]
+        return [*du_func.deriv_args(), cls.dxdu]
 
     def fdiff(self, argindex=1):
         beta, n = self.args
-        out = (
+        return (
             -dxdu_func_nobeta(beta, n + 1)
             + n * dxdu_func_nobeta(beta, n - 1) * du_func(beta, 2)
             + dxdu_func_nobeta(beta, 1) * du_func(beta, n)
         )
-        return out
 
     @classmethod
     def eval(cls, beta, n):
@@ -145,17 +139,16 @@ class dxdu_func_beta(SymFuncBase):
 
     @classmethod
     def deriv_args(cls):
-        return du_func.deriv_args() + [cls.dxdu]
+        return [*du_func.deriv_args(), cls.dxdu]
 
     def fdiff(self, argindex=1):
         beta, n, d = self.args
-        out = (
+        return (
             -dxdu_func_beta(beta, n + 1, d)
             + n * dxdu_func_beta(beta, n - 1, d) * du_func(beta, 2)
             + dxdu_func_beta(beta, n, d + 1)
             + dxdu_func_beta(beta, 1, d) * du_func(beta, n)
         )
-        return out
 
     @classmethod
     def eval(cls, beta, n, deriv):
@@ -169,14 +162,14 @@ class dxdu_func_beta(SymFuncBase):
 
 
 class x_func_central_nobeta(SymFuncBase):
-    r"""Sympy functionn to evaluate derivatives of observable :math:`\langle x \rangle` using central moments."""
+    r"""Sympy function to evaluate derivatives of observable :math:`\langle x \rangle` using central moments."""
 
     nargs = 1
     x1_symbol = get_default_symbol("x1")
 
     @classmethod
     def deriv_args(cls):
-        return [cls.x1_symbol] + dxdu_func_nobeta.deriv_args()
+        return [cls.x1_symbol, *dxdu_func_nobeta.deriv_args()]
 
     def fdiff(self, argindex=1):
         (beta,) = self.args
@@ -184,11 +177,7 @@ class x_func_central_nobeta(SymFuncBase):
 
     @classmethod
     def eval(cls, beta):
-        if beta is None:
-            out = cls.x1_symbol
-        else:
-            out = None
-        return out
+        return cls.x1_symbol if beta is None else None
 
 
 class x_func_central_beta(SymFuncBase):
@@ -199,21 +188,16 @@ class x_func_central_beta(SymFuncBase):
 
     @classmethod
     def deriv_args(cls):
-        return [cls.x1_indexed] + dxdu_func_beta.deriv_args()
+        return [cls.x1_indexed, *dxdu_func_beta.deriv_args()]
 
     def fdiff(self, argindex=1):
         # xalpha
         beta, d = self.args
-        out = -dxdu_func_beta(beta, 1, d) + x_func_central_beta(beta, d + 1)
-        return out
+        return -dxdu_func_beta(beta, 1, d) + x_func_central_beta(beta, d + 1)
 
     @classmethod
     def eval(cls, beta, deriv):
-        if beta is None:
-            out = cls.x1_indexed[deriv]
-        else:
-            out = None
-        return out
+        return cls.x1_indexed[deriv] if beta is None else None
 
 
 ####################
@@ -257,7 +241,7 @@ class xu_func(SymFuncBase):
 
     @classmethod
     def deriv_args(cls):
-        return u_func.deriv_args() + [cls.xu]
+        return [*u_func.deriv_args(), cls.xu]
 
     def fdiff(self, argindex=1):
         if len(self.args) == 2:
@@ -276,25 +260,21 @@ class xu_func(SymFuncBase):
     @classmethod
     def eval(cls, beta, n, deriv=None):
         if beta is None:
-            if deriv is None:
-                out = cls.xu[n]
-            else:
-                out = cls.xu[n, deriv]
+            out = cls.xu[n] if deriv is None else cls.xu[n, deriv]
         else:
             out = None
         return out
 
 
+@docfiller_shared.inherit(SymDerivBase)
 class SymDerivBeta(SymDerivBase):
     r"""Provide symbolic expressions for :math:`d^n \langle x \rangle /d\beta^n`."""
 
     beta = get_default_symbol("beta")
 
     @classmethod
-    @docfiller_shared
-    def x_ave(
-        cls, xalpha=False, central=None, expand=True, post_func=None
-    ):  # noqa: 417
+    @docfiller_shared.decorate
+    def x_ave(cls, xalpha=False, central=None, expand=True, post_func=None):
         r"""
         General method to find derivatives of :math:`\langle x \rangle`.
 
@@ -316,16 +296,13 @@ class SymDerivBeta(SymDerivBase):
                 func = x_func_central_nobeta(cls.beta)
 
         else:
-            if xalpha:
-                func = xu_func(cls.beta, 0, 0)
-            else:
-                func = xu_func(cls.beta, 0)
+            func = xu_func(cls.beta, 0, 0) if xalpha else xu_func(cls.beta, 0)
 
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    @docfiller_shared
-    def u_ave(cls, central=None, expand=True, post_func=None):  # noqa: D417
+    @docfiller_shared.decorate
+    def u_ave(cls, central=None, expand=True, post_func=None):
         r"""
         General constructor for symbolic derivatives of :math:`\langle u \rangle`.
 
@@ -339,16 +316,13 @@ class SymDerivBeta(SymDerivBase):
         if central is None:
             central = False
 
-        if central:
-            func = u_func_central(cls.beta)
-        else:
-            func = u_func(cls.beta, 1)
+        func = u_func_central(cls.beta) if central else u_func(cls.beta, 1)
 
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    @docfiller_shared
-    def dun_ave(cls, n, expand=True, post_func=None, central=None):  # noqa: D417
+    @docfiller_shared.decorate
+    def dun_ave(cls, n, expand=True, post_func=None, central=None):
         r"""
         Constructor for derivatives of :math:`\langle (\delta u)^n\rangle`.
 
@@ -359,12 +333,13 @@ class SymDerivBeta(SymDerivBase):
         {post_func}
         {central}
         """
+        if central is not None and not central:
+            msg = f"{central=} must be None or evaluate to True"
+            raise ValueError(msg)
 
-        if central is not None:
-            assert central
-
-        n = int(n)
-        assert n > 1
+        if (n := int(n)) <= 1:
+            msg = f"{n=} must be > 1."
+            raise ValueError(msg)
         func = du_func(cls.beta, n)
 
         # special case for args.
@@ -378,7 +353,7 @@ class SymDerivBeta(SymDerivBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def dxdun_ave(
         cls, n, xalpha=False, expand=True, post_func=None, d=None, central=None
     ):
@@ -398,15 +373,18 @@ class SymDerivBeta(SymDerivBase):
         -----
         If xalpha is True, must also specify d.
         """
-
         # special case for args
         # for consistency between xave and dxdun_ave, also include x1
-        if central is not None:
-            assert central
+        if central is not None and not central:
+            msg = f"{central=} nust be `None` or evaluate to `True`"
+            raise ValueError(msg)
 
-        assert isinstance(n, int) and n > 0
+        if (n := int(n)) <= 0:
+            msg = f"{n=} must be positive integer."
+            raise ValueError(msg)
         if xalpha:
-            assert isinstance(d, int)
+            if not isinstance(d, int):
+                raise TypeError
             func = dxdu_func_beta(cls.beta, n, d)
             args = x_func_central_beta.deriv_args()
 
@@ -422,7 +400,7 @@ class SymDerivBeta(SymDerivBase):
         )
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def un_ave(cls, n, expand=True, post_func=None, central=None):
         r"""
         Constructor for derivatives of :math:`\langle u^n\rangle`.
@@ -434,16 +412,19 @@ class SymDerivBeta(SymDerivBase):
         {post_func}
         {central}
         """
-        if central is not None:
-            assert not central
-        n = int(n)
-        assert n >= 1
+        if central is not None and central:
+            msg = f"{central=} must be `None` or evaluate to False"
+            raise ValueError(msg)
+
+        if (n := int(n)) < 1:
+            msg = f"{n=} must be >=1."
+            raise ValueError(msg)
 
         func = u_func(cls.beta, n)
         return cls(func=func, expand=expand, post_func=post_func)
 
     @classmethod
-    @docfiller_shared
+    @docfiller_shared.decorate
     def xun_ave(
         cls, n, d=None, xalpha=False, expand=True, post_func=None, central=None
     ):
@@ -459,14 +440,21 @@ class SymDerivBeta(SymDerivBase):
         {post_func}
         {central}
         """
+        if central is not None and central:
+            msg = f"{central=} must be `None` or False"
+            raise ValueError(msg)
 
-        if central is not None:
-            assert not central
-
-        assert isinstance(n, int) and n >= 0
+        # assert isinstance(n, int)
+        # assert n >= 0
+        if (n := int(n)) < 0:
+            msg = f"{n=} must be >= 0"
+            raise ValueError(msg)
 
         if xalpha:
-            assert isinstance(d, int) and d >= 0
+            if not isinstance(d, int):
+                raise TypeError
+            if d < 0:
+                raise ValueError
             func = xu_func(cls.beta, n, d)
         else:
             func = xu_func(cls.beta, n)
@@ -513,20 +501,20 @@ class SymDerivBeta(SymDerivBase):
         d : int, optional
             d parameter for dxdun_ave
         """
-
         func = getattr(cls, name, None)
 
         if func is None:
-            raise ValueError("{name} not found")
+            msg = f"{name} not found"
+            raise ValueError(msg)
 
         kws = {"expand": expand, "post_func": post_func, "central": central}
         if name == "x_ave":
             kws.update(xalpha=xalpha)
         # elif name in ["u_ave", "lnPi_correction":
         #     kws.update(central=central)
-        elif name in ["dun_ave", "un_ave"]:
+        elif name in {"dun_ave", "un_ave"}:
             kws.update(n=n)
-        elif name in ["dxdun_ave", "xun_ave"]:
+        elif name in {"dxdun_ave", "xun_ave"}:
             kws.update(n=n, xalpha=xalpha, d=d)
 
         elif name == "lnPi_correction":
@@ -542,7 +530,7 @@ class SymDerivBeta(SymDerivBase):
 
 
 @lru_cache(5)
-@docfiller_shared
+@docfiller_shared.decorate
 def factory_derivatives(
     name="x_ave",
     n=None,
@@ -567,7 +555,6 @@ def factory_derivatives(
     derivatives : :class:`thermoextrap.models.Derivatives` instance
         Object used to calculate taylor series coefficients
     """
-
     derivs = SymDerivBeta.from_name(
         name=name,
         n=n,
@@ -586,7 +573,7 @@ def factory_derivatives(
     return Derivatives.from_sympy(exprs, args=derivs.args)
 
 
-@docfiller_shared
+@docfiller_shared.decorate
 def factory_extrapmodel(
     beta,
     data,
@@ -633,7 +620,6 @@ def factory_extrapmodel(
     --------
     ~thermoextrap.models.ExtrapModel
     """
-
     if xalpha is None:
         xalpha = data.xalpha
     if central is None:
@@ -641,13 +627,23 @@ def factory_extrapmodel(
     if order is None:
         order = data.order
 
-    assert xalpha == data.xalpha
-    assert central == data.central
-    assert order <= data.order
+    # assert xalpha == data.xalpha
+    # assert central == data.central
+    # assert order <= data.order
+    if xalpha != data.xalpha:
+        msg = f"{xalpha=} must equal {data.xalpha=}"
+        raise ValueError(msg)
+    if central != data.central:
+        msg = f"{central=} must equal {data.central=}"
+        raise ValueError(msg)
+    if order > data.order:
+        msg = f"{order=} must be <= {data.order=}"
+        raise ValueError(msg)
 
     if derivatives is None:
-        if name in ["u_ave", "un_ave", "dun_ave"]:
-            assert data.x_is_u
+        if name in {"u_ave", "un_ave", "dun_ave"} and not data.x_is_u:
+            msg = "if name in [u_ave, un_ave, dun_ave] must have data.x_is_u"
+            raise ValueError(msg)
 
         if derivatives_kws is None:
             derivatives_kws = {}
@@ -670,7 +666,7 @@ def factory_extrapmodel(
     )
 
 
-@docfiller_shared
+@docfiller_shared.decorate
 def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     """
     Factory function to create PerturbModel for beta expansion.

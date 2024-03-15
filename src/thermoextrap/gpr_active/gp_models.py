@@ -2,6 +2,9 @@
 Models for Gaussian process regression (:mod:`~thermoextrap.gpr_active.gp_models`)
 ----------------------------------------------------------------------------------
 """
+
+import logging
+import warnings
 from typing import Any, Optional
 
 import gpflow
@@ -11,32 +14,36 @@ import tensorflow as tf
 from gpflow import logdensities
 from scipy import optimize
 
+logger = logging.getLogger(__name__)
 
-# TODO: Bunch of cleanup here
+
+GPFLOW_POSITIVE = gpflow.utilities.positive()
+
+
+# TODO(wpk): Bunch of cleanup here
 # First define classes needed for a GPR model
 # A general derivative kernel based on a sympy expression
 class DerivativeKernel(gpflow.kernels.Kernel):
     """
-    Creates a kernel that can be differentiated based on a sympy expression for
-    the kernel. Given observations that are tagged with the order of the
-    derivative, builds the appropriate kernel. Be warned that your kernel_expr
-    will not be checked to make sure it is positive definite, stationary, etc.
+    Creates a differentiable kernel based on a sympy expression.
 
+    Given observations that are tagged with the order of the derivative,
+    builds the appropriate kernel. Be warned that your kernel_expr will
+    not be checked to make sure it is positive definite, stationary, etc.
     There are rules for kernel_expr and kernel_params that guarantee
     consistency. First, the variable names supplied as keys to kernel_params
     should match the symbol names in kernel_expr. Symbol names for the inputs
-    should be 'x1' and 'x2' (ignoring case). We could accept anything as long as
-    2 symbols are left over after those in kernel_params, but these two rules
-    will guarantee that nothing breaks.
-
-    Currently, everything is only intended to work with 1D observables.
+    should be 'x1' and 'x2' (ignoring case). For multidimensional kernels,
+    the dimensions of 'x1' and 'x2' should be indexed such as 'x1_0', 'x1_1',
+    and 'x2_0', 'x2_1', etc. These will be identified from the provided
+    expression and sorted to guarantee specific ordering when taking derivatives.
 
     Parameters
     ----------
     kernel_expr : Expr
         Expression for the kernel that can be differentiated - must have at
         least 2 symbols (symbol names should be 'x1' and 'x2', case insensitive,
-        if have only 2)
+        if have only 2).
     obs_dims : int
         Number of dimensions for observable input (input should be twice this
         with obs_dims values then obs_dims derivative labels each row)
@@ -45,20 +52,29 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         (key should be name, then references list with value then another dict
         with kwargs for gpflow.Parameter, i.e., {'variance', [1.0,
         {'transform':gpflow.utilities.positive()}]} so if you don't want to set
-        any kwargs, just pass empty dictionary NOTE THAT THE KEYS MUST MATCH THE
-        SYMBOL NAMES IN kernel_expr OTHER THAN 'x1' and 'x2' Default is empty
-        dict, so will mine names from kernel_expr and set all parameters to 1.0
+        any kwargs, just pass empty dictionary. NOTE THAT THE KEYS MUST MATCH THE
+        SYMBOL NAMES IN kernel_expr OTHER THAN 'x1' and 'x2'. Default is empty
+        dict, so will mine names from kernel_expr and set all parameters to 1.0.
     """
 
-    def __init__(
-        self, kernel_expr, obs_dims, kernel_params={}, active_dims=None, **kwargs
-    ):
-        #         if active_dims is not None:
-        #             print("active_dims set to: ", active_dims)
-        #             print("This is not implemented in this kernel, so setting to 'None'")
-        #             active_dims = None
-        # Having active_dims should be fine since just slices
-        # Will work as long as include derivative info in active_dims
+    def __init__(  # noqa: C901,PLR0912
+        self, kernel_expr, obs_dims, kernel_params=None, active_dims=None, **kwargs
+    ) -> None:
+        if kernel_params is None:
+            kernel_params = {}
+        if active_dims is not None:
+            warnings.warn(
+                f"""\
+                Active_dims set to: {active_dims}.
+                This is not implemented in this kernel, so setting to `None`
+                """,
+                stacklevel=1,
+            )
+            active_dims = None
+        # Having active_dims relies on slicing self.lengthscales
+        # But expressions in sympy don't work well with vectors, so specifying separate lengthscale params
+        # Then without vector to slice, can't implement active_dims like in GPflow
+        # However, can use ARD-like or active_dims-like behavior via the provided sympy expression
 
         super().__init__(active_dims=active_dims, **kwargs)
 
@@ -69,16 +85,28 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         self.kernel_expr = kernel_expr
         # Now need to mine it a little bit to get the adjustable parameters and input variables
         expr_syms = tuple(kernel_expr.free_symbols)
-        # Require that have two symbols called x1 and x2, with the rest being parameters
-        self.x_syms = []
-        self.param_syms = []
+        # Require that have at least two symbols containing 'x1' or 'x2', not case sensitive,
+        # with the rest being parameters
+        x_syms = []
+        param_syms = []
         for s in expr_syms:
-            if s.name.casefold() == "x1" or s.name.casefold() == "x2":
-                self.x_syms.append(s)
+            if "x1" in s.name.casefold() or "x2" in s.name.casefold():
+                x_syms.append(s)
             else:
-                self.param_syms.append(s)
+                param_syms.append(s)
         # Make sure to sort so clearly define x1 and x2
-        list(self.x_syms).sort(key=lambda s: s.name)
+        # Note that need to make list and sort it before making object attribute
+        # This is because gpflow.kernels.Kernel class inherits from tf.Module
+        # (for a ListWrapper, sorting by key is not possible)
+        x_syms.sort(key=lambda s: s.name)
+        self.x_syms = x_syms
+        self.param_syms = param_syms
+        # And ensure that all symbols are twice the length of obs_dims
+        if len(self.x_syms) != 2 * obs_dims:
+            raise ValueError(
+                "Number of symbols (%s) in kernel expression does not match 2*obs_dims, %i"
+                % (str(self.x_syms), obs_dims)
+            )
         # If have no other symbols (i.e. parameters) there is nothing to optimize!
         if len(self.param_syms) == 0:
             raise ValueError(
@@ -87,13 +115,13 @@ class DerivativeKernel(gpflow.kernels.Kernel):
             )
         # Make sure that parameters here match those in kernel_params, if it's provided
         if bool(kernel_params):
-            if (
-                list([s.name for s in self.param_syms]).sort()
-                != list(kernel_params.keys()).sort()
-            ):
-                raise ValueError(
-                    "Symbol names in kernel_expr must match keys in " + "kernel_params!"
-                )
+            list_current = [s.name for s in self.param_syms]
+            list_current.sort()
+            list_new = list(kernel_params.keys())
+            list_new.sort()
+            if list_new != list_current:
+                msg = "Symbol names in kernel_expr must match keys in kernel_params!"
+                raise ValueError(msg)
             # If they are the same, obtain parameter values from kernel_params dictionary
             # Need to set as gpflow Parameter objects so can optimize over them
             for key, val in kernel_params.items():
@@ -108,10 +136,14 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         self.obs_dims = obs_dims
 
     # Define ARD behavior (if ever want multiple dimensions with different lengthscales)
+    # Can have multiple dimensions with different lengthscales, but have to implement manually in
+    # the provided sympy expression for the kernel. Hard to detect automatically and can't have
+    # a lengthscales parameter that is a vector (that doesn't work well with sympy).
     @property
     def ard(self) -> bool:
-        """Whether ARD behavior is active, following gpflow.kernels.Stationary."""
-        return self.lengthscales.shape.ndims > 0
+        """Whether ARD behavior is active, following gpflow.kernels.Stationary"""
+        # return self.lengthscales.shape.ndims > 0
+        return False
 
     def K(self, X, X2=None):
         if X2 is None:
@@ -120,17 +152,17 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
         x2, d2 = self._split_x_into_locs_and_deriv_info(X2)
 
-        # Output should be a tensor that is len(X) by len(X2) - at least in 1D, not
-        # sure what to do otherwise
+        # Output should be a tensor that is len(X) by len(X2)
         # And must be traceable with tensorflow's autodifferentiation
         # (in the inherited kernel parameters)
 
         # Want full list of all combinations of derivative pairs
-        # Definitely only works for 1D data because of way reshaping
         expand_d1 = tf.reshape(
             tf.tile(d1, (1, d2.shape[0])), (d1.shape[0] * d2.shape[0], -1)
         )
+        expand_d1 = tf.cast(expand_d1, tf.int32)
         expand_d2 = tf.tile(d2, (d1.shape[0], 1))
+        expand_d2 = tf.cast(expand_d2, tf.int32)
         deriv_pairs = tf.stack([expand_d1, expand_d2], axis=1)
 
         # For convenience, do same with x, but no need to stack
@@ -149,27 +181,30 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         for pair in unique_pairs:
             # Get the right indices
             this_inds = tf.cast(
-                tf.where(tf.reduce_all(deriv_pairs == pair, axis=1))[:, :1], tf.int32
+                tf.where(tf.reduce_all(deriv_pairs == pair, axis=[1, 2]))[:, :1],
+                tf.int32,
             )
             # Use sympy to obtain right derivative
             this_expr = sp.diff(
                 self.kernel_expr,
-                self.x_syms[0],
-                int(pair[0]),
-                self.x_syms[1],
-                int(pair[1]),
+                *zip(self.x_syms[: self.obs_dims], pair[0].numpy()),
+                *zip(self.x_syms[self.obs_dims :], pair[1].numpy()),
             )
             # Get lambdified function compatible with tensorflow
             this_func = sp.lambdify(
-                (self.x_syms[0], self.x_syms[1], *self.param_syms),
+                (*self.x_syms, *self.param_syms),
                 this_expr,
                 modules="tensorflow",
             )
             # Plug in our values for the derivative kernel
             k_list.append(
                 this_func(
-                    tf.gather_nd(expand_x1, this_inds),
-                    tf.gather_nd(expand_x2, this_inds),
+                    *tf.split(
+                        tf.gather_nd(expand_x1, this_inds), self.obs_dims, axis=-1
+                    ),
+                    *tf.split(
+                        tf.gather_nd(expand_x2, this_inds), self.obs_dims, axis=-1
+                    ),
                     *[getattr(self, s.name) for s in self.param_syms],
                 )
             )
@@ -179,41 +214,45 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         # Stitch back together
         k_list = tf.dynamic_stitch(inds_list, k_list)
 
-        # Reshape to the correct output - will only really work for 1D, I think
-        k_mat = tf.reshape(k_list, (x1.shape[0], x2.shape[0]))
-        return k_mat
+        # Reshape to the correct output
+        return tf.reshape(k_list, (x1.shape[0], x2.shape[0]))
 
     def K_diag(self, X):
         # Same as for K but don't need every combination, just every x with itself
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
-        unique_d1 = tf.unique(tf.reshape(d1, (-1,)))[0]
+        unique_d1 = tf.raw_ops.UniqueV2(x=d1, axis=[0])[0]
+        unique_d1 = tf.cast(unique_d1, tf.int32)
+
         k_list = []
         inds_list = []
         for d in unique_d1:
-            this_inds = tf.cast(tf.where(d1 == d)[:, :1], tf.int32)
+            this_inds = tf.cast(
+                tf.where(tf.reduce_all(d1 == d, axis=1))[:, :1], tf.int32
+            )
             this_expr = sp.diff(
-                self.kernel_expr, self.x_syms[0], int(d), self.x_syms[1], int(d)
+                self.kernel_expr,
+                *zip(self.x_syms[: self.obs_dims], d.numpy()),
+                *zip(self.x_syms[self.obs_dims :], d.numpy()),
             )
             this_func = sp.lambdify(
-                (self.x_syms[0], self.x_syms[1], *self.param_syms),
+                (*self.x_syms, *self.param_syms),
                 this_expr,
                 modules="tensorflow",
             )
             k_list.append(
                 this_func(
-                    tf.gather_nd(x1, this_inds),
-                    tf.gather_nd(x1, this_inds),
+                    *tf.split(tf.gather_nd(x1, this_inds), self.obs_dims, axis=-1),
+                    *tf.split(tf.gather_nd(x1, this_inds), self.obs_dims, axis=-1),
                     *[getattr(self, s.name) for s in self.param_syms],
                 )
             )
             inds_list.append(this_inds)
 
         k_list = tf.dynamic_stitch(inds_list, k_list)
-        k_diag = tf.reshape(k_list, (x1.shape[0],))
-        return k_diag
+        return tf.reshape(k_list, (x1.shape[0],))
 
     def _split_x_into_locs_and_deriv_info(self, x):
-        """Splits input into actual observable input and derivative labels."""
+        """Splits input into actual observable input and derivative labels"""
         locs = x[:, : self.obs_dims]
         grad_info = x[:, -self.obs_dims :]
         return locs, grad_info
@@ -235,9 +274,9 @@ class HetGaussianNoiseGP(gpflow.likelihoods.ScalarLikelihood):
     used is a Matern52 with separate lengthscales over the different input dimensions.
     """
 
-    def __init__(self, data, noise_kernel=None, **kwargs):
+    def __init__(self, data, noise_kernel=None, **kwargs) -> None:
         super().__init__(**kwargs)
-        X_data, Y_data = data
+        X_data, _Y_data = data
         if noise_kernel is not None:
             self.noise_gp = gpflow.models.GPR(data=data, kernel=noise_kernel)
         else:
@@ -326,7 +365,7 @@ class FullyHeteroscedasticGPR(
         kernel: gpflow.kernels.Kernel,
         mean_function: Optional[gpflow.mean_functions.MeanFunction] = None,
         noise_kernel: Optional[gpflow.kernels.Kernel] = None,
-    ):
+    ) -> None:
         X_data, Y_data = data
         # This is really a conditional likelihood given the output of self.noise_gp
         likelihood = HetGaussianNoiseGP(
@@ -365,10 +404,9 @@ class FullyHeteroscedasticGPR(
 
         log_prob = gpflow.logdensities.multivariate_normal(Y, m, L)
         # Add this log probability to that of Gaussian process on noise, as in Binois 2018
-        output = (
+        return (
             tf.reduce_sum(log_prob) + self.likelihood.noise_gp.log_marginal_likelihood()
         )
-        return output
 
     def predict_f(
         self,
@@ -407,9 +445,8 @@ class FullyHeteroscedasticGPR(
         """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
         if full_cov or full_output_cov:
             # See https://github.com/GPflow/GPflow/issues/1461
-            raise NotImplementedError(
-                "The predict_y method currently supports only the argument values full_cov=False and full_output_cov=False"
-            )
+            msg = "The predict_y method currently supports only the argument values full_cov=False and full_output_cov=False"
+            raise NotImplementedError(msg)
 
         f_mean, f_var = self.predict_f(
             Xnew, full_cov=full_cov, full_output_cov=full_output_cov
@@ -427,9 +464,8 @@ class FullyHeteroscedasticGPR(
         full_output_cov: bool = False,
     ) -> tf.Tensor:
         if full_cov or full_output_cov:
-            raise NotImplementedError(
-                "The predict_log_density method currently supports only the argument values full_cov=False and full_output_cov=False"
-            )
+            msg = "The predict_log_density method currently supports only the argument values full_cov=False and full_output_cov=False"
+            raise NotImplementedError(msg)
         X, Y = data
         f_mean, f_var = self.predict_f(
             X, full_cov=full_cov, full_output_cov=full_output_cov
@@ -494,9 +530,7 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
             Y, F, tf.math.sqrt(self.scale_noise) * self.Lcov
         )
 
-    def _conditional_mean(
-        self, F: gpflow.base.TensorType
-    ) -> tf.Tensor:  # pylint: disable=R0201
+    def _conditional_mean(self, F: gpflow.base.TensorType) -> tf.Tensor:  # pylint: disable=R0201
         return tf.identity(F)
 
     def _conditional_variance(self, F: gpflow.base.TensorType) -> tf.Tensor:
@@ -509,9 +543,8 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
     ) -> gpflow.models.model.MeanAndVariance:
         # From what I can tell, use this in predict_y, which will not be implemented either
         # Can't predict noise variance at NEW points, so no way to add noise to Fvar
-        raise NotImplementedError(
-            "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
-        )
+        msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
+        raise NotImplementedError(msg)
 
     def _predict_log_density(
         self,
@@ -521,9 +554,8 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
     ) -> tf.Tensor:
         # Again, relates to predictions at new points, which we are not doing
         # Can't predict noise variance at NEW points, so no way to add noise to Fvar
-        raise NotImplementedError(
-            "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
-        )
+        msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
+        raise NotImplementedError(msg)
 
     def _variational_expectations(
         self,
@@ -531,9 +563,8 @@ class HetGaussianSimple(gpflow.likelihoods.ScalarLikelihood):
         Fvar: gpflow.base.TensorType,
         Y: gpflow.base.TensorType,
     ) -> tf.Tensor:
-        raise NotImplementedError(
-            "Variational expectations is not implemented for this likelihood."
-        )
+        msg = "Variational expectations is not implemented for this likelihood."
+        raise NotImplementedError(msg)
 
 
 def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
@@ -568,7 +599,6 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
         to sum over locations as would for multivariate Gaussian over each
         dimension
     """
-
     d = tf.expand_dims(tf.transpose(x - mu), -1)
     alpha = tf.linalg.triangular_solve(L, d, lower=True)
     alpha = tf.squeeze(alpha, axis=-1)
@@ -591,11 +621,12 @@ def multioutput_multivariate_normal(x, mu, L) -> tf.Tensor:
 
 class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     r"""
-    Heteroscedastic Gaussian likelihood with variance provided and no modeling
-    of noise variance. Note that the noise variance can be provided as a matrix
-    or a 1D array. If a 1D array, it is assumed that the off-diagonal elements
-    of the noise covariance matrix are all zeros, otherwise the noise covariance
-    is used. For diagonal elements, it would make sense to also provide this
+    Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise variance.
+
+    Note that the noise variance can be provided as a matrix or a 1D array.
+    If a 1D array, it is assumed that the off-diagonal elements of the noise
+    covariance matrix are all zeros, otherwise the noise covariance is used.
+    For diagonal elements, it would make sense to also provide this
     information as an additional column in the target outputs, Y. However, this
     is not possible for a provided covariance matrix, when some of the noise
     values may be correlated as for derivatives at the same input location, X,
@@ -614,23 +645,28 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     For scaling model, effectively model logarithm of each element in covariance matrix
 
     .. math::
-        \ln {\rm cov}_{i,j} = \ln {\rm cov}_{i,j,0} + p (d_i + d_j) + s
+        \ln {\rm cov}_{i,j} = \ln {\rm cov}_{i,j,0} + p sum(d_i + d_j) + s
 
     or
 
     .. math::
-        {\rm cov}_{i,j} = {\rm cov}_{i,j,0} \exp[ p (d_i + d_j)] \exp(s)
+        {\rm cov}_{i,j} = {\rm cov}_{i,j,0} \exp[ p sum(d_i + d_j)] \exp(s)
 
-    We can accomplish this while keeping the scaled covariance matrix positive
+    Note that the summation over derivative orders is over all of the input
+    dimensions (i.e., if the input is 3D, we sum over three derivative orders.
+
+    We can accomplish the above while keeping the scaled covariance matrix positive
     semidefinite by making the scaling matrix diagonal with positive entries
     If we then take S*Cov*S, with S being the diagonal scaling matrix with positive
     entries, the result will be positive semi-definite because S is positive definite
     and Cov is positive semidefinite
+
     The scaling matrix is given by :math:`exp(s + p*d_i,j)` if :math:`i=j` and 0 otherwise
     While could make parameters s and p unconstrained, default will set ``s=0``, `p>=0``.
     This means that we CANNOT decrease the uncertainty, only increase it
     Further, if we increase the uncertainty, we must do it MORE for higher order
     derivatives
+
     Rationale is that it's only a really big deal if underestimate uncertainty
     Further, tend to have more numerical issues, bias, etc. in derivatives
     Even if derivatives actually more certain, typically want to focus on
@@ -640,10 +676,12 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     Parameters
     ----------
     cov : array
-        covariance matrix (or its diagonal) for the uncertainty (noise) in the data
-    d_orders : int
-        derivative order of the data; should be in same order as columns/rows of
-        the covariance matrix
+        (fixed) covariance matrix (or its diagonal) for the uncertainty (noise)
+        in the data
+    obs_dims : int
+        number of dimensions in the input/observation, X; the first obs_dims
+        columns of X will be treated as input locations while the final obs_dims
+        entries will be derivative orders of each data point (see DerivativeKernel)
     p : float, default=10.0
         scaling of the covariance matrix dependent on derivative order
     s : float, default=0.0
@@ -665,10 +703,10 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
     def __init__(
         self,
         cov,
-        d_orders,
+        obs_dims,
         p=10.0,  # Sometimes gets stuck if starts small, but no issues if start large
         s=0.0,
-        transform_p=gpflow.utilities.positive(),
+        transform_p=GPFLOW_POSITIVE,
         transform_s=None,
         constrain_p=False,
         constrain_s=True,
@@ -681,10 +719,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         else:
             self.cov = cov
 
-        # Need to track derivative orders associated with each covariance entry
-        if len(d_orders.shape) > 1:
-            d_orders = np.squeeze(d_orders, axis=-1)
-        self.d_orders = d_orders
+        self.obs_dims = obs_dims
 
         # Define parameters for power scale
         self.power_scale = gpflow.Parameter(
@@ -697,18 +732,19 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         # Define stability threshold
         self.stable_var_min = 1.0e-12
 
-    def build_scaled_cov_mat(self):
-        """
-        Creates scaled covariance matrix using noise scale parameters.
-
-        Returns
-        -------
-        :class:`tensorflow.Tensor`
-            Tensor of the scaled covariance matrix
-        """
+    def build_scaled_cov_mat(self, X: gpflow.base.TensorType):
+        """Creates scaled covariance matrix using noise scale parameters"""
         # First step is determining scaling based on exponential function
         # Add 1 so even zeroth order can be scaled
-        scale = tf.exp(self.power_scale * (self.d_orders + 1) + 0.5 * self.power_add)
+        # Have modified for multiple input dimensions by just summing over d_orders
+        # (last obs_dims columns of input, X)
+        # Effectively assumes same linear model on all input dimensions, then add together
+        # So power_scale will depend on the input dimensionality
+        d_orders = X[:, self.obs_dims :]
+        scale = tf.exp(
+            self.power_scale * tf.reduce_sum(d_orders + 1, axis=-1)
+            + 0.5 * self.power_add
+        )
         scale = tf.linalg.diag(scale)
         # Multiply both sides of covariance matrix by diagonal scaling matrix
         output = tf.linalg.matmul(tf.linalg.matmul(scale, self.cov), scale)
@@ -718,55 +754,62 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         return tf.linalg.set_diag(output, out_diag)
 
     def _scalar_log_prob(
-        self, F: gpflow.base.TensorType, Y: gpflow.base.TensorType
+        self,
+        X: gpflow.base.TensorType,
+        F: gpflow.base.TensorType,
+        Y: gpflow.base.TensorType,
     ) -> tf.Tensor:
         return multioutput_multivariate_normal(
-            Y, F, tf.linalg.cholesky(self.build_scaled_cov_mat())
+            Y, F, tf.linalg.cholesky(self.build_scaled_cov_mat(X))
         )
 
     def _conditional_mean(
-        self, F: gpflow.base.TensorType
+        self, X: gpflow.base.TensorType, F: gpflow.base.TensorType
     ) -> tf.Tensor:  # pylint: disable=R0201
         return tf.identity(F)
 
-    def _conditional_variance(self, F: gpflow.base.TensorType) -> tf.Tensor:
+    def _conditional_variance(
+        self, X: gpflow.base.TensorType, F: gpflow.base.TensorType
+    ) -> tf.Tensor:
         # Returns full covariance for INPUT Y data
         # May not fit with expected behavior, so could consider making "Not Implemented"
-        return self.build_scaled_cov_mat()
+        return self.build_scaled_cov_mat(X)
 
     def _predict_mean_and_var(
-        self, Fmu: gpflow.base.TensorType, Fvar: gpflow.base.TensorType
+        self,
+        X: gpflow.base.TensorType,
+        Fmu: gpflow.base.TensorType,
+        Fvar: gpflow.base.TensorType,
     ) -> gpflow.models.model.MeanAndVariance:
         # From what I can tell, use this in predict_y, which will not be implemented either
         # Can't predict noise variance at NEW points, so no way to add noise to Fvar
-        raise NotImplementedError(
-            "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
-        )
+        msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
+        raise NotImplementedError(msg)
 
     def _predict_log_density(
         self,
+        X: gpflow.base.TensorType,
         Fmu: gpflow.base.TensorType,
         Fvar: gpflow.base.TensorType,
         Y: gpflow.base.TensorType,
     ) -> tf.Tensor:
         # Again, relates to predictions at new points, which we are not doing
         # Can't predict noise variance at NEW points, so no way to add noise to Fvar
-        raise NotImplementedError(
-            "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
-        )
+        msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
+        raise NotImplementedError(msg)
 
     def _variational_expectations(
         self,
+        X: gpflow.base.TensorType,
         Fmu: gpflow.base.TensorType,
         Fvar: gpflow.base.TensorType,
         Y: gpflow.base.TensorType,
     ) -> tf.Tensor:
-        raise NotImplementedError(
-            "Variational expectations is not implemented for this likelihood."
-        )
+        msg = "Variational expectations is not implemented for this likelihood."
+        raise NotImplementedError(msg)
 
 
-class HeteroscedasticGPR_analytical_scale(
+class HeteroscedasticGPR_analytical_scale(  # noqa: N801
     gpflow.models.GPModel, gpflow.models.InternalDataTrainingLossMixin
 ):
     """
@@ -785,7 +828,7 @@ class HeteroscedasticGPR_analytical_scale(
         kernel: gpflow.kernels.Kernel,
         mean_function: Optional[gpflow.mean_functions.MeanFunction] = None,
         scale_fac: Optional[float] = None,
-    ):
+    ) -> None:
         X_data, Y_data, noise_cov = data
 
         # To make training behave better, can try scaling covariance matrices and data
@@ -823,9 +866,7 @@ class HeteroscedasticGPR_analytical_scale(
 
         num_dims = tf.cast(tf.shape(err)[0], L.dtype)
         alpha = tf.linalg.triangular_solve(L, err, lower=True)
-        v = tf.reduce_sum(tf.square(alpha), 0) / num_dims
-
-        return v
+        return tf.reduce_sum(tf.square(alpha), 0) / num_dims
 
     def maximum_log_likelihood_objective(self) -> tf.Tensor:
         return self.log_marginal_likelihood()
@@ -864,7 +905,6 @@ class HeteroscedasticGPR_analytical_scale(
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
         """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
-
         X_data, Y_data = self.data
         err = Y_data - (self.mean_function(X_data) / self.scale_fac)
 
@@ -901,9 +941,8 @@ class HeteroscedasticGPR_analytical_scale(
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
         """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
-        raise NotImplementedError(
-            "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
-        )
+        msg = "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
+        raise NotImplementedError(msg)
 
     def predict_log_density(
         self,
@@ -911,17 +950,17 @@ class HeteroscedasticGPR_analytical_scale(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> tf.Tensor:
-        raise NotImplementedError(
-            "Predicting log density at new points requires knowledge of noise at new points, which is not modeled here."
-        )
+        msg = "Predicting log density at new points requires knowledge of noise at new points, which is not modeled here."
+        raise NotImplementedError(msg)
 
 
 class HeteroscedasticGPR(
     gpflow.models.GPModel, gpflow.models.InternalDataTrainingLossMixin
 ):
     """
-    Implements a GPR model with heteroscedastic input noise, which must be the full noise
-    covariance matrix. This is necessary for derivatives from the same simulation at the
+    Implements a GPR model with heteroscedastic input noise (full noise covariance matrix).
+
+    The full covariance matrix is necessary for derivatives from the same simulation at the
     same input location, which will likely be correlated. If the output is multidimensional,
     a separate covariance matrix may be specified for each dimension of the output - if this
     is not the case, the same covariance matrix will be used for all output dimensions. The
@@ -930,11 +969,15 @@ class HeteroscedasticGPR(
     multioutput kernel should be used to wrap whatever kernel has been specified. If it is
     detected that the kernel does not satisfy this property, the model will attempt to
     appropriately wrap the specified kernel. The covariance matrix is expected to
-    be the third element of the input data tuple (`X, Y, noise_cov`). Specific shapes should be ``X.shape == (N, 2)``, ``Y.shape == (N, D)``, ``noise_cov.shape == (N, D, D) or (D, D)``,
-    where `N` is the number of input locations and `D` is the input dimensionality. Note that the
-    first column of `X` is for the locations and the second is for the derivative order of
-    the observation at that location, so only 1D inputs can be handled, though the output
-    dimension, `D`, is not restricted.
+    be the third element of the input data tuple (`X, Y, noise_cov`). Specific shapes should
+    be ``X.shape == (N, 2*D_x)``, ``Y.shape == (N, D_y)``, and ``noise_cov.shape == (N, D_y, D_y) or (D_y, D_y)``,
+    where `N` is the number of input locations and `D_x` is the input dimensionality, and `D_y`
+    is the output dimensionality. Note that the first `D_x` columns of `X` are for the locations
+    and the next `D_x` columns are for the derivative order (with respect to the corresponding
+    input dimension) of the observation at that location. As an example, for a single observation
+    (row of `X` or `Y`), `X` may be ``[0.5, 0.5, 1.0, 3.0]``, indicating that at the point ``(0.5, 0.5)``,
+    the corresponding observation in `Y` is a 1st partial derivative with respect to the first `X`
+    dimension and a 3rd partial derivative with respect to the second.
 
     Parameters
     ----------
@@ -952,8 +995,6 @@ class HeteroscedasticGPR(
         scaling factor on the output data; can apply to each dimension
         separately if an array; helpful to ensure all output dimensions have
         similar variance
-    x_scale_fac : float, default=1.0
-        scaling factor on input locations; NOT USEFUL AND SOON TO BE DEPRECATED
     likelihood_kwargs, dict, optional
         Dictionary of keyword arguments to pass to the HetGaussianDeriv
         likelihood model used by this GP model
@@ -965,9 +1006,11 @@ class HeteroscedasticGPR(
         kernel: gpflow.kernels.Kernel,
         mean_function: Optional[gpflow.mean_functions.MeanFunction] = None,
         scale_fac: Optional[float] = 1.0,
-        x_scale_fac: Optional[float] = 1.0,
-        likelihood_kwargs: Optional[dict] = {},
-    ):
+        # x_scale_fac: Optional[float] = 1.0,
+        likelihood_kwargs: Optional[dict] = None,
+    ) -> None:
+        if likelihood_kwargs is None:
+            likelihood_kwargs = {}
         X_data, Y_data, noise_cov = data
         self.out_dim = Y_data.shape[-1]
 
@@ -984,33 +1027,44 @@ class HeteroscedasticGPR(
             )
             ** 2
         )
-
-        # Can also include another scaling factor for x data
-        # This can help keep the lengthscale parameter for an RBF kernel >1.0
-        # To save computational time, modify data now since always used scaled
-        self.x_scale_fac = x_scale_fac
-        X_data = np.concatenate(
-            [X_data[:, :1] * self.x_scale_fac, X_data[:, 1:]], axis=-1
-        )
-        Y_data = Y_data / (self.x_scale_fac ** X_data[:, 1:])
-        noise_cov = noise_cov / self.x_scale_fac ** (
-            np.add(*np.meshgrid(X_data[:, 1:], X_data[:, 1:]))
-        )
+        # Removed below since scaling of x much more complicated with multiple input dimensions
+        # And didn't really do much previously (didn't use)
+        #         #Can also include another scaling factor for x data
+        #         #This can help keep the lengthscale parameter for an RBF kernel >1.0
+        #         #To save computational time, modify data now since always used scaled
+        #         self.x_scale_fac = x_scale_fac
+        #         X_data = np.concatenate([X_data[:, :1]*self.x_scale_fac, X_data[:, 1:]], axis=-1)
+        #         Y_data = Y_data / (self.x_scale_fac**X_data[:, 1:])
+        #         noise_cov = noise_cov / self.x_scale_fac**(np.add(*np.meshgrid(X_data[:, 1:], X_data[:, 1:])))
+        # Set to one so old notebooks will still work (deprecate eventually)
+        self.x_scale_fac = 1.0
 
         # To generally allow for multidimensional outputs, need last Y_data and first
         # noise_cov dimensions to match
         if len(noise_cov.shape) == 2:
             noise_cov = np.tile(noise_cov[None, ...], (self.out_dim, 1, 1))
 
-        # Create specific likelihood for this model
-        likelihood = HetGaussianDeriv(noise_cov, X_data[:, 1:], **likelihood_kwargs)
-
-        # Check if kernel is multioutput and if not wrap as SharedIndependent
+        # Need to get number of input dimensions from kernel
+        # In the process, check if kernel is multioutput and, if not, wrap as SharedIndependent
         # If prefer to have different kernels on different outputs, can use SeparateIndependent
-        # If need even more flexibility, like correlations between dimensions, can
+        # If need even more flexibility, like correlations between output dimensions, can
         # subclass off of MultioutputKernel in gpflow and make custom
         if not issubclass(type(kernel), gpflow.kernels.MultioutputKernel):
+            # Get number of input dimensions
+            n_obs_dims = kernel.obs_dims
+            # And now wrap in SharedIndependent
             kernel = gpflow.kernels.SharedIndependent(kernel, output_dim=self.out_dim)
+        elif isinstance(kernel, gpflow.kernels.SharedIndependent):
+            n_obs_dims = kernel.kernel.obs_dims
+        elif isinstance(kernel, gpflow.kernels.SeparateIndependent):
+            n_obs_dims = kernel.kernels[0].obs_dims
+        else:
+            # Know how to handle above cases, but if have something else, just try below
+            # Assuming some type of custom MultioutputKernel, so requiring obs_dims is defined there
+            n_obs_dims = kernel.obs_dims
+
+        # Create specific likelihood for this model
+        likelihood = HetGaussianDeriv(noise_cov, n_obs_dims, **likelihood_kwargs)
 
         super().__init__(kernel, likelihood, mean_function, num_latent_gps=1)
         self.data = gpflow.models.util.data_input_to_tensor((X_data, Y_data))
@@ -1022,7 +1076,7 @@ class HeteroscedasticGPR(
         X, Y = self.data
 
         K = self.kernel(X, full_cov=True, full_output_cov=False)
-        ks = K + self.likelihood.build_scaled_cov_mat()
+        ks = K + self.likelihood.build_scaled_cov_mat(X)
         L = tf.linalg.cholesky(ks)
         m = self.mean_function(X) / self.scale_fac
 
@@ -1039,8 +1093,9 @@ class HeteroscedasticGPR(
         """See :meth:`gpflow.models.GPModel.predict_f` for further details."""
         X_data, Y_data = self.data
 
-        # Account for scaling in x for new inputs
-        Xnew = tf.concat([Xnew[:, :1] * self.x_scale_fac, Xnew[:, 1:]], -1)
+        # Again removing scaling on x
+        #         #Account for scaling in x for new inputs
+        #         Xnew = tf.concat([Xnew[:, :1]*self.x_scale_fac, Xnew[:, 1:]], -1)
 
         err = Y_data - (self.mean_function(X_data) / self.scale_fac)
 
@@ -1050,7 +1105,7 @@ class HeteroscedasticGPR(
         kmm = self.kernel(X_data, full_cov=True, full_output_cov=False)
         knn = self.kernel(Xnew, full_cov=full_cov, full_output_cov=False)
         kmn = self.kernel(X_data, Xnew, full_cov=True, full_output_cov=False)
-        kmm_plus_s = kmm + self.likelihood.build_scaled_cov_mat()
+        kmm_plus_s = kmm + self.likelihood.build_scaled_cov_mat(X_data)
 
         # To generally handle multioutput data, use appropriate conditional
         # Means also need to tile kernel (not kmm_plus_s, though, since __init__ checks noise)
@@ -1077,16 +1132,15 @@ class HeteroscedasticGPR(
         )
         f_mean = f_mean_zero + (self.mean_function(Xnew) / self.scale_fac)
 
-        # Again account for scaling in x for output
-        f_mean = f_mean * (self.x_scale_fac ** Xnew[:, 1:])
-        # Will be either scaling a vector, or a vector of full covariance matrices
-        # Depends on full_cov value
-        if not full_cov:
-            f_var = f_var * (self.x_scale_fac ** (2 * Xnew[:, 1:]))
-        else:
-            f_var = f_var * self.x_scale_fac ** (
-                np.add(*np.meshgrid(Xnew[:, 1:], Xnew[:, 1:]))
-            )
+        # Again removing scaling on x
+        #         #Again account for scaling in x for output
+        #         f_mean = f_mean * (self.x_scale_fac**Xnew[:, 1:])
+        #         #Will be either scaling a vector, or a vector of full covariance matrices
+        #         #Depends on full_cov value
+        #         if not full_cov:
+        #             f_var = f_var * (self.x_scale_fac**(2*Xnew[:, 1:]))
+        #         else:
+        #             f_var = f_var * self.x_scale_fac**(np.add(*np.meshgrid(Xnew[:, 1:], Xnew[:, 1:])))
 
         f_mean *= self.scale_fac
         # Need to appropriately reshape scale factor based on full_cov
@@ -1107,9 +1161,8 @@ class HeteroscedasticGPR(
         full_output_cov: bool = False,
     ) -> gpflow.models.model.MeanAndVariance:
         """See :meth:`gpflow.models.GPModel.predict_y` for further details."""
-        raise NotImplementedError(
-            "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
-        )
+        msg = "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
+        raise NotImplementedError(msg)
 
     def predict_log_density(
         self,
@@ -1117,12 +1170,11 @@ class HeteroscedasticGPR(
         full_cov: bool = False,
         full_output_cov: bool = False,
     ) -> tf.Tensor:
-        raise NotImplementedError(
-            "Predicting log density at new points requires knowledge of noise at new points, which is not modeled here."
-        )
+        msg = "Predicting log density at new points requires knowledge of noise at new points, which is not modeled here."
+        raise NotImplementedError(msg)
 
 
-class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
+class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
     """
     Constant mean function that takes derivative-augmented X as input.
     Only applies mean function constant to zeroth order derivatives.
@@ -1146,7 +1198,7 @@ class ConstantMeanWithDerivs(gpflow.mean_functions.MeanFunction):
         return tf.where((X[:, -1:] == 0), filled_mean, filled_zeros)
 
 
-class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
+class LinearWithDerivs(gpflow.functions.MeanFunction):
     """
     Linear mean function that can be applied to derivative data - in other words,
     the 0th order derivative is fit with a linear fit, so the 1st derivative also
@@ -1190,7 +1242,7 @@ class LinearWithDerivs(gpflow.mean_functions.MeanFunction):
         return output_0 + output_1
 
 
-class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
+class SympyMeanFunc(gpflow.functions.MeanFunction):
     """
     Mean function based on sympy expression. This way, can take derivatives up
     to any order. In the provided expression, the input variable should be 'x'
@@ -1213,7 +1265,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
         expression to start with
     """
 
-    def __init__(self, expr, x_data, y_data, params=None):
+    def __init__(self, expr, x_data, y_data, params=None) -> None:  # noqa: C901
         super().__init__()
         self.expr = expr
 
@@ -1227,10 +1279,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
 
         # Make sure that parameters here match those in params, if it's provided
         if bool(params):
-            if (
-                list([s.name for s in self.param_syms]).sort()
-                != list(params.keys()).sort()
-            ):
+            if [s.name for s in self.param_syms].sort() != list(params.keys()).sort():
                 raise ValueError("Symbol names in expr must match keys in " + "params!")
             # If they are the same, obtain parameter values from params dictionary
             # Need to set as gpflow Parameter objects so can optimize over them
@@ -1240,7 +1289,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
         # If kernel_params is not provided, set everything to 1.0 by default
         else:
             for s in self.param_syms:
-                setattr(self, s.name, float(1.0))
+                setattr(self, s.name, 1.0)
 
         # Collect only zeroth-order data for training mean function
         zero_bool = x_data[:, 1] == 0
@@ -1276,7 +1325,7 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
             method="L-BFGS-B",
             jac=jac_func,
         )
-        print(opt)
+        logging.info("optimization opt: %s", opt)
 
         # Set parameters based on optimization
         for i, s in enumerate(self.param_syms):
@@ -1305,7 +1354,5 @@ class SympyMeanFunc(gpflow.mean_functions.MeanFunction):
             )
             inds_list.append(this_inds)
 
-        # NOTE: never used, so commented out.  Something wrong here?
-        # k_list = tf.dynamic_stitch(inds_list, f_list)
-        out = tf.reshape(f_list, (x_vals.shape[0], 1))  # Really, just for 1D functions
-        return out
+        f_list = tf.dynamic_stitch(inds_list, f_list)
+        return tf.reshape(f_list, (x_vals.shape[0], 1))  # Really, just for 1D functions

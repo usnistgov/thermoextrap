@@ -4,7 +4,7 @@
 """Legacy (deprecated) code kept only for testing and reference purposes.
 SHOULD NOT BE USED.
 """
-
+import math
 import numpy as np
 from scipy.special import factorial
 
@@ -65,7 +65,7 @@ def extrapWithSamples(B, B0, x, U, order):
         outvec[o] = oDeriv(avgUfunc, avgXUfunc)
         # Perform extrapolation using same deriatives and averages, just have many dBeta
         # Taking the tensor product of two (really should be) 1D arrays to get the right shape
-        outval += np.tensordot((dBeta**o), outvec[o], axes=0) / np.math.factorial(o)
+        outval += np.tensordot((dBeta**o), outvec[o], axes=0) / math.factorial(o)
 
     return (outval, outvec)
 
