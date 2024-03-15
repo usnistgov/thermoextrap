@@ -1,15 +1,14 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Temperature indepent average observable &#8212; thermoextrap 0.4.1.dev11+g5663a30.d20230714 documentation</title>
+    <title>Temperature independent average observable &#8212; thermoextrap v0.5.0 documentation</title>
   
   
   
@@ -19,49 +18,49 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
-    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
-    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
-    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
-    <script src="../../../_static/js/leave_notice.js"></script>
-    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script src="../../../_static/documentation_options.js?v=91ffe994"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/usage/basic/Temperature_Extrap_Case1';</script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../../_static/js/leave_notice.js?v=133c5535"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Temperature dependent average observable" href="Temperature_Extrap_Case2.html" />
     <link rel="prev" title="Temperature Extrapolation/interpolation" href="../../thermoextrap.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2024-03-15"/>
   </head>
   
   
@@ -69,7 +68,15 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -104,11 +111,14 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -123,6 +133,7 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
   
 
 <a class="navbar-brand logo" href="../../../index.html">
@@ -131,10 +142,22 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.4.1.dev11+g5663a30.d20230714 documentation</p>
+  
+    <p class="title logo__title">thermoextrap v0.5.0 documentation</p>
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -146,11 +169,11 @@
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Data_Organization.html">Data Organization</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../../thermoextrap.html">Temperature Extrapolation/interpolation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">Temperature indepent average observable</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Temperature independent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Temperature_Extrap_Case2.html">Temperature dependent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Temperature_Extrap_Case3.html">Temperature independent negative logarithm of average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Temperature_Extrap_Case4.html">Temperature dependent negative logarithm of average observable</a></li>
@@ -170,28 +193,147 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/api-baseclasses.html">Base classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference/api-random.html">Random number generator (<code class="xref py py-mod docutils literal notranslate"><span class="pre">random</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="simple">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
 </ul>
 </li>
 </ul>
@@ -347,20 +489,22 @@
 </button>
 
 
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script>
 
+
 <script>
 document.write(`
   <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
@@ -375,7 +519,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Temperature indepent average observable</h1>
+    <h1>Temperature independent average observable</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -387,23 +531,27 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="temperature-indepent-average-observable">
-<h1>Temperature indepent average observable<a class="headerlink" href="#temperature-indepent-average-observable" title="Permalink to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="temperature-independent-average-observable">
+<h1>Temperature independent average observable<a class="headerlink" href="#temperature-independent-average-observable" title="Link to this heading">#</a></h1>
 <p>We first extrapolate our ideal gas test system in temperature and compare to the exact result. We also compare results with finite numbers of samples to exact results for an infinite number of samples. This is possible because we can analytically calculate derivatives for the ideal gas model at any order rather than estimating them.</p>
 <p>The first thing we want to do is define some parameters and generate data. We will define a reference inverse temperature, specific orders we want to extrapolate to, and create some reference data. The <a class="reference internal" href="../../../reference/generated/thermoextrap.idealgas.html#thermoextrap.idealgas.generate_data" title="thermoextrap.idealgas.generate_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">thermoextrap.idealgas.generate_data()</span></code></a> function conveniently provides random samples of <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(U\)</span> data. This will be in the format of an array with <code class="docutils literal notranslate"><span class="pre">nconfig</span></code> elements, each being the average <span class="math notranslate nohighlight">\(x\)</span> value over <span class="math notranslate nohighlight">\(N\)</span> independent ideal gas particles. The relevant potential energy is an array of the same shape with a single entry for each configuration. More generally, the data that should be provided to the extrapolation/interpolation code can have any number of columns but should have a single row associated with each simulation snapshot and potential energy. This allows for simultaneous extrapolation of all points in RDFs or time correlation functions with the interparticle distance or time varying with column. Or for simultaneous extrapolation of multiple observables. Critical, however, is that the potential energy (or Hamiltonian) is that which is appropriate to the snapshot with the same index. So for dynamical quantities like time correlation functions, the appropriate Hamiltonian is that for the starting configuration. Another main point here is that the number of columns is arbitrary, with each extrapolated separately, but because of the way the code is vectorized you get much better efficiency by providing multiple columns rather than running the extrapolation multiple times for different observables.</p>
-<p>For more information on the structure of data and other options for inputting data, please see the <a class="reference internal" href="Data_Organization.html"><span class="doc std std-doc">Data_Organization</span></a> notebook.</p>
+<p>For more information on the structure of data and other options for inputting data, please see the <a class="reference internal" href="Data_Organization.html"><span class="std std-doc">Data_Organization</span></a> notebook.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 
+<span class="kn">import</span> <span class="nn">cmomy</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># Import idealgas module</span>
 <span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">idealgas</span>
+
+<span class="c1"># set random seed</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">cmomy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># Define test betas and reference beta</span>
 <span class="n">betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
@@ -460,52 +608,71 @@ document.write(`
 <p>Let’s test some predictions and look at the results. Notice that you can make predictions over scalars or arrays of values, but the extrapolation will only be 1D in the variable of interest (e.g. temperature, pressure, etc.). Extrapolations in multiple dimensions of state variables is not yet supported.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make some predictions</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extrapolation prediction:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">xem</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Perturbation prediction:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">xpm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># By default, uses maximum order, which here is innacurate due to limited sampling (see figure below)</span>
-<span class="c1"># But can switch to any lower order if desired</span>
-<span class="c1"># Remember, order doesn&#39;t matter for perturbation</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;At lower order...&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extrapolation:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">xem</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Perturbation:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">xpm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Can also make predictions for multiple values</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;For multiple beta values...&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extrapolation:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">xem</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Perturbation:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">xpm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extrapolation prediction:
- 374.8673401133903
-Perturbation prediction:
- 0.19800168920153607
-
-
-At lower order...
-Extrapolation:
- 0.41000494418404937
-Perturbation:
- 0.19800168920153607
-
-
-For multiple beta values...
-Extrapolation:
-[0.41000494 0.38198452 0.35529251 0.3299289 ]
-Perturbation:
-[0.19800169 0.1979941  0.19798435 0.19797105]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.045
 </pre></div>
 </div>
 </div>
 </div>
-<p>All of the extrapolation/interpolation model classes come with a way to resample data efficiently to allow for bootstrapped uncertainty estimates. The <a class="reference internal" href="../../../reference/generated/thermoextrap.data.html#thermoextrap.data.DataCentralMomentsVals.resample" title="thermoextrap.data.DataCentralMomentsVals.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">thermoextrap.data.DataCentralMomentsVals.resample()</span></code></a> function actually resamples the data and returns a new extrapolation/interpolation class object, meaning that the necessary coefficients are automatically recomputed. However, the coefficients are computed separately for the different bootstrapped samples, which appear as different entries in the “replication” or “rep” dimension. In what we show below, this makes it easy to create bootstrap resampled data, then compute statistics on the coefficients or the predictions using built in statistical functions in xarray (e.g., <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.mean.html#xarray.DataArray.mean" title="(in xarray v2023.7.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.mean()</span></code></a> and <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.std.html#xarray.DataArray.std" title="(in xarray v2023.7.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.std()</span></code></a>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make some predictions</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Extrapolation: </span><span class="si">{</span><span class="n">xem</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span>
+<span class="s2">Perturbation:, </span><span class="si">{</span><span class="n">xpm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># By default, uses maximum order, which here is inaccurate due to limited sampling (see figure below)</span>
+<span class="c1"># But can switch to any lower order if desired</span>
+<span class="c1"># Remember, order doesn&#39;t matter for perturbation</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">At lower order</span>
+<span class="s2">--------------</span>
+<span class="s2">Extrapolation: </span><span class="si">{</span><span class="n">xem</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span>
+<span class="s2">Perturbation:  </span><span class="si">{</span><span class="n">xpm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Can also make predictions for multiple values</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">For multiple beta values</span>
+<span class="s2">------------------------</span>
+<span class="s2">Extrapolation: </span><span class="si">{</span><span class="n">xem</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="si">}</span>
+<span class="s2">Perturbation:  </span><span class="si">{</span><span class="n">xpm</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">values</span><span class="si">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extrapolation: -23.750
+Perturbation:, 0.199
+
+
+At lower order
+--------------
+Extrapolation: 0.448
+Perturbation:  0.199
+
+
+For multiple beta values
+------------------------
+Extrapolation: [0.4484 0.4137 0.3811 0.3503]
+Perturbation:  [0.1986 0.1986 0.1986 0.1986]
+</pre></div>
+</div>
+</div>
+</div>
+<p>All of the extrapolation/interpolation model classes come with a way to resample data efficiently to allow for bootstrapped uncertainty estimates. The <a class="reference internal" href="../../../reference/generated/thermoextrap.data.html#thermoextrap.data.DataCentralMomentsVals.resample" title="thermoextrap.data.DataCentralMomentsVals.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">thermoextrap.data.DataCentralMomentsVals.resample()</span></code></a> function actually resamples the data and returns a new extrapolation/interpolation class object, meaning that the necessary coefficients are automatically recomputed. However, the coefficients are computed separately for the different bootstrapped samples, which appear as different entries in the “replication” or “rep” dimension. In what we show below, this makes it easy to create bootstrap resampled data, then compute statistics on the coefficients or the predictions using built in statistical functions in xarray (e.g., <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.mean.html#xarray.DataArray.mean" title="(in xarray v2024.2.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.mean()</span></code></a> and <a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.std.html#xarray.DataArray.std" title="(in xarray v2024.2.1.dev0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xarray.DataArray.std()</span></code></a>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a bootstrapped sample</span>
@@ -517,9 +684,6 @@ Perturbation:
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>OMP: Info #276: omp_set_nested routine deprecated, please use omp_set_max_active_levels instead.
-</pre></div>
-</div>
 <div class="output text_html"><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
 <defs>
 <symbol id="icon-database" viewBox="0 0 32 32">
@@ -883,89 +1047,89 @@ dl.xr-attrs {
   stroke: currentColor;
   fill: currentColor;
 }
-</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (order: 3, rep: 100)&gt;
-array([[ 0.17487134,  0.17483964,  0.17482412,  0.17482346,  0.17486891,
-         0.17485348,  0.17483295,  0.17480557,  0.17485159,  0.17485452,
-         0.17483192,  0.17483127,  0.17483989,  0.17485731,  0.17480007,
-         0.17482535,  0.17483783,  0.17482074,  0.17483355,  0.17480565,
-         0.17486438,  0.17482277,  0.1748463 ,  0.17484995,  0.17484178,
-         0.17483144,  0.17482775,  0.17485423,  0.17484307,  0.17484101,
-         0.17481674,  0.17482994,  0.17482271,  0.17482909,  0.17482141,
-         0.17484809,  0.17483853,  0.17482719,  0.17483989,  0.1748596 ,
-         0.17484242,  0.17483078,  0.17485062,  0.174815  ,  0.17484696,
-         0.17484273,  0.17483191,  0.17485204,  0.17483585,  0.17484304,
-         0.17481995,  0.17485329,  0.17483131,  0.17483146,  0.17484962,
-         0.17484579,  0.1748361 ,  0.17485731,  0.17486525,  0.17485836,
-         0.17482572,  0.17483764,  0.17480755,  0.17484656,  0.17483753,
-         0.17482457,  0.17482676,  0.17482482,  0.1748355 ,  0.17485848,
-         0.17482703,  0.17485409,  0.17483204,  0.17483659,  0.17484297,
-         0.17485988,  0.17483792,  0.1748602 ,  0.17485377,  0.17483486,
-         0.17484907,  0.17485782,  0.17482198,  0.17484067,  0.17483871,
-         0.17485909,  0.17479606,  0.17486104,  0.17485238,  0.17483193,
-         0.1748448 ,  0.17485264,  0.1748432 ,  0.17482134,  0.17484609,
-         0.17486098,  0.17481359,  0.17483881,  0.17486178,  0.17481238],
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (order: 3, rep: 100)&gt; Size: 2kB
+array([[ 0.1749,  0.1748,  0.1749,  0.1748,  0.1748,  0.1748,  0.1749,
+         0.1749,  0.1749,  0.1748,  0.1749,  0.1748,  0.1748,  0.1749,
+         0.1748,  0.1749,  0.1749,  0.1749,  0.1749,  0.1749,  0.1748,
+         0.1749,  0.1749,  0.1749,  0.1748,  0.1748,  0.1749,  0.1748,
+         0.1748,  0.1748,  0.1748,  0.1748,  0.1749,  0.1748,  0.1748,
+         0.1749,  0.1749,  0.1748,  0.1748,  0.1749,  0.1749,  0.1748,
+         0.1749,  0.1748,  0.1748,  0.1749,  0.1749,  0.1748,  0.1748,
+         0.1749,  0.1749,  0.1749,  0.1749,  0.1749,  0.1748,  0.1748,
+         0.1749,  0.1749,  0.1748,  0.1749,  0.1749,  0.1748,  0.1748,
+         0.1748,  0.1748,  0.1749,  0.1749,  0.1749,  0.1749,  0.1748,
+         0.1749,  0.1749,  0.1748,  0.1748,  0.1749,  0.1749,  0.1748,
+         0.1748,  0.1748,  0.1748,  0.1748,  0.1748,  0.1748,  0.1748,
+         0.1748,  0.1748,  0.1748,  0.1749,  0.1748,  0.1748,  0.1749,
+         0.1748,  0.1748,  0.1749,  0.1749,  0.1748,  0.1749,  0.1748,
+         0.1749,  0.1748],
+       [-0.0283, -0.0282, -0.0285, -0.0283, -0.0283, -0.0282, -0.0283,
+        -0.0282, -0.028 , -0.0281, -0.0282, -0.028 , -0.028 , -0.0281,
+        -0.0284, -0.0281, -0.0281, -0.0284, -0.0284, -0.0284, -0.0281,
+        -0.0282, -0.0282, -0.0282, -0.0283, -0.0284, -0.0281, -0.0282,
+        -0.0282, -0.0282, -0.0283, -0.0284, -0.0283, -0.0282, -0.028 ,
 ...
-       [ 0.00338675,  0.00269053,  0.00308832,  0.00163406,  0.00125382,
-         0.00235187,  0.00232288,  0.00271085,  0.00106611,  0.00379955,
-         0.00262636,  0.00287912,  0.00164399,  0.00277677,  0.00302502,
-         0.0014255 ,  0.0034641 ,  0.00251738,  0.00288973,  0.00243466,
-         0.00243968,  0.00197332,  0.00274788,  0.00257236,  0.0029735 ,
-         0.00259636,  0.0024025 ,  0.00335038,  0.00411921,  0.00258866,
-         0.00237605,  0.00215835,  0.00235754,  0.00239316,  0.00358133,
-         0.00218777,  0.00309075,  0.00327324,  0.00244504,  0.00329803,
-         0.00247889,  0.00274896,  0.0029977 ,  0.00342736,  0.00378115,
-         0.00244041,  0.00322131,  0.0033937 ,  0.00423165,  0.00341062,
-         0.0020688 ,  0.00210904,  0.00248527,  0.00269809,  0.00299893,
-         0.00219043,  0.00192036,  0.00271958,  0.00275872,  0.00274958,
-         0.00260357,  0.00329414,  0.00249003,  0.00230969,  0.0028447 ,
-         0.0028741 ,  0.00287284,  0.00236034,  0.00255108,  0.0025279 ,
-         0.00234083,  0.0025983 ,  0.00311193,  0.0014323 ,  0.00312624,
-         0.00247064,  0.00257587,  0.00186128,  0.00275507,  0.0034654 ,
-         0.00139836,  0.00259378,  0.00245895,  0.00198856,  0.00263667,
-         0.00154498,  0.00210181,  0.00234335,  0.00277685,  0.00309956,
-         0.0026313 ,  0.00208805,  0.00251388,  0.00177837,  0.00297274,
-         0.00437705,  0.0023996 ,  0.00248967,  0.00203361,  0.00308744]])
-Dimensions without coordinates: order, rep</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span>order</span>: 3</li><li><span>rep</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-31ca22ea-e3dc-49d5-8887-c7f076b31139' class='xr-array-in' type='checkbox' checked><label for='section-31ca22ea-e3dc-49d5-8887-c7f076b31139' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.1749 0.1748 0.1748 0.1748 ... 0.0024 0.00249 0.002034 0.003087</span></div><div class='xr-array-data'><pre>array([[ 0.17487134,  0.17483964,  0.17482412,  0.17482346,  0.17486891,
-         0.17485348,  0.17483295,  0.17480557,  0.17485159,  0.17485452,
-         0.17483192,  0.17483127,  0.17483989,  0.17485731,  0.17480007,
-         0.17482535,  0.17483783,  0.17482074,  0.17483355,  0.17480565,
-         0.17486438,  0.17482277,  0.1748463 ,  0.17484995,  0.17484178,
-         0.17483144,  0.17482775,  0.17485423,  0.17484307,  0.17484101,
-         0.17481674,  0.17482994,  0.17482271,  0.17482909,  0.17482141,
-         0.17484809,  0.17483853,  0.17482719,  0.17483989,  0.1748596 ,
-         0.17484242,  0.17483078,  0.17485062,  0.174815  ,  0.17484696,
-         0.17484273,  0.17483191,  0.17485204,  0.17483585,  0.17484304,
-         0.17481995,  0.17485329,  0.17483131,  0.17483146,  0.17484962,
-         0.17484579,  0.1748361 ,  0.17485731,  0.17486525,  0.17485836,
-         0.17482572,  0.17483764,  0.17480755,  0.17484656,  0.17483753,
-         0.17482457,  0.17482676,  0.17482482,  0.1748355 ,  0.17485848,
-         0.17482703,  0.17485409,  0.17483204,  0.17483659,  0.17484297,
-         0.17485988,  0.17483792,  0.1748602 ,  0.17485377,  0.17483486,
-         0.17484907,  0.17485782,  0.17482198,  0.17484067,  0.17483871,
-         0.17485909,  0.17479606,  0.17486104,  0.17485238,  0.17483193,
-         0.1748448 ,  0.17485264,  0.1748432 ,  0.17482134,  0.17484609,
-         0.17486098,  0.17481359,  0.17483881,  0.17486178,  0.17481238],
+        -0.0282, -0.0284, -0.0282, -0.0283, -0.0283, -0.0284, -0.0281,
+        -0.0283, -0.0284, -0.0282, -0.0282, -0.0281, -0.028 , -0.0282,
+        -0.0283, -0.0284, -0.0286, -0.0284, -0.0283, -0.0284, -0.0285,
+        -0.0282, -0.028 , -0.0282, -0.0283, -0.0283, -0.0283, -0.0279,
+        -0.0282, -0.0282],
+       [ 0.0039,  0.0035,  0.0045,  0.004 ,  0.004 ,  0.0035,  0.0038,
+         0.0049,  0.0032,  0.0036,  0.0034,  0.0041,  0.0044,  0.0039,
+         0.0041,  0.0046,  0.0041,  0.0035,  0.0035,  0.0035,  0.0043,
+         0.004 ,  0.0033,  0.0048,  0.0038,  0.0038,  0.0034,  0.0041,
+         0.0035,  0.0042,  0.005 ,  0.0038,  0.0054,  0.0037,  0.0048,
+         0.0039,  0.0039,  0.0047,  0.0048,  0.0043,  0.004 ,  0.0041,
+         0.0041,  0.0032,  0.0041,  0.0047,  0.0044,  0.0044,  0.0037,
+         0.0042,  0.0038,  0.0049,  0.0046,  0.0026,  0.0045,  0.0038,
+         0.003 ,  0.0045,  0.0034,  0.0048,  0.004 ,  0.0049,  0.0027,
+         0.0031,  0.0041,  0.0045,  0.0039,  0.0024,  0.0037,  0.0043,
+         0.0037,  0.0042,  0.0051,  0.0027,  0.004 ,  0.0037,  0.0047,
+         0.0036,  0.0053,  0.0046,  0.0046,  0.0039,  0.0033,  0.004 ,
+         0.0038,  0.0045,  0.0034,  0.0044,  0.0051,  0.004 ,  0.0041,
+         0.0049,  0.004 ,  0.0042,  0.0042,  0.0045,  0.004 ,  0.0038,
+         0.0043,  0.0043]])
+Dimensions without coordinates: order, rep</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span>order</span>: 3</li><li><span>rep</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-7db210f1-372d-459d-a719-b57ab4d4c8d9' class='xr-array-in' type='checkbox' checked><label for='section-7db210f1-372d-459d-a719-b57ab4d4c8d9' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.1749 0.1748 0.1749 0.1748 ... 0.003974 0.003779 0.004303 0.004342</span></div><div class='xr-array-data'><pre>array([[ 0.1749,  0.1748,  0.1749,  0.1748,  0.1748,  0.1748,  0.1749,
+         0.1749,  0.1749,  0.1748,  0.1749,  0.1748,  0.1748,  0.1749,
+         0.1748,  0.1749,  0.1749,  0.1749,  0.1749,  0.1749,  0.1748,
+         0.1749,  0.1749,  0.1749,  0.1748,  0.1748,  0.1749,  0.1748,
+         0.1748,  0.1748,  0.1748,  0.1748,  0.1749,  0.1748,  0.1748,
+         0.1749,  0.1749,  0.1748,  0.1748,  0.1749,  0.1749,  0.1748,
+         0.1749,  0.1748,  0.1748,  0.1749,  0.1749,  0.1748,  0.1748,
+         0.1749,  0.1749,  0.1749,  0.1749,  0.1749,  0.1748,  0.1748,
+         0.1749,  0.1749,  0.1748,  0.1749,  0.1749,  0.1748,  0.1748,
+         0.1748,  0.1748,  0.1749,  0.1749,  0.1749,  0.1749,  0.1748,
+         0.1749,  0.1749,  0.1748,  0.1748,  0.1749,  0.1749,  0.1748,
+         0.1748,  0.1748,  0.1748,  0.1748,  0.1748,  0.1748,  0.1748,
+         0.1748,  0.1748,  0.1748,  0.1749,  0.1748,  0.1748,  0.1749,
+         0.1748,  0.1748,  0.1749,  0.1749,  0.1748,  0.1749,  0.1748,
+         0.1749,  0.1748],
+       [-0.0283, -0.0282, -0.0285, -0.0283, -0.0283, -0.0282, -0.0283,
+        -0.0282, -0.028 , -0.0281, -0.0282, -0.028 , -0.028 , -0.0281,
+        -0.0284, -0.0281, -0.0281, -0.0284, -0.0284, -0.0284, -0.0281,
+        -0.0282, -0.0282, -0.0282, -0.0283, -0.0284, -0.0281, -0.0282,
+        -0.0282, -0.0282, -0.0283, -0.0284, -0.0283, -0.0282, -0.028 ,
 ...
-       [ 0.00338675,  0.00269053,  0.00308832,  0.00163406,  0.00125382,
-         0.00235187,  0.00232288,  0.00271085,  0.00106611,  0.00379955,
-         0.00262636,  0.00287912,  0.00164399,  0.00277677,  0.00302502,
-         0.0014255 ,  0.0034641 ,  0.00251738,  0.00288973,  0.00243466,
-         0.00243968,  0.00197332,  0.00274788,  0.00257236,  0.0029735 ,
-         0.00259636,  0.0024025 ,  0.00335038,  0.00411921,  0.00258866,
-         0.00237605,  0.00215835,  0.00235754,  0.00239316,  0.00358133,
-         0.00218777,  0.00309075,  0.00327324,  0.00244504,  0.00329803,
-         0.00247889,  0.00274896,  0.0029977 ,  0.00342736,  0.00378115,
-         0.00244041,  0.00322131,  0.0033937 ,  0.00423165,  0.00341062,
-         0.0020688 ,  0.00210904,  0.00248527,  0.00269809,  0.00299893,
-         0.00219043,  0.00192036,  0.00271958,  0.00275872,  0.00274958,
-         0.00260357,  0.00329414,  0.00249003,  0.00230969,  0.0028447 ,
-         0.0028741 ,  0.00287284,  0.00236034,  0.00255108,  0.0025279 ,
-         0.00234083,  0.0025983 ,  0.00311193,  0.0014323 ,  0.00312624,
-         0.00247064,  0.00257587,  0.00186128,  0.00275507,  0.0034654 ,
-         0.00139836,  0.00259378,  0.00245895,  0.00198856,  0.00263667,
-         0.00154498,  0.00210181,  0.00234335,  0.00277685,  0.00309956,
-         0.0026313 ,  0.00208805,  0.00251388,  0.00177837,  0.00297274,
-         0.00437705,  0.0023996 ,  0.00248967,  0.00203361,  0.00308744]])</pre></div></div></li><li class='xr-section-item'><input id='section-ccef4427-9323-4fc3-9587-897199cbeac5' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ccef4427-9323-4fc3-9587-897199cbeac5' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-bca51bea-ff6b-4bdc-9411-d04ffda4d95f' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-bca51bea-ff6b-4bdc-9411-d04ffda4d95f' class='xr-section-summary'  title='Expand/collapse section'>Indexes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-3c7c2b9d-19c1-42a3-9f37-e69e27f785d1' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-3c7c2b9d-19c1-42a3-9f37-e69e27f785d1' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+        -0.0282, -0.0284, -0.0282, -0.0283, -0.0283, -0.0284, -0.0281,
+        -0.0283, -0.0284, -0.0282, -0.0282, -0.0281, -0.028 , -0.0282,
+        -0.0283, -0.0284, -0.0286, -0.0284, -0.0283, -0.0284, -0.0285,
+        -0.0282, -0.028 , -0.0282, -0.0283, -0.0283, -0.0283, -0.0279,
+        -0.0282, -0.0282],
+       [ 0.0039,  0.0035,  0.0045,  0.004 ,  0.004 ,  0.0035,  0.0038,
+         0.0049,  0.0032,  0.0036,  0.0034,  0.0041,  0.0044,  0.0039,
+         0.0041,  0.0046,  0.0041,  0.0035,  0.0035,  0.0035,  0.0043,
+         0.004 ,  0.0033,  0.0048,  0.0038,  0.0038,  0.0034,  0.0041,
+         0.0035,  0.0042,  0.005 ,  0.0038,  0.0054,  0.0037,  0.0048,
+         0.0039,  0.0039,  0.0047,  0.0048,  0.0043,  0.004 ,  0.0041,
+         0.0041,  0.0032,  0.0041,  0.0047,  0.0044,  0.0044,  0.0037,
+         0.0042,  0.0038,  0.0049,  0.0046,  0.0026,  0.0045,  0.0038,
+         0.003 ,  0.0045,  0.0034,  0.0048,  0.004 ,  0.0049,  0.0027,
+         0.0031,  0.0041,  0.0045,  0.0039,  0.0024,  0.0037,  0.0043,
+         0.0037,  0.0042,  0.0051,  0.0027,  0.004 ,  0.0037,  0.0047,
+         0.0036,  0.0053,  0.0046,  0.0046,  0.0039,  0.0033,  0.004 ,
+         0.0038,  0.0045,  0.0034,  0.0044,  0.0051,  0.004 ,  0.0041,
+         0.0049,  0.004 ,  0.0042,  0.0042,  0.0045,  0.004 ,  0.0038,
+         0.0043,  0.0043]])</pre></div></div></li><li class='xr-section-item'><input id='section-342e36a8-7fdc-4d09-a21c-fbac5df5eebd' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-342e36a8-7fdc-4d09-a21c-fbac5df5eebd' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-7b17a423-5d5d-4a8c-adfc-ea9a175e98f3' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-7b17a423-5d5d-4a8c-adfc-ea9a175e98f3' class='xr-section-summary'  title='Expand/collapse section'>Indexes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-e05dc3f4-1607-49a7-8028-0f3e341646fa' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-e05dc3f4-1607-49a7-8028-0f3e341646fa' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1338,93 +1502,93 @@ dl.xr-attrs {
   stroke: currentColor;
   fill: currentColor;
 }
-</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (beta: 4, rep: 100)&gt;
-array([[0.43151511, 0.41189771, 0.42212777, 0.37854746, 0.36721193,
-        0.40165021, 0.40112644, 0.41193673, 0.36118205, 0.44427757,
-        0.40925575, 0.41676918, 0.38089079, 0.41395572, 0.42137802,
-        0.3722446 , 0.43412588, 0.4059567 , 0.41767792, 0.40401982,
-        0.40401938, 0.38905529, 0.41337288, 0.40746231, 0.41965663,
-        0.40847783, 0.40176814, 0.43068557, 0.45441597, 0.40700583,
-        0.40110911, 0.39501512, 0.40075079, 0.40180333, 0.43818096,
-        0.39580091, 0.42229248, 0.42902008, 0.40289051, 0.42950955,
-        0.40440155, 0.4122469 , 0.42139711, 0.43411907, 0.44430746,
-        0.40371074, 0.42770802, 0.43274364, 0.45760144, 0.43321484,
-        0.39438707, 0.39193777, 0.40514859, 0.41158191, 0.4225506 ,
-        0.39586479, 0.38822637, 0.41279853, 0.41264225, 0.41224496,
-        0.4083519 , 0.42969127, 0.40588522, 0.39988893, 0.41604217,
-        0.41658738, 0.41636884, 0.40169375, 0.40760241, 0.40568961,
-        0.40092662, 0.40777049, 0.42464326, 0.37215572, 0.42457022,
-        0.40484481, 0.40860507, 0.38589787, 0.41367403, 0.43472498,
-        0.37209643, 0.40859   , 0.40374185, 0.39009585, 0.4104531 ,
-        0.37577828, 0.3942892 , 0.39998713, 0.41378934, 0.42273515,
-        0.40984998, 0.39365458, 0.4048234 , 0.38305381, 0.42004641,
-        0.46247848, 0.40252733, 0.40485848, 0.39128015, 0.42417864],
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (beta: 4, rep: 100)&gt; Size: 3kB
+array([[0.4493, 0.4352, 0.4688, 0.4502, 0.4498, 0.4348, 0.4462, 0.479 ,
+        0.4265, 0.439 , 0.432 , 0.454 , 0.4629, 0.449 , 0.4553, 0.4682,
+        0.4535, 0.4369, 0.436 , 0.4376, 0.459 , 0.4509, 0.4312, 0.4752,
+        0.4438, 0.4473, 0.4336, 0.4542, 0.4375, 0.4569, 0.4828, 0.4449,
+        0.4927, 0.442 , 0.4728, 0.4487, 0.447 , 0.4724, 0.4741, 0.4612,
+        0.4509, 0.4549, 0.4543, 0.4262, 0.4525, 0.4733, 0.4642, 0.4617,
+        0.4421, 0.4574, 0.4469, 0.4785, 0.4709, 0.4086, 0.4672, 0.4435,
+        0.4214, 0.4644, 0.434 , 0.4761, 0.4524, 0.4804, 0.4124, 0.4243,
+        0.4547, 0.4657, 0.4483, 0.4023, 0.4426, 0.4629, 0.4414, 0.4581,
+        0.4833, 0.4119, 0.4506, 0.4435, 0.4723, 0.4388, 0.4927, 0.4696,
+        0.468 , 0.4471, 0.4289, 0.4512, 0.4441, 0.4671, 0.4355, 0.4654,
+        0.4848, 0.4518, 0.4542, 0.4766, 0.4504, 0.4585, 0.4571, 0.4674,
+        0.4505, 0.4427, 0.4601, 0.4613],
+       [0.4145, 0.4029, 0.4307, 0.4152, 0.4149, 0.4025, 0.412 , 0.439 ,
+        0.3956, 0.4059, 0.4001, 0.4183, 0.4257, 0.4142, 0.4196, 0.4301,
+        0.4179, 0.4044, 0.4036, 0.4049, 0.4224, 0.4158, 0.3995, 0.4359,
+        0.4099, 0.4129, 0.4014, 0.4186, 0.4047, 0.4207, 0.4422, 0.4109,
+        0.4504, 0.4085, 0.4338, 0.414 , 0.4126, 0.4334, 0.435 , 0.4244,
+        0.4159, 0.4192, 0.4187, 0.3955, 0.4171, 0.4343, 0.4269, 0.4247,
+        0.4086, 0.4213, 0.4125, 0.4386, 0.4324, 0.3809, 0.4293, 0.4097,
 ...
-       [0.34120085, 0.33110232, 0.33615139, 0.313182  , 0.30723182,
-        0.32568532, 0.32547273, 0.33099948, 0.30396798, 0.34800125,
-        0.32956382, 0.33351139, 0.31483114, 0.33208646, 0.33597939,
-        0.30984997, 0.34262637, 0.32781535, 0.33410924, 0.3268989 ,
-        0.32688451, 0.31878835, 0.33183291, 0.3285884 , 0.33504794,
-        0.32917794, 0.32546032, 0.34081111, 0.35345353, 0.32815621,
-        0.32513674, 0.3220145 , 0.3249888 , 0.32554228, 0.34486764,
-        0.32241445, 0.33626054, 0.34005531, 0.32602464, 0.34027139,
-        0.32692119, 0.33100328, 0.33617095, 0.34283561, 0.34813131,
-        0.32664976, 0.33941394, 0.34204735, 0.35509364, 0.34228611,
-        0.32209235, 0.32007869, 0.32742319, 0.33082506, 0.33700222,
-        0.32244431, 0.31850686, 0.33158798, 0.33124166, 0.33100566,
-        0.32904152, 0.34042092, 0.32792383, 0.32465559, 0.3331909 ,
-        0.33340745, 0.33325671, 0.32565837, 0.32881406, 0.32756824,
-        0.3252181 , 0.32865806, 0.33784135, 0.30974759, 0.33770537,
-        0.3272978 , 0.32939518, 0.31717446, 0.33201081, 0.34305345,
-        0.30991153, 0.3292822 , 0.32655543, 0.31945853, 0.33037458,
-        0.31171223, 0.3218166 , 0.32452898, 0.33196361, 0.33652782,
-        0.32996984, 0.32145301, 0.32701824, 0.31559294, 0.33533714,
-        0.35777502, 0.32602601, 0.32718782, 0.32005527, 0.33764503]])
+        0.377 , 0.3872, 0.3801, 0.4012, 0.3962, 0.3545, 0.3937, 0.3778,
+        0.363 , 0.3917, 0.3715, 0.3997, 0.3839, 0.4026, 0.3569, 0.3649,
+        0.3854, 0.3927, 0.381 , 0.3501, 0.3771, 0.391 , 0.3764, 0.3877,
+        0.4044, 0.3567, 0.3826, 0.3779, 0.397 , 0.3747, 0.4108, 0.3952,
+        0.3941, 0.3801, 0.3678, 0.3829, 0.3782, 0.3937, 0.3727, 0.3926,
+        0.4055, 0.3835, 0.3851, 0.3999, 0.3823, 0.3878, 0.3869, 0.3938,
+        0.3825, 0.377 , 0.3889, 0.3897],
+       [0.3509, 0.3433, 0.3614, 0.3513, 0.3511, 0.3431, 0.3493, 0.3665,
+        0.3386, 0.3452, 0.3416, 0.353 , 0.3578, 0.3505, 0.3542, 0.3607,
+        0.3529, 0.3445, 0.3439, 0.3448, 0.3558, 0.3516, 0.3412, 0.3644,
+        0.3479, 0.3499, 0.3423, 0.3534, 0.3445, 0.3547, 0.3686, 0.3487,
+        0.3738, 0.3469, 0.3629, 0.3505, 0.3495, 0.3627, 0.3639, 0.3572,
+        0.3518, 0.354 , 0.3536, 0.3387, 0.3523, 0.3634, 0.3589, 0.3572,
+        0.3472, 0.3552, 0.3496, 0.3662, 0.3623, 0.3293, 0.3604, 0.3477,
+        0.3361, 0.3587, 0.3428, 0.3651, 0.3527, 0.3675, 0.3312, 0.3375,
+        0.3539, 0.3596, 0.3502, 0.3258, 0.3471, 0.3583, 0.3467, 0.3557,
+        0.3687, 0.3311, 0.3516, 0.3479, 0.3628, 0.3453, 0.3739, 0.3615,
+        0.3606, 0.3495, 0.3397, 0.3518, 0.3481, 0.3604, 0.3438, 0.3595,
+        0.3697, 0.3524, 0.3536, 0.3652, 0.3512, 0.3557, 0.355 , 0.3604,
+        0.3515, 0.347 , 0.3565, 0.3571]])
 Coordinates:
-  * beta     (beta) float64 0.1 0.6 1.1 1.6
-    dalpha   (beta) float64 -5.5 -5.0 -4.5 -4.0
-    beta0    float64 5.6
-Dimensions without coordinates: rep</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>beta</span>: 4</li><li><span>rep</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4b9cd2cd-2158-4db4-8831-74248e447f6a' class='xr-array-in' type='checkbox' checked><label for='section-4b9cd2cd-2158-4db4-8831-74248e447f6a' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.4315 0.4119 0.4221 0.3785 0.3672 ... 0.326 0.3272 0.3201 0.3376</span></div><div class='xr-array-data'><pre>array([[0.43151511, 0.41189771, 0.42212777, 0.37854746, 0.36721193,
-        0.40165021, 0.40112644, 0.41193673, 0.36118205, 0.44427757,
-        0.40925575, 0.41676918, 0.38089079, 0.41395572, 0.42137802,
-        0.3722446 , 0.43412588, 0.4059567 , 0.41767792, 0.40401982,
-        0.40401938, 0.38905529, 0.41337288, 0.40746231, 0.41965663,
-        0.40847783, 0.40176814, 0.43068557, 0.45441597, 0.40700583,
-        0.40110911, 0.39501512, 0.40075079, 0.40180333, 0.43818096,
-        0.39580091, 0.42229248, 0.42902008, 0.40289051, 0.42950955,
-        0.40440155, 0.4122469 , 0.42139711, 0.43411907, 0.44430746,
-        0.40371074, 0.42770802, 0.43274364, 0.45760144, 0.43321484,
-        0.39438707, 0.39193777, 0.40514859, 0.41158191, 0.4225506 ,
-        0.39586479, 0.38822637, 0.41279853, 0.41264225, 0.41224496,
-        0.4083519 , 0.42969127, 0.40588522, 0.39988893, 0.41604217,
-        0.41658738, 0.41636884, 0.40169375, 0.40760241, 0.40568961,
-        0.40092662, 0.40777049, 0.42464326, 0.37215572, 0.42457022,
-        0.40484481, 0.40860507, 0.38589787, 0.41367403, 0.43472498,
-        0.37209643, 0.40859   , 0.40374185, 0.39009585, 0.4104531 ,
-        0.37577828, 0.3942892 , 0.39998713, 0.41378934, 0.42273515,
-        0.40984998, 0.39365458, 0.4048234 , 0.38305381, 0.42004641,
-        0.46247848, 0.40252733, 0.40485848, 0.39128015, 0.42417864],
+  * beta     (beta) float64 32B 0.1 0.6 1.1 1.6
+    dalpha   (beta) float64 32B -5.5 -5.0 -4.5 -4.0
+    beta0    float64 8B 5.6
+Dimensions without coordinates: rep</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>beta</span>: 4</li><li><span>rep</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-a4537e84-5bd9-4fe7-bc8e-d57cb393ccbd' class='xr-array-in' type='checkbox' checked><label for='section-a4537e84-5bd9-4fe7-bc8e-d57cb393ccbd' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.4493 0.4352 0.4688 0.4502 0.4498 ... 0.3515 0.347 0.3565 0.3571</span></div><div class='xr-array-data'><pre>array([[0.4493, 0.4352, 0.4688, 0.4502, 0.4498, 0.4348, 0.4462, 0.479 ,
+        0.4265, 0.439 , 0.432 , 0.454 , 0.4629, 0.449 , 0.4553, 0.4682,
+        0.4535, 0.4369, 0.436 , 0.4376, 0.459 , 0.4509, 0.4312, 0.4752,
+        0.4438, 0.4473, 0.4336, 0.4542, 0.4375, 0.4569, 0.4828, 0.4449,
+        0.4927, 0.442 , 0.4728, 0.4487, 0.447 , 0.4724, 0.4741, 0.4612,
+        0.4509, 0.4549, 0.4543, 0.4262, 0.4525, 0.4733, 0.4642, 0.4617,
+        0.4421, 0.4574, 0.4469, 0.4785, 0.4709, 0.4086, 0.4672, 0.4435,
+        0.4214, 0.4644, 0.434 , 0.4761, 0.4524, 0.4804, 0.4124, 0.4243,
+        0.4547, 0.4657, 0.4483, 0.4023, 0.4426, 0.4629, 0.4414, 0.4581,
+        0.4833, 0.4119, 0.4506, 0.4435, 0.4723, 0.4388, 0.4927, 0.4696,
+        0.468 , 0.4471, 0.4289, 0.4512, 0.4441, 0.4671, 0.4355, 0.4654,
+        0.4848, 0.4518, 0.4542, 0.4766, 0.4504, 0.4585, 0.4571, 0.4674,
+        0.4505, 0.4427, 0.4601, 0.4613],
+       [0.4145, 0.4029, 0.4307, 0.4152, 0.4149, 0.4025, 0.412 , 0.439 ,
+        0.3956, 0.4059, 0.4001, 0.4183, 0.4257, 0.4142, 0.4196, 0.4301,
+        0.4179, 0.4044, 0.4036, 0.4049, 0.4224, 0.4158, 0.3995, 0.4359,
+        0.4099, 0.4129, 0.4014, 0.4186, 0.4047, 0.4207, 0.4422, 0.4109,
+        0.4504, 0.4085, 0.4338, 0.414 , 0.4126, 0.4334, 0.435 , 0.4244,
+        0.4159, 0.4192, 0.4187, 0.3955, 0.4171, 0.4343, 0.4269, 0.4247,
+        0.4086, 0.4213, 0.4125, 0.4386, 0.4324, 0.3809, 0.4293, 0.4097,
 ...
-       [0.34120085, 0.33110232, 0.33615139, 0.313182  , 0.30723182,
-        0.32568532, 0.32547273, 0.33099948, 0.30396798, 0.34800125,
-        0.32956382, 0.33351139, 0.31483114, 0.33208646, 0.33597939,
-        0.30984997, 0.34262637, 0.32781535, 0.33410924, 0.3268989 ,
-        0.32688451, 0.31878835, 0.33183291, 0.3285884 , 0.33504794,
-        0.32917794, 0.32546032, 0.34081111, 0.35345353, 0.32815621,
-        0.32513674, 0.3220145 , 0.3249888 , 0.32554228, 0.34486764,
-        0.32241445, 0.33626054, 0.34005531, 0.32602464, 0.34027139,
-        0.32692119, 0.33100328, 0.33617095, 0.34283561, 0.34813131,
-        0.32664976, 0.33941394, 0.34204735, 0.35509364, 0.34228611,
-        0.32209235, 0.32007869, 0.32742319, 0.33082506, 0.33700222,
-        0.32244431, 0.31850686, 0.33158798, 0.33124166, 0.33100566,
-        0.32904152, 0.34042092, 0.32792383, 0.32465559, 0.3331909 ,
-        0.33340745, 0.33325671, 0.32565837, 0.32881406, 0.32756824,
-        0.3252181 , 0.32865806, 0.33784135, 0.30974759, 0.33770537,
-        0.3272978 , 0.32939518, 0.31717446, 0.33201081, 0.34305345,
-        0.30991153, 0.3292822 , 0.32655543, 0.31945853, 0.33037458,
-        0.31171223, 0.3218166 , 0.32452898, 0.33196361, 0.33652782,
-        0.32996984, 0.32145301, 0.32701824, 0.31559294, 0.33533714,
-        0.35777502, 0.32602601, 0.32718782, 0.32005527, 0.33764503]])</pre></div></div></li><li class='xr-section-item'><input id='section-20933d1e-549f-4956-aec7-66718fcf0787' class='xr-section-summary-in' type='checkbox'  checked><label for='section-20933d1e-549f-4956-aec7-66718fcf0787' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>beta</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1 0.6 1.1 1.6</div><input id='attrs-b09df542-a8b6-4271-a1e3-144118a4711a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b09df542-a8b6-4271-a1e3-144118a4711a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cc776a1d-6ea1-4919-a9c2-9cb05c4b9991' class='xr-var-data-in' type='checkbox'><label for='data-cc776a1d-6ea1-4919-a9c2-9cb05c4b9991' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.1, 0.6, 1.1, 1.6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dalpha</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-5.5 -5.0 -4.5 -4.0</div><input id='attrs-1d970adb-7f5c-4a19-81cb-c0699eea2a16' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1d970adb-7f5c-4a19-81cb-c0699eea2a16' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-10d1a255-a2fb-4b4f-bfac-b4708fee67dc' class='xr-var-data-in' type='checkbox'><label for='data-10d1a255-a2fb-4b4f-bfac-b4708fee67dc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-5.5, -5. , -4.5, -4. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>beta0</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.6</div><input id='attrs-ea551838-f8f7-4018-ae9c-3b77de8f4cc0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ea551838-f8f7-4018-ae9c-3b77de8f4cc0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4c70af59-0316-48fc-913b-68310468bc2d' class='xr-var-data-in' type='checkbox'><label for='data-4c70af59-0316-48fc-913b-68310468bc2d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(5.6)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-02be7d26-7122-4789-85fc-ead8c26b1fa6' class='xr-section-summary-in' type='checkbox'  ><label for='section-02be7d26-7122-4789-85fc-ead8c26b1fa6' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>beta</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-73034e25-58da-4440-b691-786c6f91e243' class='xr-index-data-in' type='checkbox'/><label for='index-73034e25-58da-4440-b691-786c6f91e243' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([0.1, 0.6, 1.1, 1.6], dtype=&#x27;float64&#x27;, name=&#x27;beta&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-821e4456-9585-4df1-9191-230faefaa580' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-821e4456-9585-4df1-9191-230faefaa580' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+        0.377 , 0.3872, 0.3801, 0.4012, 0.3962, 0.3545, 0.3937, 0.3778,
+        0.363 , 0.3917, 0.3715, 0.3997, 0.3839, 0.4026, 0.3569, 0.3649,
+        0.3854, 0.3927, 0.381 , 0.3501, 0.3771, 0.391 , 0.3764, 0.3877,
+        0.4044, 0.3567, 0.3826, 0.3779, 0.397 , 0.3747, 0.4108, 0.3952,
+        0.3941, 0.3801, 0.3678, 0.3829, 0.3782, 0.3937, 0.3727, 0.3926,
+        0.4055, 0.3835, 0.3851, 0.3999, 0.3823, 0.3878, 0.3869, 0.3938,
+        0.3825, 0.377 , 0.3889, 0.3897],
+       [0.3509, 0.3433, 0.3614, 0.3513, 0.3511, 0.3431, 0.3493, 0.3665,
+        0.3386, 0.3452, 0.3416, 0.353 , 0.3578, 0.3505, 0.3542, 0.3607,
+        0.3529, 0.3445, 0.3439, 0.3448, 0.3558, 0.3516, 0.3412, 0.3644,
+        0.3479, 0.3499, 0.3423, 0.3534, 0.3445, 0.3547, 0.3686, 0.3487,
+        0.3738, 0.3469, 0.3629, 0.3505, 0.3495, 0.3627, 0.3639, 0.3572,
+        0.3518, 0.354 , 0.3536, 0.3387, 0.3523, 0.3634, 0.3589, 0.3572,
+        0.3472, 0.3552, 0.3496, 0.3662, 0.3623, 0.3293, 0.3604, 0.3477,
+        0.3361, 0.3587, 0.3428, 0.3651, 0.3527, 0.3675, 0.3312, 0.3375,
+        0.3539, 0.3596, 0.3502, 0.3258, 0.3471, 0.3583, 0.3467, 0.3557,
+        0.3687, 0.3311, 0.3516, 0.3479, 0.3628, 0.3453, 0.3739, 0.3615,
+        0.3606, 0.3495, 0.3397, 0.3518, 0.3481, 0.3604, 0.3438, 0.3595,
+        0.3697, 0.3524, 0.3536, 0.3652, 0.3512, 0.3557, 0.355 , 0.3604,
+        0.3515, 0.347 , 0.3565, 0.3571]])</pre></div></div></li><li class='xr-section-item'><input id='section-de7c2b92-4586-40b3-a8cf-e3cd8c2942bd' class='xr-section-summary-in' type='checkbox'  checked><label for='section-de7c2b92-4586-40b3-a8cf-e3cd8c2942bd' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>beta</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1 0.6 1.1 1.6</div><input id='attrs-b6516223-02a5-4308-b654-e4cc074a1774' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b6516223-02a5-4308-b654-e4cc074a1774' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e1028aab-5138-4783-84d5-71a13157b3cf' class='xr-var-data-in' type='checkbox'><label for='data-e1028aab-5138-4783-84d5-71a13157b3cf' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.1, 0.6, 1.1, 1.6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dalpha</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-5.5 -5.0 -4.5 -4.0</div><input id='attrs-084ee96f-adb6-49ab-b118-0749ec970f13' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-084ee96f-adb6-49ab-b118-0749ec970f13' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2d5924df-7c81-4440-8faf-8004b9baa8db' class='xr-var-data-in' type='checkbox'><label for='data-2d5924df-7c81-4440-8faf-8004b9baa8db' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-5.5, -5. , -4.5, -4. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>beta0</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.6</div><input id='attrs-d04f08fd-0f81-4e57-8474-5ea0dc3ab971' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d04f08fd-0f81-4e57-8474-5ea0dc3ab971' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f4b2ad79-000d-4a97-929d-80ffbfa14536' class='xr-var-data-in' type='checkbox'><label for='data-f4b2ad79-000d-4a97-929d-80ffbfa14536' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(5.6)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bae4e7c2-9311-4529-ae7f-8a775c3281d7' class='xr-section-summary-in' type='checkbox'  ><label for='section-bae4e7c2-9311-4529-ae7f-8a775c3281d7' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>beta</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-e42d7414-7d55-45ab-866a-25c40447bb44' class='xr-index-data-in' type='checkbox'/><label for='index-e42d7414-7d55-45ab-866a-25c40447bb44' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0.1, 0.6, 1.1, 1.6], dtype=&#x27;float64&#x27;, name=&#x27;beta&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-9e85bc49-c64d-4b52-a775-a27e664d105a' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-9e85bc49-c64d-4b52-a775-a27e664d105a' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1798,12 +1962,12 @@ dl.xr-attrs {
   stroke: currentColor;
   fill: currentColor;
 }
-</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (beta: 4)&gt;
-array([0.40952796, 0.38160448, 0.35499862, 0.32971037])
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (beta: 4)&gt; Size: 32B
+array([0.4527, 0.4173, 0.384 , 0.3526])
 Coordinates:
-  * beta     (beta) float64 0.1 0.6 1.1 1.6
-    dalpha   (beta) float64 -5.5 -5.0 -4.5 -4.0
-    beta0    float64 5.6</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>beta</span>: 4</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-fe971161-6e18-4a3f-9879-f873e036bf40' class='xr-array-in' type='checkbox' checked><label for='section-fe971161-6e18-4a3f-9879-f873e036bf40' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.4095 0.3816 0.355 0.3297</span></div><div class='xr-array-data'><pre>array([0.40952796, 0.38160448, 0.35499862, 0.32971037])</pre></div></div></li><li class='xr-section-item'><input id='section-f5a7bb14-1981-4f3e-b7ea-2e04ade941a1' class='xr-section-summary-in' type='checkbox'  checked><label for='section-f5a7bb14-1981-4f3e-b7ea-2e04ade941a1' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>beta</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1 0.6 1.1 1.6</div><input id='attrs-2e6e5366-54b4-4ffc-92b7-7251d53e156e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2e6e5366-54b4-4ffc-92b7-7251d53e156e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-63f70789-9a2f-4ca9-a83b-e091fd537c77' class='xr-var-data-in' type='checkbox'><label for='data-63f70789-9a2f-4ca9-a83b-e091fd537c77' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.1, 0.6, 1.1, 1.6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dalpha</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-5.5 -5.0 -4.5 -4.0</div><input id='attrs-8660e840-d5eb-4c73-b554-164444647f13' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8660e840-d5eb-4c73-b554-164444647f13' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bbe20e41-a221-4e1d-badc-edc700db85d1' class='xr-var-data-in' type='checkbox'><label for='data-bbe20e41-a221-4e1d-badc-edc700db85d1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-5.5, -5. , -4.5, -4. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>beta0</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.6</div><input id='attrs-f1c7c6a3-cccc-4281-9e61-cc8f2aa6dfad' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f1c7c6a3-cccc-4281-9e61-cc8f2aa6dfad' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9875eebb-f5f4-460d-84ca-8ffeaec18f77' class='xr-var-data-in' type='checkbox'><label for='data-9875eebb-f5f4-460d-84ca-8ffeaec18f77' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(5.6)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a0a1ef52-2416-4fc4-9892-8b1db0f6834d' class='xr-section-summary-in' type='checkbox'  ><label for='section-a0a1ef52-2416-4fc4-9892-8b1db0f6834d' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>beta</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-ae8631b9-94f5-4b30-9935-2f8463f3bbc3' class='xr-index-data-in' type='checkbox'/><label for='index-ae8631b9-94f5-4b30-9935-2f8463f3bbc3' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([0.1, 0.6, 1.1, 1.6], dtype=&#x27;float64&#x27;, name=&#x27;beta&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-cc5b8686-7416-49c4-8cd8-74aae72f0b44' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-cc5b8686-7416-49c4-8cd8-74aae72f0b44' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+  * beta     (beta) float64 32B 0.1 0.6 1.1 1.6
+    dalpha   (beta) float64 32B -5.5 -5.0 -4.5 -4.0
+    beta0    float64 8B 5.6</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>beta</span>: 4</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-8976e130-9c26-46a2-85d8-82f9ebba4fae' class='xr-array-in' type='checkbox' checked><label for='section-8976e130-9c26-46a2-85d8-82f9ebba4fae' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.4527 0.4173 0.384 0.3526</span></div><div class='xr-array-data'><pre>array([0.4527, 0.4173, 0.384 , 0.3526])</pre></div></div></li><li class='xr-section-item'><input id='section-4a87d6e5-b75c-4d4a-9f16-0df2f4e20f75' class='xr-section-summary-in' type='checkbox'  checked><label for='section-4a87d6e5-b75c-4d4a-9f16-0df2f4e20f75' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>beta</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1 0.6 1.1 1.6</div><input id='attrs-d68d2b0d-02e4-4dae-8904-c8d7f26b7fc2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d68d2b0d-02e4-4dae-8904-c8d7f26b7fc2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5cb33abf-77a4-4896-92b9-e78ed229c01d' class='xr-var-data-in' type='checkbox'><label for='data-5cb33abf-77a4-4896-92b9-e78ed229c01d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.1, 0.6, 1.1, 1.6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dalpha</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-5.5 -5.0 -4.5 -4.0</div><input id='attrs-7d285c0c-85f6-4941-aad7-493e888dcdb5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7d285c0c-85f6-4941-aad7-493e888dcdb5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0766665e-cd2a-4ad3-ae09-cdc3811cf26b' class='xr-var-data-in' type='checkbox'><label for='data-0766665e-cd2a-4ad3-ae09-cdc3811cf26b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-5.5, -5. , -4.5, -4. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>beta0</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.6</div><input id='attrs-3e4806d6-3e86-473a-9109-7523eecb9a42' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3e4806d6-3e86-473a-9109-7523eecb9a42' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6053d2ab-8dfa-4e29-bf9e-613716e755ef' class='xr-var-data-in' type='checkbox'><label for='data-6053d2ab-8dfa-4e29-bf9e-613716e755ef' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(5.6)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c270d392-e45d-4da1-945a-e169ea5bbe35' class='xr-section-summary-in' type='checkbox'  ><label for='section-c270d392-e45d-4da1-945a-e169ea5bbe35' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>beta</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-2d370623-27a8-4358-b929-5165b2763d4b' class='xr-index-data-in' type='checkbox'/><label for='index-2d370623-27a8-4358-b929-5165b2763d4b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0.1, 0.6, 1.1, 1.6], dtype=&#x27;float64&#x27;, name=&#x27;beta&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-987603dd-0e7e-4362-9c4c-87fe64f176e8' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-987603dd-0e7e-4362-9c4c-87fe64f176e8' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2177,12 +2341,12 @@ dl.xr-attrs {
   stroke: currentColor;
   fill: currentColor;
 }
-</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (beta: 4)&gt;
-array([0.01864663, 0.0154186 , 0.01249734, 0.00988286])
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (beta: 4)&gt; Size: 32B
+array([0.0178, 0.0147, 0.0119, 0.0094])
 Coordinates:
-  * beta     (beta) float64 0.1 0.6 1.1 1.6
-    dalpha   (beta) float64 -5.5 -5.0 -4.5 -4.0
-    beta0    float64 5.6</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>beta</span>: 4</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-90ba78f2-85ba-4756-90fd-87406670da10' class='xr-array-in' type='checkbox' checked><label for='section-90ba78f2-85ba-4756-90fd-87406670da10' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.01865 0.01542 0.0125 0.009883</span></div><div class='xr-array-data'><pre>array([0.01864663, 0.0154186 , 0.01249734, 0.00988286])</pre></div></div></li><li class='xr-section-item'><input id='section-0a7a8dd6-6e95-4513-85a1-7404c259dae8' class='xr-section-summary-in' type='checkbox'  checked><label for='section-0a7a8dd6-6e95-4513-85a1-7404c259dae8' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>beta</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1 0.6 1.1 1.6</div><input id='attrs-71665a3b-222e-4060-849b-9e762abe5e69' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-71665a3b-222e-4060-849b-9e762abe5e69' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f371ea87-6570-4d3e-9b70-04e461792818' class='xr-var-data-in' type='checkbox'><label for='data-f371ea87-6570-4d3e-9b70-04e461792818' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.1, 0.6, 1.1, 1.6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dalpha</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-5.5 -5.0 -4.5 -4.0</div><input id='attrs-3325c934-7af6-4a1a-9118-1c36a729715a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3325c934-7af6-4a1a-9118-1c36a729715a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0cb3b53a-188e-43b0-85aa-108bdce9ed18' class='xr-var-data-in' type='checkbox'><label for='data-0cb3b53a-188e-43b0-85aa-108bdce9ed18' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-5.5, -5. , -4.5, -4. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>beta0</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.6</div><input id='attrs-7f113059-3e82-4e3f-9f44-980321ec10b5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7f113059-3e82-4e3f-9f44-980321ec10b5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-edead676-24f7-4842-bea5-5c8a28b1c54f' class='xr-var-data-in' type='checkbox'><label for='data-edead676-24f7-4842-bea5-5c8a28b1c54f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(5.6)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-22a727e6-07b7-425f-8ea3-6fe931090f1e' class='xr-section-summary-in' type='checkbox'  ><label for='section-22a727e6-07b7-425f-8ea3-6fe931090f1e' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>beta</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-2870f1af-f3f1-44b1-9f1e-8d9425bf5689' class='xr-index-data-in' type='checkbox'/><label for='index-2870f1af-f3f1-44b1-9f1e-8d9425bf5689' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([0.1, 0.6, 1.1, 1.6], dtype=&#x27;float64&#x27;, name=&#x27;beta&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c89bd704-adc9-4e20-b2cc-afbd611105f0' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-c89bd704-adc9-4e20-b2cc-afbd611105f0' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
+  * beta     (beta) float64 32B 0.1 0.6 1.1 1.6
+    dalpha   (beta) float64 32B -5.5 -5.0 -4.5 -4.0
+    beta0    float64 8B 5.6</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>beta</span>: 4</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-0b9e988d-8598-4b65-93cd-cfe7a2fb7cc9' class='xr-array-in' type='checkbox' checked><label for='section-0b9e988d-8598-4b65-93cd-cfe7a2fb7cc9' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0.01782 0.01473 0.01193 0.009434</span></div><div class='xr-array-data'><pre>array([0.0178, 0.0147, 0.0119, 0.0094])</pre></div></div></li><li class='xr-section-item'><input id='section-69413b5c-31e8-40b4-a4ec-9cb241faed53' class='xr-section-summary-in' type='checkbox'  checked><label for='section-69413b5c-31e8-40b4-a4ec-9cb241faed53' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>beta</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1 0.6 1.1 1.6</div><input id='attrs-0a4bedb8-d1c0-4a48-972e-c6f117a7bc8a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0a4bedb8-d1c0-4a48-972e-c6f117a7bc8a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-946c9b02-bfa7-4461-b3ce-1663a12a71d8' class='xr-var-data-in' type='checkbox'><label for='data-946c9b02-bfa7-4461-b3ce-1663a12a71d8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.1, 0.6, 1.1, 1.6])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dalpha</span></div><div class='xr-var-dims'>(beta)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-5.5 -5.0 -4.5 -4.0</div><input id='attrs-77f4dd9e-bba0-4e1a-80c8-c2f8a0b758a6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-77f4dd9e-bba0-4e1a-80c8-c2f8a0b758a6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-149eed29-3ea0-4760-a979-fa033eb8e9c7' class='xr-var-data-in' type='checkbox'><label for='data-149eed29-3ea0-4760-a979-fa033eb8e9c7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-5.5, -5. , -4.5, -4. ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>beta0</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.6</div><input id='attrs-f46a283b-57c3-4b60-913e-b32babe69197' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f46a283b-57c3-4b60-913e-b32babe69197' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2b5b94d5-ebbd-493b-9a30-ed869091422e' class='xr-var-data-in' type='checkbox'><label for='data-2b5b94d5-ebbd-493b-9a30-ed869091422e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(5.6)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-19b74d65-9731-44ff-9077-fc10790cc56f' class='xr-section-summary-in' type='checkbox'  ><label for='section-19b74d65-9731-44ff-9077-fc10790cc56f' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>beta</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-380347bf-7b74-42ea-83d3-c7ded27fd5f5' class='xr-index-data-in' type='checkbox'/><label for='index-380347bf-7b74-42ea-83d3-c7ded27fd5f5' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0.1, 0.6, 1.1, 1.6], dtype=&#x27;float64&#x27;, name=&#x27;beta&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-19cd204e-d0df-4b6e-99e1-096cb2b7ceb3' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-19cd204e-d0df-4b6e-99e1-096cb2b7ceb3' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 <p>To demonstrate how easy it is to try extrapolations at different orders and compare to our analytical test system, we will loop over different numbers of samples (in sets randomly drawn from the data we generated earlier) and extrapolation orders and compare the performance of extrapolation and perturbation to the analytical result.</p>
 <div class="cell docutils container">
@@ -2205,7 +2369,7 @@ Coordinates:
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;True extrapolation coefficients: </span><span class="si">{</span><span class="n">trueDerivs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nsampvals</span><span class="p">):</span>
-    <span class="n">thisinds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xdata</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">thisinds</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xdata</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># Get parameters for extrapolation model with this data by training it - the parameters are the derivatives</span>
     <span class="n">xem</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">factory_extrapmodel</span><span class="p">(</span>
@@ -2257,21 +2421,19 @@ Coordinates:
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True extrapolation coefficients: [ 0.17485984 -0.02816239  0.00763547 -0.00229234  0.00043704  0.00025699
- -0.0004418 ]
-	 With N_configs =     10: [ 1.72711180e-01 -4.67574875e-02  1.19839411e-01  2.00450166e+00
- -2.95249864e+01 -2.73003740e+02  1.43603779e+04]
-	 With N_configs =    100: [ 1.75730944e-01 -2.36839313e-02  2.78780576e-02  2.16307341e-01
- -2.87217502e+00 -4.53265508e+00  4.55304951e+02]
-	 With N_configs =   1000: [ 1.74613243e-01 -2.72285512e-02  1.16286057e-02 -2.09961731e-03
-  2.53303757e-01  6.90784445e+00 -6.60468204e+01]
-	 With N_configs =  10000: [ 1.74910814e-01 -2.82774129e-02  6.00242249e-03  2.88947219e-02
-  3.00623500e-01 -1.10390770e+01 -6.15095866e+01]
-	 With N_configs = 100000: [ 1.74842527e-01 -2.81443627e-02  5.31361467e-03 -2.26751352e-04
-  9.03767657e-03 -5.07809354e-01  9.17689391e+00]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True extrapolation coefficients: [ 0.1749 -0.0282  0.0076 -0.0023  0.0004  0.0003 -0.0004]
+	 With N_configs =     10: [ 1.7514e-01 -1.6838e-02  5.7698e-02 -9.1330e-02 -2.8572e+00  5.4054e+01
+ -2.4043e+02]
+	 With N_configs =    100: [ 1.7533e-01 -2.4669e-02  5.8247e-02  1.8898e-01 -6.3072e+00  3.1714e+01
+  1.0259e+03]
+	 With N_configs =   1000: [ 1.7476e-01 -2.8602e-02  8.0187e-03  7.5768e-03  8.5724e-01  2.5574e+01
+ -3.4636e+02]
+	 With N_configs =  10000: [ 1.7487e-01 -2.8687e-02  6.2837e-03  4.7795e-02 -7.1003e-01  2.6718e+00
+ -5.6026e+01]
+	 With N_configs = 100000: [ 0.1748 -0.0282  0.0078 -0.0049 -0.1045  0.4246 -0.0662]
 </pre></div>
 </div>
-<img alt="../../../_images/1f881b0673eee0d7025f22a74b86e849b274a27b55a003d2e35c0513cf41f5a1.png" src="../../../_images/1f881b0673eee0d7025f22a74b86e849b274a27b55a003d2e35c0513cf41f5a1.png" />
+<img alt="../../../_images/5fd3e349cea2463e051166f8e8ab213a389c3b82c0c7d910f5984f3f4d7c0b3e.png" src="../../../_images/5fd3e349cea2463e051166f8e8ab213a389c3b82c0c7d910f5984f3f4d7c0b3e.png" />
 </div>
 </div>
 <p>In each of the figures, the true behavior is shown as a black dashed line, the analytical result (infinite sampling) for each order of extrapolation is shown as a red solid line and the results with 10, 100, 1000, … 100000 randomly sampled configurations are shown with purple (fewer samples) to green (more samples) circles. Perturbation works close to the reference temperature, but saturates far away. With more samples, it works further out, but the increases in accuracy are marginal. First order extrapolation quickly converges to the infinite sampling limit while second order takes more sampling to do so. The actual coefficients at each order of extrapolation are printed below. Since perturbation essentially refuses to provide an estimate past a certain distance in <span class="math notranslate nohighlight">\(\beta\)</span>, it is not reliable some distance out. Both first and second order extrapolation essentially get lucky here and remain highly accurate over very large temperature ranges. For higher order extrapolation, the analytical, infinite sampling result matches very closely with the true temperature dependence of <span class="math notranslate nohighlight">\(\langle x \rangle\)</span>. However, the finite-sampling results are in practice very poor due to difficulties in accurately estimating the higher-order moments of the potential energy distribution. The higher orders are actually quite accurate (if you try zooming in) close to the point we’re extrapolating from, but the error grows very quickly as we move further away.</p>
@@ -2283,11 +2445,10 @@ Coordinates:
 
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="../../thermoextrap.html"
@@ -2307,15 +2468,14 @@ Coordinates:
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -2333,9 +2493,10 @@ By William P. Krekelberg
   
   <div class="footer-item">
     
+
   <p class="copyright">
     
-      © Copyright 2021, William P. Krekelberg.
+      © Copyright 2020, William P. Krekelberg.
       <br/>
     
   </p>
@@ -2344,7 +2505,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-08-17.
+  Last updated on 2024-03-15.
   <br/>
 </p>
   </div>
@@ -2362,8 +2523,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>

@@ -1,15 +1,14 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Base classes &#8212; thermoextrap 0.4.1.dev11+g5663a30.d20230714 documentation</title>
+    <title>Base classes &#8212; thermoextrap v0.5.0 documentation</title>
   
   
   
@@ -19,47 +18,47 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/documentation_options.js?v=91ffe994"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/api-baseclasses';</script>
     <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
     <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
     <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
-    <script src="../_static/js/leave_notice.js"></script>
+    <script src="../_static/js/leave_notice.js?v=133c5535"></script>
     <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/api-baseclasses';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="License" href="../license.html" />
+    <link rel="next" title="Random number generator (random)" href="api-random.html" />
     <link rel="prev" title="GPR for ideal gas (ig_active)" href="generated/thermoextrap.gpr_active.ig_active.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2024-03-15"/>
   </head>
   
   
@@ -67,7 +66,15 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -102,11 +109,14 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -121,6 +131,7 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -129,10 +140,22 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.4.1.dev11+g5663a30.d20230714 documentation</p>
+  
+    <p class="title logo__title">thermoextrap v0.5.0 documentation</p>
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -144,11 +167,11 @@
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/index.html">User guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../examples/usage/basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../examples/usage/basic/Data_Organization.html">Data Organization</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../examples/thermoextrap.html">Temperature Extrapolation/interpolation</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../examples/usage/basic/Temperature_Extrap_Case1.html">Temperature indepent average observable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/usage/basic/Temperature_Extrap_Case1.html">Temperature independent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/usage/basic/Temperature_Extrap_Case2.html">Temperature dependent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/usage/basic/Temperature_Extrap_Case3.html">Temperature independent negative logarithm of average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../examples/usage/basic/Temperature_Extrap_Case4.html">Temperature dependent negative logarithm of average observable</a></li>
@@ -168,28 +191,147 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
 <li class="toctree-l2 has-children"><a class="reference internal" href="api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l3"><a class="reference internal" href="generated/thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l3"><a class="reference internal" href="generated/thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
 </ul>
 </li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Base classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api-random.html">Random number generator (<code class="xref py py-mod docutils literal notranslate"><span class="pre">random</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="simple">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../py-modindex.html">Module Index</a></li>
 </ul>
 </li>
 </ul>
@@ -345,24 +487,28 @@
 </button>
 
 
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script>
+
 
 <script>
 document.write(`
   <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -378,6 +524,94 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.asdict"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.new_like"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.assign"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.set_params"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.set_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.PiecewiseMixin"><code class="docutils literal notranslate"><span class="pre">PiecewiseMixin</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymDerivBase"><code class="docutils literal notranslate"><span class="pre">SymDerivBase</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase"><code class="docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase.deriv_args"><code class="docutils literal notranslate"><span class="pre">SymFuncBase.deriv_args()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase.fdiff"><code class="docutils literal notranslate"><span class="pre">SymFuncBase.fdiff()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase.eval"><code class="docutils literal notranslate"><span class="pre">SymFuncBase.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData"><code class="docutils literal notranslate"><span class="pre">AbstractData</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.meta"><code class="docutils literal notranslate"><span class="pre">AbstractData.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.central"><code class="docutils literal notranslate"><span class="pre">AbstractData.central</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.derivs_args"><code class="docutils literal notranslate"><span class="pre">AbstractData.derivs_args</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.xalpha"><code class="docutils literal notranslate"><span class="pre">AbstractData.xalpha</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.asdict"><code class="docutils literal notranslate"><span class="pre">AbstractData.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.assign"><code class="docutils literal notranslate"><span class="pre">AbstractData.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.new_like"><code class="docutils literal notranslate"><span class="pre">AbstractData.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.set_params"><code class="docutils literal notranslate"><span class="pre">AbstractData.set_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.dxduave"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.dxduave</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.umom_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.umom_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xmom_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xmom_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.rec_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.rec_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.deriv_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.deriv_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.central"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.central</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.x_is_u"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.x_is_u</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.order"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.order</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.values"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.values</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.rmom"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.rmom()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.cmom"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.cmom()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xu"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xu</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.u"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.u</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xave"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xave</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.dxdu"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.dxdu</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.du"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.du</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.u_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.u_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xu_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xu_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xave_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xave_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.du_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.du_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.dxdu_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.dxdu_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.derivs_args"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.derivs_args</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.asdict"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.assign"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.meta"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.new_like"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.set_params"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.set_params()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xalpha"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xalpha</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase"><code class="docutils literal notranslate"><span class="pre">DataValuesBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.uv"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.uv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.xv"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.xv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.order"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.order</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.rec_dim"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.rec_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.umom_dim"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.umom_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.deriv_dim"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.deriv_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.skipna"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.skipna</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.chunk"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.chunk</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.compute"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.compute</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.build_aves_kws"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.build_aves_kws</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.x_is_u"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.x_is_u</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.from_vals"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.from_vals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.central"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.central</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.resample"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.resample()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.asdict"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.assign"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.derivs_args"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.derivs_args</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.meta"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.new_like"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.set_params"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.set_params()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.xalpha"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.xalpha</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -385,14 +619,14 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="base-classes">
-<h1>Base classes<a class="headerlink" href="#base-classes" title="Permalink to this heading">#</a></h1>
+<h1>Base classes<a class="headerlink" href="#base-classes" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.core._attrs_utils.MyAttrsMixin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.core._attrs_utils.</span></span><span class="sig-name descname"><span class="pre">MyAttrsMixin</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L80-L195"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.core._attrs_utils.</span></span><span class="sig-name descname"><span class="pre">MyAttrsMixin</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L71-L182"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Baseclass for adding some sugar to attrs.derived classes.</p>
 <p><strong>Methods:</strong></p>
 <table class="autosummary longtable table autosummary">
@@ -413,13 +647,13 @@ document.write(`
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.core._attrs_utils.MyAttrsMixin.asdict">
-<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L84-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.asdict" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L75-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.asdict" title="Link to this definition">#</a></dt>
 <dd><p>Convert object to dictionary.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.core._attrs_utils.MyAttrsMixin.new_like">
-<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L88-L97"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.new_like" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L79-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.new_like" title="Link to this definition">#</a></dt>
 <dd><p>Create a new object with optional parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -430,13 +664,13 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.core._attrs_utils.MyAttrsMixin.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L99-L101"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.assign" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L90-L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.assign" title="Link to this definition">#</a></dt>
 <dd><p>Alias to <a class="reference internal" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.new_like" title="thermoextrap.core._attrs_utils.MyAttrsMixin.new_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">new_like()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.core._attrs_utils.MyAttrsMixin.set_params">
-<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L103-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.set_params" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L94-L103"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.set_params" title="Link to this definition">#</a></dt>
 <dd><p>Set parameters of self, and return self (for chaining).</p>
 </dd></dl>
 
@@ -444,24 +678,24 @@ document.write(`
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.models.PiecewiseMixin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.models.</span></span><span class="sig-name descname"><span class="pre">PiecewiseMixin</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L714-L741"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.PiecewiseMixin" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.models.</span></span><span class="sig-name descname"><span class="pre">PiecewiseMixin</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L719-L745"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.PiecewiseMixin" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Provide methods for Piecewise state collection.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.models.SymDerivBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.models.</span></span><span class="sig-name descname"><span class="pre">SymDerivBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L81-L129"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymDerivBase" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.models.</span></span><span class="sig-name descname"><span class="pre">SymDerivBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L90-L138"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymDerivBase" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Base class for working with recursive derivatives in expansions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>func</strong> (<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.function.Function" title="(in SymPy v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a>) – Function to differentiate.  This should (most likely) be an instance
 of <a class="reference internal" href="#thermoextrap.models.SymFuncBase" title="thermoextrap.models.SymFuncBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.models.SymFuncBase</span></code></a></p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Symbol</span></code></a>) – Arguments to func</p></li>
-<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.12)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
-<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.12)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Symbol</span></code></a>) – Arguments to func</p></li>
+<li><p><strong>expand</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, apply <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr.expand" title="(in SymPy v1.12)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand()</span></code></a></p></li>
+<li><p><strong>post_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>) – Transformation of base function.
 For example, <cite>post_fuc = -sympy.log</cite> is equivalent to passing <cite>minus_log=True</cite>
 If a string, then apply the following standard functions</p>
 <ul>
@@ -476,7 +710,7 @@ If a string, then apply the following standard functions</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.models.SymFuncBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.models.</span></span><span class="sig-name descname"><span class="pre">SymFuncBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L42-L78"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.models.</span></span><span class="sig-name descname"><span class="pre">SymFuncBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L48-L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.function.Function" title="(in SymPy v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a></p>
 <p>Base class to define a sympy function for user defined deriatives.</p>
 <div class="admonition seealso">
@@ -499,7 +733,7 @@ If a string, then apply the following standard functions</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.models.SymFuncBase.deriv_args">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L53-L64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase.deriv_args" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deriv_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L59-L71"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase.deriv_args" title="Link to this definition">#</a></dt>
 <dd><p>Symbol arguments of function.</p>
 <p>This is used by Data class to create a ‘lambdfied’ callable function.</p>
 <div class="admonition seealso">
@@ -510,13 +744,13 @@ If a string, then apply the following standard functions</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.models.SymFuncBase.fdiff">
-<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L66-L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase.fdiff" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">fdiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L73-L76"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase.fdiff" title="Link to this definition">#</a></dt>
 <dd><p>Derivative of function.  This will be used by <a class="reference internal" href="#thermoextrap.models.SymDerivBase" title="thermoextrap.models.SymDerivBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">thermoextrap.models.SymDerivBase</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.models.SymFuncBase.eval">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L70-L78"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase.eval" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/models.py#L78-L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.models.SymFuncBase.eval" title="Link to this definition">#</a></dt>
 <dd><p>Evaluate function.</p>
 <p>We use the convention of passing in <cite>beta=’None’</cite> to evaluate the
 function to an indexed variable.</p>
@@ -526,7 +760,7 @@ function to an indexed variable.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.data.</span></span><span class="sig-name descname"><span class="pre">AbstractData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L248-L300"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.data.</span></span><span class="sig-name descname"><span class="pre">AbstractData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L243-L295"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#thermoextrap.core._attrs_utils.MyAttrsMixin" title="thermoextrap.core._attrs_utils.MyAttrsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MyAttrsMixin</span></code></a></p>
 <p>Abstract class for data.</p>
 <p><strong>Attributes:</strong></p>
@@ -565,44 +799,44 @@ function to an indexed variable.</p>
 </table>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.meta">
-<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.meta" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.meta" title="Link to this definition">#</a></dt>
 <dd><p>Callback</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.central">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">central</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.central" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">central</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.central" title="Link to this definition">#</a></dt>
 <dd><p>Whether central (True) or raw (False) moments are used.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.derivs_args">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">derivs_args</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.derivs_args" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">derivs_args</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.derivs_args" title="Link to this definition">#</a></dt>
 <dd><p>Sequence of arguments to derivative calculation function.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.xalpha">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xalpha</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.xalpha" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xalpha</span></span><a class="headerlink" href="#thermoextrap.data.AbstractData.xalpha" title="Link to this definition">#</a></dt>
 <dd><p>Whether X has explicit dependence on <cite>alpha</cite>.</p>
 <p>That is, if <cite>self.deriv_dim</cite> is not <cite>None</cite></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.asdict">
-<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L84-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.asdict" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L75-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.asdict" title="Link to this definition">#</a></dt>
 <dd><p>Convert object to dictionary.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L99-L101"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.assign" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L90-L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.assign" title="Link to this definition">#</a></dt>
 <dd><p>Alias to <a class="reference internal" href="#thermoextrap.data.AbstractData.new_like" title="thermoextrap.data.AbstractData.new_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">new_like()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.new_like">
-<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L88-L97"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.new_like" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L79-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.new_like" title="Link to this definition">#</a></dt>
 <dd><p>Create a new object with optional parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -613,7 +847,7 @@ function to an indexed variable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.AbstractData.set_params">
-<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L103-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.set_params" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L94-L103"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.AbstractData.set_params" title="Link to this definition">#</a></dt>
 <dd><p>Set parameters of self, and return self (for chaining).</p>
 </dd></dl>
 
@@ -621,24 +855,24 @@ function to an indexed variable.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.data.</span></span><span class="sig-name descname"><span class="pre">DataCentralMomentsBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dxduave</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'umom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xmom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_is_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L969-L1128"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.data.</span></span><span class="sig-name descname"><span class="pre">DataCentralMomentsBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dxduave</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'umom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xmom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">central</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_is_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L963-L1119"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#thermoextrap.data.AbstractData" title="thermoextrap.data.AbstractData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractData</span></code></a></p>
 <p>Data object based on central co-moments array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dxduave</strong> (<a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xCentralMoments</span></code></a>) – Central moments object.</p></li>
-<li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
-<li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
-<li><p><strong>xmom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'xmom'</span></code>) – Name of dimension for moments of observable <cite>x</cite>.</p></li>
-<li><p><strong>deriv_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – if deriv_dim is a string, then this is the name of the derivative dimension
+<li><p><strong>dxduave</strong> (<a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy vv0.8.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xCentralMoments</span></code></a>) – Central moments object.</p></li>
+<li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.12)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
+<li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
+<li><p><strong>xmom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'xmom'</span></code>) – Name of dimension for moments of observable <cite>x</cite>.</p></li>
+<li><p><strong>deriv_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – if deriv_dim is a string, then this is the name of the derivative dimension
 and xarray objects will have a derivative</p></li>
-<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
-<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
+<li><p><strong>central</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If True, Use central moments.  Otherwise, use raw moments.</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
 this can also be used to override things like derivs_args.
 Values passed through method <cite>resample_meta</cite></p></li>
-<li><p><strong>x_is_u</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, treat <cite>xv = uv</cite> and do adjust u/du accordingly</p></li>
+<li><p><strong>x_is_u</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, treat <cite>xv = uv</cite> and do adjust u/du accordingly</p></li>
 </ul>
 </dd>
 </dl>
@@ -646,7 +880,7 @@ Values passed through method <cite>resample_meta</cite></p></li>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMomentsBase.dxduave" title="thermoextrap.data.DataCentralMomentsBase.dxduave"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dxduave</span></code></a></p></td>
-<td><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p></td>
+<td><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy vv0.8.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.data.DataCentralMomentsBase.umom_dim" title="thermoextrap.data.DataCentralMomentsBase.umom_dim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">umom_dim</span></code></a></p></td>
 <td><p>Energy moment dimension</p></td>
@@ -738,162 +972,162 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </table>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.dxduave">
-<span class="sig-name descname"><span class="pre">dxduave</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.dxduave" title="Permalink to this definition">#</a></dt>
-<dd><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy v0.7.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p>
+<span class="sig-name descname"><span class="pre">dxduave</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.dxduave" title="Link to this definition">#</a></dt>
+<dd><p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments" title="(in cmomy vv0.8.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">cmomy.xCentralMoments</span></code></a> object</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.umom_dim">
-<span class="sig-name descname"><span class="pre">umom_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.umom_dim" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">umom_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.umom_dim" title="Link to this definition">#</a></dt>
 <dd><p>Energy moment dimension</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.xmom_dim">
-<span class="sig-name descname"><span class="pre">xmom_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xmom_dim" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">xmom_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xmom_dim" title="Link to this definition">#</a></dt>
 <dd><p>Overvable moment dimension</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.rec_dim">
-<span class="sig-name descname"><span class="pre">rec_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.rec_dim" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">rec_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.rec_dim" title="Link to this definition">#</a></dt>
 <dd><p>Records dimension</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.deriv_dim">
-<span class="sig-name descname"><span class="pre">deriv_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.deriv_dim" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">deriv_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.deriv_dim" title="Link to this definition">#</a></dt>
 <dd><p>Derivative with respect to alpha dimension</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.central">
-<span class="sig-name descname"><span class="pre">central</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.central" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">central</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.central" title="Link to this definition">#</a></dt>
 <dd><p>Whether central or raw moments are used</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.x_is_u">
-<span class="sig-name descname"><span class="pre">x_is_u</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.x_is_u" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">x_is_u</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.x_is_u" title="Link to this definition">#</a></dt>
 <dd><p>Whether observable <cite>x</cite> is same as energy <cite>u</cite></p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.order">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.order" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.order" title="Link to this definition">#</a></dt>
 <dd><p>Order of expansion.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.values">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">values</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.values" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">values</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.values" title="Link to this definition">#</a></dt>
 <dd><p>Data underlying <a class="reference internal" href="#thermoextrap.data.DataCentralMomentsBase.dxduave" title="thermoextrap.data.DataCentralMomentsBase.dxduave"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dxduave</span></code></a>.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.values" title="(in cmomy v0.7.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.values</span></code></a></p>
+<p><a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.xCentralMoments.html#cmomy.xCentralMoments.values" title="(in cmomy vv0.8.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmomy.xCentralMoments.values</span></code></a></p>
 </div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.rmom">
-<span class="sig-name descname"><span class="pre">rmom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1022-L1025"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.rmom" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">rmom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1015-L1018"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.rmom" title="Link to this definition">#</a></dt>
 <dd><p>Raw co-moments.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.cmom">
-<span class="sig-name descname"><span class="pre">cmom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1027-L1030"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.cmom" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">cmom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1020-L1023"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.cmom" title="Link to this definition">#</a></dt>
 <dd><p>Central co-moments.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.xu">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xu</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xu" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">xu</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1025-L1028"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xu" title="Link to this definition">#</a></dt>
 <dd><p>Averages of form <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">*</span> <span class="pre">u</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.u">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.u" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">u</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1030-L1040"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.u" title="Link to this definition">#</a></dt>
 <dd><p>Averages of form <code class="docutils literal notranslate"><span class="pre">u</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.xave">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xave</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xave" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">xave</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1042-L1047"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xave" title="Link to this definition">#</a></dt>
 <dd><p>Averages of form observable <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.dxdu">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dxdu</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.dxdu" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">dxdu</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1049-L1052"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.dxdu" title="Link to this definition">#</a></dt>
 <dd><p>Averages of form <code class="docutils literal notranslate"><span class="pre">dx</span> <span class="pre">*</span> <span class="pre">dx</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.du">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">du</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.du" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">du</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1054-L1064"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.du" title="Link to this definition">#</a></dt>
 <dd><p>Averages of <code class="docutils literal notranslate"><span class="pre">du</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.u_selector">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u_selector</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.u_selector" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">u_selector</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1066-L1071"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.u_selector" title="Link to this definition">#</a></dt>
 <dd><p>Indexer for <code class="docutils literal notranslate"><span class="pre">u_selector[n]</span> <span class="pre">=</span> <span class="pre">u</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.xu_selector">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xu_selector</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xu_selector" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">xu_selector</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1073-L1078"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xu_selector" title="Link to this definition">#</a></dt>
 <dd><p>Indexer for <code class="docutils literal notranslate"><span class="pre">xu_select[n]</span> <span class="pre">=</span> <span class="pre">x</span> <span class="pre">*</span> <span class="pre">u</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.xave_selector">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xave_selector</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xave_selector" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">xave_selector</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1080-L1085"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xave_selector" title="Link to this definition">#</a></dt>
 <dd><p>Selector for <code class="docutils literal notranslate"><span class="pre">xave</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.du_selector">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">du_selector</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.du_selector" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">du_selector</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1087-L1092"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.du_selector" title="Link to this definition">#</a></dt>
 <dd><p>Selector for <code class="docutils literal notranslate"><span class="pre">du_selector[n]</span> <span class="pre">=</span> <span class="pre">du</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.dxdu_selector">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dxdu_selector</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.dxdu_selector" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">dxdu_selector</span></span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L1094-L1099"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.dxdu_selector" title="Link to this definition">#</a></dt>
 <dd><p>Selector for <code class="docutils literal notranslate"><span class="pre">dxdu_selector[n]</span> <span class="pre">=</span> <span class="pre">dx</span> <span class="pre">*</span> <span class="pre">du</span> <span class="pre">**</span> <span class="pre">n</span></code>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.derivs_args">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">derivs_args</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.derivs_args" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">derivs_args</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.derivs_args" title="Link to this definition">#</a></dt>
 <dd><p>Arguments to be passed to derivative function.</p>
 <p>For example, <code class="docutils literal notranslate"><span class="pre">derivs(*self.derivs_args)</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.asdict">
-<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L84-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.asdict" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L75-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.asdict" title="Link to this definition">#</a></dt>
 <dd><p>Convert object to dictionary.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L99-L101"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.assign" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L90-L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.assign" title="Link to this definition">#</a></dt>
 <dd><p>Alias to <a class="reference internal" href="#thermoextrap.data.DataCentralMomentsBase.new_like" title="thermoextrap.data.DataCentralMomentsBase.new_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">new_like()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.meta">
-<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.meta" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.meta" title="Link to this definition">#</a></dt>
 <dd><p>Callback</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.new_like">
-<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L88-L97"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.new_like" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L79-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.new_like" title="Link to this definition">#</a></dt>
 <dd><p>Create a new object with optional parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -904,13 +1138,13 @@ Values passed through method <cite>resample_meta</cite></p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.set_params">
-<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L103-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.set_params" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L94-L103"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.set_params" title="Link to this definition">#</a></dt>
 <dd><p>Set parameters of self, and return self (for chaining).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.DataCentralMomentsBase.xalpha">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xalpha</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xalpha" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xalpha</span></span><a class="headerlink" href="#thermoextrap.data.DataCentralMomentsBase.xalpha" title="Link to this definition">#</a></dt>
 <dd><p>Whether X has explicit dependence on <cite>alpha</cite>.</p>
 <p>That is, if <cite>self.deriv_dim</cite> is not <cite>None</cite></p>
 </dd></dl>
@@ -919,27 +1153,27 @@ Values passed through method <cite>resample_meta</cite></p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.data.</span></span><span class="sig-name descname"><span class="pre">DataValuesBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'umom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_aves_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_is_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L307-L525"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.data.</span></span><span class="sig-name descname"><span class="pre">DataValuesBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'umom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_aves_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_is_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L298-L524"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#thermoextrap.data.AbstractData" title="thermoextrap.data.AbstractData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractData</span></code></a></p>
 <p>Base class to work with data based on values (non-cmomy).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.7.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.7.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
-<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
-<li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
-<li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
-<li><p><strong>deriv_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – if deriv_dim is a string, then this is the name of the derivative dimension
+<li><p><strong>uv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2024.2.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of u (energy)</p></li>
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2024.2.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
+<li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.12)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
+<li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
+<li><p><strong>deriv_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – if deriv_dim is a string, then this is the name of the derivative dimension
 and xarray objects will have a derivative</p></li>
-<li><p><strong>skipna</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, skip nan values</p></li>
-<li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
-<li><p><strong>compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – whether to perform compute step on xarray outputs</p></li>
-<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
+<li><p><strong>skipna</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, skip nan values</p></li>
+<li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
+<li><p><strong>compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – whether to perform compute step on xarray outputs</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
 this can also be used to override things like derivs_args.
 Values passed through method <cite>resample_meta</cite></p></li>
-<li><p><strong>x_is_u</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, treat <cite>xv = uv</cite> and do adjust u/du accordingly</p></li>
+<li><p><strong>x_is_u</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, treat <cite>xv = uv</cite> and do adjust u/du accordingly</p></li>
 </ul>
 </dd>
 </dl>
@@ -1018,94 +1252,94 @@ Values passed through method <cite>resample_meta</cite></p></li>
 </table>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.uv">
-<span class="sig-name descname"><span class="pre">uv</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.uv" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">uv</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.uv" title="Link to this definition">#</a></dt>
 <dd><p>Energy values</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.xv">
-<span class="sig-name descname"><span class="pre">xv</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.xv" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">xv</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.xv" title="Link to this definition">#</a></dt>
 <dd><p>Obervable values</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.order">
-<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.order" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.order" title="Link to this definition">#</a></dt>
 <dd><p>Expansion order</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.rec_dim">
-<span class="sig-name descname"><span class="pre">rec_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.rec_dim" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">rec_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.rec_dim" title="Link to this definition">#</a></dt>
 <dd><p>Records dimension</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.umom_dim">
-<span class="sig-name descname"><span class="pre">umom_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.umom_dim" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">umom_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.umom_dim" title="Link to this definition">#</a></dt>
 <dd><p>Energy moments dimension</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.deriv_dim">
-<span class="sig-name descname"><span class="pre">deriv_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.deriv_dim" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">deriv_dim</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.deriv_dim" title="Link to this definition">#</a></dt>
 <dd><p>Derivative dimension</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.skipna">
-<span class="sig-name descname"><span class="pre">skipna</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.skipna" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">skipna</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.skipna" title="Link to this definition">#</a></dt>
 <dd><p>Whether to skip NAN values</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.chunk">
-<span class="sig-name descname"><span class="pre">chunk</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.chunk" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">chunk</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.chunk" title="Link to this definition">#</a></dt>
 <dd><p>Whether to chunk the xarray objects</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.compute" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.compute" title="Link to this definition">#</a></dt>
 <dd><p>Whether to compute the chunked data</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.build_aves_kws">
-<span class="sig-name descname"><span class="pre">build_aves_kws</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.build_aves_kws" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">build_aves_kws</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.build_aves_kws" title="Link to this definition">#</a></dt>
 <dd><p>Arguments to building the averages</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.x_is_u">
-<span class="sig-name descname"><span class="pre">x_is_u</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.x_is_u" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">x_is_u</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.x_is_u" title="Link to this definition">#</a></dt>
 <dd><p>Whether the observable <cite>x</cite> is the same as energy <cite>u</cite></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.from_vals">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_vals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'umom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rep_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rep'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_aves_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_is_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L378-L444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.from_vals" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_vals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umom_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'umom'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rep_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rep'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deriv_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_aves_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_is_u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L371-L436"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.from_vals" title="Link to this definition">#</a></dt>
 <dd><p>Constructor from arrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>uv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span class="xref std std-term">array-like</span></a>) – raw values of u (energy)
+<li><p><strong>uv</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.26)"><span class="xref std std-term">array-like</span></a>) – raw values of u (energy)
 if not DataArray, wrap with <cite>xrwrap_uv</cite></p></li>
-<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2023.7.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
+<li><p><strong>xv</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2024.2.1.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code></a>) – raw values of x (observable)
 if not DataArray, wrap with <cite>xrwrap_xv</cite></p></li>
-<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
-<li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
-<li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
-<li><p><strong>val_dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.11)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Names of extra dimensions</p></li>
-<li><p><strong>deriv_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – if deriv_dim is a string, then this is the name of the derivative dimension
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – maximum order of moments/expansion to calculate</p></li>
+<li><p><strong>rec_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.12)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of dimension for ‘records’, i.e., multiple observations.</p></li>
+<li><p><strong>umom_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">'umom'</span></code>) – Name of dimension for moment of energy <cite>u</cite>.</p></li>
+<li><p><strong>val_dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.12)"><span class="xref std std-term">sequence</span></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Names of extra dimensions</p></li>
+<li><p><strong>deriv_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>) – if deriv_dim is a string, then this is the name of the derivative dimension
 and xarray objects will have a derivative</p></li>
-<li><p><strong>skipna</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, skip nan values</p></li>
-<li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
-<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
+<li><p><strong>skipna</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, skip nan values</p></li>
+<li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – extra meta data/parameters to be carried along with object and child objects.
 if ‘checker’ in meta, then perform a callback of the form meta[‘checker](self, meta)
 this can also be used to override things like derivs_args.
 Values passed through method <cite>resample_meta</cite></p></li>
-<li><p><strong>x_is_u</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, treat <cite>xv = uv</cite> and do adjust u/du accordingly</p></li>
+<li><p><strong>x_is_u</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – if True, treat <cite>xv = uv</cite> and do adjust u/du accordingly</p></li>
 </ul>
 </dd>
 </dl>
@@ -1113,24 +1347,27 @@ Values passed through method <cite>resample_meta</cite></p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.central">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">central</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.central" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">central</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.central" title="Link to this definition">#</a></dt>
 <dd><p>Whether central (True) or raw (False) moments are used.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rep_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rep'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'None'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L453-L525"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.resample" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rep_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rep'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'None'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/data.py#L445-L524"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.resample" title="Link to this definition">#</a></dt>
 <dd><p>Resample object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.25)"><span class="xref std std-term">array</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(nrep,</span> <span class="pre">size)</span></code>.  If passed, create <cite>freq</cite> from indices.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.7.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
-<li><p><strong>nrep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Number of replicates.  Create <cite>freq</cite> with this many replicates.
-See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy v0.7.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
-<li><p><strong>rep_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.11)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of new ‘replicated’ dimension:</p></li>
-<li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
-<li><p><strong>compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – whether to perform compute step on xarray outputs</p></li>
+<li><p><strong>indices</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.26)"><span class="xref std std-term">array</span></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(nrep,</span> <span class="pre">size)</span></code>.  If passed, create <cite>freq</cite> from indices.
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy vv0.8.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a>.</p></li>
+<li><p><strong>nrep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <em>optional</em>) – Number of replicates.  Create <cite>freq</cite> with this many replicates.
+See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.resample.html#cmomy.resample.randsamp_freq" title="(in cmomy vv0.8.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randsamp_freq()</span></code></a></p></li>
+<li><p><strong>rep_dim</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-hashable" title="(in Python v3.12)"><span class="xref std std-term">hashable</span></a>, <em>optional</em>) – Name of new ‘replicated’ dimension:</p></li>
+<li><p><strong>chunk</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – chunking of xarray objects</p></li>
+<li><p><strong>compute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>optional</em>) – whether to perform compute step on xarray outputs</p></li>
+<li><p><strong>meta_kws</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.12)"><span class="xref std std-term">mapping</span></a>, <em>optional</em>) – Optional parameters for meta.</p></li>
+<li><p><strong>rng</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a>, <em>optional</em>) – Random number generator object.
+Defaults to result of <a class="reference external" href="https://pages.nist.gov/cmomy/reference/generated/cmomy.random.html#cmomy.random.default_rng" title="(in cmomy vv0.8.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">cmomy.random.default_rng()</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1138,31 +1375,31 @@ See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/g
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.asdict">
-<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L84-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.asdict" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L75-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.asdict" title="Link to this definition">#</a></dt>
 <dd><p>Convert object to dictionary.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L99-L101"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.assign" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L90-L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.assign" title="Link to this definition">#</a></dt>
 <dd><p>Alias to <a class="reference internal" href="#thermoextrap.data.DataValuesBase.new_like" title="thermoextrap.data.DataValuesBase.new_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">new_like()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.derivs_args">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">derivs_args</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.derivs_args" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">derivs_args</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.derivs_args" title="Link to this definition">#</a></dt>
 <dd><p>Sequence of arguments to derivative calculation function.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.meta">
-<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.meta" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.meta" title="Link to this definition">#</a></dt>
 <dd><p>Callback</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.new_like">
-<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L88-L97"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.new_like" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">new_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L79-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.new_like" title="Link to this definition">#</a></dt>
 <dd><p>Create a new object with optional parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1173,13 +1410,13 @@ See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/g
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.set_params">
-<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L103-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.set_params" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kws</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/core/_attrs_utils.py#L94-L103"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.data.DataValuesBase.set_params" title="Link to this definition">#</a></dt>
 <dd><p>Set parameters of self, and return self (for chaining).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.data.DataValuesBase.xalpha">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xalpha</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.xalpha" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xalpha</span></span><a class="headerlink" href="#thermoextrap.data.DataValuesBase.xalpha" title="Link to this definition">#</a></dt>
 <dd><p>Whether X has explicit dependence on <cite>alpha</cite>.</p>
 <p>That is, if <cite>self.deriv_dim</cite> is not <cite>None</cite></p>
 </dd></dl>
@@ -1194,11 +1431,10 @@ See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/g
 
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="generated/thermoextrap.gpr_active.ig_active.html"
@@ -1210,23 +1446,115 @@ See <a class="reference external" href="https://pages.nist.gov/cmomy/reference/g
       </div>
     </a>
     <a class="right-next"
-       href="../license.html"
+       href="api-random.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">License</p>
+        <p class="prev-next-title">Random number generator (<code class="xref py py-mod docutils literal notranslate"><span class="pre">random</span></code>)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.asdict"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.new_like"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.assign"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.core._attrs_utils.MyAttrsMixin.set_params"><code class="docutils literal notranslate"><span class="pre">MyAttrsMixin.set_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.PiecewiseMixin"><code class="docutils literal notranslate"><span class="pre">PiecewiseMixin</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymDerivBase"><code class="docutils literal notranslate"><span class="pre">SymDerivBase</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase"><code class="docutils literal notranslate"><span class="pre">SymFuncBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase.deriv_args"><code class="docutils literal notranslate"><span class="pre">SymFuncBase.deriv_args()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase.fdiff"><code class="docutils literal notranslate"><span class="pre">SymFuncBase.fdiff()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.models.SymFuncBase.eval"><code class="docutils literal notranslate"><span class="pre">SymFuncBase.eval()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData"><code class="docutils literal notranslate"><span class="pre">AbstractData</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.meta"><code class="docutils literal notranslate"><span class="pre">AbstractData.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.central"><code class="docutils literal notranslate"><span class="pre">AbstractData.central</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.derivs_args"><code class="docutils literal notranslate"><span class="pre">AbstractData.derivs_args</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.xalpha"><code class="docutils literal notranslate"><span class="pre">AbstractData.xalpha</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.asdict"><code class="docutils literal notranslate"><span class="pre">AbstractData.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.assign"><code class="docutils literal notranslate"><span class="pre">AbstractData.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.new_like"><code class="docutils literal notranslate"><span class="pre">AbstractData.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.AbstractData.set_params"><code class="docutils literal notranslate"><span class="pre">AbstractData.set_params()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.dxduave"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.dxduave</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.umom_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.umom_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xmom_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xmom_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.rec_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.rec_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.deriv_dim"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.deriv_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.central"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.central</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.x_is_u"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.x_is_u</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.order"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.order</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.values"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.values</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.rmom"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.rmom()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.cmom"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.cmom()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xu"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xu</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.u"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.u</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xave"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xave</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.dxdu"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.dxdu</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.du"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.du</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.u_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.u_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xu_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xu_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xave_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xave_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.du_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.du_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.dxdu_selector"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.dxdu_selector</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.derivs_args"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.derivs_args</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.asdict"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.assign"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.meta"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.new_like"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.set_params"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.set_params()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataCentralMomentsBase.xalpha"><code class="docutils literal notranslate"><span class="pre">DataCentralMomentsBase.xalpha</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase"><code class="docutils literal notranslate"><span class="pre">DataValuesBase</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.uv"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.uv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.xv"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.xv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.order"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.order</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.rec_dim"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.rec_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.umom_dim"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.umom_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.deriv_dim"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.deriv_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.skipna"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.skipna</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.chunk"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.chunk</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.compute"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.compute</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.build_aves_kws"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.build_aves_kws</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.x_is_u"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.x_is_u</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.from_vals"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.from_vals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.central"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.central</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.resample"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.resample()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.asdict"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.asdict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.assign"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.assign()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.derivs_args"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.derivs_args</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.meta"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.new_like"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.new_like()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.set_params"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.set_params()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.data.DataValuesBase.xalpha"><code class="docutils literal notranslate"><span class="pre">DataValuesBase.xalpha</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
@@ -1244,9 +1572,10 @@ By William P. Krekelberg
   
   <div class="footer-item">
     
+
   <p class="copyright">
     
-      © Copyright 2021, William P. Krekelberg.
+      © Copyright 2020, William P. Krekelberg.
       <br/>
     
   </p>
@@ -1255,7 +1584,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-08-17.
+  Last updated on 2024-03-15.
   <br/>
 </p>
   </div>
@@ -1273,8 +1602,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>

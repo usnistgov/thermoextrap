@@ -1,15 +1,14 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Models for Gaussian process regression (gp_models) &#8212; thermoextrap 0.4.1.dev11+g5663a30.d20230714 documentation</title>
+    <title>Models for Gaussian process regression (gp_models) &#8212; thermoextrap v0.5.0 documentation</title>
   
   
   
@@ -19,49 +18,49 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
-    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
-    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
-    <script src="../../_static/js/leave_notice.js"></script>
-    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
+    <script src="../../_static/documentation_options.js?v=91ffe994"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/generated/thermoextrap.gpr_active.gp_models';</script>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js"></script>
+    <script src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+    <script src="../../_static/js/leave_notice.js?v=133c5535"></script>
+    <script async="async" id="_fed_au_ua_tag" type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-66610693-1&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="GPR utilities (active_utils)" href="thermoextrap.gpr_active.active_utils.html" />
     <link rel="prev" title="Gaussian process regression (gpr_active)" href="../api-gpr.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="2024-03-15"/>
   </head>
   
   
@@ -69,7 +68,15 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -104,11 +111,14 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
-    </nav>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -123,6 +133,7 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
   
 
 <a class="navbar-brand logo" href="../../index.html">
@@ -131,10 +142,22 @@
   
   
   
-    <p class="title logo__title">thermoextrap 0.4.1.dev11+g5663a30.d20230714 documentation</p>
+  
+    <p class="title logo__title">thermoextrap v0.5.0 documentation</p>
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -146,11 +169,11 @@
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">User guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../examples/usage/basic/Data_Organization.html">Data Organization</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/thermoextrap.html">Temperature Extrapolation/interpolation</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/basic/Temperature_Extrap_Case1.html">Temperature indepent average observable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/usage/basic/Temperature_Extrap_Case1.html">Temperature independent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/usage/basic/Temperature_Extrap_Case2.html">Temperature dependent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/usage/basic/Temperature_Extrap_Case3.html">Temperature independent negative logarithm of average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/usage/basic/Temperature_Extrap_Case4.html">Temperature dependent negative logarithm of average observable</a></li>
@@ -170,28 +193,147 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.models.html">General extrapolation/interpolation models (<code class="xref py py-mod docutils literal notranslate"><span class="pre">models</span></code>)</a></li>
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.idealgas.html">Ideal gas reference (<code class="xref py py-mod docutils literal notranslate"><span class="pre">idealgas</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.beta.html">Inverse temperature (beta) extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">beta</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.volume.html">Volume extrapolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume</span></code>)</a></li>
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.volume_idealgas.html">Volume expansion for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">volume_idealgas</span></code>)</a></li>
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.recursive_interp.html">Recursive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">recursive_interp</span></code>)</a></li>
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.adaptive_interp.html">Adaptive interpolation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">adaptive_interp</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
 <li class="toctree-l2"><a class="reference internal" href="thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
+
+
+
+
+
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l3"><a class="reference internal" href="thermoextrap.gpr_active.active_utils.html">GPR utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">active_utils</span></code>)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <li class="toctree-l3"><a class="reference internal" href="thermoextrap.gpr_active.ig_active.html">GPR for ideal gas (<code class="xref py py-mod docutils literal notranslate"><span class="pre">ig_active</span></code>)</a></li>
+
+
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api-baseclasses.html">Base classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api-random.html">Random number generator (<code class="xref py py-mod docutils literal notranslate"><span class="pre">random</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="simple">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../genindex.html">Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../py-modindex.html">Module Index</a></li>
 </ul>
 </li>
 </ul>
@@ -347,24 +489,28 @@
 </button>
 
 
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script>
+
 
 <script>
 document.write(`
   <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -380,6 +526,62 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel.ard"><code class="docutils literal notranslate"><span class="pre">DerivativeKernel.ard</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianNoiseGP"><code class="docutils literal notranslate"><span class="pre">HetGaussianNoiseGP</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.maximum_log_likelihood_objective"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.maximum_log_likelihood_objective()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_f"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.predict_f()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_y"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.predict_y()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_log_density"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.predict_log_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple"><code class="docutils literal notranslate"><span class="pre">HetGaussianSimple</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple.build_scaled_cov_mat"><code class="docutils literal notranslate"><span class="pre">HetGaussianSimple.build_scaled_cov_mat()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.multioutput_multivariate_normal"><code class="docutils literal notranslate"><span class="pre">multioutput_multivariate_normal()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv"><code class="docutils literal notranslate"><span class="pre">HetGaussianDeriv</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat"><code class="docutils literal notranslate"><span class="pre">HetGaussianDeriv.build_scaled_cov_mat()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.maximum_log_likelihood_objective"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.maximum_log_likelihood_objective()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_f"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.predict_f()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_y"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.predict_y()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_log_density"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.predict_log_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.maximum_log_likelihood_objective"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.maximum_log_likelihood_objective()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_f"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.predict_f()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_y"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.predict_y()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_log_density"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.predict_log_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs"><code class="docutils literal notranslate"><span class="pre">ConstantMeanWithDerivs</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs.__call__"><code class="docutils literal notranslate"><span class="pre">ConstantMeanWithDerivs.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs"><code class="docutils literal notranslate"><span class="pre">LinearWithDerivs</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs.__call__"><code class="docutils literal notranslate"><span class="pre">LinearWithDerivs.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc"><code class="docutils literal notranslate"><span class="pre">SympyMeanFunc</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc.__call__"><code class="docutils literal notranslate"><span class="pre">SympyMeanFunc.__call__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -387,10 +589,11 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
-  <span class="target" id="module-thermoextrap.gpr_active.gp_models"></span><section id="models-for-gaussian-process-regression-gp-models">
-<h1>Models for Gaussian process regression (<a class="reference internal" href="#module-thermoextrap.gpr_active.gp_models" title="thermoextrap.gpr_active.gp_models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code></a>)<a class="headerlink" href="#models-for-gaussian-process-regression-gp-models" title="Permalink to this heading">#</a></h1>
+  <section id="models-for-gaussian-process-regression-gp-models">
+<span id="module-thermoextrap.gpr_active.gp_models"></span><h1>Models for Gaussian process regression (<a class="reference internal" href="#module-thermoextrap.gpr_active.gp_models" title="thermoextrap.gpr_active.gp_models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code></a>)<a class="headerlink" href="#models-for-gaussian-process-regression-gp-models" title="Link to this heading">#</a></h1>
+</section>
 <p><strong>Classes:</strong></p>
 <table class="autosummary longtable table autosummary">
 <tbody>
@@ -406,7 +609,7 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple" title="thermoextrap.gpr_active.gp_models.HetGaussianSimple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HetGaussianSimple</span></code></a>(cov[, init_scale])</p></td>
 <td><p>NOTE MAINTAINED, MAY BE OUT OF DATE AND NOT COMPATIBLE.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv" title="thermoextrap.gpr_active.gp_models.HetGaussianDeriv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HetGaussianDeriv</span></code></a>(cov, d_orders[, p, s, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv" title="thermoextrap.gpr_active.gp_models.HetGaussianDeriv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HetGaussianDeriv</span></code></a>(cov, obs_dims[, p, s, ...])</p></td>
 <td><p>Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise variance.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale</span></code></a>(data, kernel)</p></td>
@@ -436,7 +639,7 @@ document.write(`
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.DerivativeKernel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">DerivativeKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel_expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L18-L246"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">DerivativeKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel_expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L26-L258"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/kernels/index.html#gpflow.kernels.Kernel" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code></a></p>
 <p>Creates a differentiable kernel based on a sympy expression.</p>
 <p>Given observations that are tagged with the order of the derivative,
@@ -455,9 +658,9 @@ expression and sorted to guarantee specific ordering when taking derivatives.</p
 <li><p><strong>kernel_expr</strong> (<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code></a>) – Expression for the kernel that can be differentiated - must have at
 least 2 symbols (symbol names should be ‘x1’ and ‘x2’, case insensitive,
 if have only 2).</p></li>
-<li><p><strong>obs_dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of dimensions for observable input (input should be twice this
+<li><p><strong>obs_dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of dimensions for observable input (input should be twice this
 with obs_dims values then obs_dims derivative labels each row)</p></li>
-<li><p><strong>kernel_params</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.11)"><span class="xref std std-term">mapping</span></a>) – A dictionary of kernel parameters that can be optimized by tensorflow
+<li><p><strong>kernel_params</strong> (<a class="reference external" href="https://docs.python.org/3/glossary.html#term-mapping" title="(in Python v3.12)"><span class="xref std std-term">mapping</span></a>) – A dictionary of kernel parameters that can be optimized by tensorflow
 (key should be name, then references list with value then another dict
 with kwargs for gpflow.Parameter, i.e., {‘variance’, [1.0,
 {‘transform’:gpflow.utilities.positive()}]} so if you don’t want to set
@@ -477,7 +680,7 @@ dict, so will mine names from kernel_expr and set all parameters to 1.0.</p></li
 </table>
 <dl class="py property">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.DerivativeKernel.ard">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ard</span></span><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel.ard" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ard</span></span><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel.ard" title="Link to this definition">#</a></dt>
 <dd><p>Whether ARD behavior is active, following gpflow.kernels.Stationary</p>
 </dd></dl>
 
@@ -485,7 +688,7 @@ dict, so will mine names from kernel_expr and set all parameters to 1.0.</p></li
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HetGaussianNoiseGP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HetGaussianNoiseGP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L249-L322"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianNoiseGP" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HetGaussianNoiseGP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L261-L334"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianNoiseGP" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/likelihoods/index.html#gpflow.likelihoods.ScalarLikelihood" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalarLikelihood</span></code></a></p>
 <p>EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!</p>
 <p>Intended to model the noise associated with a GPR model using another GP contained
@@ -501,7 +704,7 @@ used is a Matern52 with separate lengthscales over the different input dimension
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">FullyHeteroscedasticGPR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L325-L467"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">FullyHeteroscedasticGPR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L337-L476"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">GPModel</span></code></a>, <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.InternalDataTrainingLossMixin" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalDataTrainingLossMixin</span></code></a></p>
 <p>EXPERIMENTAL! NOT INTENDED FOR USE, BUT USEFUL FOR FUTURE WORK!</p>
 <p>Implements a fully heteroscedastic GPR model in which the noise is modeled
@@ -533,42 +736,65 @@ or configurations used to calculate the provided value and variance.</p>
 <td><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_y" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_y()</span></code></a> for further details.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_log_density" title="thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_log_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_log_density</span></code></a>(data[, full_cov, ...])</p></td>
-<td><p>Compute the log density of the data at the new data points.</p></td>
+<td><p>Compute the log of the probability density of the data at the new data points.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.maximum_log_likelihood_objective">
-<span class="sig-name descname"><span class="pre">maximum_log_likelihood_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L374-L375"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.maximum_log_likelihood_objective" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">maximum_log_likelihood_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L386-L387"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.maximum_log_likelihood_objective" title="Link to this definition">#</a></dt>
 <dd><p>Objective for maximum likelihood estimation. Should be maximized. E.g.
 log-marginal likelihood (hyperparameter likelihood) for GPR, or lower
 bound to the log-marginal likelihood (ELBO) for sparse and variational
 GPs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>return</strong> has shape [].</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_f">
-<span class="sig-name descname"><span class="pre">predict_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L400-L426"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_f" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">predict_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L411-L437"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_f" title="Link to this definition">#</a></dt>
 <dd><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_f" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_f()</span></code></a> for further details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_y">
-<span class="sig-name descname"><span class="pre">predict_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L428-L448"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_y" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">predict_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L439-L458"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_y" title="Link to this definition">#</a></dt>
 <dd><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_y" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_y()</span></code></a> for further details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_log_density">
-<span class="sig-name descname"><span class="pre">predict_log_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L450-L467"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_log_density" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute the log density of the data at the new data points.</p>
+<span class="sig-name descname"><span class="pre">predict_log_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L460-L476"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_log_density" title="Link to this definition">#</a></dt>
+<dd><p>Compute the log of the probability density of the data at the new data points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <ul class="simple">
+<li><p><strong>data[0]</strong> has shape [<em>batch</em>…, <em>N</em>, <em>D</em>].</p></li>
+<li><p><strong>data[1]</strong> has shape [<em>batch</em>…, <em>N</em>, <em>P</em>].</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>return</strong> has shape [<em>batch</em>…, <em>N</em>].</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HetGaussianSimple">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HetGaussianSimple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L470-L563"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HetGaussianSimple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L479-L567"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/likelihoods/index.html#gpflow.likelihoods.ScalarLikelihood" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalarLikelihood</span></code></a></p>
 <p>NOTE MAINTAINED, MAY BE OUT OF DATE AND NOT COMPATIBLE.</p>
 <p>Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise
@@ -591,7 +817,7 @@ is NxN, each of Y and F should be N.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HetGaussianSimple.build_scaled_cov_mat">
-<span class="sig-name descname"><span class="pre">build_scaled_cov_mat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L513-L515"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple.build_scaled_cov_mat" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">build_scaled_cov_mat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L522-L524"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple.build_scaled_cov_mat" title="Link to this definition">#</a></dt>
 <dd><p>Creates scaled covariance matrix using noise scale parameters.</p>
 </dd></dl>
 
@@ -599,7 +825,7 @@ is NxN, each of Y and F should be N.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.multioutput_multivariate_normal">
-<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">multioutput_multivariate_normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L566-L616"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.multioutput_multivariate_normal" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">multioutput_multivariate_normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L570-L619"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.multioutput_multivariate_normal" title="Link to this definition">#</a></dt>
 <dd><p>Follows gpflow.logdensities.multivariate_normal exactly, but changes reducing sums so
 that multiple outputs with DIFFERENT covariance matrices can be taken into account.
 This still assumes that data in different columns of x are independent, but allows for
@@ -612,15 +838,15 @@ separate applications of multivariate_normal, but hopefully this parallelizes.</
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.25)"><span class="xref std std-term">array</span></a>) – Shape <cite>N x D</cite> where here <cite>N</cite> is the number of input locations and <cite>D</cite> is
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.26)"><span class="xref std std-term">array</span></a>) – Shape <cite>N x D</cite> where here <cite>N</cite> is the number of input locations and <cite>D</cite> is
 the dimensionality</p></li>
-<li><p><strong>mu</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.25)"><span class="xref std std-term">array</span></a>) – Shape <cite>N x D</cite>, or broadcastable to NxD. mean values</p></li>
-<li><p><strong>L</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.25)"><span class="xref std std-term">array</span></a>) – Shape <cite>DxNxN</cite> Cholesky decomposition of <cite>D</cite> independent covariance
+<li><p><strong>mu</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.26)"><span class="xref std std-term">array</span></a>) – Shape <cite>N x D</cite>, or broadcastable to NxD. mean values</p></li>
+<li><p><strong>L</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.26)"><span class="xref std std-term">array</span></a>) – Shape <cite>DxNxN</cite> Cholesky decomposition of <cite>D</cite> independent covariance
 matrices</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.25)"><span class="xref std std-term">array</span></a>) – Shape of length <cite>D</cite>. Vector of log probabilities for each dimension
+<dd class="field-even"><p><strong>p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.26)"><span class="xref std std-term">array</span></a>) – Shape of length <cite>D</cite>. Vector of log probabilities for each dimension
 (summed over input locations) Since covariance matrices independent
 across dimensions but convey covariances across locations, makes sense
 to sum over locations as would for multivariate Gaussian over each
@@ -631,7 +857,7 @@ dimension</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HetGaussianDeriv">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HetGaussianDeriv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_orders</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p=10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_p=&lt;tfp.bijectors.Softplus</span> <span class="pre">'softplus'</span> <span class="pre">batch_shape=[]</span> <span class="pre">forward_min_event_ndims=0</span> <span class="pre">inverse_min_event_ndims=0</span> <span class="pre">dtype_x=?</span> <span class="pre">dtype_y=?&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_s=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_p=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_s=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L619-L799"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HetGaussianDeriv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p=10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_p=&lt;tfp.bijectors.Softplus</span> <span class="pre">'softplus'</span> <span class="pre">batch_shape=[]</span> <span class="pre">forward_min_event_ndims=0</span> <span class="pre">inverse_min_event_ndims=0</span> <span class="pre">dtype_x=?</span> <span class="pre">dtype_y=?&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_s=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_p=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_s=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L622-L809"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/likelihoods/index.html#gpflow.likelihoods.ScalarLikelihood" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalarLikelihood</span></code></a></p>
 <p>Heteroscedastic Gaussian likelihood with variance provided and no modeling of noise variance.</p>
 <p>Note that the noise variance can be provided as a matrix or a 1D array.
@@ -677,17 +903,19 @@ In that case, can set p effectively to zero and will emphasize derivatives more<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cov</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.25)"><span class="xref std std-term">array</span></a>) – covariance matrix (or its diagonal) for the uncertainty (noise) in the data</p></li>
-<li><p><strong>d_orders</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – derivative order of the data; should be in same order as columns/rows of
-the covariance matrix</p></li>
-<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10.0</span></code>) – scaling of the covariance matrix dependent on derivative order</p></li>
-<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">0.0</span></code>) – scaling of the covariance matrix independent of derivative order</p></li>
-<li><p><strong>transform_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>, <em>optional</em>) – Defaults to <code class="docutils literal notranslate"><span class="pre">gpflow.utilities.positive()</span></code> transformation of p during
+<li><p><strong>cov</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array" title="(in NumPy v1.26)"><span class="xref std std-term">array</span></a>) – (fixed) covariance matrix (or its diagonal) for the uncertainty (noise)
+in the data</p></li>
+<li><p><strong>obs_dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – number of dimensions in the input/observation, X; the first obs_dims
+columns of X will be treated as input locations while the final obs_dims
+entries will be derivative orders of each data point (see DerivativeKernel)</p></li>
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">10.0</span></code>) – scaling of the covariance matrix dependent on derivative order</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">0.0</span></code>) – scaling of the covariance matrix independent of derivative order</p></li>
+<li><p><strong>transform_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>, <em>optional</em>) – Defaults to <code class="docutils literal notranslate"><span class="pre">gpflow.utilities.positive()</span></code> transformation of p during
 training of the GP model; the default is to require it be positive</p></li>
-<li><p><strong>transform_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>, <em>optional</em>) – transformation of s during GP model training</p></li>
-<li><p><strong>constrain_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – whether or not p should be constrained and not altered during GP model
+<li><p><strong>transform_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>, <em>optional</em>) – transformation of s during GP model training</p></li>
+<li><p><strong>constrain_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) – whether or not p should be constrained and not altered during GP model
 training</p></li>
-<li><p><strong>constrain_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>) – whether or not to constrain s during GP model training</p></li>
+<li><p><strong>constrain_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <em>default</em> <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>) – whether or not to constrain s during GP model training</p></li>
 <li><p><strong>**kwargs</strong> – Extra keyword arguments passed to <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/likelihoods/index.html#gpflow.likelihoods.ScalarLikelihood" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">gpflow.likelihoods.ScalarLikelihood</span></code></a></p></li>
 </ul>
 </dd>
@@ -695,14 +923,14 @@ training</p></li>
 <p><strong>Methods:</strong></p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat" title="thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_scaled_cov_mat</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat" title="thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_scaled_cov_mat</span></code></a>(X)</p></td>
 <td><p>Creates scaled covariance matrix using noise scale parameters</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat">
-<span class="sig-name descname"><span class="pre">build_scaled_cov_mat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L734-L751"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">build_scaled_cov_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L735-L754"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat" title="Link to this definition">#</a></dt>
 <dd><p>Creates scaled covariance matrix using noise scale parameters</p>
 </dd></dl>
 
@@ -710,7 +938,7 @@ training</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HeteroscedasticGPR_analytical_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_fac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L802-L949"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HeteroscedasticGPR_analytical_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_fac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L812-L954"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">GPModel</span></code></a>, <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.InternalDataTrainingLossMixin" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalDataTrainingLossMixin</span></code></a></p>
 <p>EXPERIMENTAL! NOT INTENDED FOR USE, BUT MAYBE INTERESTING TO CONSIDER IN FUTURE!</p>
 <p>Implements a GPR model with heteroscedastic input noise, which can be just a vector
@@ -731,42 +959,65 @@ be the third element of the input data tuple (X, Y, noise_cov).</p>
 <td><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_y" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_y()</span></code></a> for further details.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_log_density" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_log_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_log_density</span></code></a>(data[, full_cov, ...])</p></td>
-<td><p>Compute the log density of the data at the new data points.</p></td>
+<td><p>Compute the log of the probability density of the data at the new data points.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.maximum_log_likelihood_objective">
-<span class="sig-name descname"><span class="pre">maximum_log_likelihood_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L863-L864"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.maximum_log_likelihood_objective" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">maximum_log_likelihood_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L871-L872"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.maximum_log_likelihood_objective" title="Link to this definition">#</a></dt>
 <dd><p>Objective for maximum likelihood estimation. Should be maximized. E.g.
 log-marginal likelihood (hyperparameter likelihood) for GPR, or lower
 bound to the log-marginal likelihood (ELBO) for sparse and variational
 GPs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>return</strong> has shape [].</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_f">
-<span class="sig-name descname"><span class="pre">predict_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L893-L928"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_f" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">predict_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L901-L935"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_f" title="Link to this definition">#</a></dt>
 <dd><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_f" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_f()</span></code></a> for further details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_y">
-<span class="sig-name descname"><span class="pre">predict_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L930-L939"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_y" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">predict_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L937-L945"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_y" title="Link to this definition">#</a></dt>
 <dd><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_y" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_y()</span></code></a> for further details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_log_density">
-<span class="sig-name descname"><span class="pre">predict_log_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L941-L949"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_log_density" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute the log density of the data at the new data points.</p>
+<span class="sig-name descname"><span class="pre">predict_log_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L947-L954"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_log_density" title="Link to this definition">#</a></dt>
+<dd><p>Compute the log of the probability density of the data at the new data points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <ul class="simple">
+<li><p><strong>data[0]</strong> has shape [<em>batch</em>…, <em>N</em>, <em>D</em>].</p></li>
+<li><p><strong>data[1]</strong> has shape [<em>batch</em>…, <em>N</em>, <em>P</em>].</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>return</strong> has shape [<em>batch</em>…, <em>N</em>].</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HeteroscedasticGPR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_fac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihood_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L952-L1173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">HeteroscedasticGPR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_fac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihood_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L957-L1174"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">GPModel</span></code></a>, <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.InternalDataTrainingLossMixin" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternalDataTrainingLossMixin</span></code></a></p>
 <p>Implements a GPR model with heteroscedastic input noise (full noise covariance matrix).</p>
 <p>The full covariance matrix is necessary for derivatives from the same simulation at the
@@ -790,14 +1041,14 @@ dimension and a 3rd partial derivative with respect to the second.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>) – A list or tuple of the input locations, output data, and noise
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>) – A list or tuple of the input locations, output data, and noise
 covariance matrix, in that order</p></li>
 <li><p><strong>kernel</strong> (<a class="reference internal" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel" title="thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a> object) – The kernel to use; must be DerivativeKernel or compatible subclass
 expecting derivative information provided in extra columns of the input
 locations</p></li>
-<li><p><strong>mean_function</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>, <em>optional</em>) – Mean function to be used (probably should be one that
+<li><p><strong>mean_function</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">callable()</span></code></a>, <em>optional</em>) – Mean function to be used (probably should be one that
 handles inputs including the derivative order)</p></li>
-<li><p><strong>scale_fac</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1.0</span></code>) – scaling factor on the output data; can apply to each dimension
+<li><p><strong>scale_fac</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <em>default</em> <code class="docutils literal notranslate"><span class="pre">1.0</span></code>) – scaling factor on the output data; can apply to each dimension
 separately if an array; helpful to ensure all output dimensions have
 similar variance</p></li>
 <li><p><strong>likelihood_kwargs, dict, optional</strong> – Dictionary of keyword arguments to pass to the HetGaussianDeriv
@@ -818,49 +1069,72 @@ likelihood model used by this GP model</p></li>
 <td><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_y" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_y()</span></code></a> for further details.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_log_density" title="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_log_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_log_density</span></code></a>(data[, full_cov, ...])</p></td>
-<td><p>Compute the log density of the data at the new data points.</p></td>
+<td><p>Compute the log of the probability density of the data at the new data points.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.maximum_log_likelihood_objective">
-<span class="sig-name descname"><span class="pre">maximum_log_likelihood_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1069-L1070"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.maximum_log_likelihood_objective" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">maximum_log_likelihood_objective</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1072-L1073"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.maximum_log_likelihood_objective" title="Link to this definition">#</a></dt>
 <dd><p>Objective for maximum likelihood estimation. Should be maximized. E.g.
 log-marginal likelihood (hyperparameter likelihood) for GPR, or lower
 bound to the log-marginal likelihood (ELBO) for sparse and variational
 GPs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>return</strong> has shape [].</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_f">
-<span class="sig-name descname"><span class="pre">predict_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1084-L1152"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_f" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">predict_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1087-L1155"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_f" title="Link to this definition">#</a></dt>
 <dd><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_f" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_f()</span></code></a> for further details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_y">
-<span class="sig-name descname"><span class="pre">predict_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1154-L1163"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_y" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">predict_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Xnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1157-L1165"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_y" title="Link to this definition">#</a></dt>
 <dd><p>See <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/models/index.html#gpflow.models.GPModel.predict_y" title="(in GPflow)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gpflow.models.GPModel.predict_y()</span></code></a> for further details.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_log_density">
-<span class="sig-name descname"><span class="pre">predict_log_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1165-L1173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_log_density" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute the log density of the data at the new data points.</p>
+<span class="sig-name descname"><span class="pre">predict_log_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1167-L1174"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_log_density" title="Link to this definition">#</a></dt>
+<dd><p>Compute the log of the probability density of the data at the new data points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – <ul class="simple">
+<li><p><strong>data[0]</strong> has shape [<em>batch</em>…, <em>N</em>, <em>D</em>].</p></li>
+<li><p><strong>data[1]</strong> has shape [<em>batch</em>…, <em>N</em>, <em>P</em>].</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>return</strong> has shape [<em>batch</em>…, <em>N</em>].</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">ConstantMeanWithDerivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1176-L1197"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MeanFunction</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">ConstantMeanWithDerivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1177-L1198"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/functions/index.html#gpflow.functions.MeanFunction" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanFunction</span></code></a></p>
 <p>Constant mean function that takes derivative-augmented X as input.
 Only applies mean function constant to zeroth order derivatives.
 Because added constant, adding mean function does not change variance or derivatives.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>y_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span class="xref std std-term">array-like</span></a>) – The data for which the mean should be taken</p>
+<dd class="field-odd"><p><strong>y_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.26)"><span class="xref std std-term">array-like</span></a>) – The data for which the mean should be taken</p>
 </dd>
 </dl>
 <p><strong>Methods:</strong></p>
@@ -873,7 +1147,7 @@ Because added constant, adding mean function does not change variance or derivat
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1194-L1197"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs.__call__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1195-L1198"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs.__call__" title="Link to this definition">#</a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
@@ -881,8 +1155,8 @@ Because added constant, adding mean function does not change variance or derivat
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.LinearWithDerivs">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">LinearWithDerivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1200-L1241"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MeanFunction</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">LinearWithDerivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1201-L1242"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/functions/index.html#gpflow.functions.MeanFunction" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanFunction</span></code></a></p>
 <p>Linear mean function that can be applied to derivative data - in other words,
 the 0th order derivative is fit with a linear fit, so the 1st derivative also
 has to be modified (by a constant that is the slope). Currently handles y of
@@ -891,8 +1165,8 @@ y_data should be different dimensions while rows are observations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span class="xref std std-term">array-like</span></a>) – input locations of data points</p></li>
-<li><p><strong>y_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span class="xref std std-term">array-like</span></a>) – output data to learn linear function for based on input locations</p></li>
+<li><p><strong>x_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.26)"><span class="xref std std-term">array-like</span></a>) – input locations of data points</p></li>
+<li><p><strong>y_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.26)"><span class="xref std std-term">array-like</span></a>) – output data to learn linear function for based on input locations</p></li>
 </ul>
 </dd>
 </dl>
@@ -906,7 +1180,7 @@ y_data should be different dimensions while rows are observations.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.LinearWithDerivs.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1231-L1241"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs.__call__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1232-L1242"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs.__call__" title="Link to this definition">#</a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
@@ -914,8 +1188,8 @@ y_data should be different dimensions while rows are observations.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.SympyMeanFunc">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">SympyMeanFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1244-L1362"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MeanFunction</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thermoextrap.gpr_active.gp_models.</span></span><span class="sig-name descname"><span class="pre">SympyMeanFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1245-L1358"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://gpflow.github.io/GPflow/develop/api/gpflow/functions/index.html#gpflow.functions.MeanFunction" title="(in GPflow)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeanFunction</span></code></a></p>
 <p>Mean function based on sympy expression. This way, can take derivatives up
 to any order. In the provided expression, the input variable should be ‘x’
 or ‘X’, otherwise this will not work. For consistency with other mean
@@ -926,9 +1200,9 @@ starting parameter values.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expr</strong> (<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code></a>) – Representing the functional form of the mean function.</p></li>
-<li><p><strong>x_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span class="xref std std-term">array-like</span></a>) – the input locations of the data</p></li>
-<li><p><strong>y_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.25)"><span class="xref std std-term">array-like</span></a>) – the output values of the data to fit the mean function to</p></li>
-<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – dictionary specifying starting parameter values for the mean function;
+<li><p><strong>x_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.26)"><span class="xref std std-term">array-like</span></a>) – the input locations of the data</p></li>
+<li><p><strong>y_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array_like" title="(in NumPy v1.26)"><span class="xref std std-term">array-like</span></a>) – the output values of the data to fit the mean function to</p></li>
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <em>optional</em>) – dictionary specifying starting parameter values for the mean function;
 in other words, these values will be substituted into the sympy
 expression to start with</p></li>
 </ul>
@@ -944,13 +1218,12 @@ expression to start with</p></li>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="thermoextrap.gpr_active.gp_models.SympyMeanFunc.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1336-L1362"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc.__call__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/usnistgov/thermoextrap/blob/main/src/thermoextrap/gpr_active/gp_models.py#L1334-L1358"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc.__call__" title="Link to this definition">#</a></dt>
 <dd><p>Closely follows K_diag from DerivativeKernel.</p>
 </dd></dl>
 
 </dd></dl>
 
-</section>
 
 
                 </article>
@@ -958,11 +1231,10 @@ expression to start with</p></li>
 
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="../api-gpr.html"
@@ -982,15 +1254,75 @@ expression to start with</p></li>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel"><code class="docutils literal notranslate"><span class="pre">DerivativeKernel</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.DerivativeKernel.ard"><code class="docutils literal notranslate"><span class="pre">DerivativeKernel.ard</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianNoiseGP"><code class="docutils literal notranslate"><span class="pre">HetGaussianNoiseGP</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.maximum_log_likelihood_objective"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.maximum_log_likelihood_objective()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_f"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.predict_f()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_y"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.predict_y()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.FullyHeteroscedasticGPR.predict_log_density"><code class="docutils literal notranslate"><span class="pre">FullyHeteroscedasticGPR.predict_log_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple"><code class="docutils literal notranslate"><span class="pre">HetGaussianSimple</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianSimple.build_scaled_cov_mat"><code class="docutils literal notranslate"><span class="pre">HetGaussianSimple.build_scaled_cov_mat()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.multioutput_multivariate_normal"><code class="docutils literal notranslate"><span class="pre">multioutput_multivariate_normal()</span></code></a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv"><code class="docutils literal notranslate"><span class="pre">HetGaussianDeriv</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HetGaussianDeriv.build_scaled_cov_mat"><code class="docutils literal notranslate"><span class="pre">HetGaussianDeriv.build_scaled_cov_mat()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.maximum_log_likelihood_objective"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.maximum_log_likelihood_objective()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_f"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.predict_f()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_y"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.predict_y()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR_analytical_scale.predict_log_density"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR_analytical_scale.predict_log_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.maximum_log_likelihood_objective"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.maximum_log_likelihood_objective()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_f"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.predict_f()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_y"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.predict_y()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.HeteroscedasticGPR.predict_log_density"><code class="docutils literal notranslate"><span class="pre">HeteroscedasticGPR.predict_log_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs"><code class="docutils literal notranslate"><span class="pre">ConstantMeanWithDerivs</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.ConstantMeanWithDerivs.__call__"><code class="docutils literal notranslate"><span class="pre">ConstantMeanWithDerivs.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs"><code class="docutils literal notranslate"><span class="pre">LinearWithDerivs</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.LinearWithDerivs.__call__"><code class="docutils literal notranslate"><span class="pre">LinearWithDerivs.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc"><code class="docutils literal notranslate"><span class="pre">SympyMeanFunc</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thermoextrap.gpr_active.gp_models.SympyMeanFunc.__call__"><code class="docutils literal notranslate"><span class="pre">SympyMeanFunc.__call__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
               
             
           </div>
@@ -1008,9 +1340,10 @@ By William P. Krekelberg
   
   <div class="footer-item">
     
+
   <p class="copyright">
     
-      © Copyright 2021, William P. Krekelberg.
+      © Copyright 2020, William P. Krekelberg.
       <br/>
     
   </p>
@@ -1019,7 +1352,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2023-08-17.
+  Last updated on 2024-03-15.
   <br/>
 </p>
   </div>
@@ -1037,8 +1370,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>
