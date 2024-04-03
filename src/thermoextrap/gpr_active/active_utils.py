@@ -832,7 +832,10 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 
         # Set values to provided starting values
         for j in range(len(gpr.trainable_parameters)):
-            gpr.trainable_parameters[j].assign(start_params[j])
+            this_param = _catch_inf_unconstrained_param(
+                gpr.trainable_parameters[j], start_params[j]
+            )
+            gpr.trainable_parameters[j].assign(this_param)
 
         # Perform optimization starting with provided values
         loss_info_new = optim.minimize(
@@ -853,7 +856,10 @@ def train_GPR(gpr, record_loss=False, start_params=None):
         # In other words, update parameters if default loss less OR if new loss is NaN
         if (loss_info.fun < loss_info_new.fun) or (check_nan[1]):
             for j, tpar in enumerate(optim_params):
-                gpr.trainable_parameters[j].assign(tpar)
+                this_param = _catch_inf_unconstrained_param(
+                    gpr.trainable_parameters[j], tpar
+                )
+                gpr.trainable_parameters[j].assign(this_param)
         # Otherwise, change loss information that's potentially returned and leave params
         else:
             loss_info = loss_info_new
@@ -2238,3 +2244,14 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
         )
 
     return data_list, train_history
+
+
+def _catch_inf_unconstrained_param(param, value):
+    # Need to make sure transformed variables are finite
+    # Optimization will not prevent infinite transformed variables
+    # that will then throw an error when assigning (catches, but does not fix, so circumventing)
+    # So attempt to catch that behavior here
+    this_transformed_param = param.transform.inverse(value).numpy()
+    if (not np.isfinite(this_transformed_param)) and (value == 0.0):
+        return np.finfo(np.float64).eps
+    return value
