@@ -37,7 +37,7 @@ gpflow==2.9.1
 greenlet==3.0.3           # via sqlalchemy
 grpcio==1.62.1            # via tensorboard, tensorflow
 h5py==3.10.0              # via keras, tensorflow
-idna==3.6                 # via requests
+idna==3.7                 # via requests
 imagesize==1.4.1          # via sphinx
 importlib-metadata==7.0.2  # via jupyter-cache, myst-nb
 ipykernel==6.29.3         # via myst-nb
