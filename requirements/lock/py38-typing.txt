@@ -23,7 +23,7 @@ google-pasta==0.2.0       # via tensorflow
 gpflow==2.9.1
 grpcio==1.62.1            # via tensorboard, tensorflow
 h5py==3.10.0              # via tensorflow
-idna==3.6                 # via requests
+idna==3.7                 # via requests
 importlib-metadata==7.0.2  # via jax, markdown, numba
 iniconfig==2.0.0          # via pytest
 jax==0.4.13

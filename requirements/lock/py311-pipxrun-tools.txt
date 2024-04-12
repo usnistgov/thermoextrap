@@ -26,7 +26,7 @@ gitdb==4.0.11             # via gitpython
 gitpython==3.1.42         # via conda-lock
 grayskull==2.6.0
 html5lib==1.1             # via conda-lock
-idna==3.6                 # via requests
+idna==3.7                 # via requests
 importlib-metadata==7.0.2  # via keyring, twine
 ipython==8.22.2           # via nbqa
 jaraco-classes==3.3.1     # via keyring
