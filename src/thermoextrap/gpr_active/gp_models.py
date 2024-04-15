@@ -829,18 +829,19 @@ class HeteroscedasticGPR_analytical_scale(  # noqa: N801
         mean_function: Optional[gpflow.mean_functions.MeanFunction] = None,
         scale_fac: Optional[float] = None,
     ) -> None:
-        X_data, Y_data, noise_cov = data
-
         # To make training behave better, can try scaling covariance matrices and data
         # Just remember to scale mean function and predictions throughout
         # Can make difference, but only impacts ease of training, not optimal model behavior
         # So default is to scale by minimum variance, but can set to 1.0
         if scale_fac is None:
-            self.scale_fac = np.sqrt(np.min(np.diag(noise_cov)))
+            self.scale_fac = np.sqrt(np.min(np.diag(data[2])))
         else:
             self.scale_fac = scale_fac
-        Y_data = Y_data / self.scale_fac
-        noise_cov = noise_cov / (self.scale_fac**2)
+
+        X_data = data[0]
+
+        Y_data = data[1] / self.scale_fac
+        noise_cov = data[2] / (self.scale_fac**2)
 
         likelihood = HetGaussianSimple(noise_cov)
         super().__init__(kernel, likelihood, mean_function, num_latent_gps=1)
@@ -1011,19 +1012,19 @@ class HeteroscedasticGPR(
     ) -> None:
         if likelihood_kwargs is None:
             likelihood_kwargs = {}
-        X_data, Y_data, noise_cov = data
-        self.out_dim = Y_data.shape[-1]
+        self.out_dim = data[1].shape[-1]
 
         # Scale data by the desired scaling factor - can help equalize variance across outputs
         # Nice to handle scaling inside model rather than outside
         scale_fac = np.array(scale_fac)
         if len(scale_fac.shape) == 0:
-            scale_fac = scale_fac * np.ones(self.out_dim)
+            scale_fac = scale_fac * np.ones(self.out_dim)  # noqa: PLR6104
         self.scale_fac = scale_fac
-        Y_data = Y_data / self.scale_fac
-        noise_cov = noise_cov / (
+        X_data = data[0]
+        Y_data = data[1] / self.scale_fac
+        noise_cov = data[2] / (
             np.expand_dims(
-                self.scale_fac, axis=tuple(range(scale_fac.ndim, noise_cov.ndim))
+                self.scale_fac, axis=tuple(range(scale_fac.ndim, data[2].ndim))
             )
             ** 2
         )

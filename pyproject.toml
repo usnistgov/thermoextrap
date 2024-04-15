@@ -108,7 +108,7 @@ pipxrun-tools = [
     "conda-lock >= 2.5.5",
     "grayskull >= 2.5.3",
     "nbqa >= 1.8.4",
-    "pyright >= 1.1.353",
+    "pyright >= 1.1.357, != 1.1.358", # skipping 1.1.358.  Breaks module_utilities.cached.
     "thermoextrap[mypy]",
     "twine >= 5.0.0",
 ]
@@ -180,7 +180,7 @@ unsafe-fixes = true
 preview = true
 select = ["ALL"]
 # fixable = ["ALL"]
-# unfixable = []
+unfixable = ["T", "PLR6104"]
 ignore = [
     "CPY",       # - Don't require copyright
     "ERA",       # - eradicate (want to keep some stuff)
@@ -249,7 +249,7 @@ max-public-methods = 30
 # Project specific ignores (avoid changing per-file-ignores directly)
 "tests/*.py" = ["PT011", "PLR0914", "SLF001"]
 "tests/test_lnPi.py" = ["N999"]
-"**/*.ipynb" = ["F821", "T201", "N", "ARG", "PTH", "D102", "D103"]
+"**/*.ipynb" = ["F821", "T201", "N", "ARG", "PTH", "D102", "D103", "W391", "PLR6104"]
 "src/**/*.py" = ["TD003", "FIX002"]
 "**/adaptive_interp.py" = ["T201"]
 "**/beta.py" = ["N801", "ARG002", "A003", "D102"]

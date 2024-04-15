@@ -47,10 +47,11 @@ def load_data():
 def prepare_data(lnpi_data, energy, mu, temp, order, beta):
     beta = 1.0 / temp
     mu = xr.DataArray(np.atleast_1d(mu), dims=["comp"])
-    lnpi_data = xr.DataArray(lnpi_data, dims=["n"])
-
-    # adjust lnpi_data to have lnpi_data[n=0] = 0
-    lnpi_data = lnpi_data - lnpi_data.sel(n=0)
+    lnpi_data = (
+        xr.DataArray(lnpi_data, dims=["n"])
+        # adjust lnpi_data to have lnpi_data[n=0] = 0
+        .pipe(lambda x: x - x.sel(n=0))
+    )
 
     # have to include mom = 0
     a = np.ones_like(lnpi_data)
@@ -75,12 +76,12 @@ def sample_data():
     return ref, samples
 
 
-@pytest.fixture()
+@pytest.fixture()  # noqa: FURB118
 def ref(sample_data):
     return sample_data[0]
 
 
-@pytest.fixture()
+@pytest.fixture()  # noqa: FURB118
 def samples(sample_data):
     return sample_data[1]
 

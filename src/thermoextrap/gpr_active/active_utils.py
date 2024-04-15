@@ -117,7 +117,7 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
                 bell_fac = sp.bell(
                     n, k, state.alpha0 * (np.log(10.0) ** np.arange(1, n - k + 2))
                 )
-                log_derivs[n, :] = log_derivs[n, :] + derivs[k, :] * bell_fac
+                log_derivs[n, :] += derivs[k, :] * float(bell_fac)
                 resamp_log_derivs[{"order": n}] = (
                     resamp_log_derivs[{"order": n}].values
                     + resamp_derivs[{"order": k}].values * bell_fac
@@ -1163,7 +1163,7 @@ class UpdateFuncBase(UpdateStopABC):
         new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)
 
         if self.log_scale:
-            new_alpha = 10.0 ** (new_alpha)
+            new_alpha = 10.0 ** (new_alpha)  # noqa: PLR6104
 
         return new_alpha, pred_mu, pred_std
 
@@ -1825,13 +1825,12 @@ class ErrorStability(MetricBase, UpdateStopABC):
     def calc_metric(self, history, x_vals, gp):
         # Get input data points for current active learning step (current GP model)
         input_x = gp.data[0].numpy()
-        input_y = gp.data[1].numpy()
         input_x = np.concatenate([input_x[:, :1], input_x[:, 1:]], axis=-1)
-        input_y = input_y * gp.scale_fac
-        input_cov = gp.likelihood.cov.copy()
-        input_cov = input_cov * (
+        input_y = gp.data[1].numpy() * gp.scale_fac
+        input_cov = gp.likelihood.cov * (
             np.expand_dims(
-                gp.scale_fac, axis=tuple(range(gp.scale_fac.ndim, input_cov.ndim))
+                gp.scale_fac,
+                axis=tuple(range(gp.scale_fac.ndim, gp.likelihood.cov.ndim)),
             )
             ** 2
         )
@@ -1861,7 +1860,8 @@ class ErrorStability(MetricBase, UpdateStopABC):
         transform_scale = self.transform_func(
             pred_x[:, :1], np.ones_like(pred_x[:, :1]), 1.0
         )[0]
-        cov_curr = cov_curr * (transform_scale * transform_scale.T)
+
+        cov_curr *= transform_scale * transform_scale.T
 
         # Next need to create new GP with SAME PARAMETERS (so same prior)
         # But should exclude most recently added inputs
@@ -1888,7 +1888,7 @@ class ErrorStability(MetricBase, UpdateStopABC):
         # And make prediction with GP with only previous inputs, but at all current inputs
         mu_prev, cov_prev = prev_gp.predict_f(pred_x, full_cov=True)
         mu_prev = self.transform_func(pred_x[:, :1], mu_prev.numpy(), 1.0)[0]
-        cov_prev = cov_prev * (transform_scale * transform_scale.T)
+        cov_prev *= transform_scale * transform_scale.T
 
         # For metric, calculate the KL divergence between predicted distributions
         inv_cov_curr = np.linalg.inv(
