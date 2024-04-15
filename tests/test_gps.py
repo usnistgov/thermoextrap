@@ -458,8 +458,7 @@ def test_multiout_multivar_normal() -> None:
     cov1 = np.array([[1.0, 0.0], [0.0, 1.0]])
     cov2 = np.array([[0.5, 0.0], [0.0, 2.0]])
     cov3 = np.array([[0.5, 0.0], [-2.5, 3.5]])
-    cov3 = cov3.T @ cov3
-    cov_mats = np.array([cov1, cov2, cov3])
+    cov_mats = np.array([cov1, cov2, cov3.T @ cov3])
 
     # Generate Cholesky decomposition, which is required input for
     cov_cholesky = np.array([np.linalg.cholesky(c) for c in cov_mats])
@@ -507,12 +506,12 @@ def test_gp_likelihood() -> None:
     # Now check specifics of building covariance matrix
     # Check using alternative calculation
     def log_cov_model(cov0, p, s, d_o):
-        d_o = d_o + 1
+        d_o = d_o + 1  # noqa: PLR6104
         return np.log(cov0) + p * np.add(*np.meshgrid(d_o, d_o)) + s
 
     # Default has p=10.0, s=0.0
-    cov = np.array([[0.5, 0.0, 0.0], [-1.5, 2.5, 0.0], [3.5, 4.5, 5.5]])
-    cov = cov.T @ cov
+    _cov = np.array([[0.5, 0.0, 0.0], [-1.5, 2.5, 0.0], [3.5, 4.5, 5.5]])
+    cov = _cov.T @ _cov
     check = HetGaussianDeriv(cov, 1)
     np.testing.assert_allclose(
         log_cov_model(cov, 10.0, 0.0, d_orders),

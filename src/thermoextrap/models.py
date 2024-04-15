@@ -457,7 +457,7 @@ class ExtrapModel(MyAttrsMixin):
             order = self.order
         out = self._derivs(order=order, order_dim=order_dim, minus_log=minus_log)
         if norm:
-            out = out * taylor_series_norm(order, order_dim)
+            return out * taylor_series_norm(order, order_dim)
         return out
 
     def coefs(self, order=None, order_dim="order", minus_log=None):
@@ -690,7 +690,7 @@ class StateCollection(MyAttrsMixin):
 
     @property
     def order(self):
-        return min([m.order for m in self])
+        return min(m.order for m in self)
 
     @property
     def alpha0(self):
