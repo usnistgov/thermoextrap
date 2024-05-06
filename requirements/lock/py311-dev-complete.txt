@@ -134,7 +134,7 @@ urllib3==2.2.1            # via requests
 userpath==1.9.2           # via pipx
 virtualenv==20.25.1       # via nox, pre-commit
 wcwidth==0.2.13           # via prompt-toolkit
-werkzeug==3.0.1           # via tensorboard
+werkzeug==3.0.3           # via tensorboard
 wheel==0.43.0             # via astunparse
 wrapt==1.16.0             # via deprecated, tensorflow
 xarray==2024.2.0          # via cmomy
