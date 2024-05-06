@@ -123,7 +123,7 @@ tzdata==2024.1            # via pandas
 urllib3==2.2.1            # via requests
 virtualenv==20.25.1       # via nox
 wcwidth==0.2.13           # via prompt-toolkit
-werkzeug==3.0.1           # via tensorboard
+werkzeug==3.0.3           # via tensorboard
 wheel==0.43.0             # via astunparse
 wrapt==1.16.0             # via deprecated, tensorflow
 xarray==2024.2.0          # via cmomy
