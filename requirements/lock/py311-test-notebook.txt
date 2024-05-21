@@ -88,7 +88,7 @@ python-dateutil==2.9.0.post0  # via jupyter-client, matplotlib, pandas
 pytz==2024.1              # via pandas
 pyzmq==25.1.2             # via ipykernel, jupyter-client
 referencing==0.33.0       # via jsonschema, jsonschema-specifications
-requests==2.31.0          # via tensorflow
+requests==2.32.0          # via tensorflow
 rich==13.7.1              # via keras
 rpds-py==0.18.0           # via jsonschema, referencing
 scipy==1.12.0             # via gpflow, jax, jaxlib, pymbar
