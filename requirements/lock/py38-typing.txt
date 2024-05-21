@@ -55,7 +55,7 @@ pymbar==4.0.2
 pytest==8.1.1
 python-dateutil==2.9.0.post0  # via pandas
 pytz==2024.1              # via pandas
-requests==2.31.0          # via requests-oauthlib, tensorboard
+requests==2.32.0          # via requests-oauthlib, tensorboard
 requests-oauthlib==1.4.0  # via google-auth-oauthlib
 rsa==4.9                  # via google-auth
 scipy==1.10.1             # via gpflow, jax, jaxlib, pymbar
