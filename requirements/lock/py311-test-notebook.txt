@@ -104,7 +104,7 @@ tensorflow-io-gcs-filesystem==0.36.0  # via tensorflow
 tensorflow-probability==0.24.0  # via gpflow
 termcolor==2.4.0          # via pytest-sugar, tensorflow
 tf-keras==2.16.0          # via tensorflow-probability
-tornado==6.4              # via ipykernel, jupyter-client
+tornado==6.4.1              # via ipykernel, jupyter-client
 traitlets==5.14.2         # via comm, ipykernel, ipython, jupyter-client, jupyter-core, matplotlib-inline, nbformat
 typing-extensions==4.10.0  # via gpflow, module-utilities, tensorflow
 tzdata==2024.1            # via pandas
