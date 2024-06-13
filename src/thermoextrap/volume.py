@@ -62,7 +62,7 @@ class VolumeDerivFuncs:
         # Even if order is defined somewhere outside of this class, won't affect returned func
         def func(W, xW, dxdq, volume, ndim=1):  # noqa: N803
             """
-            Calculat function.  dxdq is <sum_{i=1}^N dy/dx_i x_i>.
+            Calculate function.  dxdq is <sum_{i=1}^N dy/dx_i x_i>.
 
             for ideal gas
             """

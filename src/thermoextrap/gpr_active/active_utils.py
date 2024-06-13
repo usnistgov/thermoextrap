@@ -257,10 +257,8 @@ class DataWrapper:
         for k in range(x.shape[1]):
             this_g_x = timeseries.statistical_inefficiency(x[:, k])
             this_g_cross = timeseries.statistical_inefficiency(x[:, k], pot)
-            if this_g_x > g_x:
-                g_x = this_g_x
-            if this_g_cross > g_cross:
-                g_cross = this_g_cross
+            g_x = max(this_g_x, g_x)
+            g_cross = max(this_g_cross, g_cross)
         g_pot = timeseries.statistical_inefficiency(pot)
         g_max = np.max([g_x, g_pot, g_cross])
         # Get indices of uncorrelated data and subsample everything
@@ -1154,7 +1152,7 @@ class UpdateFuncBase(UpdateStopABC):
         new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)
 
         if self.log_scale:
-            new_alpha = 10.0 ** (new_alpha)  # noqa: PLR6104
+            new_alpha = 10.0 ** (new_alpha)
 
         return new_alpha, pred_mu, pred_std
 
@@ -2228,7 +2226,7 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
         for key in train_history:
             train_history[key] = np.array(train_history[key])
         np.savez(
-            "%s/active_history.npz" % base_dir,
+            f"{base_dir}/active_history.npz",
             pred_mu=stop_criteria.history[0],
             pred_std=stop_criteria.history[1],
             alpha=np.array(alpha_list),

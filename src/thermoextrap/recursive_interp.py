@@ -403,7 +403,7 @@ class RecursiveInterp:
         return predict_vals
 
     @deprecate_kwarg("doPlot", "do_plot")
-    def check_poly_consistency(self, do_plot=False):  # noqa: C901, PLR0914, PLR0915
+    def check_poly_consistency(self, do_plot=False):  # noqa: PLR0914, PLR0915
         """
         If the interpolation model is a polynomial, checks to see if the polynomials
         are locally consistent. In other words, we want the coefficients between
@@ -507,10 +507,8 @@ class RecursiveInterp:
                 pax.plot(plotpoints, plotreg1, color=pcolors[i], linestyle=":")
                 pax.plot(plotpoints, plotreg2, color=pcolors[i], linestyle="--")
                 allploty = np.hstack((plotfull, plotreg1, plotreg2))
-                if np.min(allploty) < plotymin:
-                    plotymin = np.min(allploty)
-                if np.max(allploty) > plotymax:
-                    plotymax = np.max(allploty)
+                plotymin = min(np.min(allploty), plotymin)
+                plotymax = max(np.max(allploty), plotymax)
 
         if do_plot:
             for edge in self.edge_beta:

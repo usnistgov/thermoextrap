@@ -13,10 +13,12 @@ keywords = [
     "thermoextrap",
 ]
 license = { text = "NIST-PD" }
-license-files = { paths = ["LICENSE"] }
+license-files = { paths = [
+    "LICENSE",
+] }
 authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
-    { name = "William Krekelberg", email = "wpk@nist.gov" }
+    { name = "William Krekelberg", email = "wpk@nist.gov" },
 ]
 requires-python = ">=3.8,<3.12"
 classifiers = [
@@ -38,81 +40,80 @@ dynamic = [
 ]
 dependencies = [
     "attrs",
-    "cmomy >= 0.8",
-    "lazy_loader",
-    "module-utilities[inherit] >= 0.2",
-    "numpy >= 1.20",
+    "cmomy>=0.8,<0.11.0",
+    "lazy-loader",
+    "module-utilities[inherit]>=0.2",
+    "numpy>=1.20",
     "scipy",
     "sympy",
-    "xarray >= 0.16",
+    "xarray>=0.16",
 ]
-[project.optional-dependencies]
-accel = [
+optional-dependencies.accel = [
     "bottleneck",
 ]
-all = [
+optional-dependencies.all = [
     "thermoextrap[mbar,gpr,accel,parallel,viz]",
 ]
-dev = [
+optional-dependencies.dev = [
     "thermoextrap[dev-extras,test,typing,pipxrun,mypy,nbval,accel,viz,gpr,mbar]",
 ]
-dev-complete = [
+optional-dependencies.dev-complete = [
     "thermoextrap[dev,tools]",
 ]
-dev-extras = [
+optional-dependencies.dev-extras = [
     "ipykernel",
     "ipython",
-    "nbclient >= 0.10.0",
-    "nox >= 2024.3.2",
+    "nbclient>=0.10.0",
+    "nox>=2024.3.2",
     "pytest-accept",
 ]
-docs = [
+optional-dependencies.docs = [
     "autodocsumm",
     "myst-nb",
     "pyenchant",
-    "sphinx >= 5.3.0",
+    "sphinx>=5.3.0",
     "sphinx-autobuild",
     "sphinx-book-theme",
     "sphinx-copybutton",
     "sphinxcontrib-spelling",
     "thermoextrap[gpr,mbar,viz]",
 ]
-gpr = [
-    "gpflow >= 2.6.0",
-    "tensorflow >= 2.13",
+optional-dependencies.gpr = [
+    "gpflow>=2.6.0",
+    "tensorflow>=2.13",
     "tensorflow-probability[tf]",
 ]
-mbar = [
+optional-dependencies.mbar = [
     # NOTE: Getting all sorts of errors with pymbar with jax.  This seems to fix them for now...
-    "jax[cpu] < 0.4.25",
+    "jax[cpu]<0.4.25",
     "pymbar>=4.0",
 ]
-mypy = [
-    "mypy >= 1.9.0",
+optional-dependencies.mypy = [
+    "mypy>=1.9.0",
 ]
-nbval = [
+optional-dependencies.nbval = [
     "nbval",
 ]
-openmm = [
+optional-dependencies.openmm = [
     "openmm",
 ]
-parallel = [
+optional-dependencies.parallel = [
     "dask[complete]",
 ]
-pipxrun = [
+optional-dependencies.pipxrun = [
     # Anything needed to run tools/pipxrun.py
     "packaging",
 ]
-pipxrun-tools = [
+optional-dependencies.pipxrun-tools = [
     # these used solely for specking tools to be used with tools/pipxrun.py
-    "conda-lock >= 2.5.5",
-    "grayskull >= 2.5.3",
-    "nbqa >= 1.8.4",
-    "pyright >= 1.1.357, != 1.1.358", # skipping 1.1.358.  Breaks module_utilities.cached.
+    "conda-lock>=2.5.5",
+    "grayskull>=2.5.3",
+    "nbqa>=1.8.4",
+    "pyright>=1.1.357,!=1.1.358", # skipping 1.1.358.  Breaks module_utilities.cached.
     "thermoextrap[mypy]",
-    "twine >= 5.0.0",
+    "twine>=5.0.0",
 ]
-test = [
+optional-dependencies.test = [
     "pandas",
     "pytest",
     "pytest-cov",
@@ -120,29 +121,28 @@ test = [
     "pytest-xdist",
     "thermoextrap[mbar,gpr]",
 ]
-tools = [
+optional-dependencies.tools = [
     "pipx",
     "pre-commit",
     "scriv",
 ]
-typing = [
+optional-dependencies.typing = [
     "pandas-stubs",
     "pytest",
     "thermoextrap[pipxrun,mbar,gpr]",
 ]
-viz = [
+optional-dependencies.viz = [
     "matplotlib",
 ]
-[project.urls]
-Documentation = "https://pages.nist.gov/thermoextrap/"
-Homepage = "https://github.com/usnistgov/thermoextrap"
+urls.Documentation = "https://pages.nist.gov/thermoextrap/"
+urls.Homepage = "https://github.com/usnistgov/thermoextrap"
 
 [tool.hatch.version]
 source = "vcs"
 
 [tool.hatch.build]
 exclude = [
-  ".*_cache",
+    ".*_cache",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -162,65 +162,64 @@ fragments = [
 # * Linting --------------------------------------------------------------------
 
 [tool.ruff]
-fix = true
 line-length = 88
-extend-include = ["*.ipynb"]
+extend-include = [
+    "*.ipynb",
+]
 extend-exclude = [
+    ".numba_cache",
     ".venv",
     "dist-conda",
-    ".numba_cache",
-    "src/thermoextrap/legacy/",
     "examples/gpr_active_learning",
+    "src/thermoextrap/legacy/",
     # "tests/",
     # "src/{{ cookiecutter.project_slug }}/tests",
 ]
+fix = true
 unsafe-fixes = true
 
-[tool.ruff.lint]
-preview = true
-select = ["ALL"]
-# fixable = ["ALL"]
-unfixable = ["T", "PLR6104"]
-ignore = [
-    "CPY",       # - Don't require copyright
-    "ERA",       # - eradicate (want to keep some stuff)
-    "FBT",       # - bools are ok
-    # * Annotations
-    "ANN101",    # - Leads to issues with methods and self
-    "ANN102",    # - Leads to issues with classmethods and cls
-    "ANN401",    # - Any ok sometimes
-    # * Allow non top level imports
-    "PLC0415",   # - import should be at top level (leads to issues with imports in func?)
-    "TID252",    # - Allow relative imports
-    "E402",      # - module level import not at top of file
-    # * Other
-    "E501",      # - line too long - let formatter fix this
-    "E731",      # - do not assign a lambda expression, use a def
-    # * Docstrings
-    "D105",      # - Missing magic method docstring
-    "D205",      # - blank line after summary
-    # * This leads to errors with placing titles in module
-    "D400",      # - First line should end with a period
-    "D401",      # - First line of docstring should be in imperative mood: "{first_line}"
-    "D415",      # - First line should end with a period, question mark, or exclamation point
-    # * Not a fan of these.  And lead to issues with docfiller
-    "D107",      # - Missing docstring in __init__
-    "D203",      # - 1 blank line required before class docstring
-    "D212",      # - Multi-line docstring summary should start at the first line
-    "D417",      # - Missing argument description in the docstring for {definition}: {name} (bad with docfiller)
-    # * These conflict with formatter
-    "COM",       # - flake8-commas, formatter should take care of this?
-    "ISC",       # - flake8-implicit-str-concat
+format.docstring-code-format = true
+lint.select = [
+    "ALL",
 ]
-# Allow unused variables when underscore-prefixed.
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+lint.ignore = [
+    # * Annotations
+    "ANN101", # - Leads to issues with methods and self
+    "ANN102", # - Leads to issues with classmethods and cls
+    "ANN401", # - Any ok sometimes
+    # * These conflict with formatter
+    "COM", # - flake8-commas, formatter should take care of this?
+    "CPY", # - Don't require copyright
+    # * Docstrings
+    "D105", # - Missing magic method docstring
+    # * Not a fan of these.  And lead to issues with docfiller
+    "D107", # - Missing docstring in __init__
+    "D203", # - 1 blank line required before class docstring
+    "D205", # - blank line after summary
+    "D212", # - Multi-line docstring summary should start at the first line
+    # * This leads to errors with placing titles in module
+    "D400", # - First line should end with a period
+    "D401", # - First line of docstring should be in imperative mood: "{first_line}"
+    "D415", # - First line should end with a period, question mark, or exclamation point
+    "D417", # - Missing argument description in the docstring for {definition}: {name} (bad with docfiller)
+    "E402", # - module level import not at top of file
+    # * Other
+    "E501", # - line too long - let formatter fix this
+    "E731", # - do not assign a lambda expression, use a def
+    "ERA",  # - eradicate (want to keep some stuff)
+    "FBT",  # - bools are ok
+    "ISC",  # - flake8-implicit-str-concat
+    # * Allow non top level imports
+    "PLC0415", # - import should be at top level (leads to issues with imports in func?)
+    "TID252",  # - Allow relative imports
+]
 # Use extend-ignore for project specific ignores (avoid changing ignore directly)
-extend-ignore = [
-    "PD",        # - not using pandas?
+lint.extend-ignore = [
     # "NPY",       # - not using numpy?
     # * Annotations
     # "SLF001",  # - flake8-self (private access sometimes OK)
-    "ANN",     # - Annotations (just use mypy/pyright)
+    "ANN", # - Annotations (just use mypy/pyright)
+    "PD",  # - not using pandas?
     # * pylint
     "PLR2004", # - numbers in comparison sometimes ok
     # "PLR0913", # - complexity sometimes ok
@@ -230,44 +229,127 @@ extend-ignore = [
     # "D103",    # - Missing docstring in public function
     # "D202",    # - blank line after docstring
 ]
-[tool.ruff.lint.pydocstyle]
-convention = "numpy"
-
-[tool.ruff.lint.pylint]
-max-args = 15
-max-positional-args = 15
-max-public-methods = 30
-
-[tool.ruff.lint.per-file-ignores]
-"docs/conf.py" = ["INP001"]
-"noxfile.py" = ["RUF009"]
-"tools/*.py" = ["S", "A", "SLF001", "D102"]
-"tests/*.py" = ["D", "S101"]
-"**/*.ipynb" = ["D100", "B018", "INP001", "E302", "E305"]
-
-[tool.ruff.lint.extend-per-file-ignores]
+lint.per-file-ignores."**/*.ipynb" = [
+    "B018",
+    "D100",
+    "E302",
+    "E305",
+    "INP001",
+]
+lint.per-file-ignores."docs/conf.py" = [
+    "INP001",
+]
+lint.per-file-ignores."noxfile.py" = [
+    "RUF009",
+]
+lint.per-file-ignores."tests/*.py" = [
+    "D",
+    "S101",
+]
+lint.per-file-ignores."tools/*.py" = [
+    "A",
+    "D102",
+    "S",
+    "SLF001",
+]
+lint.extend-per-file-ignores."**/*.ipynb" = [
+    "ARG",
+    "D102",
+    "D103",
+    "F821",
+    "N",
+    "PLR6104",
+    "PTH",
+    "T201",
+    "W391",
+]
+lint.extend-per-file-ignores."**/_attrs_utils.py" = [
+    "A002",
+    "ARG001",
+]
+lint.extend-per-file-ignores."**/adaptive_interp.py" = [
+    "T201",
+]
+lint.extend-per-file-ignores."**/beta.py" = [
+    "A003",
+    "ARG002",
+    "D102",
+    "N801",
+]
+lint.extend-per-file-ignores."**/data.py" = [
+    "D102",
+]
+lint.extend-per-file-ignores."**/gpr_active/*.py" = [
+    "ARG002",
+    "D102",
+    "D103",
+    "FA100",
+    "N802",
+    "N803",
+    "N806",
+    "PLR0914",
+    "PLR6301",
+]
+lint.extend-per-file-ignores."**/lnpi.py" = [
+    "A003",
+    "ARG002",
+    "D102",
+    "N801",
+    "N802",
+    "N815",
+]
+lint.extend-per-file-ignores."**/models.py" = [
+    "A003",
+    "ARG002",
+    "D102",
+    "N803",
+    "N815",
+]
+lint.extend-per-file-ignores."**/stack.py" = [
+    "D102",
+]
+lint.extend-per-file-ignores."**/volume*.py" = [
+    "D102",
+]
+lint.extend-per-file-ignores."conftest.py" = [
+    "D103",
+]
+lint.extend-per-file-ignores."examples/usage/gpr/**/*.ipynb" = [
+    "B008",
+    "FA100",
+    "PERF203",
+    "PERF401",
+    "PLR0911",
+    "PLR6301",
+]
+lint.extend-per-file-ignores."src/**/*.py" = [
+    "FIX002",
+    "TD003",
+]
 # Project specific ignores (avoid changing per-file-ignores directly)
-"tests/*.py" = ["PT011", "PLR0914", "SLF001"]
-"tests/test_lnPi.py" = ["N999"]
-"**/*.ipynb" = ["F821", "T201", "N", "ARG", "PTH", "D102", "D103", "W391", "PLR6104"]
-"src/**/*.py" = ["TD003", "FIX002"]
-"**/adaptive_interp.py" = ["T201"]
-"**/beta.py" = ["N801", "ARG002", "A003", "D102"]
-"**/data.py" = ["D102"]
-"**/lnpi.py" = ["N801", "N802", "N815", "ARG002", "A003", "D102"]
-"**/models.py" = ["ARG002", "A003", "N803", "N815", "D102"]
-"**/stack.py" = ["D102"]
-"**/volume*.py" = ["D102"]
-"**/_attrs_utils.py" = ["ARG001", "A002"]
-"**/gpr_active/*.py" = ["N802", "N803", "N806", "PLR6301", "PLR0914", "ARG002", "FA100", "D102", "D103"]
-"examples/usage/gpr/**/*.ipynb" = ["PLR0911", "PLR6301", "FA100", "PERF203", "PERF401", "B008"]
-"conftest.py" = ["D103"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["thermoextrap"]
-
-[tool.ruff.format]
-docstring-code-format = true
+lint.extend-per-file-ignores."tests/*.py" = [
+    "PLR0914",
+    "PT011",
+    "SLF001",
+]
+lint.extend-per-file-ignores."tests/test_lnPi.py" = [
+    "N999",
+]
+# fixable = ["ALL"]
+lint.unfixable = [
+    "PLR6104",
+    "T",
+]
+# Allow unused variables when underscore-prefixed.
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+lint.isort.known-first-party = [
+    "thermoextrap",
+]
+lint.pydocstyle.convention = "numpy"
+lint.pylint.max-args = 15
+lint.pylint.max-positional-args = 15
+lint.pylint.max-public-methods = 30
+lint.preview = true
 
 [tool.nbqa.exclude]
 ruff = "^examples/gpr_active_learning|^examples/usage/gpr"
@@ -276,8 +358,12 @@ ruff = "^examples/gpr_active_learning|^examples/usage/gpr"
 skip = "examples/*"
 
 [tool.check-wheel-contents]
-toplevel = ["thermoextrap"]
-src_dir = ["src"]
+toplevel = [
+    "thermoextrap",
+]
+src_dir = [
+    "src",
+]
 
 # * Testing --------------------------------------------------------------------
 
@@ -288,7 +374,8 @@ addopts = [
     "--pyargs",
     "--cov-config=pyproject.toml",
     "--ignore-glob='**/legacy/**",
-    "-n", "4",
+    "-n",
+    "4",
 ]
 testpaths = [
     "README.md",
@@ -302,38 +389,75 @@ parallel = true
 
 [tool.coverage.report]
 # show_missing = true
-exclude_also = ["if TYPE_CHECKING:", "@overload"]
-omit = ["*/vendored/*", "*/_typing.py"]
-include = ["src/*"]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "@overload",
+]
+omit = [
+    "*/vendored/*",
+    "*/_typing.py",
+]
+include = [
+    "src/*",
+]
 
 [tool.coverage.paths]
-source = ["src/", ".nox/**/site-packages/"]
+source = [
+    "src/",
+    ".nox/**/site-packages/",
+]
 
 # * Typing ---------------------------------------------------------------------
 
 [tool.mypy]
-files = ["src", "tests"]
+files = [
+    "src",
+    "tests",
+]
 show_error_codes = true
 warn_unused_ignores = true
 warn_return_any = true
 warn_unused_configs = true
-exclude = [".eggs", ".tox", ".nox", ".venv", ".numba_cache", "docs"]
+exclude = [
+    ".eggs",
+    ".tox",
+    ".nox",
+    ".venv",
+    ".numba_cache",
+    "docs",
+]
 check_untyped_defs = true
 # strict = true
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
-module = []
+module = [
+]
 
 [[tool.mypy.overrides]]
 ignore_errors = true
-module = []
+module = [
+]
 
 [tool.pyright]
-include = ["src", "tests"]
-exclude = ["**/__pycache__", ".tox/**", ".nox/**", ".venv/**", "**/.mypy_cache", "**/.numba_cache", "**/thermoextrap/legacy/*.py"]
+include = [
+    "src",
+    "tests",
+]
+exclude = [
+    "**/__pycache__",
+    ".tox/**",
+    ".nox/**",
+    ".venv/**",
+    "**/.mypy_cache",
+    "**/.numba_cache",
+    "**/thermoextrap/legacy/*.py",
+]
 # strict = ["src", "tests", "noxfile.py", "tools/*.py"]
-strict = ["noxfile.py", "tools/*.py"]
+strict = [
+    "noxfile.py",
+    "tools/*.py",
+]
 pythonVersion = "3.11"
 typeCheckingMode = "basic"
 # enable subset of "strict"
@@ -357,7 +481,10 @@ reportPrivateImportUsage = false
 reportUnboundVariable = false
 
 [tool.pytype]
-inputs = ["src", "tests"]
+inputs = [
+    "src",
+    "tests",
+]
 
 # * Dependency creation --------------------------------------------------------
 
@@ -365,10 +492,23 @@ inputs = ["src", "tests"]
 user_config = "config/userconfig.toml"
 template_python = "requirements/py{py}-{env}"
 template = "requirements/{env}"
-python = ["3.11"]
-channels = ["conda-forge"]
-style = ["yaml", "requirements"]
-default_envs = ["test", "typing", "docs", "dev", "dev-complete"]
+python = [
+    "3.11",
+]
+channels = [
+    "conda-forge",
+]
+style = [
+    "yaml",
+    "requirements",
+]
+default_envs = [
+    "test",
+    "typing",
+    "docs",
+    "dev",
+    "dev-complete",
+]
 
 [tool.pyproject2conda.dependencies]
 pytest-accept = { pip = true }
@@ -381,11 +521,13 @@ tensorflow-probability = { pip = true }
 pymbar = { pip = true }
 jax = { pip = true }
 jaxlib = { pip = true }
-module-utilities = { packages = "docstring-inheritance"}
+module-utilities = { packages = "docstring-inheritance" }
 
 [tool.pyproject2conda.envs.build]
 extras = "build-system.requires"
-reqs = ["build"]
+reqs = [
+    "build",
+]
 base = false
 style = "requirements"
 
@@ -395,20 +537,42 @@ base = false
 style = "requirements"
 
 [tool.pyproject2conda.envs.test-extras]
-extras = ["test"]
+extras = [
+    "test",
+]
 base = false
 
 [tool.pyproject2conda.envs.test-notebook]
-extras = ["test", "nbval", "viz"]
+extras = [
+    "test",
+    "nbval",
+    "viz",
+]
 
 [[tool.pyproject2conda.overrides]]
 # Ensure these have pip in yaml file
-envs = ["test", "docs", "dev", "dev-complete"]
-deps = ["pip"]
+envs = [
+    "test",
+    "docs",
+    "dev",
+    "dev-complete",
+]
+deps = [
+    "pip",
+]
 
 [[tool.pyproject2conda.overrides]]
-envs = ["test", "typing", "test-extras"]
-python = ["3.8", "3.9", "3.10", "3.11"]
+envs = [
+    "test",
+    "typing",
+    "test-extras",
+]
+python = [
+    "3.8",
+    "3.9",
+    "3.10",
+    "3.11",
+]
 
 [tool.pip-tools]
 allow-unsafe = true
