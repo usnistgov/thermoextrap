@@ -64,7 +64,7 @@ optional-dependencies.dev-extras = [
     "ipykernel",
     "ipython",
     "nbclient>=0.10.0",
-    "nox>=2024.3.2",
+    "nox>=2024.4.15",
     "pytest-accept",
 ]
 optional-dependencies.docs = [
@@ -89,7 +89,7 @@ optional-dependencies.mbar = [
     "pymbar>=4.0",
 ]
 optional-dependencies.mypy = [
-    "mypy>=1.9.0",
+    "mypy>=1.10.0",
 ]
 optional-dependencies.nbval = [
     "nbval",
@@ -109,7 +109,7 @@ optional-dependencies.pipxrun-tools = [
     "conda-lock>=2.5.5",
     "grayskull>=2.5.3",
     "nbqa>=1.8.4",
-    "pyright>=1.1.357,!=1.1.358", # skipping 1.1.358.  Breaks module_utilities.cached.
+    "pyright>=1.1.367",
     "thermoextrap[mypy]",
     "twine>=5.0.0",
 ]
@@ -522,6 +522,7 @@ pymbar = { pip = true }
 jax = { pip = true }
 jaxlib = { pip = true }
 module-utilities = { packages = "docstring-inheritance" }
+lazy-loader = { skip = true, packages = "lazy_loader" }
 
 [tool.pyproject2conda.envs.build]
 extras = "build-system.requires"

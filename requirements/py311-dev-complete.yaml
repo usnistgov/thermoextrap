@@ -13,17 +13,17 @@ dependencies:
   - python=3.11
   - attrs
   - bottleneck
-  - cmomy>=0.8
+  - cmomy<0.11.0,>=0.8
   - docstring-inheritance
   - ipykernel
   - ipython
   - lazy_loader
   - matplotlib-base
   - module-utilities>=0.2
-  - mypy>=1.9.0
+  - mypy>=1.10.0
   - nbclient>=0.10.0
   - nbval
-  - nox>=2024.3.2
+  - nox>=2024.4.15
   - numpy>=1.20
   - packaging
   - pandas

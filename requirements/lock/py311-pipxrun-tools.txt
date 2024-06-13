@@ -13,7 +13,7 @@ click==8.1.7              # via click-default-group, conda-lock, ensureconda
 click-default-group==1.2.4  # via conda-lock
 clikit==0.6.2             # via conda-lock
 colorama==0.4.6           # via grayskull
-conda-lock==2.5.6
+conda-lock==2.5.6         # via -r requirements/pipxrun-tools.txt
 conda-souschef==2.2.3     # via grayskull
 crashtest==0.3.1          # via clikit, conda-lock
 decorator==5.1.1          # via ipython
@@ -24,7 +24,7 @@ executing==2.0.1          # via stack-data
 filelock==3.13.1          # via cachecontrol, ensureconda, virtualenv
 gitdb==4.0.11             # via gitpython
 gitpython==3.1.42         # via conda-lock
-grayskull==2.6.0
+grayskull==2.6.0          # via -r requirements/pipxrun-tools.txt
 html5lib==1.1             # via conda-lock
 idna==3.6                 # via requests
 importlib-metadata==7.0.2  # via keyring, twine
@@ -39,9 +39,9 @@ matplotlib-inline==0.1.6  # via ipython
 mdurl==0.1.2              # via markdown-it-py
 more-itertools==10.2.0    # via jaraco-classes
 msgpack==1.0.8            # via cachecontrol
-mypy==1.9.0
+mypy==1.10.0              # via -r requirements/pipxrun-tools.txt
 mypy-extensions==1.0.0    # via mypy
-nbqa==1.8.4
+nbqa==1.8.4               # via -r requirements/pipxrun-tools.txt
 nh3==0.2.15               # via readme-renderer
 nodeenv==1.8.0            # via pyright
 packaging==24.0           # via conda-lock, ensureconda, grayskull
@@ -60,7 +60,7 @@ pydantic==2.6.4           # via conda-lock
 pydantic-core==2.16.3     # via pydantic
 pygments==2.17.2          # via ipython, readme-renderer, rich
 pylev==1.4.0              # via clikit
-pyright==1.1.354
+pyright==1.1.367          # via -r requirements/pipxrun-tools.txt
 python-utils==3.8.2       # via progressbar2
 pyyaml==6.0.1             # via conda-lock
 rapidfuzz==3.6.2          # via grayskull
@@ -85,7 +85,7 @@ tomli-w==1.0.0            # via grayskull
 tomlkit==0.12.4           # via conda-lock
 toolz==0.12.1             # via conda-lock
 traitlets==5.14.2         # via ipython, matplotlib-inline
-twine==5.0.0
+twine==5.0.0              # via -r requirements/pipxrun-tools.txt
 typing-extensions==4.10.0  # via conda-lock, mypy, pydantic, pydantic-core, python-utils
 urllib3==1.26.18          # via conda-lock, requests, twine
 virtualenv==20.25.1       # via conda-lock
