@@ -7,7 +7,7 @@ certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.8.0              # via -r requirements/typing.txt
+cmomy==0.12.0             # via -r requirements/typing.txt
 decorator==5.1.1          # via tensorflow-probability
 deprecated==1.2.14        # via gpflow
 dm-tree==0.1.8            # via keras, tensorflow-probability
@@ -66,7 +66,7 @@ tensorflow-probability==0.24.0  # via gpflow, -r requirements/typing.txt
 termcolor==2.4.0          # via tensorflow
 tf-keras==2.16.0          # via tensorflow-probability
 types-pytz==2024.1.0.20240203  # via pandas-stubs
-typing-extensions==4.10.0  # via gpflow, module-utilities, tensorflow
+typing-extensions==4.10.0  # via cmomy, gpflow, module-utilities, tensorflow
 tzdata==2024.1            # via pandas
 urllib3==2.2.1            # via requests
 werkzeug==3.0.1           # via tensorboard

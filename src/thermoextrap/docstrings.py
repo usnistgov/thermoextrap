@@ -17,6 +17,8 @@ xv : xarray.DataArray
     raw values of x (observable)
 w : array-like, optional
     optional weight array.  Note that this array/xarray must be conformable to uv, xv
+weight : array-like or DataArray, optional
+    optional weight array.  Note that this array/xarray must be conformable to uv, xv
 order : int
     maximum order of moments/expansion to calculate
 umom_dim : str, default='umom'

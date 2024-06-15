@@ -11,7 +11,7 @@ certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.8.0              # via -r requirements/dev.txt
+cmomy==0.12.0             # via -r requirements/dev.txt
 colorlog==6.8.2           # via nox
 comm==0.2.2               # via ipykernel
 contourpy==1.2.0          # via matplotlib
@@ -118,7 +118,7 @@ tf-keras==2.16.0          # via tensorflow-probability
 tornado==6.4              # via ipykernel, jupyter-client
 traitlets==5.14.2         # via comm, ipykernel, ipython, jupyter-client, jupyter-core, matplotlib-inline, nbclient, nbformat
 types-pytz==2024.1.0.20240203  # via pandas-stubs
-typing-extensions==4.10.0  # via gpflow, module-utilities, mypy, tensorflow
+typing-extensions==4.10.0  # via cmomy, gpflow, module-utilities, mypy, tensorflow
 tzdata==2024.1            # via pandas
 urllib3==2.2.1            # via requests
 virtualenv==20.25.1       # via nox

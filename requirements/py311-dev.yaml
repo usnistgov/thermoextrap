@@ -13,7 +13,7 @@ dependencies:
   - python=3.11
   - attrs
   - bottleneck
-  - cmomy<0.11.0,>=0.8
+  - cmomy>=0.11.0
   - docstring-inheritance
   - ipykernel
   - ipython

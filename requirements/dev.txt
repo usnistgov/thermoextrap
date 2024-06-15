@@ -9,7 +9,7 @@
 #
 attrs
 bottleneck
-cmomy<0.11.0,>=0.8
+cmomy>=0.11.0
 gpflow>=2.6.0
 ipykernel
 ipython

@@ -14,7 +14,7 @@ The general scheme is to use the following:
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Hashable, Mapping, Sequence
+from typing import TYPE_CHECKING, Hashable, Mapping, Sequence
 
 import attrs
 import cmomy
@@ -34,6 +34,9 @@ from .core._attrs_utils import (
 from .core.xrutils import xrwrap_uv, xrwrap_xv
 from .docstrings import DOCFILLER_SHARED
 
+if TYPE_CHECKING:
+    from typing import Any
+
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
 __all__ = [
@@ -46,6 +49,17 @@ __all__ = [
     "factory_data_values",
     "resample_indices",
 ]
+
+
+# TODO(wpk): rename order to something like mom_order or expansion_order just umom...
+
+# * Utilities
+
+
+def _raise_if_not_dataarray(x: Any, name: str | None = None) -> None:
+    if not isinstance(x, xr.DataArray):
+        msg = f"type({name})={type(x)} must be a DataArray."
+        raise TypeError(msg)
 
 
 @docfiller_shared.decorate
@@ -180,7 +194,7 @@ class DataCallbackABC(
         """Perform any consistency checks between self and data."""
 
     @abstractmethod
-    def derivs_args(self, data, derivs_args):
+    def derivs_args(self, *args, data, derivs_args):
         """
         Adjust derivs args from data class.
 
@@ -190,7 +204,7 @@ class DataCallbackABC(
 
     # define these to raise error instead
     # of forcing usage.
-    def resample(self, data, meta_kws, **kws) -> None:
+    def resample(self, *args, data, meta_kws, **kws) -> None:
         """
         Adjust create new object.
 
@@ -198,11 +212,11 @@ class DataCallbackABC(
         """
         raise NotImplementedError
 
-    def block(self, data, meta_kws, **kws) -> None:
+    def block(self, *args, data, meta_kws, **kws) -> None:
         """Block averaging."""
         raise NotImplementedError
 
-    def reduce(self, data, meta_kws, **kws) -> None:
+    def reduce(self, *args, data, meta_kws, **kws) -> None:
         """Reduce along dimension."""
         raise NotImplementedError
 
@@ -221,16 +235,16 @@ class DataCallback(DataCallbackABC):
     def check(self, data) -> None:
         pass
 
-    def derivs_args(self, data, derivs_args):  # noqa: PLR6301,ARG002
+    def derivs_args(self, *args, data, derivs_args):  # noqa: PLR6301,ARG002
         return derivs_args
 
-    def resample(self, data, meta_kws, **kws):  # noqa: ARG002
+    def resample(self, *args, data, meta_kws, **kws):  # noqa: ARG002
         return self
 
-    def block(self, data, meta_kws, **kws):  # noqa: ARG002
+    def block(self, *args, data, meta_kws, **kws):  # noqa: ARG002
         return self
 
-    def reduce(self, data, meta_kws, **kws):  # noqa: ARG002
+    def reduce(self, *args, data, meta_kws, **kws):  # noqa: ARG002
         return self
 
 
@@ -626,7 +640,7 @@ def build_aves_xu(
 
 
 @docfiller_shared.decorate
-def build_aves_dxdu(  # noqa: C901
+def build_aves_dxdu(
     uv,
     xv,
     order,
@@ -667,9 +681,7 @@ def build_aves_dxdu(  # noqa: C901
         xarray objects with averaged data.  If merge is True, merge output
         into single :class:`xr.Dataset` object.
     """
-    if not isinstance(uv, xr.DataArray):
-        msg = f"{type(uv)=} must be a DataArray."
-        raise TypeError(msg)
+    _raise_if_not_dataarray(uv, "uv")
     if not isinstance(xv, (xr.DataArray, xr.Dataset)):
         msg = f"{type(xv)=} must be a DataArray or Dataset."
         raise TypeError(msg)
@@ -1232,7 +1244,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
     @classmethod
     @docfiller_shared.decorate
-    def from_raw(  # noqa: PLR0913,PLR0917
+    def from_raw(
         cls,
         raw,
         rec_dim="rec",
@@ -1240,16 +1252,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         umom_dim="umom",
         deriv_dim=None,
         central=False,
-        mom=None,
-        val_shape=None,
-        dtype=None,
-        dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
-        meta=None,
         x_is_u=False,
+        meta=None,
     ):
         """
         Convert raw moments to data object.
@@ -1267,7 +1271,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         {umom_dim}
         {deriv_dim}
         {central}
-        {mom}
         {val_shape}
         {dtype}
         {xr_params}
@@ -1284,6 +1287,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_raw`
         """
+        _raise_if_not_dataarray(raw)
+
         if x_is_u:
             raw = xr.concat(
                 [
@@ -1300,16 +1305,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         dxduave = cmomy.xCentralMoments.from_raw(
             raw=raw,
-            mom=mom,
             mom_ndim=2,
-            val_shape=val_shape,
-            dtype=dtype,
-            dims=dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
-            mom_dims=(xmom_dim, umom_dim),
         )
 
         return cls(
@@ -1325,7 +1321,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
     @classmethod
     @docfiller_shared.decorate
-    def from_vals(  # noqa: PLR0913,PLR0917
+    def from_vals(  # noqa: PLR0913
         cls,
         xv,
         uv,
@@ -1335,19 +1331,14 @@ class DataCentralMoments(DataCentralMomentsBase):
         rec_dim="rec",
         deriv_dim=None,
         central=False,
-        w=None,
+        weight=None,
         axis=None,
         dim=None,
-        broadcast=True,
-        val_shape=None,
         dtype=None,
         dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
         meta=None,
         x_is_u=False,
+        **kwargs,
     ):
         """
         Create DataCentralMoments object from individual (unaveraged) samples.
@@ -1362,15 +1353,14 @@ class DataCentralMoments(DataCentralMomentsBase):
         {rec_dim}
         {deriv_dim}
         {central}
-        {w}
+        {weight}
         {dim}
         {axis}
-        {broadcast}
-        {val_shape}
         {dtype}
-        {xr_params}
         {meta}
         {x_is_u}
+        **kwargs
+            Extra arguments to :meth:`cmomy.xCentralMoments.from_vals`
 
 
         Returns
@@ -1381,27 +1371,26 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_vals`
         """
-        if axis is None and dim is None:
-            axis = 0
-
         if xv is None or x_is_u:
             xv = uv
 
+        _raise_if_not_dataarray(xv)
+        _raise_if_not_dataarray(uv)
+
+        if axis is None and dim is None:
+            axis = 0
+
         dxduave = cmomy.xCentralMoments.from_vals(
-            x=(xv, uv),
-            w=w,
+            xv,
+            uv,
+            w=weight,
             axis=axis,
             dim=dim,
             mom=(1, order),
-            broadcast=broadcast,
-            val_shape=val_shape,
             dtype=dtype,
             dims=dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
             mom_dims=(xmom_dim, umom_dim),
+            **kwargs,
         )
 
         return cls(
@@ -1417,24 +1406,18 @@ class DataCentralMoments(DataCentralMomentsBase):
 
     @classmethod
     @docfiller_shared.decorate
-    def from_data(  # noqa: PLR0913,PLR0917
+    def from_data(
         cls,
-        data,
+        data: xr.DataArray,
         rec_dim="rec",
         xmom_dim="xmom",
         umom_dim="umom",
         deriv_dim=None,
         central=False,
-        mom=None,
-        val_shape=None,
         dtype=None,
-        dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
         meta=None,
         x_is_u=False,
+        **kwargs,
     ):
         """
         Create DataCentralMoments object from data.
@@ -1446,18 +1429,17 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         Parameters
         ----------
-        data : array-like
+        data : DataArray
         {rec_dim}
         {xmom_dim}
         {umom_dim}
         {deriv_dim}
         {central}
-        {mom}
-        {val_shape}
         {dtype}
-        {xr_params}
         {meta}
         {x_is_u}
+        **kwargs
+            Extra arguments to :meth:`cmomy.xCentralMoments`
 
         Returns
         -------
@@ -1467,6 +1449,8 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_data`
         """
+        _raise_if_not_dataarray(data)
+
         if x_is_u:
             # convert from central moments to central co-moments
             # out_0 = data.sel(**{umom_dim: slice(None, -1)})
@@ -1483,18 +1467,11 @@ class DataCentralMoments(DataCentralMomentsBase):
                 dim=xmom_dim,
             )
 
-        dxduave = cmomy.xCentralMoments.from_data(
+        dxduave = cmomy.xCentralMoments(
             data=data,
             mom_ndim=2,
-            mom=mom,
-            val_shape=val_shape,
-            dims=dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
-            mom_dims=(xmom_dim, umom_dim),
             dtype=dtype,
+            **kwargs,
         )
 
         return cls(
@@ -1511,32 +1488,23 @@ class DataCentralMoments(DataCentralMomentsBase):
     @classmethod
     def from_resample_vals(  # noqa: PLR0913,PLR0917
         cls,
-        xv,
+        xv: xr.DataArray,
         uv,
         order,
-        freq=None,
-        indices=None,
-        nrep=None,
+        freq,
+        weight=None,
+        axis=None,
+        dim=None,
         xmom_dim="xmom",
         umom_dim="umom",
         rep_dim="rep",
         deriv_dim=None,
         central=False,
-        w=None,
-        axis=None,
-        dim=None,
-        broadcast=True,
         dtype=None,
-        dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
-        resample_kws=None,
-        parallel=True,
         meta=None,
         meta_kws=None,
         x_is_u=False,
+        **kwargs,
     ):
         """
         Create DataCentralMoments object from unaveraged samples with resampling.
@@ -1547,55 +1515,54 @@ class DataCentralMoments(DataCentralMomentsBase):
         {uv}
         {order}
         {freq}
-        {indices}
-        {nrep}
+        {weight}
+        {axis}
+        {dim}
         {xmom_dim}
         {umom_dim}
         {rep_dim}
         {deriv_dim}
         {central}
-        w : array-like, optional
-            Weights for each observation.
-        {axis}
-        {dim}
-        {broadcast}
         {dtype}
-        {xr_params}
-        {resample_kws}
         {meta}
         {meta_kws}
         {x_is_us}
+        **kwargs
+            Extra arguments to :meth:`cmomy.xCentralMoments.from_resample_vals`
 
         See Also
         --------
         :meth:`cmomy.xCentralMoments.from_resample_vals`
+        :meth:`cmomy.resample.random_freq`
+        :meth:`cmomy.resmaple.randsamp_freq`
         """
         if xv is None or x_is_u:
             xv = uv
 
-        kws = {
-            "x": (xv, uv),
-            "w": w,
-            "freq": freq,
-            "indices": indices,
-            "nrep": nrep,
-            "dim": dim,
-            "axis": axis,
-            "mom": (1, order),
-            "parallel": parallel,
-            "resample_kws": resample_kws,
-            "broadcast": broadcast,
-            "dtype": dtype,
-            "dims": dims,
-            "rep_dim": rep_dim,
-            "attrs": attrs,
-            "coords": coords,
-            "indexes": indexes,
-            "name": name,
-            "mom_dims": (xmom_dim, umom_dim),
-        }
+        _raise_if_not_dataarray(xv)
+        _raise_if_not_dataarray(uv)
 
-        dxduave = cmomy.xCentralMoments.from_resample_vals(**kws)
+        # from cmomy._utils import select_axis_dim
+
+        # axis, dim = select_axis_dim(xv.dims, axis=axis, dim=dim, default_axis=0)
+
+        # ndat = xv.sizes[dim]
+
+        # freq = cmomy.resample.randsamp_freq(ndat=ndat, nrep=nrep, indices=indices, freq=freq, check=True)
+
+        dxduave = cmomy.xCentralMoments.from_resample_vals(
+            xv,
+            uv,
+            weight=weight,
+            freq=freq,
+            mom=(1, order),
+            axis=axis,
+            dim=dim,
+            dtype=dtype,
+            mom_dims=(xmom_dim, umom_dim),
+            rep_dim=rep_dim,
+            **kwargs,
+        )
 
         out = cls(
             dxduave=dxduave,
@@ -1609,32 +1576,35 @@ class DataCentralMoments(DataCentralMomentsBase):
         )
 
         return out.set_params(
-            meta=out.meta.resample(data=out, meta_kws=meta_kws, **kws)
+            meta=out.meta.resample(
+                xv,
+                uv,
+                data=out,
+                meta_kws=meta_kws,
+                weight=weight,
+                freq=freq,
+                mom=(1, order),
+                axis=axis,
+                dim=dim,
+                dtype=dtype,
+                mom_dims=(xmom_dim, umom_dim),
+                rep_dim=rep_dim,
+                **kwargs,
+            )
         )
 
     @classmethod
     @docfiller_shared.decorate
-    def from_ave_raw(  # noqa: PLR0913,PLR0917
+    def from_ave_raw(
         cls,
         u,
         xu,
-        w=None,
-        axis=-1,
-        umom_axis=None,
-        xumom_axis=None,
+        weight=None,
         rec_dim="rec",
         xmom_dim="xmom",
         umom_dim="umom",
         deriv_dim=None,
         central=False,
-        mom=None,
-        val_shape=None,
-        dtype=None,
-        dims=None,
-        attrs=None,
-        coords=None,
-        indexes=None,
-        name=None,
         meta=None,
         x_is_u=False,
     ):
@@ -1673,61 +1643,29 @@ class DataCentralMoments(DataCentralMomentsBase):
         --------
         :meth:`cmomy.xCentralMoments.from_raw`
         """
+        _raise_if_not_dataarray(u)
         if xu is None or x_is_u:
             raw = u
 
-            if w is not None:
-                raw.loc[{umom_dim: 0}] = w
+            if weight is not None:
+                raw.loc[{umom_dim: 0}] = weight
             raw = raw.transpose(..., umom_dim)
 
-        elif isinstance(xu, xr.DataArray):
+        else:
+            _raise_if_not_dataarray(xu)
             raw = xr.concat((u, xu), dim=xmom_dim)
-            if w is not None:
-                raw.loc[{umom_dim: 0, xmom_dim: 0}] = w
+            if weight is not None:
+                raw.loc[{umom_dim: 0, xmom_dim: 0}] = weight
             # make sure in correct order
             raw = raw.transpose(..., xmom_dim, umom_dim)
-            # return raw
-            # raw.data = np.ascontiguousarray(raw.data)
-        else:
-            if axis is None:
-                axis = -1
-            if umom_axis is None:
-                umom_axis = axis
-            if xumom_axis is None:
-                xumom_axis = axis
-
-            u = np.swapaxes(u, umom_axis, -1)
-            xu = np.swapaxes(xu, xumom_axis, -1)
-
-            shape = xu.shape[:-1]
-            shape_moments = (2, min(u.shape[-1], xu.shape[-1]))
-            shape_out = shape + shape_moments
-
-            if dtype is None:
-                dtype = xu.dtype
-
-            raw = np.empty(shape_out, dtype=dtype)
-            raw[..., 0, :] = u
-            raw[..., 1, :] = xu
-            if w is not None:
-                raw[..., 0, 0] = w
-            # raw = np.ascontiguousarray(raw)
 
         return cls.from_raw(
             raw=raw,
-            deriv_dim=deriv_dim,
-            rec_dim=rec_dim,
             xmom_dim=xmom_dim,
             umom_dim=umom_dim,
-            mom=mom,
+            deriv_dim=deriv_dim,
+            rec_dim=rec_dim,
             central=central,
-            val_shape=val_shape,
-            dtype=dtype,
-            dims=dims,
-            attrs=attrs,
-            coords=coords,
-            indexes=indexes,
-            name=name,
             meta=meta,
             x_is_u=x_is_u,
         )
