@@ -120,7 +120,7 @@ traitlets==5.14.2         # via comm, ipykernel, ipython, jupyter-client, jupyte
 types-pytz==2024.1.0.20240203  # via pandas-stubs
 typing-extensions==4.10.0  # via gpflow, module-utilities, mypy, tensorflow
 tzdata==2024.1            # via pandas
-urllib3==2.2.1            # via requests
+urllib3==1.26.19            # via requests
 virtualenv==20.25.1       # via nox
 wcwidth==0.2.13           # via prompt-toolkit
 werkzeug==3.0.1           # via tensorboard

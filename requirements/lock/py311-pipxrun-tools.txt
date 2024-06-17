@@ -87,7 +87,7 @@ toolz==0.12.1             # via conda-lock
 traitlets==5.14.2         # via ipython, matplotlib-inline
 twine==5.0.0
 typing-extensions==4.10.0  # via conda-lock, mypy, pydantic, pydantic-core, python-utils
-urllib3==1.26.18          # via conda-lock, requests, twine
+urllib3==1.26.19          # via conda-lock, requests, twine
 virtualenv==20.25.1       # via conda-lock
 wcwidth==0.2.13           # via prompt-toolkit
 webencodings==0.5.1       # via html5lib
