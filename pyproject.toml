@@ -55,7 +55,7 @@ optional-dependencies.all = [
     "thermoextrap[mbar,gpr,accel,parallel,viz]",
 ]
 optional-dependencies.dev = [
-    "thermoextrap[dev-extras,test,typing,pipxrun,mypy,nbval,accel,viz,gpr,mbar]",
+    "thermoextrap[dev-extras,test,typing,uvxrun,mypy,nbval,accel,viz,gpr,mbar]",
 ]
 optional-dependencies.dev-complete = [
     "thermoextrap[dev,tools]",
@@ -89,7 +89,7 @@ optional-dependencies.mbar = [
     "pymbar>=4.0",
 ]
 optional-dependencies.mypy = [
-    "mypy>=1.10.0",
+    "mypy>=1.11.2",
 ]
 optional-dependencies.nbval = [
     "nbval",
@@ -100,19 +100,6 @@ optional-dependencies.openmm = [
 optional-dependencies.parallel = [
     "dask[complete]",
 ]
-optional-dependencies.pipxrun = [
-    # Anything needed to run tools/pipxrun.py
-    "packaging",
-]
-optional-dependencies.pipxrun-tools = [
-    # these used solely for specking tools to be used with tools/pipxrun.py
-    "conda-lock>=2.5.5",
-    "grayskull>=2.5.3",
-    "nbqa>=1.8.4",
-    "pyright>=1.1.367",
-    "thermoextrap[mypy]",
-    "twine>=5.0.0",
-]
 optional-dependencies.test = [
     "pandas",
     "pytest",
@@ -122,14 +109,26 @@ optional-dependencies.test = [
     "thermoextrap[mbar,gpr]",
 ]
 optional-dependencies.tools = [
-    "pipx",
     "pre-commit",
     "scriv",
 ]
 optional-dependencies.typing = [
     "pandas-stubs",
     "pytest",
-    "thermoextrap[pipxrun,mbar,gpr]",
+    "thermoextrap[uvxrun,mbar,gpr]",
+]
+optional-dependencies.uvxrun = [
+    # Anything needed to run tools/uvxrun.py
+    "packaging",
+]
+optional-dependencies.uvxrun-tools = [
+    # these used solely for specking tools to be used with tools/uvxrun.py
+    "conda-lock>=2.5.5",
+    "grayskull>=2.5.3",
+    "nbqa>=1.8.4",
+    "pyright>=1.1.380",
+    "thermoextrap[mypy]",
+    "twine>=5.0.0",
 ]
 optional-dependencies.viz = [
     "matplotlib",
@@ -206,7 +205,6 @@ lint.ignore = [
     # * Other
     "E501", # - line too long - let formatter fix this
     "E731", # - do not assign a lambda expression, use a def
-    "ERA",  # - eradicate (want to keep some stuff)
     "FBT",  # - bools are ok
     "ISC",  # - flake8-implicit-str-concat
     # * Allow non top level imports
@@ -219,15 +217,21 @@ lint.extend-ignore = [
     # * Annotations
     # "SLF001",  # - flake8-self (private access sometimes OK)
     "ANN", # - Annotations (just use mypy/pyright)
-    "PD",  # - not using pandas?
-    # * pylint
-    "PLR2004", # - numbers in comparison sometimes ok
     # "PLR0913", # - complexity sometimes ok
     # "PLR0917", # - complexity sometimes ok
     # * Docstrings ymmv
     # "D102",    # - Missing docstring in public method
     # "D103",    # - Missing docstring in public function
     # "D202",    # - blank line after docstring
+    "DOC201", # - Missing return from documentation
+    "DOC202", # - Missing return from documentation
+    "DOC402",
+    "DOC501", # - Missing raises from documentation
+    "ERA",    # - eradicate (want to keep some stuff)
+    "NPY",    # - not using numpy?
+    "PD",     # - not using pandas?
+    # * pylint
+    "PLR2004", # - numbers in comparison sometimes ok
 ]
 lint.per-file-ignores."**/*.ipynb" = [
     "B018",
@@ -237,6 +241,7 @@ lint.per-file-ignores."**/*.ipynb" = [
     "INP001",
 ]
 lint.per-file-ignores."docs/conf.py" = [
+    "ERA",
     "INP001",
 ]
 lint.per-file-ignores."noxfile.py" = [
@@ -262,6 +267,10 @@ lint.extend-per-file-ignores."**/*.ipynb" = [
     "PTH",
     "T201",
     "W391",
+]
+# temporary ignores
+lint.extend-per-file-ignores."**/*.py" = [
+    "UP031",
 ]
 lint.extend-per-file-ignores."**/_attrs_utils.py" = [
     "A002",
@@ -308,6 +317,7 @@ lint.extend-per-file-ignores."**/models.py" = [
 lint.extend-per-file-ignores."**/stack.py" = [
     "D102",
 ]
+lint.extend-per-file-ignores."**/thermoextrap/random.py" = [ "A005" ]
 lint.extend-per-file-ignores."**/volume*.py" = [
     "D102",
 ]
@@ -337,6 +347,7 @@ lint.extend-per-file-ignores."tests/test_lnPi.py" = [
 ]
 # fixable = ["ALL"]
 lint.unfixable = [
+    "ERA",
     "PLR6104",
     "T",
 ]
@@ -532,8 +543,8 @@ reqs = [
 base = false
 style = "requirements"
 
-[tool.pyproject2conda.envs.pipxrun-tools]
-extras = "pipxrun-tools"
+[tool.pyproject2conda.envs.uvxrun-tools]
+extras = "uvxrun-tools"
 base = false
 style = "requirements"
 
@@ -575,9 +586,19 @@ python = [
     "3.11",
 ]
 
+# * pip-tools (keeping for legacy) ---------------------------------------------
+
 [tool.pip-tools]
 allow-unsafe = true
 strip-extras = true
+
+# * uv -------------------------------------------------------------------------
+
+[tool.uv]
+managed = false
+
+[tool.uv.pip]
+annotation-style = "line"
 
 # * Other tools ----------------------------------------------------------------
 

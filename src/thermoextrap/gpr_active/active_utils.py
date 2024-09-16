@@ -2223,8 +2223,7 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
         )
 
     if save_history and (stop_criteria is not None):
-        for key in train_history:
-            train_history[key] = np.array(train_history[key])
+        train_history = {k: np.array(v) for k, v in train_history.items()}
         np.savez(
             f"{base_dir}/active_history.npz",
             pred_mu=stop_criteria.history[0],

@@ -1321,7 +1321,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
     @classmethod
     @docfiller_shared.decorate
-    def from_vals(  # noqa: PLR0913
+    def from_vals(
         cls,
         xv,
         uv,

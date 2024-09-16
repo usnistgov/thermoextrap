@@ -531,7 +531,7 @@ def test_gp_likelihood() -> None:
 # Would allow for most comparisons to a "base" model created in __init__
 # But would make testing more modular and specific
 # Manually parsing and running all methods in class is a pain for testing, though
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_gp() -> None:  # noqa: PLR0915
     # First create data we can use
     rng = np.random.default_rng(42)

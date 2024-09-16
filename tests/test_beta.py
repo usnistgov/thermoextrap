@@ -14,7 +14,7 @@ def rng() -> np.random.Generator:
     return cmomy.random.default_rng()
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_beta_derivs_slow(fixture) -> None:
     a = np.array(fixture.derivs_list)
     s = xtrap.beta.factory_derivatives(xalpha=False, central=False)
@@ -39,7 +39,7 @@ def test_beta_derivs(fixture) -> None:
     fixture.xr_test(b, s.derivs(fixture.xdata_val, norm=False))
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_extrapmodel_slow(fixture) -> None:
     betas = [0.3, 0.4]
     em = fixture.em
@@ -47,7 +47,7 @@ def test_extrapmodel_slow(fixture) -> None:
     np.testing.assert_allclose(em.predict(betas, order=3), xem.predict(betas, order=3))
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_extrapmodel_resample_slow(fixture) -> None:
     betas = [0.3, 0.4]
     em = fixture.em
@@ -162,7 +162,7 @@ def test_perturbmodel(fixture) -> None:
     np.testing.assert_allclose(pm.predict(betas), xpm.predict(betas))
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_extrapmodel_weighted_slow(fixture) -> None:
     beta0 = [0.05, 0.5]
 
@@ -310,7 +310,7 @@ def test_extrapmodel_weighted_multi(fixture, rng: np.random.Generator) -> None:
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_interpmodel_slow(fixture, rng: np.random.Generator) -> None:
     beta0 = [0.05, 0.5, 1.0]
 
@@ -511,7 +511,7 @@ class LogAvgExtrapModel(thermoextrap.legacy.ExtrapModel):
         return deriv_vals
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_extrapmodel_minuslog_slow(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.3]
@@ -646,7 +646,7 @@ class ExtrapModelDependent(thermoextrap.legacy.ExtrapModel):
         return deriv_vals
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_extrapmodel_alphadep_slow(fixture, rng: np.random.Generator) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]
@@ -811,7 +811,7 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
         return deriv_vals
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_extrapmodel_alphadep_minuslog_slow(fixture, rng: np.random.Generator) -> None:
     beta0 = 0.5
     betas = [0.2, 0.7]

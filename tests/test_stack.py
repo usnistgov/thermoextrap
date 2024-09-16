@@ -8,7 +8,7 @@ import thermoextrap as xtrap
 from thermoextrap import stack
 
 
-@pytest.fixture()
+@pytest.fixture
 def states():
     shape = (3, 2, 4)
     dims = ["rec", "pair", "position"]
