@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import warnings
 from functools import lru_cache
-from typing import Hashable, Sequence
+from typing import TYPE_CHECKING
 
 import attrs
 import cmomy
@@ -29,6 +29,9 @@ from .core.sputils import get_default_indexed, get_default_symbol
 from .data import DataCallbackABC
 from .docstrings import DOCFILLER_SHARED
 from .models import Derivatives, ExtrapModel, SymFuncBase, SymSubs
+
+if TYPE_CHECKING:
+    from collections.abc import Hashable, Sequence
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta").decorate
 

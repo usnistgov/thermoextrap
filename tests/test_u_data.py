@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import thermoextrap as xtrap
+from thermoextrap.core.xrutils import xrwrap_uv, xrwrap_xv
 
 if TYPE_CHECKING:
     from typing import Any
@@ -89,7 +90,11 @@ def data_other(request, data, xv_fixture, order, central):
         factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
         factory = xtrap.DataCentralMomentsVals.from_vals
-    return factory(xv=xv_fixture, uv=data.u, order=order, central=central)
+
+    xv = None if xv_fixture is None else xrwrap_xv(xv_fixture)
+    uv = xrwrap_uv(data.u)
+
+    return factory(xv=xv, uv=uv, order=order, central=central)
 
 
 def test_factory_0(data_x, data_other, central) -> None:
@@ -142,7 +147,10 @@ def data_x_is_u(request, data, order, central):
         factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
         factory = xtrap.DataCentralMomentsVals.from_vals
-    return factory(xv=None, uv=data.u, order=order, central=central, x_is_u=True)
+
+    return factory(
+        xv=None, uv=xrwrap_uv(data.u), order=order, central=central, x_is_u=True
+    )
 
 
 @pytest.fixture

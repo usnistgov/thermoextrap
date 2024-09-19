@@ -20,7 +20,7 @@ authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" },
 ]
-requires-python = ">=3.8,<3.12"
+requires-python = ">=3.9,<3.13"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
@@ -28,10 +28,10 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
 ]
 dynamic = [
@@ -40,13 +40,13 @@ dynamic = [
 ]
 dependencies = [
     "attrs",
-    "cmomy>=0.11.0",
+    "cmomy>=0.17.0",
     "lazy-loader",
     "module-utilities[inherit]>=0.2",
-    "numpy>=1.20",
+    "numpy>=1.26.0",
     "scipy",
     "sympy",
-    "xarray>=0.16",
+    "xarray>=2024.7.0",
 ]
 optional-dependencies.accel = [
     "bottleneck",
@@ -241,51 +241,53 @@ lint.per-file-ignores."**/*.ipynb" = [
     "INP001",
 ]
 lint.per-file-ignores."docs/conf.py" = [
+    "D102",
     "ERA",
     "INP001",
+    "N801",
 ]
 lint.per-file-ignores."noxfile.py" = [
     "RUF009",
 ]
+
 lint.per-file-ignores."tests/*.py" = [
     "D",
+    "PLR0914",
+    "PT011",
     "S101",
+    "SLF001",
 ]
 lint.per-file-ignores."tools/*.py" = [
     "A",
     "D102",
+    "DOC402",
     "S",
     "SLF001",
 ]
+# TODO(wpk): fix these...
 lint.extend-per-file-ignores."**/*.ipynb" = [
-    "ARG",
-    "D102",
-    "D103",
-    "F821",
-    "N",
+    "ARG001",
+    "ARG002",
+    "D",
+    "N801",
+    "N802",
+    "N803",
+    "N806",
+    "N816",
     "PLR6104",
-    "PTH",
+    "PTH111",
+    "PTH207",
     "T201",
-    "W391",
 ]
-# temporary ignores
+
+# for now...
 lint.extend-per-file-ignores."**/*.py" = [
     "UP031",
 ]
-lint.extend-per-file-ignores."**/_attrs_utils.py" = [
-    "A002",
-    "ARG001",
-]
-lint.extend-per-file-ignores."**/adaptive_interp.py" = [
-    "T201",
-]
-lint.extend-per-file-ignores."**/beta.py" = [
-    "A003",
-    "ARG002",
-    "D102",
-    "N801",
-]
-lint.extend-per-file-ignores."**/data.py" = [
+lint.extend-per-file-ignores."**/_attrs_utils.py" = [ "A002", "ARG001" ]
+lint.extend-per-file-ignores."**/adaptive_interp.py" = [ "T201" ]
+lint.extend-per-file-ignores."**/beta.py" = [ "A003", "ARG002", "D102", "N801" ]
+lint.extend-per-file-ignores."**/data*.py" = [
     "D102",
 ]
 lint.extend-per-file-ignores."**/gpr_active/*.py" = [
@@ -318,6 +320,7 @@ lint.extend-per-file-ignores."**/stack.py" = [
     "D102",
 ]
 lint.extend-per-file-ignores."**/thermoextrap/random.py" = [ "A005" ]
+lint.extend-per-file-ignores."**/typing.py" = [ "A005" ]
 lint.extend-per-file-ignores."**/volume*.py" = [
     "D102",
 ]
@@ -337,11 +340,6 @@ lint.extend-per-file-ignores."src/**/*.py" = [
     "TD003",
 ]
 # Project specific ignores (avoid changing per-file-ignores directly)
-lint.extend-per-file-ignores."tests/*.py" = [
-    "PLR0914",
-    "PT011",
-    "SLF001",
-]
 lint.extend-per-file-ignores."tests/test_lnPi.py" = [
     "N999",
 ]
@@ -385,8 +383,6 @@ addopts = [
     "--pyargs",
     "--cov-config=pyproject.toml",
     "--ignore-glob='**/legacy/**",
-    "-n",
-    "4",
 ]
 testpaths = [
     "README.md",
@@ -580,10 +576,10 @@ envs = [
     "test-extras",
 ]
 python = [
-    "3.8",
     "3.9",
     "3.10",
     "3.11",
+    "3.12",
 ]
 
 # * pip-tools (keeping for legacy) ---------------------------------------------

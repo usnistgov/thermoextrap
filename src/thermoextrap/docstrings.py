@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cmomy.docstrings import docfiller as docfiller_cmomy
+from cmomy.core.docstrings import docfiller as docfiller_cmomy
 
 # from .external.docfiller import DocFiller
 from module_utilities.docfiller import DocFiller

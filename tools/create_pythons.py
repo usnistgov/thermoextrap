@@ -2,14 +2,8 @@
 
 from __future__ import annotations
 
-import sys
-from functools import lru_cache
-
-if sys.version_info < (3, 9):
-    msg = "Requires python >= 3.9"
-    raise RuntimeError(msg)
-
 import logging
+from functools import lru_cache
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

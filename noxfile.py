@@ -85,7 +85,7 @@ CONFIG = load_nox_config()
 
 LOCK = True
 
-PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11"]
+PYTHON_ALL_VERSIONS = ["3.9", "3.10", "3.11", "3.12"]
 PYTHON_DEFAULT_VERSION = "3.11"
 
 UVXRUN_LOCK_REQUIREMENTS = "requirements/lock/py{}-uvxrun-tools.txt".format(

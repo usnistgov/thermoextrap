@@ -44,7 +44,8 @@ from nox.virtualenv import CondaEnv, VirtualEnv
 
 if TYPE_CHECKING:
     import sys
-    from typing import Any, Callable, Iterable, Iterator, Literal, Union
+    from collections.abc import Iterable, Iterator
+    from typing import Any, Callable, Literal, Union
 
     from nox import Session
 

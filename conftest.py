@@ -11,9 +11,4 @@ def pytest_collectstart(collector) -> None:
 
 
 def pytest_ignore_collect(collection_path, path, config) -> None:  # noqa: ARG001
-    import sys
-
-    if sys.version_info < (3, 9):
-        return "thermoextrap/tests" not in str(collection_path)
-
     return False

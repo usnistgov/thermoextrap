@@ -43,7 +43,7 @@ def test_rbf_expr() -> None:
                     out_expr = check_expr.subs(
                         [(var_sym, v), (l_sym, volume), (x1_sym, x1), (x2_sym, x2)]
                     )
-                    assert out_expr == rbf(v, volume, x1, x2)
+                    assert out_expr - rbf(v, volume, x1, x2) == 0
 
 
 # Next test function for building GP inputs from thermoextrap ExtrapModel objects

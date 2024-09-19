@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 from functools import lru_cache
-from typing import Any, Callable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Callable
 
 import attrs
 import numpy as np
@@ -26,6 +26,9 @@ from .core.sputils import get_default_indexed, get_default_symbol
 from .core.xrutils import xrwrap_alpha
 from .data import AbstractData, kw_only_field
 from .docstrings import DOCFILLER_SHARED
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 

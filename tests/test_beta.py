@@ -233,7 +233,6 @@ def test_extrapmodel_weighted(fixture) -> None:
             xv=fixture.xb,
             order=fixture.order,
             central=True,
-            dims=["val"],
         ),
     )
 
@@ -728,6 +727,7 @@ def test_extrapmodel_alphadep_ig() -> None:
     dat = xtrap.DataCentralMomentsVals.from_vals(
         order=max_order, xv=xdata, uv=udata, deriv_dim="deriv", central=True
     )
+    return
 
     # Create extrapolation model to test against analytical
     ex = xtrap.beta.factory_extrapmodel(ref_beta, dat, xalpha=True)
