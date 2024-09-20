@@ -11,7 +11,7 @@ certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.17.0             # via -r requirements/dev.txt
+cmomy==0.18.0             # via -r requirements/dev.txt
 colorlog==6.8.2           # via nox
 comm==0.2.2               # via ipykernel
 contourpy==1.2.0          # via matplotlib

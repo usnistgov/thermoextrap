@@ -1058,10 +1058,20 @@ class DataCentralMomentsBase(AbstractData):
         """Averages of form observable ``x``."""
         return self.dxduave.obj.sel(**{self.umom_dim: 0, self.xmom_dim: 1}, drop=True)
 
+    @property
+    def xave2(self):
+        return self.dxduave.obj.select_moment("xmom")
+
     @cached.prop
     def dxdu(self):
         """Averages of form ``dx * dx ** n``."""
         return self.cmom().sel(**{self.xmom_dim: 1}, drop=True)
+
+    @property
+    def dxdu2(self):
+        return cmomy.select_moment(
+            self.cmom(), "xmom_1", mom_ndim=2, mom_dims=self.dxduave.mom_dims
+        )
 
     @cached.prop
     def du(self):
@@ -1073,6 +1083,18 @@ class DataCentralMomentsBase(AbstractData):
         else:
             out = _xu_to_u(self.dxdu, self.umom_dim)
 
+        return out
+
+    @cached.prop
+    def du2(self):
+        if self.x_isnot_u:
+            out = cmomy.select_moment(
+                self.cmom(), "xmom_0", mom_ndim=2, mom_dims=self.dxduave.mom_dims
+            )
+            if self.xalpha:
+                out = out.sel({self.deriv_dim: 0}, drop=True)
+        else:
+            out = _xu_to_u(self.dxdu, self.umom_dim)
         return out
 
     @cached.prop
