@@ -971,6 +971,61 @@ def factory_data_values(
     )
 
 
+# @docfiller_shared.decorate
+# def factory_data_values(
+#     order,
+#     uv,
+#     xv,
+#     weight=None,
+#     central=False,
+#     xalpha=False,
+#     rec_dim="rec",
+#     umom_dim="umom",
+#     xmom_dim="xmom",
+#     val_dims="val",
+#     rep_dim="rep",
+#     deriv_dim=None,
+#     from_vals_kws=None,
+#     meta=None,
+#     x_is_u=False,
+# ):
+#     """
+#     Factory function to produce a DataValues object.
+
+#     Parameters
+#     ----------
+#     order : int
+#         Highest moment <x * u ** order>.
+#         For the case `x_is_u`, highest order is <u ** (order+1)>
+#     {uv_xv_array}
+#     {central}
+#     {xalpha}
+#     {rec_dim}
+#     {umom_dim}
+#     {val_dims}
+#     {rep_dim}
+#     {deriv_dim}
+#     {meta}
+#     {x_is_u}
+
+#     Returns
+#     -------
+#     output : DataCentralMomentsVals
+
+
+#     See Also
+#     --------
+#     DataValuesCentral
+#     DataValues
+#     """
+
+#     if xalpha and deriv_dim is None:
+#         msg = "if xalpha, must pass string name of derivative"
+#         raise ValueError(msg)
+
+#     return DataCentralMomentsVals.from_vals(xv=xv, uv=uv, order=order, weight=weight, rec_dim=rec_dim, umom_dim=umom_dim, xmom_dim=xmom_dim, rep_dim=rep_dim, deriv_dim=deriv_dim, val_dims=val_dims, central=central, from_vals_kws=from_vals_kws, meta=meta, x_is_u=x_is_u,)
+
+
 ################################################################################
 # StatsCov objects
 ################################################################################
@@ -1940,10 +1995,11 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             self.from_vals_kws = {}
 
         if self.dxduave is None:
-            if self.order is None:
+            if self.order is None or self.order <= 0:
                 msg = "must pass order if calculating dxduave"
                 raise ValueError(msg)
 
+            # if self.order > 0:
             self.dxduave = cmomy.wrap_reduce_vals(
                 self.xv,
                 self.uv,
@@ -2084,6 +2140,11 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             dim=dim,
         )
 
+        # back to indices for meta analysis...
+        indices = cmomy.resample.freq_to_indices(freq, shuffle=False)
+        if not isinstance(indices, xr.DataArray):
+            indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))
+
         kws = {
             "nrep": nrep,
             "freq": freq,
@@ -2094,6 +2155,12 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
             "rep_dim": rep_dim,
             **kwargs,
         }
+        meta = self.meta.resample(data=self, meta_kws=meta_kws, indices=indices, **kws)
+
+        # if self.order == 0:
+        #     uv = self.uv.isel({self.rec_dim: indices})
+        #     xv = None if self.x_is_u else self.xv.isel({self.rec_dim: indices})
+        #     return self.new_like(uv=uv, xv=xv, rec_dim=rep_dim, meta=meta)
 
         dxduave = cmomy.CentralMomentsData.from_resample_vals(
             self.xv,
@@ -2105,7 +2172,4 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         )
 
         dxduave = dxduave.transpose(rep_dim, ...)
-
-        meta = self.meta.resample(data=self, meta_kws=meta_kws, indices=indices, **kws)
-
         return self.new_like(dxduave=dxduave, rec_dim=rep_dim, meta=meta)

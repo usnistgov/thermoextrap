@@ -688,7 +688,9 @@ def factory_perturbmodel(beta, uv, xv, alpha_name="beta", **kws):
     --------
     ~thermoextrap.models.PerturbModel
     """
-    from .data import factory_data_values
+    # from .data import factory_data_values
+    # data = factory_data_values(uv=uv, xv=xv, order=0, central=False, **kws)
+    from .data import DataValues
 
-    data = factory_data_values(uv=uv, xv=xv, order=0, central=False, **kws)
+    data = DataValues.from_vals(xv=xv, uv=uv, order=0, **kws)
     return PerturbModel(alpha0=beta, data=data, alpha_name=alpha_name)

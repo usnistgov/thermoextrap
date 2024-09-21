@@ -55,7 +55,7 @@ optional-dependencies.all = [
     "thermoextrap[mbar,gpr,accel,parallel,viz]",
 ]
 optional-dependencies.dev = [
-    "thermoextrap[dev-extras,test,typing,uvxrun,mypy,nbval,accel,viz,gpr,mbar]",
+    "thermoextrap[dev-extras,test,typing,uvxrun,mypy,nbval,accel,viz,gpr,mbar,parallel]",
 ]
 optional-dependencies.dev-complete = [
     "thermoextrap[dev,tools]",

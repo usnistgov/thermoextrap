@@ -6,24 +6,28 @@ argcomplete==3.2.3        # via nox
 asttokens==2.4.1          # via stack-data
 astunparse==1.6.3         # via tensorflow
 attrs==23.2.0             # via jsonschema, referencing, scriv, -r requirements/dev-complete.txt
+bokeh==3.5.2              # via dask
 bottleneck==1.3.8         # via -r requirements/dev-complete.txt
 certifi==2024.2.2         # via requests
 cfgv==3.4.0               # via pre-commit
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
-click==8.1.7              # via click-log, scriv
+click==8.1.7              # via click-log, dask, distributed, scriv
 click-log==0.4.0          # via scriv
-cloudpickle==3.0.0        # via tensorflow-probability
+cloudpickle==3.0.0        # via dask, distributed, tensorflow-probability
 cmomy==0.19.0             # via -r requirements/dev-complete.txt
 colorlog==6.8.2           # via nox
 comm==0.2.2               # via ipykernel
-contourpy==1.2.0          # via matplotlib
+contourpy==1.2.0          # via bokeh, matplotlib
 coverage==7.4.4           # via nbval, pytest-cov
 cycler==0.12.1            # via matplotlib
+dask==2024.9.0            # via dask-expr, distributed, -r requirements/dev-complete.txt
+dask-expr==1.1.14         # via dask
 debugpy==1.8.1            # via ipykernel
 decorator==5.1.1          # via ipython, tensorflow-probability
 deprecated==1.2.14        # via gpflow
 distlib==0.3.8            # via virtualenv
+distributed==2024.9.0     # via dask
 dm-tree==0.1.8            # via keras, tensorflow-probability
 docstring-inheritance==2.2.0  # via cmomy, module-utilities
 dropstackframe==0.1.0     # via check-shapes
@@ -33,6 +37,7 @@ fastjsonschema==2.19.1    # via nbformat
 filelock==3.13.1          # via virtualenv
 flatbuffers==24.3.7       # via tensorflow
 fonttools==4.49.0         # via matplotlib
+fsspec==2024.9.0          # via dask
 gast==0.5.4               # via tensorflow, tensorflow-probability
 google-pasta==0.2.0       # via tensorflow
 gpflow==2.9.1             # via -r requirements/dev-complete.txt
@@ -40,13 +45,14 @@ grpcio==1.62.1            # via tensorboard, tensorflow
 h5py==3.10.0              # via keras, tensorflow
 identify==2.5.35          # via pre-commit
 idna==3.6                 # via requests
+importlib-metadata==8.5.0  # via dask
 iniconfig==2.0.0          # via pytest
 ipykernel==6.29.3         # via nbval, -r requirements/dev-complete.txt
 ipython==8.22.2           # via ipykernel, -r requirements/dev-complete.txt
 jax==0.4.24               # via -r requirements/dev-complete.txt
 jaxlib==0.4.24            # via jax
 jedi==0.19.1              # via ipython
-jinja2==3.1.3             # via scriv
+jinja2==3.1.3             # via bokeh, dask, distributed, scriv
 jsonschema==4.21.1        # via nbformat
 jsonschema-specifications==2023.12.1  # via jsonschema
 jupyter-client==8.6.1     # via ipykernel, nbclient, nbval
@@ -57,6 +63,8 @@ lark==1.1.9               # via check-shapes
 lazy-loader==0.3          # via cmomy, -r requirements/dev-complete.txt
 libclang==16.0.6          # via tensorflow
 llvmlite==0.42.0          # via numba
+locket==1.0.0             # via distributed, partd
+lz4==4.3.3                # via dask
 markdown==3.6             # via tensorboard
 markdown-it-py==3.0.0     # via rich, scriv
 markupsafe==2.1.5         # via jinja2, werkzeug
@@ -66,6 +74,7 @@ mdurl==0.1.2              # via markdown-it-py
 ml-dtypes==0.3.2          # via jax, jaxlib, keras, tensorflow
 module-utilities==0.9.0   # via cmomy, -r requirements/dev-complete.txt
 mpmath==1.3.0             # via sympy
+msgpack==1.1.0            # via distributed
 multipledispatch==1.0.0   # via gpflow
 mypy==1.11.2              # via -r requirements/dev-complete.txt
 mypy-extensions==1.0.0    # via mypy
@@ -78,22 +87,24 @@ nodeenv==1.8.0            # via pre-commit
 nox==2024.4.15            # via -r requirements/dev-complete.txt
 numba==0.59.0             # via cmomy
 numexpr==2.9.0            # via pymbar
-numpy==1.26.4             # via bottleneck, cmomy, contourpy, gpflow, h5py, jax, jaxlib, keras, matplotlib, ml-dtypes, numba, numexpr, opt-einsum, pandas, pandas-stubs, pymbar, scipy, tensorboard, tensorflow, tensorflow-probability, xarray, -r requirements/dev-complete.txt
+numpy==1.26.4             # via bokeh, bottleneck, cmomy, contourpy, dask, gpflow, h5py, jax, jaxlib, keras, matplotlib, ml-dtypes, numba, numexpr, opt-einsum, pandas, pandas-stubs, pyarrow, pymbar, scipy, tensorboard, tensorflow, tensorflow-probability, xarray, -r requirements/dev-complete.txt
 opt-einsum==3.3.0         # via jax, tensorflow
-packaging==24.0           # via gpflow, ipykernel, matplotlib, nox, pytest, pytest-sugar, tensorflow, xarray, -r requirements/dev-complete.txt
-pandas==2.2.1             # via xarray, -r requirements/dev-complete.txt
+packaging==24.0           # via bokeh, dask, distributed, gpflow, ipykernel, matplotlib, nox, pytest, pytest-sugar, tensorflow, xarray, -r requirements/dev-complete.txt
+pandas==2.2.1             # via bokeh, dask, dask-expr, xarray, -r requirements/dev-complete.txt
 pandas-stubs==2.2.0.240218  # via -r requirements/dev-complete.txt
 parso==0.8.3              # via jedi
+partd==1.4.2              # via dask
 pexpect==4.9.0            # via ipython
-pillow==10.2.0            # via matplotlib
+pillow==10.2.0            # via bokeh, matplotlib
 platformdirs==4.2.0       # via jupyter-core, virtualenv
 pluggy==1.4.0             # via pytest
 pre-commit==3.6.2         # via -r requirements/dev-complete.txt
 prompt-toolkit==3.0.43    # via ipython
 protobuf==4.25.3          # via tensorboard, tensorflow
-psutil==5.9.8             # via ipykernel
+psutil==5.9.8             # via distributed, ipykernel
 ptyprocess==0.7.0         # via pexpect
 pure-eval==0.2.2          # via stack-data
+pyarrow==17.0.0           # via dask, dask-expr
 pygments==2.17.2          # via ipython, rich
 pymbar==4.0.2             # via -r requirements/dev-complete.txt
 pyparsing==3.1.2          # via matplotlib
@@ -104,7 +115,7 @@ pytest-sugar==1.0.0       # via -r requirements/dev-complete.txt
 pytest-xdist==3.5.0       # via -r requirements/dev-complete.txt
 python-dateutil==2.9.0.post0  # via jupyter-client, matplotlib, pandas
 pytz==2024.1              # via pandas
-pyyaml==6.0.1             # via pre-commit
+pyyaml==6.0.1             # via bokeh, dask, distributed, pre-commit
 pyzmq==25.1.2             # via ipykernel, jupyter-client
 referencing==0.33.0       # via jsonschema, jsonschema-specifications
 requests==2.31.0          # via scriv, tensorflow
@@ -114,9 +125,11 @@ scipy==1.12.0             # via gpflow, jax, jaxlib, pymbar, -r requirements/dev
 scriv==1.5.1              # via -r requirements/dev-complete.txt
 setuptools==69.2.0        # via gpflow, nodeenv, tensorboard, tensorflow
 six==1.16.0               # via asttokens, astunparse, google-pasta, python-dateutil, tensorboard, tensorflow, tensorflow-probability
+sortedcontainers==2.4.0   # via distributed
 stack-data==0.6.3         # via ipython
 sympy==1.12               # via -r requirements/dev-complete.txt
 tabulate==0.9.0           # via gpflow
+tblib==3.0.0              # via distributed
 tensorboard==2.16.2       # via tensorflow
 tensorboard-data-server==0.7.2  # via tensorboard
 tensorflow==2.16.1        # via gpflow, tensorflow-probability, tf-keras, -r requirements/dev-complete.txt
@@ -125,15 +138,19 @@ tensorflow-probability==0.24.0  # via gpflow, -r requirements/dev-complete.txt
 termcolor==2.4.0          # via pytest-sugar, tensorflow
 tf-keras==2.16.0          # via tensorflow-probability
 tomli==2.0.1              # via coverage
-tornado==6.4              # via ipykernel, jupyter-client
+toolz==0.12.1             # via dask, distributed, partd
+tornado==6.4              # via bokeh, distributed, ipykernel, jupyter-client
 traitlets==5.14.2         # via comm, ipykernel, ipython, jupyter-client, jupyter-core, matplotlib-inline, nbclient, nbformat
 types-pytz==2024.1.0.20240203  # via pandas-stubs
 typing-extensions==4.10.0  # via cmomy, gpflow, module-utilities, mypy, tensorflow
 tzdata==2024.1            # via pandas
-urllib3==2.2.1            # via requests
+urllib3==2.2.1            # via distributed, requests
 virtualenv==20.25.1       # via nox, pre-commit
 wcwidth==0.2.13           # via prompt-toolkit
 werkzeug==3.0.1           # via tensorboard
 wheel==0.43.0             # via astunparse
 wrapt==1.16.0             # via deprecated, tensorflow
 xarray==2024.9.0          # via cmomy, -r requirements/dev-complete.txt
+xyzservices==2024.9.0     # via bokeh
+zict==3.0.0               # via distributed
+zipp==3.20.2              # via importlib-metadata
