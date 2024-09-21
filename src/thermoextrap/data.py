@@ -750,7 +750,7 @@ def _xu_to_u(xu, dim="umom"):
 
     # add 0th element
     out.loc[{dim: 0}] = 1.0
-    return out
+    return out.drop_vars(dim)
 
 
 @attrs.define
@@ -990,6 +990,9 @@ class DataCentralMomentsBase(AbstractData):
     {central}
     {meta}
     {x_is_u}
+    use_cache : bool
+        If ``True`` (default), cache intermediate result.  Speeds up calculations,
+        but can lead to large objects.
     """
 
     #: :class:`cmomy.CentralMomentsData` object
@@ -1009,6 +1012,8 @@ class DataCentralMomentsBase(AbstractData):
     #: Whether observable `x` is same as energy `u`
     x_is_u: bool = kw_only_field(default=None)
 
+    _use_cache: bool = kw_only_field(default=True)
+
     @property
     def order(self):
         """Order of expansion."""
@@ -1026,106 +1031,102 @@ class DataCentralMomentsBase(AbstractData):
         """
         return self.dxduave.obj
 
-    @cached.meth
+    @cached.meth(check_use_cache=True)
     def rmom(self):
         """Raw co-moments."""
         return self.dxduave.rmom()
 
-    @cached.meth
+    @cached.meth(check_use_cache=True)
     def cmom(self):
         """Central co-moments."""
         return self.dxduave.cmom()
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def xu(self):
         """Averages of form ``x * u ** n``."""
-        return self.rmom().sel(**{self.xmom_dim: 1}, drop=True)
+        return cmomy.select_moment(
+            self.rmom(),
+            "xmom_1",
+            mom_ndim=2,
+            mom_dims=self.dxduave.mom_dims,
+        )
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def u(self):
         """Averages of form ``u ** n``."""
-        if self.x_isnot_u:
-            out = self.rmom().sel(**{self.xmom_dim: 0}, drop=True)
-            if self.xalpha:
-                out = out.sel(**{self.deriv_dim: 0}, drop=True)
-        else:
-            out = _xu_to_u(self.xu, self.umom_dim)
+        if self.x_is_u:
+            return cmomy.convert.comoments_to_moments(
+                self.rmom(),
+                mom_dims=self.dxduave.mom_dims,
+                mom_dims_out=self.umom_dim,
+            )
 
+        out = cmomy.select_moment(
+            self.rmom(),
+            "xmom_0",
+            mom_ndim=2,
+            mom_dims=self.dxduave.mom_dims,
+        )
+        if self.xalpha:
+            out = out.sel({self.deriv_dim: 0}, drop=True)
         return out
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def xave(self):
         """Averages of form observable ``x``."""
-        return self.dxduave.obj.sel(**{self.umom_dim: 0, self.xmom_dim: 1}, drop=True)
+        return self.dxduave.select_moment("xave")
 
-    @property
-    def xave2(self):
-        return self.dxduave.obj.select_moment("xmom")
-
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def dxdu(self):
         """Averages of form ``dx * dx ** n``."""
-        return self.cmom().sel(**{self.xmom_dim: 1}, drop=True)
-
-    @property
-    def dxdu2(self):
         return cmomy.select_moment(
             self.cmom(), "xmom_1", mom_ndim=2, mom_dims=self.dxduave.mom_dims
         )
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def du(self):
         """Averages of ``du ** n``."""
-        if self.x_isnot_u:
-            out = self.cmom().sel(**{self.xmom_dim: 0}, drop=True)
-            if self.xalpha:
-                out = out.sel(**{self.deriv_dim: 0}, drop=True)
-        else:
-            out = _xu_to_u(self.dxdu, self.umom_dim)
-
-        return out
-
-    @cached.prop
-    def du2(self):
-        if self.x_isnot_u:
-            out = cmomy.select_moment(
-                self.cmom(), "xmom_0", mom_ndim=2, mom_dims=self.dxduave.mom_dims
+        if self.x_is_u:
+            return cmomy.convert.comoments_to_moments(
+                self.cmom(), mom_dims=self.dxduave.mom_dims, mom_dims_out=self.umom_dim
             )
-            if self.xalpha:
-                out = out.sel({self.deriv_dim: 0}, drop=True)
-        else:
-            out = _xu_to_u(self.dxdu, self.umom_dim)
+
+        out = cmomy.select_moment(
+            self.cmom(), "xmom_0", mom_ndim=2, mom_dims=self.dxduave.mom_dims
+        )
+        if self.xalpha:
+            out = out.sel({self.deriv_dim: 0}, drop=True)
         return out
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def u_selector(self):
         """Indexer for ``u_selector[n] = u ** n``."""
         return DatasetSelector.from_defaults(
             self.u, deriv_dim=None, mom_dim=self.umom_dim
         )
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def xu_selector(self):
         """Indexer for ``xu_select[n] = x * u ** n``."""
         return DatasetSelector.from_defaults(
             self.xu, deriv_dim=self.deriv_dim, mom_dim=self.umom_dim
         )
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def xave_selector(self):
         """Selector for ``xave``."""
         if self.deriv_dim is None:
             return self.xave
         return DatasetSelector(self.xave, dims=[self.deriv_dim])
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def du_selector(self):
         """Selector for ``du_selector[n] = du ** n``."""
         return DatasetSelector.from_defaults(
             self.du, deriv_dim=None, mom_dim=self.umom_dim
         )
 
-    @cached.prop
+    @cached.prop(check_use_cache=True)
     def dxdu_selector(self):
         """Selector for ``dxdu_selector[n] = dx * du ** n``."""
         return DatasetSelector.from_defaults(
