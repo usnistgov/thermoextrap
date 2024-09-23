@@ -20,7 +20,6 @@ import sympy as sp
 # import tensorflow as tf
 import xarray as xr
 from cmomy.random import validate_rng
-from pymbar import timeseries
 from scipy import integrate, linalg, special
 
 from thermoextrap import beta as xpan_beta
@@ -242,6 +241,8 @@ class DataWrapper:
         Loads data from files needed to generate data classes for thermoextrap.
         Will change significantly if using MBAR on trajectories with different biases.
         """
+        from pymbar import timeseries
+
         tot_pot = self.load_U_info()
         cv, bias = self.load_CV_info()
         # If the cv we bias along is the x of interest for extrapolation, return that

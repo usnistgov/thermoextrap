@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING, Any, Callable
 import attrs
 import numpy as np
 import pandas as pd
-import pymbar
 import xarray as xr
 from attrs import converters as attc
 from attrs import field
@@ -1049,6 +1048,8 @@ class MBARModel(StateCollection):
 
     @cached.meth
     def _default_params(self, state_dim="state", alpha_name="alpha"):
+        import pymbar
+
         # all xvalues:
         xv = xr.concat([m.data.xv for m in self], dim=state_dim)
         uv = xr.concat([m.data.uv for m in self], dim=state_dim)

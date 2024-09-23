@@ -15,7 +15,7 @@ check-shapes==1.1.1       # via gpflow
 click==8.1.7              # via click-log, dask, distributed, scriv
 click-log==0.4.0          # via scriv
 cloudpickle==3.0.0        # via dask, distributed, tensorflow-probability
-cmomy==0.19.0             # via -r requirements/dev-complete.txt
+cmomy==0.20.0             # via -r requirements/dev-complete.txt
 colorlog==6.8.2           # via nox
 comm==0.2.2               # via ipykernel
 contourpy==1.2.0          # via bokeh, matplotlib

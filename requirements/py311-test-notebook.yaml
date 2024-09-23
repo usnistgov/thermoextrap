@@ -12,7 +12,7 @@ channels:
 dependencies:
   - python=3.11
   - attrs
-  - cmomy>=0.19.0
+  - cmomy>=0.20.0
   - docstring-inheritance
   - lazy_loader
   - matplotlib-base

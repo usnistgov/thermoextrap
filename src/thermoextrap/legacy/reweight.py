@@ -4,13 +4,6 @@ This includes perturbation and a wrapper on MBAR.
 
 import numpy as np
 
-try:
-    from pymbar import mbar
-except ImportError:
-    print(
-        "Could not find pymbar - will not import and functions involving this will not work."
-    )
-
 from .interp import InterpModel
 
 from cmomy.random import validate_rng
@@ -84,6 +77,7 @@ class PerturbModel:
         B = np.array(B)
 
         if useMBAR:
+            from pymbar import mbar
             mbarObj = mbar.MBAR(np.array([refB * U]), [U.shape[0]])
             predictVals = np.zeros((len(B), x.shape[1]))
             for i in range(len(B)):
@@ -159,6 +153,8 @@ class MBARModel(InterpModel):
 
     def train(self, refB, xData, uData, saveParams=True):
         """Trains and returns a pymbar MBAR object as the model "parameters." """
+        from pymbar import mbar
+
         refB = np.array(refB)
 
         if xData.shape[0] != uData.shape[0]:

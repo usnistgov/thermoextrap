@@ -8,13 +8,6 @@ import math
 import numpy as np
 from scipy.special import factorial
 
-try:
-    from pymbar import mbar
-except ImportError:
-    print(
-        "Could not find pymbar - will not import and functions involving this will not work."
-    )
-
 from .utilities import buildAvgFuncs, symDerivAvgX
 
 
@@ -210,6 +203,7 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
     B = np.array(B)
 
     if useMBAR:
+        from pymbar import mbar
         mbarObj = mbar.MBAR(np.array([refB * U]), [U.shape[0]])
         outval = np.zeros((len(B), x.shape[1]))
         for i in range(len(B)):
