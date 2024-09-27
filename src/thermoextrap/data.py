@@ -194,7 +194,7 @@ class DataCallbackABC(
         self,
         data: AbstractData,
         meta_kws: MetaKws,
-        sampler: cmomy.IndexSampler,
+        sampler: cmomy.IndexSampler[Any],
         **kws: Any,
     ) -> Self:
         """
@@ -234,7 +234,13 @@ class DataCallback(DataCallbackABC):
     ) -> tuple[Any, ...]:
         return derivs_args
 
-    def resample(self, data: AbstractData, meta_kws: MetaKws, **kws: Any) -> Self:  # noqa: ARG002
+    def resample(
+        self,
+        data: AbstractData,  # noqa: ARG002
+        meta_kws: MetaKws,  # noqa: ARG002
+        sampler: cmomy.IndexSampler[Any],  # noqa: ARG002
+        **kws: Any,  # noqa: ARG002
+    ) -> Self:
         return self
 
     def block(self, data: AbstractData, meta_kws: MetaKws, **kws: Any) -> Self:  # noqa: ARG002
@@ -461,7 +467,7 @@ class DataValuesBase(AbstractData):
         chunk=None,
         compute="None",
         meta_kws: MetaKws | None = None,
-    ):
+    ) -> Self:
         """
         Resample object.
 
@@ -481,9 +487,6 @@ class DataValuesBase(AbstractData):
         elif compute is None:
             compute = self.compute
 
-        if rep_dim is None:
-            rep_dim = self.rep_dim
-
         sampler = cmomy.factory_sampler(sampler, data=self.xv, dim=self.rec_dim)
         indices = sampler.indices
         if not isinstance(indices, xr.DataArray):
@@ -495,23 +498,20 @@ class DataValuesBase(AbstractData):
             raise ValueError(msg)
 
         uv = self.uv.compute()[indices]
-        if self.x_isnot_u:
-            xv = self.xv.compute().isel(**{self.rec_dim: indices})
-        else:
-            xv = None
+        xv = None if self.x_is_u else self.xv.compute().isel({self.rec_dim: indices})
 
         meta = self.meta.resample(
             data=self,
-            meta_kws=meta_kws,
+            meta_kws={} if meta_kws is None else meta_kws,
             sampler=sampler,
             rep_dim=rep_dim,
             chunk=chunk,
             compute=compute,
         )
 
-        return self.__class__(
+        return type(self)(
             uv=uv,
-            xv=xv,
+            xv=xv,  # pyright: ignore[reportArgumentType]
             order=self.order,
             rec_dim=self.rec_dim,
             umom_dim=self.umom_dim,
@@ -530,18 +530,12 @@ class DataValuesBase(AbstractData):
 ###############################################################################
 @docfiller_shared.decorate
 def build_aves_xu(
-    uv,
-    xv,
-    order,
-    rec_dim="rec",
-    umom_dim="umom",
-    deriv_dim=None,
-    skipna=False,
-    u_name=None,
-    xu_name=None,
-    merge=False,
-    transpose=False,
-):
+    uv: xr.DataArray,
+    xv: DataT,
+    order: int,
+    rec_dim: SingleDim = "rec",
+    umom_dim: SingleDim = "umom",
+) -> tuple[xr.DataArray, DataT]:
     """
     Build averages from values uv, xv up to order `order`.
 
@@ -576,71 +570,25 @@ def build_aves_xu(
         msg = f"{type(xv)=} must be a DataArray or Dataset."
         raise TypeError(msg)
 
-    u = []
-    xu = []
-
-    uave = uv.mean(rec_dim, skipna=skipna)
-    xave = xv.mean(rec_dim, skipna=skipna)
-    for i in range(order + 1):
-        if i == 0:
-            # <u**0>
-            u.append(xr.ones_like(uave))
-            # <x * u**0> = <x>
-            xu.append(xave)
-
-        elif i == 1:
-            u_n = uv.copy()
-            xu_n = xv * uv
-
-            u.append(uave)
-            xu.append(xu_n.mean(rec_dim, skipna=skipna))
-        else:
-            u_n *= uv
-            xu_n *= uv
-            u.append(u_n.mean(rec_dim, skipna=skipna))
-            xu.append(xu_n.mean(rec_dim, skipna=skipna))
-
-    u = xr.concat(u, dim=umom_dim)
-    xu = xr.concat(xu, dim=umom_dim)
-
-    # simple, but sometimes slow....
-    # nvals = xr.DataArray(np.arange(order + 1), dims=[umom_dim])
-    # un = uv**nvals
-    # u = (un).mean(rec_dim, skipna=skipna)
-    # xu = (un * xv).mean(rec_dim, skipna=skipna)
-
-    if transpose:
-        u_order = (umom_dim, ...)
-        x_order = (umom_dim, deriv_dim, ...) if deriv_dim is not None else u_order
-        u = u.trapsose(*u_order)
-        xu = xu.transpose(*x_order)
-
-    if u_name is not None:
-        u = u.rename(u_name)
-
-    if xu_name is not None and isinstance(xu, xr.DataArray):
-        xu = xu.rename(xu_name)
-
-    if merge:
-        return xr.merge((u, xu))
+    u = cmomy.wrap_reduce_vals(uv, mom=order, dim=rec_dim, mom_dims=umom_dim).rmom()
+    xu = cmomy.select_moment(
+        cmomy.wrap_reduce_vals(
+            xv, uv, mom=(1, order), dim=rec_dim, mom_dims=("_xmom", umom_dim)
+        ).rmom(),
+        "xmom_1",
+        mom_ndim=2,
+    )
     return u, xu
 
 
 @docfiller_shared.decorate
 def build_aves_dxdu(
-    uv,
-    xv,
-    order,
-    rec_dim="rec",
-    umom_dim="umom",
-    deriv_dim=None,
-    skipna=False,
-    du_name=None,
-    dxdu_name=None,
-    xave_name=None,
-    merge=False,
-    transpose=False,
-):
+    uv: xr.DataArray,
+    xv: DataT,
+    order: int,
+    rec_dim: SingleDim = "rec",
+    umom_dim: SingleDim = "umom",
+) -> tuple[DataT, xr.DataArray, DataT]:
     """
     Build central moments from values uv, xv up to order `order`.
 
@@ -673,57 +621,14 @@ def build_aves_dxdu(
         msg = f"{type(xv)=} must be a DataArray or Dataset."
         raise TypeError(msg)
 
-    xave = xv.mean(rec_dim, skipna=skipna)
-    uave = uv.mean(rec_dim, skipna=skipna)
+    duave = cmomy.wrap_reduce_vals(uv, mom=order, dim=rec_dim, mom_dims=umom_dim).cmom()
 
-    # i=0
-    # <du**0> = 1
-    # <dx * du**0> = 0
-    duave = []
-    dxduave = []
-    du = uv - uave
+    c = cmomy.wrap_reduce_vals(
+        xv, uv, mom=(1, order), dim=rec_dim, mom_dims=("_xmom", umom_dim)
+    )
+    xave = c.select_moment("xave")
+    dxduave = cmomy.select_moment(c.cmom(), "xmom_1", mom_ndim=2)
 
-    for i in range(order + 1):
-        if i == 0:
-            # <du ** 0> = 1
-            # <dx * du**0> = 0
-            duave.append(xr.ones_like(uave))
-            dxduave.append(xr.zeros_like(xave))
-
-        elif i == 1:
-            # <du**1> = 0
-            # (dx * du**1> = ...
-
-            du_n = du.copy()
-            dxdu_n = (xv - xave) * du
-            duave.append(xr.zeros_like(uave))
-            dxduave.append(dxdu_n.mean(rec_dim, skipna=skipna))
-
-        else:
-            du_n *= du
-            dxdu_n *= du
-            duave.append(du_n.mean(rec_dim, skipna=skipna))
-            dxduave.append(dxdu_n.mean(rec_dim, skipna=skipna))
-
-    duave = xr.concat(duave, dim=umom_dim)
-    dxduave = xr.concat(dxduave, dim=umom_dim)
-
-    if transpose:
-        u_order = (umom_dim, ...)
-        x_order = (deriv_dim, *u_order) if deriv_dim is not None else u_order
-
-        duave = duave.transpose(*u_order)
-        dxduave = dxduave.transpoe(*x_order)
-
-    if du_name is not None:
-        duave = duave.rename(du_name)
-    if dxdu_name is not None and isinstance(dxduave, xr.DataArray):
-        dxduave = dxduave.rename(dxdu_name)
-    if xave_name is not None and isinstance(xave, xr.DataArray):
-        xave = xave.renamae(xave_name)
-
-    if merge:
-        return xr.merge((xave, duave, dxduave))
     return xave, duave, dxduave
 
 
@@ -754,11 +659,8 @@ class DataValues(DataValuesBase):
             uv=self.uv,
             xv=self.xv,
             order=self.order,
-            skipna=skipna,
             rec_dim=self.rec_dim,
             umom_dim=self.umom_dim,
-            deriv_dim=self.deriv_dim,
-            **self.build_aves_kws,
         )
 
     @cached.prop
@@ -820,11 +722,8 @@ class DataValuesCentral(DataValuesBase):
             uv=self.uv,
             xv=self.xv,
             order=self.order,
-            skipna=skipna,
             rec_dim=self.rec_dim,
             umom_dim=self.umom_dim,
-            deriv_dim=self.deriv_dim,
-            **self.build_aves_kws,
         )
 
     @cached.prop
