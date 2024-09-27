@@ -90,12 +90,14 @@ def test_resample(fixture) -> None:
 
     idx = rng.choice(ndat, (nrep, ndat), replace=True)
 
-    b = fixture.xdata_val.resample(indices=idx)
+    sampler = cmomy.factory_sampler(indices=idx)
+
+    b = fixture.xdata_val.resample(sampler=sampler)
 
     # raw
-    a = fixture.rdata.resample(indices=idx)
+    a = fixture.rdata.resample(sampler=sampler)
     fixture.xr_test_raw(a=a, b=b)
 
     # central
-    a = fixture.cdata.resample(indices=idx)
+    a = fixture.cdata.resample(sampler=sampler)
     fixture.xr_test_central(a=a, b=b)

@@ -54,7 +54,7 @@ def test_extrapmodel_resample_slow(fixture) -> None:
     xem = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
 
     a = em.bootstrap(betas, n=10, order=3)
-    b = xem.resample(nrep=10).predict(betas).std("rep")
+    b = xem.resample(sampler={"nrep": 10}).predict(betas).std("rep")
 
     np.testing.assert_allclose(a, b, atol=0.1, rtol=0.1)
 
@@ -93,7 +93,7 @@ def test_extrapmodel_ig() -> None:
     ex = xtrap.beta.factory_extrapmodel(ref_beta, dat, xalpha=False)
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
-    ex_res = ex.resample(nrep=100)
+    ex_res = ex.resample(sampler={"nrep": 100})
 
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):
@@ -134,10 +134,10 @@ def test_extrapmodel_resample(fixture, rng: np.random.Generator) -> None:
     ndat = len(fixture.u)
     nrep = 10
 
-    idx = rng.choice(ndat, (nrep, ndat), replace=True)
+    sampler = cmomy.factory_sampler(ndat=ndat, nrep=nrep, rng=rng)
 
     xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
-    a = xem0.resample(indices=idx).predict(betas, order=3)
+    a = xem0.resample(sampler=sampler).predict(betas, order=3)
 
     for _data in [
         fixture.cdata,
@@ -147,7 +147,7 @@ def test_extrapmodel_resample(fixture, rng: np.random.Generator) -> None:
         fixture.xrdata_val,
     ]:
         xem1 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
-        b = xem1.resample(indices=idx).predict(betas, order=3)
+        b = xem1.resample(sampler=sampler).predict(betas, order=3)
         fixture.xr_test(a, b)
 
 
@@ -299,13 +299,13 @@ def test_extrapmodel_weighted_multi(fixture, rng: np.random.Generator) -> None:
 
     # resample
     nrep = 20
-    indices = []
+    sampler = []
     for xem in xems_c:
         ndat = xem.data.uv.shape[0]
-        indices.append(rng.choice(ndat, (nrep, ndat), True))
+        sampler.append(cmomy.factory_sampler(ndat=ndat, nrep=nrep, rng=rng))
 
-    a = xemw_c.resample(indices=indices)
-    b = xemw_x.resample(indices=indices)
+    a = xemw_c.resample(sampler=sampler)
+    b = xemw_x.resample(sampler=sampler)
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
@@ -383,13 +383,19 @@ def test_interpmodel(fixture, rng: np.random.Generator) -> None:
 
     # resample
     nrep = 20
-    indices = []
+    samplers = []
     for xem in xems_c:
         ndat = xem.data.uv.shape[0]
-        indices.append(rng.choice(ndat, (nrep, ndat), True))
+        samplers.append(
+            cmomy.factory_sampler(
+                ndat=ndat,
+                nrep=nrep,
+                rng=rng,
+            )
+        )
 
-    a = xemi_c.resample(indices=indices)
-    b = xemi_x.resample(indices=indices)
+    a = xemi_c.resample(sampler=samplers)
+    b = xemi_x.resample(sampler=samplers)
     fixture.xr_test(a.predict(betas), b.predict(betas))
 
 
@@ -577,7 +583,7 @@ def test_extrapmodel_minuslog_ig() -> None:
     )
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
-    ex_res = ex.resample(nrep=100)
+    ex_res = ex.resample(sampler={"nrep": 100})
 
     true_derivs = np.zeros(max_order + 1)
     # Loop over orders and compare based on uncertainty
@@ -733,7 +739,7 @@ def test_extrapmodel_alphadep_ig() -> None:
     ex = xtrap.beta.factory_extrapmodel(ref_beta, dat, xalpha=True)
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
-    ex_res = ex.resample(nrep=100)
+    ex_res = ex.resample(sampler={"nrep": 100})
 
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):
@@ -926,7 +932,7 @@ def test_extrapmodel_alphadep_minuslog_ig() -> None:
     )
     # Will need estimate of uncertainty for test data so can check if within that bound
     # So resample
-    ex_res = ex.resample(nrep=100)
+    ex_res = ex.resample(sampler={"nrep": 100})
 
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):

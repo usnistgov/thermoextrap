@@ -21,7 +21,6 @@ if TYPE_CHECKING:
         DataValues,  # noqa: TCH004
         DataValuesCentral,  # noqa: TCH004
         factory_data_values,  # noqa: TCH004
-        resample_indices,  # noqa: TCH004
     )
 
     # expose some data/models
@@ -57,7 +56,6 @@ else:
                 "DataValues",
                 "DataValuesCentral",
                 "factory_data_values",
-                "resample_indices",
             ],
             "models": [
                 "Derivatives",
@@ -105,7 +103,6 @@ __all__ = [
     "lnpi",
     "models",
     "random",
-    "resample_indices",
     "volume",
     "volume_idealgas",
     "xrwrap_alpha",

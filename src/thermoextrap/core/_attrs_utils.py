@@ -1,13 +1,28 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import attrs
 import numpy as np
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Hashable, Mapping, Sequence
+    from typing import Any
+
+    from thermoextrap.core.typing import MultDims
+    from thermoextrap.core.typing_compat import Self
 
 
 def attrs_clear_cache(self, attribute, value):
     """Clear out _cache if setting value."""
     self._cache = {}
     return value
+
+
+def convert_mapping_or_none_to_dict(kws: Mapping[str, Any] | None) -> dict[str, Any]:
+    if kws is None:
+        return {}
+    return dict(kws)
 
 
 def optional_converter(converter):
@@ -31,7 +46,7 @@ def field_formatter(fmt: str = "{:.5g}"):
     return wrapped
 
 
-def field_array_formatter(threshold=3, **kws):
+def field_array_formatter(threshold: int = 3, **kws: Any):
     """Formatter for numpy array field."""
 
     @optional_converter
@@ -42,23 +57,22 @@ def field_array_formatter(threshold=3, **kws):
     return wrapped
 
 
-def private_field(init=False, repr=False, **kws):
-    """Create a private attrs field."""
-    return attrs.field(init=init, repr=repr, **kws)
-
-
-def kw_only_field(kw_only=True, **kws):
+def kw_only_field(kw_only: bool = True, **kws: Any):
     return attrs.field(kw_only=kw_only, **kws)
 
 
-def convert_dims_to_tuple(dims):
+def convert_dims_to_tuple(dims: MultDims | None) -> tuple[Hashable, ...]:
     if dims is None:
         return ()
-
     return (dims,) if isinstance(dims, str) else tuple(dims)
 
 
-def cache_field(init=False, repr=False, factory=dict, **kws):
+def cache_field(
+    init: bool = False,
+    repr: bool = False,
+    factory: Callable[[], Any] = dict,
+    **kws: Any,
+):
     return attrs.field(init=False, repr=False, factory=dict, **kws)
 
 
@@ -72,11 +86,11 @@ def cache_field(init=False, repr=False, factory=dict, **kws):
 class MyAttrsMixin:
     """Baseclass for adding some sugar to attrs.derived classes."""
 
-    def asdict(self) -> dict:
+    def asdict(self) -> dict[str, Any]:
         """Convert object to dictionary."""
         return attrs.asdict(self, filter=self._get_smart_filter())
 
-    def new_like(self, **kws):
+    def new_like(self, **kws: Any) -> Self:
         """
         Create a new object with optional parameters.
 
@@ -87,11 +101,11 @@ class MyAttrsMixin:
         """
         return attrs.evolve(self, **kws)
 
-    def assign(self, **kws):
+    def assign(self, **kws: Any) -> Self:
         """Alias to :meth:`new_like`."""
         return self.new_like(**kws)
 
-    def set_params(self, **kws):
+    def set_params(self, **kws: Any) -> Self:
         """Set parameters of self, and return self (for chaining)."""
         for name in kws:
             if not hasattr(self, name):
@@ -102,7 +116,7 @@ class MyAttrsMixin:
             setattr(self, name, val)
         return self
 
-    def _immutable_setattrs(self, **kws) -> None:
+    def _immutable_setattrs(self, **kws: Any) -> None:
         """
         Set attributes of frozen attrs class.
 
@@ -130,8 +144,12 @@ class MyAttrsMixin:
             object.__setattr__(self, key, value)  # noqa: PLC2801
 
     def _get_smart_filter(
-        self, include=None, exclude=None, exclude_private=True, exclude_no_init=True
-    ):
+        self,
+        include: str | Sequence[str] | None = None,
+        exclude: str | Sequence[str] | None = None,
+        exclude_private: bool = True,
+        exclude_no_init: bool = True,
+    ) -> Callable[..., Any]:
         """
         Create a filter to include exclude names.
 

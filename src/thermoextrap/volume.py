@@ -12,6 +12,7 @@ import attrs
 import xarray as xr
 from attrs import field
 from attrs import validators as attv
+from cmomy import IndexSampler
 from module_utilities import cached
 
 from .core._attrs_utils import cache_field
@@ -118,11 +119,12 @@ class VolumeDataCallback(DataCallbackABC):
     def dxdq(self, rec_dim, skipna):
         return self.dxdqv.mean(rec_dim, skipna=skipna)
 
-    def resample(self, data, meta_kws, indices, **kws):  # noqa: ARG002
+    def resample(self, data, meta_kws, sampler: IndexSampler, **kws):  # noqa: ARG002
         if not isinstance(data, DataValues):
             msg = "resampling only possible with DataValues style."
             raise NotImplementedError(msg)
-        return self.new_like(dxdqv=self.dxdqv[indices])
+
+        return self.new_like(dxdqv=self.dxdqv[sampler.indices])
 
     def derivs_args(self, data, derivs_args):
         return (

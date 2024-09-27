@@ -24,7 +24,7 @@ def states():
         xems.append(xtrap.beta.factory_extrapmodel(beta, data))
     s = xtrap.StateCollection(xems)
 
-    return s.resample(nrep=3)
+    return s.resample(sampler={"nrep": 3})
 
 
 def test_mean_var(states) -> None:

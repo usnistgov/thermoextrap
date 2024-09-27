@@ -93,7 +93,7 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
 
     if isinstance(state.data, DataCentralMomentsVals):
         derivs = state.derivs(norm=False).values
-        resamp_derivs = state.resample(nrep=n_rep).derivs(norm=False)
+        resamp_derivs = state.resample(sampler={"nrep": n_rep}).derivs(norm=False)
     else:
         # Above with DataCentralMomentsVals is for simulation snapshots
         # Below is if things are pre-computed, so have multiple simulations

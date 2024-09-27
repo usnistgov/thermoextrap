@@ -9,7 +9,7 @@
 #
 attrs
 autodocsumm
-cmomy>=0.20.0
+cmomy>=0.21.0
 gpflow>=2.6.0
 jax[cpu]<0.4.25
 lazy-loader

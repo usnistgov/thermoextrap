@@ -14,13 +14,12 @@ The general scheme is to use the following:
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generic
 
 import attrs
 import cmomy
 import numpy as np
 import xarray as xr
-from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
 from cmomy.core.missing import MISSING
@@ -30,14 +29,31 @@ from .core._attrs_utils import (
     MyAttrsMixin,
     cache_field,
     convert_dims_to_tuple,
+    convert_mapping_or_none_to_dict,
     kw_only_field,
 )
 from .core.xrutils import xrwrap_uv, xrwrap_xv
 from .docstrings import DOCFILLER_SHARED
 
 if TYPE_CHECKING:
-    from collections.abc import Hashable, Mapping, Sequence
+    from collections.abc import Callable, Hashable, Mapping, Sequence
     from typing import Any
+
+    from cmomy.core.typing import (
+        AxisReduce,
+        DataT_,
+        DimsReduce,
+        MissingType,
+        Sampler,
+    )
+
+    from thermoextrap.core.typing import MetaKws, MultDims, SingleDim
+    from thermoextrap.core.typing_compat import Self, TypeVar
+
+    _T = TypeVar("_T")
+
+
+from cmomy.core.typing import DataT
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
@@ -49,60 +65,28 @@ __all__ = [
     "DataValues",
     "DataValuesCentral",
     "factory_data_values",
-    "resample_indices",
 ]
 
 
 # TODO(wpk): rename order to something like mom_order or expansion_order just umom...
 
+
 # * Utilities
-
-
 def _raise_if_not_dataarray(x: Any, name: str | None = None) -> None:
     if not isinstance(x, xr.DataArray):
         msg = f"type({name})={type(x)} must be a DataArray."
         raise TypeError(msg)
 
 
-@docfiller_shared.decorate
-def resample_indices(
-    size,
-    nrep,
-    rec_dim="rec",
-    rep_dim="rep",
-    replace=True,
-    rng: np.random.Generator | None = None,
-):
-    """
-    Get indexing DataArray.
-
-    Parameters
-    ----------
-    size : int
-        size of axis to bootstrap along
-    {nrep}
-    {rec_dim}
-    {rep_dim}
-    replace : bool, default=True
-        If True, sample with replacement.
-    {rng}
-
-    Returns
-    -------
-    indices : DataArray
-        if transpose, shape=(size, nrep)
-        else, shape=(nrep, size)
-    """
-    from cmomy.random import validate_rng
-
-    return xr.DataArray(
-        data=validate_rng(rng).choice(size, size=(nrep, size), replace=replace),
-        dims=[rep_dim, rec_dim],
-    )
+def _validate_dims(self: Any, attribute: attrs.Attribute, dims: Any) -> None:  # noqa: ARG001
+    for d in dims:
+        if d not in self.data.dims:
+            msg = f"{d} not in data.dimensions {self.data.dims}"
+            raise ValueError(msg)
 
 
-@attrs.frozen
-class DatasetSelector(MyAttrsMixin):
+@attrs.define(frozen=True)
+class DatasetSelector(MyAttrsMixin, Generic[DataT]):
     """
     Wrap xarray object so can index like ds[i, j].
 
@@ -123,21 +107,20 @@ class DatasetSelector(MyAttrsMixin):
     """
 
     #: Data to index
-    data: xr.DataArray | xr.Dataset = field(
-        validator=attv.instance_of((xr.DataArray, xr.Dataset))
-    )
+    data: DataT = field(validator=attv.instance_of((xr.DataArray, xr.Dataset)))  # pyright: ignore[reportAssignmentType]
     #: Dims to index along
-    dims: Hashable | Sequence[Hashable] = field(converter=convert_dims_to_tuple)
-
-    @dims.validator  # pyright: ignore[reportUntypedFunctionDecorator]
-    def _validate_dims(self, attribute, dims) -> None:  # noqa: ARG002
-        for d in dims:
-            if d not in self.data.dims:
-                msg = f"{d} not in data.dimensions {self.data.dims}"
-                raise ValueError(msg)
+    dims: tuple[Hashable, ...] = field(
+        converter=convert_dims_to_tuple, validator=_validate_dims
+    )
 
     @classmethod
-    def from_defaults(cls, data, dims=None, mom_dim="moment", deriv_dim=None):
+    def from_defaults(
+        cls: type[DatasetSelector[Any]],
+        data: DataT_,
+        dims: MultDims | None = None,
+        mom_dim: SingleDim = "moment",
+        deriv_dim: SingleDim | None = None,
+    ) -> DatasetSelector[DataT_]:
         """
         Create DataSelector object with default values for dims.
 
@@ -145,13 +128,13 @@ class DatasetSelector(MyAttrsMixin):
         ----------
         data : DataArray or Dataset
             object to index into.
-        dims : hashable or sequence of hashable.
+        dims : str or sequence of hashable.
             Name of dimensions to be indexed.
             If dims is None, default to either
             ``dims=(mom_dim,)`` if ``deriv_dim is None``.
             Otherwise ``dims=(mom_dim, deriv_dim)``.
-        mom_dim : hashable, default='moment'
-        deriv_dim, hashable, optional
+        mom_dim : str, default='moment'
+        deriv_dim : str, optional
             If passed and `dims` is None, set ``dims=(mom_dim, deriv_dim)``
 
         Returns
@@ -160,17 +143,16 @@ class DatasetSelector(MyAttrsMixin):
         """
         if dims is None:
             dims = (mom_dim, deriv_dim) if deriv_dim is not None else (mom_dim,)
-
         return cls(data=data, dims=dims)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> DataT:
         if not isinstance(idx, tuple):
             idx = (idx,)
         if len(idx) != len(self.dims):
             msg = f"bad idx {idx}, vs dims {self.dims}"
             raise ValueError(msg)
         selector = dict(zip(self.dims, idx))
-        return self.data.isel(**selector, drop=True)
+        return self.data.isel(selector, drop=True)
 
     def __repr__(self) -> str:
         return repr(self.data)
@@ -192,11 +174,13 @@ class DataCallbackABC(
     """
 
     @abstractmethod
-    def check(self, data):
+    def check(self, data: AbstractData) -> None:
         """Perform any consistency checks between self and data."""
 
     @abstractmethod
-    def derivs_args(self, *args, data, derivs_args):
+    def derivs_args(
+        self, *args: Any, data: AbstractData, derivs_args: tuple[Any, ...]
+    ) -> tuple[Any, ...]:
         """
         Adjust derivs args from data class.
 
@@ -206,7 +190,13 @@ class DataCallbackABC(
 
     # define these to raise error instead
     # of forcing usage.
-    def resample(self, data, meta_kws, **kws) -> None:
+    def resample(
+        self,
+        data: AbstractData,
+        meta_kws: MetaKws,
+        sampler: cmomy.IndexSampler,
+        **kws: Any,
+    ) -> Self:
         """
         Adjust create new object.
 
@@ -214,11 +204,11 @@ class DataCallbackABC(
         """
         raise NotImplementedError
 
-    def block(self, data, meta_kws, **kws) -> None:
+    def block(self, data: AbstractData, meta_kws: MetaKws, **kws: Any) -> Self:
         """Block averaging."""
         raise NotImplementedError
 
-    def reduce(self, data, meta_kws, **kws) -> None:
+    def reduce(self, data: AbstractData, meta_kws: MetaKws, **kws: Any) -> Self:
         """Reduce along dimension."""
         raise NotImplementedError
 
@@ -234,26 +224,37 @@ class DataCallback(DataCallbackABC):
     Implemented to pass things through unchanged.  Will be used for default construction
     """
 
-    def check(self, data) -> None:
+    def check(self, data: AbstractData) -> None:
         pass
 
-    def derivs_args(self, data, derivs_args):  # noqa: PLR6301,ARG002
+    def derivs_args(  # noqa: PLR6301
+        self,
+        data: AbstractData,  # noqa: ARG002
+        derivs_args: tuple[Any, ...],
+    ) -> tuple[Any, ...]:
         return derivs_args
 
-    def resample(self, data, meta_kws, **kws):  # noqa: ARG002
+    def resample(self, data: AbstractData, meta_kws: MetaKws, **kws: Any) -> Self:  # noqa: ARG002
         return self
 
-    def block(self, data, meta_kws, **kws):  # noqa: ARG002
+    def block(self, data: AbstractData, meta_kws: MetaKws, **kws: Any) -> Self:  # noqa: ARG002
         return self
 
-    def reduce(self, data, meta_kws, **kws):  # noqa: ARG002
+    def reduce(self, data: AbstractData, meta_kws: MetaKws, **kws: Any) -> Self:  # noqa: ARG002
         return self
 
 
-def _meta_converter(meta):
+def _meta_converter(meta: DataCallbackABC | None) -> DataCallbackABC:
     if meta is None:
         meta = DataCallback()
     return meta
+
+
+def _meta_validator(self: Any, attribute: attrs.Attribute, meta: Any) -> None:  # noqa: ARG001
+    if not isinstance(meta, DataCallbackABC):
+        msg = "meta must be None or subclass of DataCallbackABC"
+        raise TypeError(msg)
+    meta.check(data=self)
 
 
 @attrs.define
@@ -263,27 +264,28 @@ class AbstractData(
     """Abstract class for data."""
 
     #: Callback
-    meta: DataCallbackABC | None = field(
+    meta: DataCallbackABC = field(
         kw_only=True,
         converter=_meta_converter,
+        validator=_meta_validator,
     )
-    _cache: dict = cache_field()
-
-    @meta.validator  # pyright: ignore[reportUntypedFunctionDecorator]
-    def _meta_validate(self, attribute, meta) -> None:  # noqa: ARG002
-        if not isinstance(meta, DataCallbackABC):
-            msg = "meta must be None or subclass of DataCallbackABC"
-            raise TypeError(msg)
-        meta.check(data=self)
+    #: Energy moments dimension
+    umom_dim: SingleDim = field(kw_only=True, default="umom")
+    #: Derivative dimension
+    deriv_dim: SingleDim | None = field(kw_only=True, default=None)
+    #: Whether the observable `x` is the same as energy `u`
+    x_is_u: bool = field(kw_only=True, default=False)
+    # cache field
+    _cache: dict[str, Any] = cache_field()
 
     @property
     @abstractmethod
-    def central(self):
+    def central(self) -> bool:
         """Whether central (True) or raw (False) moments are used."""
 
     @property
     @abstractmethod
-    def derivs_args(self):
+    def derivs_args(self) -> tuple[Any, ...]:
         """Sequence of arguments to derivative calculation function."""
 
     @abstractmethod
@@ -291,11 +293,11 @@ class AbstractData(
         pass
 
     @abstractmethod
-    def resample(self, indices=None, nrep=None, **kwargs):
+    def resample(self, sampler: Sampler, **kwargs: Any) -> Self:
         pass
 
     @property
-    def xalpha(self):
+    def xalpha(self) -> bool:
         """
         Whether X has explicit dependence on `alpha`.
 
@@ -307,8 +309,16 @@ class AbstractData(
     def x_isnot_u(self) -> bool:
         return not self.x_is_u
 
-    def pipe(self, func, *args, **kwargs):
+    def pipe(self, func: Callable[..., _T], *args, **kwargs) -> _T:
         return func(self, *args, **kwargs)
+
+
+def _convert_xv(
+    xv: xr.DataArray | xr.Dataset | None, self_: DataValuesBase
+) -> xr.DataArray | xr.Dataset:
+    if xv is None:
+        return self_.uv
+    return xv
 
 
 @attrs.define
@@ -335,38 +345,26 @@ class DataValuesBase(AbstractData):
     #: Energy values
     uv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
     #: Obervable values
-    xv: xr.DataArray | None = field(
-        validator=attv.optional(attv.instance_of((xr.DataArray, xr.Dataset)))
+    xv: xr.DataArray | xr.Dataset = field(
+        converter=attrs.Converter(_convert_xv, takes_self=True),  # pyright: ignore[reportCallIssue, reportArgumentType]
+        validator=attv.instance_of((xr.DataArray, xr.Dataset)),
     )
     #: Expansion order
     order: int = field()
     #: Records dimension
-    rec_dim: Hashable | None = kw_only_field(default="rec")
-    #: Energy moments dimension
-    umom_dim: Hashable | None = kw_only_field(default="umom")
-    #: Derivative dimension
-    deriv_dim: Hashable | None = kw_only_field(default=None)
+    rec_dim: SingleDim = field(kw_only=True, default="rec")
     #: Whether to skip NAN values
-    skipna: bool = kw_only_field(default=False)
+    skipna: bool = field(kw_only=True, default=False)
     #: Whether to chunk the xarray objects
-    chunk: int | Mapping | None = kw_only_field(default=None)
+    chunk: int | Mapping[Hashable, int] | None = field(kw_only=True, default=None)
     #: Whether to compute the chunked data
-    compute: bool | None = kw_only_field(default=None)
+    compute: bool | None = field(kw_only=True, default=None)
     #: Arguments to building the averages
-    build_aves_kws: Mapping | None = kw_only_field(
-        default=None, converter=attc.default_if_none(factory=dict)
+    build_aves_kws: dict[str, Any] = field(
+        kw_only=True, converter=convert_mapping_or_none_to_dict, default=None
     )
-    #: Whether the observable `x` is the same as energy `u`
-    x_is_u: bool = kw_only_field(default=False)
 
     def __attrs_post_init__(self):
-        if not isinstance(self.uv, xr.DataArray):
-            msg = f"{type(self.uv)=} must be a DataArray."
-            raise TypeError(msg)
-        if self.xv is not None and not isinstance(self.xv, (xr.DataArray, xr.Dataset)):
-            msg = f"{type(self.xv)=} must be DataArray or Dataset."
-            raise TypeError(msg)
-
         if self.chunk is not None:
             if isinstance(self.chunk, int):
                 self.chunk = {self.rec_dim: self.chunk}
@@ -380,9 +378,6 @@ class DataValuesBase(AbstractData):
                 self.compute = False
             else:
                 self.compute = True
-
-        if self.xv is None or self.x_is_u:
-            self.xv = self.uv
 
     @classmethod
     @docfiller_shared.decorate
@@ -461,26 +456,22 @@ class DataValuesBase(AbstractData):
     @docfiller_shared.decorate
     def resample(
         self,
-        indices=None,
-        nrep=None,
-        rep_dim="rep",
+        sampler: Sampler,
+        rep_dim: SingleDim = "rep",
         chunk=None,
         compute="None",
-        meta_kws=None,
-        rng: np.random.Generator | None = None,
+        meta_kws: MetaKws | None = None,
     ):
         """
         Resample object.
 
         Parameters
         ----------
-        {indices}
-        {nrep}
+        {sampler}
         {rep_dim}
         {chunk}
         {compute}
         {meta_kws}
-        {rng}
         """
         if chunk is None:
             chunk = self.chunk
@@ -493,14 +484,9 @@ class DataValuesBase(AbstractData):
         if rep_dim is None:
             rep_dim = self.rep_dim
 
-        if indices is None:
-            if nrep is None:
-                msg = "Must set nrep if using indices."
-                raise TypeError(msg)
-            indices = resample_indices(
-                len(self), nrep, rec_dim=self.rec_dim, rep_dim=rep_dim, rng=rng
-            )
-        elif not isinstance(indices, xr.DataArray):
+        sampler = cmomy.factory_sampler(sampler, data=self.xv, dim=self.rec_dim)
+        indices = sampler.indices
+        if not isinstance(indices, xr.DataArray):
             indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))
 
         # assert indices.sizes[self.rec_dim] == len(self)
@@ -517,8 +503,7 @@ class DataValuesBase(AbstractData):
         meta = self.meta.resample(
             data=self,
             meta_kws=meta_kws,
-            indices=indices,
-            nrep=nrep,
+            sampler=sampler,
             rep_dim=rep_dim,
             chunk=chunk,
             compute=compute,
@@ -742,7 +727,7 @@ def build_aves_dxdu(
     return xave, duave, dxduave
 
 
-def _xu_to_u(xu, dim="umom"):
+def _xu_to_u(xu, dim: Hashable = "umom"):
     """For case where x = u, shift umom and add umom=0."""
     n = xu.sizes[dim]
 
@@ -1265,14 +1250,11 @@ class DataCentralMoments(DataCentralMomentsBase):
     @docfiller_shared.decorate
     def resample(
         self,
-        nrep=None,
-        freq=None,
-        indices=None,
+        sampler: Sampler,
         dim=MISSING,
         axis=MISSING,
         rep_dim="rep",
         parallel=True,
-        resample_kws=None,
         meta_kws=None,
         **kwargs,
     ):
@@ -1281,37 +1263,43 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         Parameters
         ----------
-        {freq}
-        {indices}
-        {nrep}
+        {sampler}
         {dim}
         {axis}
         {rep_dim}
         {parallel}
         meta_kws : mapping, optional
             Parameters to `self.meta.resample`
-        resample_kws : mapping, optional
-            dictionary of values to pass to self.dxduave.resample_and_reduce
         """
         if dim is MISSING and axis is MISSING:
             dim = self.rec_dim
 
+        # go ahead and get sampler now in case need for meta..
+        sampler = cmomy.factory_sampler(
+            sampler,
+            data=self.dxduave.obj,
+            dim=dim,
+            axis=axis,
+            mom_ndim=self.dxduave.mom_ndim,
+            mom_dims=self.dxduave.mom_dims,
+            rep_dim=rep_dim,
+            parallel=parallel,
+        )
+
         kws = dict(
-            freq=freq,
-            indices=indices,
-            nrep=nrep,
+            sampler=sampler,
             dim=dim,
             axis=axis,
             rep_dim=rep_dim,
             parallel=parallel,
-            resample_kws=resample_kws,
             **kwargs,
         )
 
-        kws["full_output"] = True
-
-        dxdu_new, kws["freq"] = self.dxduave.resample_and_reduce(**kws)
-        dxdu_new = dxdu_new.transpose(rep_dim, ...)
+        dxdu_new = (
+            self.dxduave.resample_and_reduce(**kws)
+            # TODO(wpk): remove this if possible...
+            .transpose(rep_dim, ...)
+        )
 
         meta = self.meta.resample(data=self, meta_kws=meta_kws, **kws)
         return self.new_like(dxduave=dxdu_new, rec_dim=rep_dim, meta=meta)
@@ -1566,9 +1554,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         xv: xr.DataArray | xr.Dataset,
         uv: xr.DataArray | xr.Dataset,
         order,
-        freq,
-        nrep=None,
-        rng=None,
+        sampler: Sampler,
         weight=None,
         axis=MISSING,
         dim=MISSING,
@@ -1581,6 +1567,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         meta=None,
         meta_kws=None,
         x_is_u=False,
+        parallel: bool | None = None,
         **kwargs,
     ):
         """
@@ -1591,7 +1578,6 @@ class DataCentralMoments(DataCentralMomentsBase):
         {xv}
         {uv}
         {order}
-        {freq}
         {weight}
         {axis}
         {dim}
@@ -1605,13 +1591,13 @@ class DataCentralMoments(DataCentralMomentsBase):
         {meta_kws}
         {x_is_u}
         **kwargs
-            Extra arguments to :meth:`cmomy.CentralMomentsData.from_resample_vals`
+            Extra arguments to :meth:`cmomy.wrap_resample_vals`
 
         See Also
         --------
-        :meth:`cmomy.wrap_resample_vals`
-        :meth:`cmomy.resample.random_freq`
-        :meth:`cmomy.resmaple.randsamp_freq`
+        cmomy.wrap_resample_vals
+        cmomy.resample.factory_sampler
+        cmomy.resmaple.IndexSampler
         """
         if xv is None or x_is_u:
             xv = uv
@@ -1619,26 +1605,28 @@ class DataCentralMoments(DataCentralMomentsBase):
         _raise_if_not_dataarray(xv)
         _raise_if_not_dataarray(uv)
 
-        # from cmomy._utils import select_axis_dim
+        mom_dims = (xmom_dim, umom_dim)
 
-        # axis, dim = select_axis_dim(xv.dims, axis=axis, dim=dim, default_axis=0)
-
-        # ndat = xv.sizes[dim]
-
-        # freq = cmomy.resample.randsamp_freq(ndat=ndat, nrep=nrep, indices=indices, freq=freq, check=True)
+        sampler = cmomy.factory_sampler(
+            sampler,
+            data=xv,
+            dim=dim,
+            axis=axis,
+            mom_dims=mom_dims,
+            rep_dim=rep_dim,
+            parallel=parallel,
+        )
 
         dxduave = cmomy.wrap_resample_vals(
             xv,
             uv,
             weight=weight,
-            freq=freq,
-            nrep=nrep,
-            rng=rng,
+            sampler=sampler,
             mom=(1, order),
             axis=axis,
             dim=dim,
             dtype=dtype,
-            mom_dims=(xmom_dim, umom_dim),
+            mom_dims=mom_dims,
             rep_dim=rep_dim,
             **kwargs,
         )
@@ -1656,17 +1644,15 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         return out.set_params(
             meta=out.meta.resample(
-                xv,
-                uv,
                 data=out,
                 meta_kws=meta_kws,
+                sampler=sampler,
                 weight=weight,
-                freq=freq,
                 mom=(1, order),
                 axis=axis,
                 dim=dim,
                 dtype=dtype,
-                mom_dims=(xmom_dim, umom_dim),
+                mom_dims=mom_dims,
                 rep_dim=rep_dim,
                 **kwargs,
             )
@@ -1748,65 +1734,6 @@ class DataCentralMoments(DataCentralMomentsBase):
             meta=meta,
             x_is_u=x_is_u,
         )
-
-        # if xu is None or x_is_u:
-        #     raw = u
-
-        #     if w is not None:
-        #         raw.loc[{umom_dim: 0}] = w
-        #     raw = raw.transpose(..., umom_dim)
-
-        # elif isinstance(xu, xr.DataArray):
-        #     raw = xr.concat((u, xu), dim=xmom_dim)
-        #     if w is not None:
-        #         raw.loc[{umom_dim: 0, xmom_dim: 0}] = w
-        #     # make sure in correct order
-        #     raw = raw.transpose(..., xmom_dim, umom_dim)
-        #     # return raw
-        #     # raw.data = np.ascontiguousarray(raw.data)
-        # else:
-        #     if axis is None:
-        #         axis = -1
-        #     if umom_axis is None:
-        #         umom_axis = axis
-        #     if xumom_axis is None:
-        #         xumom_axis = axis
-
-        #     u = np.swapaxes(u, umom_axis, -1)
-        #     xu = np.swapaxes(xu, xumom_axis, -1)
-
-        #     shape = xu.shape[:-1]
-        #     shape_moments = (2, min(u.shape[-1], xu.shape[-1]))
-        #     shape_out = shape + shape_moments
-
-        #     if dtype is None:
-        #         dtype = xu.dtype
-
-        #     raw = np.empty(shape_out, dtype=dtype)
-        #     raw[..., 0, :] = u
-        #     raw[..., 1, :] = xu
-        #     if w is not None:
-        #         raw[..., 0, 0] = w
-        #     # raw = np.ascontiguousarray(raw)
-
-        # return cls.from_raw(
-        #     raw=raw,
-        #     deriv_dim=deriv_dim,
-        #     rec_dim=rec_dim,
-        #     xmom_dim=xmom_dim,
-        #     umom_dim=umom_dim,
-        #     mom=mom,
-        #     central=central,
-        #     val_shape=val_shape,
-        #     dtype=dtype,
-        #     dims=dims,
-        #     attrs=attrs,
-        #     coords=coords,
-        #     indexes=indexes,
-        #     name=name,
-        #     meta=meta,
-        #     x_is_u=x_is_u,
-        # )
 
     @classmethod
     @docfiller_shared.decorate
@@ -1971,7 +1898,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     #: Stored energy values
     uv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
     #: Stored observable values
-    xv: xr.DataArray | None = field(
+    xv: xr.DataArray | xr.Dataset | None = field(
         validator=attv.optional(attv.instance_of(xr.DataArray))
     )
     #: Expansion order
@@ -2096,32 +2023,27 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     @docfiller_shared.inherit(DataCentralMoments.resample)
     def resample(
         self,
-        nrep=None,
-        freq=None,
-        rng=None,
-        indices=None,
-        dim=MISSING,
-        axis=MISSING,
-        rep_dim="rep",
-        parallel: bool = True,
-        meta_kws=None,
+        sampler: Sampler,
+        dim: DimsReduce | MissingType = MISSING,
+        axis: AxisReduce | MissingType = MISSING,
+        rep_dim: SingleDim = "rep",
+        parallel: bool | None = True,
+        meta_kws: MetaKws | None = None,
         **kwargs,
-    ):
+    ) -> Self:
         """
         Resample data.
 
         Parameters
         ----------
-        {nrep}
-        {freq}
-        {indices}
+        {sampler}
         {dim}
         {axis}
         {rep_dim}
         {parallel}
         {meta_kws}
         **kwargs
-            Keyword arguments to :meth:`cmomy.CentralMomentsData.from_resample_vals`
+            Keyword arguments to :meth:`cmomy.wrap_resample_vals`
 
         See Also
         --------
@@ -2130,39 +2052,28 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         if dim is MISSING and axis is MISSING:
             dim = self.rec_dim
 
-        freq = cmomy.randsamp_freq(
-            freq=freq,
-            indices=indices,
-            rng=rng,
-            nrep=nrep,
+        sampler = cmomy.factory_sampler(
+            sampler,
             data=self.xv,
-            axis=axis,
             dim=dim,
+            axis=axis,
+            rep_dim=rep_dim,
+            parallel=parallel,
         )
 
-        # back to indices for meta analysis...
-        indices = cmomy.resample.freq_to_indices(freq, shuffle=False)
-        if not isinstance(indices, xr.DataArray):
-            indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))
-
         kws = {
-            "nrep": nrep,
-            "freq": freq,
-            "rng": rng,
+            "sampler": sampler,
             "parallel": parallel,
             "axis": axis,
             "dim": dim,
             "rep_dim": rep_dim,
             **kwargs,
         }
-        meta = self.meta.resample(data=self, meta_kws=meta_kws, indices=indices, **kws)
+        # back to indices for meta analysis...
+        # Not sure if I like this.  In general, don't have metadata resampling...
+        meta = self.meta.resample(data=self, meta_kws=meta_kws, **kws)
 
-        # if self.order == 0:
-        #     uv = self.uv.isel({self.rec_dim: indices})
-        #     xv = None if self.x_is_u else self.xv.isel({self.rec_dim: indices})
-        #     return self.new_like(uv=uv, xv=xv, rec_dim=rep_dim, meta=meta)
-
-        dxduave = cmomy.CentralMomentsData.from_resample_vals(
+        dxduave = cmomy.wrap_resample_vals(
             self.xv,
             self.uv,
             weight=self.weight,

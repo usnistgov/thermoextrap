@@ -6,10 +6,12 @@ General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Callable
 
 import attrs
+import cmomy
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -18,7 +20,11 @@ from attrs import field
 from attrs import validators as attv
 from module_utilities import cached
 
-from .core._attrs_utils import MyAttrsMixin, cache_field
+from .core._attrs_utils import (
+    MyAttrsMixin,
+    cache_field,
+    convert_mapping_or_none_to_dict,
+)
 from .core._imports import has_pymbar
 from .core._imports import sympy as sp
 from .core.sputils import get_default_indexed, get_default_symbol
@@ -27,7 +33,12 @@ from .data import AbstractData, kw_only_field
 from .docstrings import DOCFILLER_SHARED
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Sequence
+    from typing import Any
+
+    from cmomy.core.typing import Sampler
+
+    from thermoextrap.core.typing_compat import Self
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
@@ -550,13 +561,13 @@ class ExtrapModel(MyAttrsMixin):
 
         return out
 
-    def resample(self, indices=None, nrep=None, **kws):
+    def resample(self, sampler: Sampler, **kws):
         """Create new object with resampled data."""
         return self.new_like(
             order=self.order,
             alpha0=self.alpha0,
             derivatives=self.derivatives,
-            data=self.data.resample(nrep=nrep, indices=indices, **kws),
+            data=self.data.resample(sampler=sampler, **kws),
             minus_log=self.minus_log,
             alpha_name=self.alpha_name,
         )
@@ -578,8 +589,8 @@ class StateCollection(MyAttrsMixin):
     """
 
     states: Sequence = field()
-    kws: Mapping | None = kw_only_field(
-        default=None, converter=attc.default_if_none(factory=dict)
+    kws: dict[str, Any] = field(
+        kw_only=True, converter=convert_mapping_or_none_to_dict, default=None
     )
 
     _cache: dict = cache_field()
@@ -597,35 +608,31 @@ class StateCollection(MyAttrsMixin):
     def alpha_name(self):
         return getattr(self[0], "alpha_name", "alpha")
 
-    def resample(self, indices=None, nrep=None, **kws):
-        """Resample underlying models."""
-        if indices is None:
-            indices = [None] * len(self)
+    def resample(self, sampler: Sampler | Sequence[Sampler], **kws: Any) -> Self:
+        """
+        Resample underlying models.
 
-        if len(indices) != len(self):
-            msg = f"{len(indices)=} must equal {len(self)=}"
+        If pass in a single sampler, use it for all states. For example, to
+        resample all states with some ``nrep``, use
+        ``.resample(sampler={"nrep": nrep})``. Note that the if you pass a
+        single mapping, the mapping will be passed to each state ``resample``
+        method, which will in turn create unique sample for each state. To
+        specify a different sampler for each state, pass in a sequence of
+        sampler.
+        """
+        if isinstance(
+            sampler,
+            (np.ndarray, xr.DataArray, xr.Dataset, cmomy.IndexSampler, Mapping),
+        ):
+            sampler = [sampler] * len(self)
+        elif len(sampler) != len(self):
+            msg = f"{len(sampler)=} must equal {len(self)=}"
             raise ValueError(msg)
-
-        if "freq" in kws:
-            freq = kws.pop("freq")
-            if freq is None:
-                freq = [None] * len(self)
-            if len(freq) != len(self):
-                msg = f"{len(freq)=} must equal {len(self)=}"
-                raise ValueError(msg)
-
-            return type(self)(
-                states=tuple(
-                    state.resample(indices=idx, nrep=nrep, freq=fq, **kws)
-                    for state, idx, fq in zip(self.states, indices, freq)
-                ),
-                **self.kws,
-            )
 
         return type(self)(
             states=tuple(
-                state.resample(indices=idx, nrep=nrep, **kws)
-                for state, idx in zip(self.states, indices)
+                state.resample(sampler=sampler, **kws)
+                for state, sampler in zip(self.states, sampler)
             ),
             **self.kws,
         )
@@ -1028,10 +1035,10 @@ class PerturbModel(MyAttrsMixin):
 
         return num / den
 
-    def resample(self, nrep, idx=None, **kws):
+    def resample(self, sampler: Sampler, **kws):
         return self.__class__(
             alpha0=self.alpha0,
-            data=self.data.resample(nrep=nrep, idx=idx, **kws),
+            data=self.data.resample(sampler=sampler, **kws),
             alpha_name=self.alpha_name,
         )
 
