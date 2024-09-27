@@ -683,7 +683,10 @@ def test_extrapmodel_alphadep(fixture, rng: np.random.Generator) -> None:
     # x[rec, deriv, val]
     n, nv = fixture.x.shape
     order = fixture.order
-    x = rng.random((n, fixture.order + 1, nv)) + fixture.xoff
+    x = xr.DataArray(
+        rng.random((n, fixture.order + 1, nv)) + fixture.xoff,
+        dims=["rec", "deriv", "val"],
+    )
     u = fixture.u
 
     # by passign a derivative name, we are
@@ -870,7 +873,11 @@ def test_extrapmodel_alphadep_minuslog(fixture, rng: np.random.Generator) -> Non
     # x[rec, deriv, val]
     n, nv = fixture.x.shape
     order = fixture.order
-    x = rng.random((n, fixture.order + 1, nv)) + fixture.xoff
+    x = xr.DataArray(
+        rng.random((n, fixture.order + 1, nv)) + fixture.xoff,
+        dims=["rec", "deriv", "val"],
+    )
+
     u = fixture.u
 
     # by passign a derivative name, we are

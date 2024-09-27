@@ -116,8 +116,8 @@ class VolumeDataCallback(DataCallbackABC):
         pass
 
     @cached.meth
-    def dxdq(self, rec_dim, skipna):
-        return self.dxdqv.mean(rec_dim, skipna=skipna)
+    def dxdq(self, rec_dim):
+        return self.dxdqv.mean(rec_dim)
 
     def resample(self, data, meta_kws, sampler: IndexSampler, **kws):  # noqa: ARG002
         if not isinstance(data, DataValues):
@@ -129,7 +129,7 @@ class VolumeDataCallback(DataCallbackABC):
     def derivs_args(self, data, derivs_args):
         return (
             *tuple(derivs_args),
-            self.dxdq(data.rec_dim, data.skipna),
+            self.dxdq(data.rec_dim),
             self.volume,
             self.ndim,
         )
@@ -195,8 +195,6 @@ def factory_extrapmodel(
         order=order,
         meta=meta,
         rec_dim=rec_dim,
-        rep_dim=rep_dim,
-        val_dims=val_dims,
         deriv_dim=None,
         **kws,
     )

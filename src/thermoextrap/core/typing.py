@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Hashable, Mapping, Sequence
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 import xarray as xr
 
@@ -15,7 +15,7 @@ DataT_ = TypeVar("DataT_", xr.DataArray, xr.Dataset)
 XArrayObj: TypeAlias = Union[xr.DataArray, xr.Dataset]
 
 
-MetaKws: TypeAlias = Mapping[str, Any]
+MetaKws: TypeAlias = Optional[Mapping[str, Any]]
 
-SingleDim: TypeAlias = Hashable
+SingleDim: TypeAlias = str
 MultDims: TypeAlias = str | Sequence[Hashable]

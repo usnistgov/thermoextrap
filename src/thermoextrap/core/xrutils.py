@@ -15,6 +15,7 @@ from cmomy.core.validate import (
 if TYPE_CHECKING:
     from collections.abc import Hashable, Sequence
 
+    from cmomy.core.typing import DataT
     from numpy.typing import ArrayLike
 
     from thermoextrap.core.typing import MultDims, SingleDim
@@ -27,11 +28,11 @@ if TYPE_CHECKING:
 # Structure(s) to handle data
 ###############################################################################
 def _check_xr(
-    x: ArrayLike | xr.DataArray | xr.Dataset,
+    x: ArrayLike | DataT,
     dims: DimsMapping,
     name: str | None = None,
     strict: bool = False,
-) -> xr.DataArray | xr.Dataset:
+) -> xr.DataArray | DataT:
     if is_dataset(x):
         return x
 
@@ -52,13 +53,13 @@ def _check_xr(
 
 
 def xrwrap_uv(
-    uv: ArrayLike | xr.DataArray | xr.Dataset,
+    uv: ArrayLike | xr.DataArray,
     dims: DimsMapping | None = None,
     rec_dim: SingleDim = "rec",
     rep_dim: SingleDim = "rep",
     name: str | None = "u",
     strict: bool = True,
-):
+) -> xr.DataArray:
     """
     Wrap uv (energy values) array.
 
@@ -70,7 +71,7 @@ def xrwrap_uv(
 
 
 def xrwrap_xv(
-    xv: ArrayLike | xr.DataArray | xr.Dataset,
+    xv: ArrayLike | DataT,
     dims: DimsMapping | None = None,
     rec_dim: SingleDim = "rec",
     rep_dim: SingleDim = "rep",
@@ -78,7 +79,7 @@ def xrwrap_xv(
     val_dims: MultDims = "val",
     name: str | None = "x",
     strict: bool | None = None,
-):
+) -> xr.DataArray | DataT:
     """
     Wraps xv (x values) array.
 
