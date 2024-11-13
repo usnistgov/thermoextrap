@@ -746,7 +746,8 @@ def create_base_GP_model(
                 )
         else:
             mean_func = ConstantMeanWithDerivs(
-                np.zeros_like(gpr_data[1][ref_d_bool, :], x_dim=n_x_dims)
+                np.zeros_like(gpr_data[1][ref_d_bool, :]),
+                x_dim=n_x_dims,
             )
 
     # For multiple output kernels, helpful to scale all outputs so have similar variance

@@ -1198,7 +1198,9 @@ class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
         filled_mean = tf.ones([tf.shape(X)[0], self.dim], dtype=X.dtype) * self.c
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
-        deriv_zero_bool = tf.math.reduce_all((X[:, self.x_dim:] == 0.0), axis=-1, keepdims=True)
+        deriv_zero_bool = tf.math.reduce_all(
+            (X[:, self.x_dim :] == 0.0), axis=-1, keepdims=True
+        )
         return tf.where(deriv_zero_bool, filled_mean, filled_zeros)
 
 
@@ -1242,18 +1244,21 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
 
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
         # Fill in mean function for 0th order for all X
-        filled_mean_0 = tf.tensordot(X[:, :self.x_dim], self.slope, 1) + self.b
+        filled_mean_0 = tf.tensordot(X[:, : self.x_dim], self.slope, 1) + self.b
         # Fill in mean function for 1st order for all X
         # complicated, though, because need to find specific derivatives in each direction of X...
-        filled_mean_1 = tf.tensordot(X[:, self.x_dim:], self.slope, 1)
+        filled_mean_1 = tf.tensordot(X[:, self.x_dim :], self.slope, 1)
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
         # Set conditions to fill in mean values for just 0th and 1st derivatives
         # For 1st derivative boolean, must be where have at least one 1 (first derivative)
         # and no derivatives higher than 1
-        deriv_zero_bool = tf.math.reduce_all((X[:, self.x_dim:] == 0.0), axis=-1, keepdims=True)
-        deriv_one_bool = tf.math.logical_or(tf.math.reduce_any((X[:, self.x_dim:] == 1.0), axis=-1, keepdims=True),
-                                            tf.math.reduce_all((X[:, self.x_dim:] < 2.0), axis=-1, keepdims=True),
-                                            )
+        deriv_zero_bool = tf.math.reduce_all(
+            (X[:, self.x_dim :] == 0.0), axis=-1, keepdims=True
+        )
+        deriv_one_bool = tf.math.logical_or(
+            tf.math.reduce_any((X[:, self.x_dim :] == 1.0), axis=-1, keepdims=True),
+            tf.math.reduce_all((X[:, self.x_dim :] < 2.0), axis=-1, keepdims=True),
+        )
         output_0 = tf.where(deriv_zero_bool, filled_mean_0, filled_zeros)
         output_1 = tf.where(deriv_one_bool, filled_mean_1, filled_zeros)
         # Return sum so that has mean values for only 0th and 1st derivatives and rest 0
@@ -1336,12 +1341,18 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
 
         # Create loss function
         def loss_func(params):
-            return np.sum((mean_func(*np.split(x_data, self.x_dim, axis=-1), *params) - y_data) ** 2)
+            return np.sum(
+                (mean_func(*np.split(x_data, self.x_dim, axis=-1), *params) - y_data)
+                ** 2
+            )
 
         # And create Jacobian function
         def jac_func(params):
             prefac = 2.0 * (mean_func(x_data, *params) - y_data)
-            jac = [np.sum(prefac * deriv(*np.split(x_data, self.x_dim, axis=-1), *params)) for deriv in deriv_funcs]
+            jac = [
+                np.sum(prefac * deriv(*np.split(x_data, self.x_dim, axis=-1), *params))
+                for deriv in deriv_funcs
+            ]
             return np.array(jac)
 
         # Perform optimization with scipy
@@ -1359,8 +1370,8 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
 
     def __call__(self, X: gpflow.base.TensorType) -> tf.Tensor:
         """Closely follows K_diag from DerivativeKernel."""
-        x_vals = X[:, :self.x_dim]
-        d_vals = X[:, self.x_dim:]
+        x_vals = X[:, : self.x_dim]
+        d_vals = X[:, self.x_dim :]
         unique_d = tf.raw_ops.UniqueV2(x=d_vals, axis=[0])[0]
         unique_d = tf.cast(unique_d, tf.int32)
         f_list = []
@@ -1387,4 +1398,4 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             inds_list.append(this_inds)
 
         f_list = tf.dynamic_stitch(inds_list, f_list)
-        return tf.reshape(f_list, (x_vals.shape[0], self.dim)) 
+        return tf.reshape(f_list, (x_vals.shape[0], self.dim))
