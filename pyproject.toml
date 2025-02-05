@@ -383,6 +383,8 @@ addopts = [
     "--pyargs",
     "--cov-config=pyproject.toml",
     "--ignore-glob='**/legacy/**",
+    "-n",
+    "4",
 ]
 testpaths = [
     "README.md",
