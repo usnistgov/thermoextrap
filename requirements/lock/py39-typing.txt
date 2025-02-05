@@ -2,7 +2,7 @@
 #    uv pip compile --python-version=3.9 -o requirements/lock/py39-typing.txt requirements/typing.txt
 absl-py==2.1.0            # via keras, tensorboard, tensorflow, tensorflow-probability
 astunparse==1.6.3         # via tensorflow
-attrs==23.2.0             # via -r requirements/typing.txt
+attrs==25.1.0             # via -r requirements/typing.txt
 certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow

@@ -11,7 +11,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.12
-  - attrs
+  - attrs>=24.1.0
   - cmomy>=0.21.0
   - docstring-inheritance
   - lazy_loader

@@ -39,7 +39,7 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "attrs",
+    "attrs>=24.1.0",
     "cmomy>=0.21.0",
     "lazy-loader",
     "module-utilities[inherit]>=0.2",
@@ -383,8 +383,6 @@ addopts = [
     "--pyargs",
     "--cov-config=pyproject.toml",
     "--ignore-glob='**/legacy/**",
-    "-n",
-    "4",
 ]
 testpaths = [
     "README.md",
@@ -538,19 +536,19 @@ extras = "build-system.requires"
 reqs = [
     "build",
 ]
-base = false
+skip_package = true
 style = "requirements"
 
 [tool.pyproject2conda.envs.uvxrun-tools]
 extras = "uvxrun-tools"
-base = false
+skip_package = true
 style = "requirements"
 
 [tool.pyproject2conda.envs.test-extras]
 extras = [
     "test",
 ]
-base = false
+skip_package = true
 
 [tool.pyproject2conda.envs.test-notebook]
 extras = [

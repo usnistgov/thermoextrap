@@ -5,7 +5,7 @@ appnope==0.1.4            # via ipykernel
 argcomplete==3.2.3        # via nox
 asttokens==2.4.1          # via stack-data
 astunparse==1.6.3         # via tensorflow
-attrs==23.2.0             # via jsonschema, referencing, scriv, -r requirements/dev-complete.txt
+attrs==25.1.0             # via jsonschema, referencing, scriv, -r requirements/dev-complete.txt
 bokeh==3.5.2              # via dask
 bottleneck==1.3.8         # via -r requirements/dev-complete.txt
 certifi==2024.2.2         # via requests

@@ -7,7 +7,7 @@
 # You should not manually edit this file.
 # Instead edit the corresponding pyproject.toml file.
 #
-attrs
+attrs>=24.1.0
 cmomy>=0.21.0
 gpflow>=2.6.0
 jax[cpu]<0.4.25

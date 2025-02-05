@@ -6,7 +6,7 @@ alabaster==0.7.16         # via sphinx
 appnope==0.1.4            # via ipykernel
 asttokens==2.4.1          # via stack-data
 astunparse==1.6.3         # via tensorflow
-attrs==23.2.0             # via jsonschema, jupyter-cache, referencing, -r requirements/docs.txt
+attrs==25.1.0             # via jsonschema, jupyter-cache, referencing, -r requirements/docs.txt
 autodocsumm==0.2.12       # via -r requirements/docs.txt
 babel==2.14.0             # via pydata-sphinx-theme, sphinx
 beautifulsoup4==4.12.3    # via pydata-sphinx-theme
