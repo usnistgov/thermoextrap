@@ -15,7 +15,7 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-sugar
-  - pytest-xdist
+  - pytest-xdist>3.6.0
   - pip
   - pip:
       - gpflow>=2.6.0

@@ -12,10 +12,11 @@ channels:
 dependencies:
   - python=3.12
   - attrs>=24.1.0
-  - cmomy>=0.21.0
+  - cmomy==0.22.0
   - docstring-inheritance
   - lazy_loader
   - module-utilities>=0.2
+  - numba==0.60.0
   - numpy>=1.26.0
   - packaging
   - pandas-stubs

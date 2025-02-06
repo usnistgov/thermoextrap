@@ -7,7 +7,7 @@ certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.21.0             # via -r requirements/typing.txt
+cmomy==0.22.0             # via -r requirements/typing.txt
 decorator==5.1.1          # via tensorflow-probability
 deprecated==1.2.14        # via gpflow
 dm-tree==0.1.8            # via keras, tensorflow-probability
@@ -29,7 +29,7 @@ keras==3.0.5              # via tensorflow
 lark==1.1.9               # via check-shapes
 lazy-loader==0.3          # via cmomy, -r requirements/typing.txt
 libclang==16.0.6          # via tensorflow
-llvmlite==0.42.0          # via numba
+llvmlite==0.43.0          # via numba
 markdown==3.6             # via tensorboard
 markdown-it-py==3.0.0     # via rich
 markupsafe==2.1.5         # via werkzeug
@@ -39,7 +39,7 @@ module-utilities==0.9.0   # via cmomy, -r requirements/typing.txt
 mpmath==1.3.0             # via sympy
 multipledispatch==1.0.0   # via gpflow
 namex==0.0.7              # via keras
-numba==0.59.0             # via cmomy
+numba==0.60.0             # via cmomy, -r requirements/typing.txt
 numexpr==2.9.0            # via pymbar
 numpy==1.26.4             # via cmomy, gpflow, h5py, jax, jaxlib, keras, ml-dtypes, numba, numexpr, opt-einsum, pandas, pandas-stubs, pymbar, scipy, tensorboard, tensorflow, tensorflow-probability, xarray, -r requirements/typing.txt
 opt-einsum==3.3.0         # via jax, tensorflow

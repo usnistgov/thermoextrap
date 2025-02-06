@@ -1817,7 +1817,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         dim: DimsReduce | MissingType = MISSING,
         axis: AxisReduce | MissingType = MISSING,
         rep_dim: SingleDim = "rep",
-        parallel: bool | None = True,
+        parallel: bool | None = None,
         meta_kws: MetaKws = None,
         **kwargs,
     ) -> Self:

@@ -13,12 +13,13 @@ dependencies:
   - python=3.11
   - attrs>=24.1.0
   - autodocsumm
-  - cmomy>=0.21.0
+  - cmomy==0.22.0
   - docstring-inheritance
   - lazy_loader
   - matplotlib-base
   - module-utilities>=0.2
   - myst-nb
+  - numba==0.60.0
   - numpy>=1.26.0
   - pyenchant
   - scipy

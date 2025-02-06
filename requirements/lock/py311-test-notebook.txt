@@ -9,7 +9,7 @@ certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.21.0             # via -r requirements/test-notebook.txt
+cmomy==0.22.0             # via -r requirements/test-notebook.txt
 comm==0.2.2               # via ipykernel
 contourpy==1.2.0          # via matplotlib
 coverage==7.4.4           # via nbval, pytest-cov
@@ -20,7 +20,7 @@ deprecated==1.2.14        # via gpflow
 dm-tree==0.1.8            # via keras, tensorflow-probability
 docstring-inheritance==2.2.0  # via cmomy, module-utilities
 dropstackframe==0.1.0     # via check-shapes
-execnet==2.0.2            # via pytest-xdist
+execnet==2.1.1            # via pytest-xdist
 executing==2.0.1          # via stack-data
 fastjsonschema==2.19.1    # via nbformat
 flatbuffers==24.3.7       # via tensorflow
@@ -46,7 +46,7 @@ kiwisolver==1.4.5         # via matplotlib
 lark==1.1.9               # via check-shapes
 lazy-loader==0.3          # via cmomy, -r requirements/test-notebook.txt
 libclang==16.0.6          # via tensorflow
-llvmlite==0.42.0          # via numba
+llvmlite==0.43.0          # via numba
 markdown==3.6             # via tensorboard
 markdown-it-py==3.0.0     # via rich
 markupsafe==2.1.5         # via werkzeug
@@ -61,7 +61,7 @@ namex==0.0.7              # via keras
 nbformat==5.10.2          # via nbval
 nbval==0.11.0             # via -r requirements/test-notebook.txt
 nest-asyncio==1.6.0       # via ipykernel
-numba==0.59.0             # via cmomy
+numba==0.60.0             # via cmomy, -r requirements/test-notebook.txt
 numexpr==2.9.0            # via pymbar
 numpy==1.26.4             # via cmomy, contourpy, gpflow, h5py, jax, jaxlib, keras, matplotlib, ml-dtypes, numba, numexpr, opt-einsum, pandas, pymbar, scipy, tensorboard, tensorflow, tensorflow-probability, xarray, -r requirements/test-notebook.txt
 opt-einsum==3.3.0         # via jax, tensorflow
@@ -83,7 +83,7 @@ pyparsing==3.1.2          # via matplotlib
 pytest==8.1.1             # via nbval, pytest-cov, pytest-sugar, pytest-xdist, -r requirements/test-notebook.txt
 pytest-cov==4.1.0         # via -r requirements/test-notebook.txt
 pytest-sugar==1.0.0       # via -r requirements/test-notebook.txt
-pytest-xdist==3.5.0       # via -r requirements/test-notebook.txt
+pytest-xdist==3.6.1       # via -r requirements/test-notebook.txt
 python-dateutil==2.9.0.post0  # via jupyter-client, matplotlib, pandas
 pytz==2024.1              # via pandas
 pyzmq==25.1.2             # via ipykernel, jupyter-client

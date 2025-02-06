@@ -8,18 +8,19 @@
 # Instead edit the corresponding pyproject.toml file.
 #
 attrs>=24.1.0
-cmomy>=0.21.0
+cmomy==0.22.0
 gpflow>=2.6.0
 jax[cpu]<0.4.25
 lazy-loader
 module-utilities[inherit]>=0.2
+numba==0.60.0
 numpy>=1.26.0
 pandas
 pymbar>=4.0
 pytest
 pytest-cov
 pytest-sugar
-pytest-xdist
+pytest-xdist>3.6.0
 scipy
 sympy
 tensorflow-probability[tf]

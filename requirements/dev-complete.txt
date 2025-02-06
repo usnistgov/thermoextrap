@@ -9,7 +9,7 @@
 #
 attrs>=24.1.0
 bottleneck
-cmomy>=0.21.0
+cmomy==0.22.0
 dask[complete]
 gpflow>=2.6.0
 ipykernel
@@ -22,6 +22,7 @@ mypy>=1.11.2
 nbclient>=0.10.0
 nbval
 nox>=2024.4.15
+numba==0.60.0
 numpy>=1.26.0
 packaging
 pandas
@@ -32,7 +33,7 @@ pytest
 pytest-accept
 pytest-cov
 pytest-sugar
-pytest-xdist
+pytest-xdist>3.6.0
 scipy
 scriv
 sympy

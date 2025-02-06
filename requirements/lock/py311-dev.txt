@@ -13,7 +13,7 @@ charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 click==8.1.7              # via dask, distributed
 cloudpickle==3.0.0        # via dask, distributed, tensorflow-probability
-cmomy==0.21.0             # via -r requirements/dev.txt
+cmomy==0.22.0             # via -r requirements/dev.txt
 colorlog==6.8.2           # via nox
 comm==0.2.2               # via ipykernel
 contourpy==1.2.0          # via bokeh, matplotlib
@@ -29,7 +29,7 @@ distributed==2024.9.0     # via dask
 dm-tree==0.1.8            # via keras, tensorflow-probability
 docstring-inheritance==2.2.0  # via cmomy, module-utilities
 dropstackframe==0.1.0     # via check-shapes
-execnet==2.0.2            # via pytest-xdist
+execnet==2.1.1            # via pytest-xdist
 executing==2.0.1          # via stack-data
 fastjsonschema==2.19.1    # via nbformat
 filelock==3.13.1          # via virtualenv
@@ -59,7 +59,7 @@ kiwisolver==1.4.5         # via matplotlib
 lark==1.1.9               # via check-shapes
 lazy-loader==0.3          # via cmomy, -r requirements/dev.txt
 libclang==16.0.6          # via tensorflow
-llvmlite==0.42.0          # via numba
+llvmlite==0.43.0          # via numba
 locket==1.0.0             # via distributed, partd
 lz4==4.3.3                # via dask
 markdown==3.6             # via tensorboard
@@ -81,7 +81,7 @@ nbformat==5.10.2          # via nbclient, nbval
 nbval==0.11.0             # via -r requirements/dev.txt
 nest-asyncio==1.6.0       # via ipykernel
 nox==2024.4.15            # via -r requirements/dev.txt
-numba==0.59.0             # via cmomy
+numba==0.60.0             # via cmomy, -r requirements/dev.txt
 numexpr==2.9.0            # via pymbar
 numpy==1.26.4             # via bokeh, bottleneck, cmomy, contourpy, dask, gpflow, h5py, jax, jaxlib, keras, matplotlib, ml-dtypes, numba, numexpr, opt-einsum, pandas, pandas-stubs, pyarrow, pymbar, scipy, tensorboard, tensorflow, tensorflow-probability, xarray, -r requirements/dev.txt
 opt-einsum==3.3.0         # via jax, tensorflow
@@ -107,7 +107,7 @@ pytest==8.1.1             # via nbval, pytest-accept, pytest-cov, pytest-sugar, 
 pytest-accept==0.1.10     # via -r requirements/dev.txt
 pytest-cov==4.1.0         # via -r requirements/dev.txt
 pytest-sugar==1.0.0       # via -r requirements/dev.txt
-pytest-xdist==3.5.0       # via -r requirements/dev.txt
+pytest-xdist==3.6.1       # via -r requirements/dev.txt
 python-dateutil==2.9.0.post0  # via jupyter-client, matplotlib, pandas
 pytz==2024.1              # via pandas
 pyyaml==6.0.2             # via bokeh, dask, distributed

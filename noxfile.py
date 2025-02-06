@@ -3,6 +3,7 @@
 # * Imports ----------------------------------------------------------------------------
 from __future__ import annotations
 
+import os
 import shlex
 import shutil
 import sys
@@ -64,6 +65,9 @@ if TYPE_CHECKING:
 PACKAGE_NAME = "thermoextrap"
 IMPORT_NAME = "thermoextrap"
 KERNEL_BASE = "thermoextrap"
+
+# Set numba_cache directory for sharing
+# os.environ["NUMBA_CACHE_DIR"] = str(Path(__file__).parent / ".numba_cache")
 
 # * nox options ------------------------------------------------------------------------
 
@@ -637,8 +641,6 @@ def _test(
     test_opts: OPT_TYPE,
     no_cov: bool,
 ) -> None:
-    import os
-
     tmpdir = os.environ.get("TMPDIR", None)
 
     session_run_commands(session, run)
@@ -1205,7 +1207,6 @@ def cog(session: nox.Session, opts: SessionParams) -> None:
 # * Utilities -------------------------------------------------------------------------
 def _create_doc_examples_symlinks(session: nox.Session, clean: bool = True) -> None:  # noqa: C901
     """Create symlinks from docs/examples/*.md files to /examples/usage/..."""
-    import os
 
     def usage_paths(path: Path) -> Iterator[Path]:
         with path.open("r") as f:

@@ -40,9 +40,10 @@ dynamic = [
 ]
 dependencies = [
     "attrs>=24.1.0",
-    "cmomy>=0.21.0",
+    "cmomy==0.22.0",
     "lazy-loader",
     "module-utilities[inherit]>=0.2",
+    "numba==0.60.0",
     "numpy>=1.26.0",
     "scipy",
     "sympy",
@@ -105,7 +106,7 @@ optional-dependencies.test = [
     "pytest",
     "pytest-cov",
     "pytest-sugar",
-    "pytest-xdist",
+    "pytest-xdist>3.6.0",
     "thermoextrap[mbar,gpr]",
 ]
 optional-dependencies.tools = [

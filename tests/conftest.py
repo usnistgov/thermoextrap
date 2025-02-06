@@ -16,15 +16,15 @@ class FixtureData:
     def __init__(self, n, nv, order=5, uoff=0.0, xoff=0.0, seed=0) -> None:
         self.order = order
 
-        self.rs = np.random.RandomState(seed)
+        self.rng = np.random.default_rng(seed)
         self.uoff = uoff
         self.xoff = xoff
 
-        self.u = xrwrap_uv(self.rs.rand(n) + uoff)
-        self.x = xrwrap_xv(self.rs.rand(n, nv) + xoff)
+        self.u = xrwrap_uv(self.rng.random(n) + uoff)
+        self.x = xrwrap_xv(self.rng.random((n, nv)) + xoff)
 
-        self.ub = xrwrap_uv(self.rs.rand(n) + uoff)
-        self.xb = xrwrap_xv(self.rs.rand(n, nv) + xoff)
+        self.ub = xrwrap_uv(self.rng.random(n) + uoff)
+        self.xb = xrwrap_xv(self.rng.random((n, nv)) + xoff)
         self._cache: dict[str, Any] = {}
 
     # bunch of things to test
@@ -140,7 +140,7 @@ class FixtureData:
         xr.testing.assert_allclose(a, b.transpose(*a.dims))
 
 
-@pytest.fixture(params=[(100, 5)], scope="module")
+@pytest.fixture(params=[(100, 5)])  # , scope="module")
 def fixture(request):
     return FixtureData(*request.param)
 

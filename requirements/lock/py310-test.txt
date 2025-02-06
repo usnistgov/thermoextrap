@@ -8,7 +8,7 @@ certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.21.0             # via -r requirements/test.txt
+cmomy==0.22.0             # via -r requirements/test.txt
 coverage==7.4.4           # via pytest-cov
 decorator==5.1.1          # via tensorflow-probability
 deprecated==1.2.14        # via gpflow
@@ -16,7 +16,7 @@ dm-tree==0.1.8            # via tensorflow-probability
 docstring-inheritance==2.2.0  # via cmomy, module-utilities
 dropstackframe==0.1.0     # via check-shapes
 exceptiongroup==1.2.0     # via pytest
-execnet==2.0.2            # via pytest-xdist
+execnet==2.1.1            # via pytest-xdist
 flatbuffers==24.3.7       # via tensorflow
 gast==0.5.4               # via tensorflow, tensorflow-probability
 google-auth==2.34.0       # via google-auth-oauthlib, tensorboard
@@ -40,7 +40,7 @@ ml-dtypes==0.2.0          # via jax, jaxlib, tensorflow
 module-utilities==0.9.0   # via cmomy, -r requirements/test.txt
 mpmath==1.3.0             # via sympy
 multipledispatch==1.0.0   # via gpflow
-numba==0.60.0             # via cmomy
+numba==0.60.0             # via cmomy, -r requirements/test.txt
 numexpr==2.9.0            # via pymbar
 numpy==2.0.2              # via cmomy, gpflow, h5py, jax, jaxlib, ml-dtypes, numba, numexpr, opt-einsum, pandas, pymbar, scipy, tensorboard, tensorflow, tensorflow-probability, xarray, -r requirements/test.txt
 oauthlib==3.2.2           # via requests-oauthlib
@@ -55,7 +55,7 @@ pymbar==4.0.2             # via -r requirements/test.txt
 pytest==8.1.1             # via pytest-cov, pytest-sugar, pytest-xdist, -r requirements/test.txt
 pytest-cov==4.1.0         # via -r requirements/test.txt
 pytest-sugar==1.0.0       # via -r requirements/test.txt
-pytest-xdist==3.5.0       # via -r requirements/test.txt
+pytest-xdist==3.6.1       # via -r requirements/test.txt
 python-dateutil==2.9.0.post0  # via pandas
 pytz==2024.1              # via pandas
 requests==2.31.0          # via requests-oauthlib, tensorboard
