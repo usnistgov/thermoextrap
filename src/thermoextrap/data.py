@@ -14,7 +14,7 @@ The general scheme is to use the following:
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import attrs
 import cmomy
@@ -42,6 +42,7 @@ if TYPE_CHECKING:
 
     from cmomy.core.typing import (
         AxisReduce,
+        DataT,
         DimsReduce,
         MissingType,
         Sampler,
@@ -300,7 +301,7 @@ class AbstractData(
         pass
 
     @abstractmethod
-    def resample(self, sampler: Sampler, **kwargs: Any) -> Self:
+    def resample(self, sampler: Sampler) -> Self:
         pass
 
     @property
@@ -349,14 +350,14 @@ class DataValuesBase(AbstractData):
     """
 
     #: Energy values
-    uv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
+    uv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))  # type: ignore[misc]
     #: Obervable values
-    xv: XArrayObj = field(
+    xv: XArrayObj = field(  # type: ignore[misc]
         # converter=attrs.Converter(_convert_xv, takes_self=True),  # pyright: ignore[reportCallIssue, reportArgumentType]
         validator=attv.instance_of((xr.DataArray, xr.Dataset)),
     )
     #: Expansion order
-    order: int = field()
+    order: int = field()  # type: ignore[misc]
     #: Records dimension
     rec_dim: SingleDim = field(kw_only=True, default="rec")
     #: Whether to chunk the xarray objects
@@ -392,8 +393,8 @@ class DataValuesBase(AbstractData):
         deriv_dim: SingleDim | None = None,
         chunk=None,
         compute=None,
-        meta=None,
-        x_is_u=False,
+        meta: DataCallbackABC | None = None,
+        x_is_u: bool = False,
     ) -> Self:
         """
         Constructor from arrays.
@@ -468,8 +469,9 @@ class DataValuesBase(AbstractData):
             msg = f"{indices.sizes[self.rec_dim]=} must equal {len(self)=}"
             raise ValueError(msg)
 
-        uv = self.uv.compute()[indices]
-        xv = None if self.x_is_u else self.xv.compute().isel({self.rec_dim: indices})
+        uv = self.uv.isel({self.rec_dim: indices})
+
+        xv = None if self.x_is_u else self.xv.isel({self.rec_dim: indices})
 
         meta = self.meta.resample(
             data=self,
@@ -1466,17 +1468,17 @@ class DataCentralMoments(DataCentralMomentsBase):
     @docfiller_shared.decorate
     def from_ave_raw(
         cls,
-        u: xr.DataArray,
-        xu: XArrayObj,
-        weight=None,
-        rec_dim="rec",
-        xmom_dim="xmom",
-        umom_dim="umom",
-        deriv_dim=None,
-        central=False,
-        meta=None,
-        x_is_u=False,
-    ):
+        u: DataT,
+        xu: DataT | None,
+        weight: DataT | None = None,
+        rec_dim: SingleDim = "rec",
+        xmom_dim: SingleDim = "xmom",
+        umom_dim: SingleDim = "umom",
+        deriv_dim: SingleDim | None = None,
+        central: bool = False,
+        meta: DataCallbackABC | None = None,
+        x_is_u: bool = False,
+    ) -> Self:
         """
         Create object with <u**n>, <x * u**n> arrays.
 
@@ -1513,18 +1515,22 @@ class DataCentralMoments(DataCentralMomentsBase):
         :meth:`cmomy.CentralMomentsData.from_raw`
         """
         _raise_if_not_dataarray(u)
+        raw: DataT
         if xu is None or x_is_u:
             raw = u
-
             if weight is not None:
-                raw.loc[{umom_dim: 0}] = weight
+                raw = cmomy.assign_moment(
+                    raw, weight=weight, mom_dims=umom_dim, copy=False
+                )
             raw = raw.transpose(..., umom_dim)
 
         else:
             _raise_if_not_dataarray(xu)
-            raw = xr.concat((u, xu), dim=xmom_dim)
+            raw = cast("DataT", xr.concat((u, xu), dim=xmom_dim))  # pyright: ignore[reportCallIssue, reportArgumentType]
             if weight is not None:
-                raw.loc[{umom_dim: 0, xmom_dim: 0}] = weight
+                raw = cmomy.assign_moment(
+                    raw, weight=weight, mom_dims=(xmom_dim, umom_dim), copy=False
+                )
             # make sure in correct order
             raw = raw.transpose(..., xmom_dim, umom_dim)
 
