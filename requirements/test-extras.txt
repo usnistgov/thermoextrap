@@ -15,5 +15,5 @@ pytest
 pytest-cov
 pytest-sugar
 pytest-xdist>3.6.0
-tensorflow-probability[tf]
+tensorflow-probability[tf]<0.25.0
 tensorflow>=2.13

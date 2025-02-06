@@ -10,6 +10,7 @@
 attrs>=24.1.0
 autodocsumm
 cmomy>=0.24.0
+dm-tree<0.1.9
 gpflow>=2.6.0
 jax[cpu]<0.4.25
 lazy-loader
@@ -27,6 +28,6 @@ sphinx-copybutton
 sphinx>=5.3.0
 sphinxcontrib-spelling
 sympy
-tensorflow-probability[tf]
+tensorflow-probability[tf]<0.25.0
 tensorflow>=2.13
 xarray>=2024.7.0

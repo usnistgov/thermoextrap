@@ -11,6 +11,7 @@ attrs>=24.1.0
 bottleneck
 cmomy>=0.24.0
 dask[complete]
+dm-tree<0.1.9
 gpflow>=2.6.0
 ipykernel
 ipython
@@ -35,6 +36,6 @@ pytest-sugar
 pytest-xdist>3.6.0
 scipy
 sympy
-tensorflow-probability[tf]
+tensorflow-probability[tf]<0.25.0
 tensorflow>=2.13
 xarray>=2024.7.0

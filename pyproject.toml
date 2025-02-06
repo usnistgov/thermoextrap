@@ -41,6 +41,7 @@ dynamic = [
 dependencies = [
     "attrs>=24.1.0",
     "cmomy>=0.24.0",
+    "dm-tree<0.1.9",
     "lazy-loader",
     "module-utilities[inherit]>=0.2",
     "numba==0.60.0",
@@ -82,7 +83,7 @@ optional-dependencies.docs = [
 optional-dependencies.gpr = [
     "gpflow>=2.6.0",
     "tensorflow>=2.13",
-    "tensorflow-probability[tf]",
+    "tensorflow-probability[tf]<0.25.0",
 ]
 optional-dependencies.mbar = [
     # NOTE: Getting all sorts of errors with pymbar with jax.  This seems to fix them for now...

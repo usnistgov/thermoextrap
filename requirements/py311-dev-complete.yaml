@@ -15,6 +15,7 @@ dependencies:
   - bottleneck
   - cmomy>=0.24.0
   - dask
+  - dm-tree<0.1.9
   - docstring-inheritance
   - ipykernel
   - ipython
@@ -45,5 +46,5 @@ dependencies:
       - pymbar>=4.0
       - pytest-accept
       - scriv
-      - tensorflow-probability[tf]
+      - tensorflow-probability[tf]<0.25.0
       - tensorflow>=2.13
