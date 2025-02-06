@@ -15,7 +15,7 @@ charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 click==8.1.7              # via jupyter-cache
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.22.0             # via -r requirements/docs.txt
+cmomy==0.24.0             # via -r requirements/docs.txt
 colorama==0.4.6           # via sphinx-autobuild
 comm==0.2.2               # via ipykernel
 contourpy==1.2.0          # via matplotlib
@@ -66,7 +66,7 @@ matplotlib-inline==0.1.6  # via ipykernel, ipython
 mdit-py-plugins==0.4.0    # via myst-parser
 mdurl==0.1.2              # via markdown-it-py
 ml-dtypes==0.3.2          # via jax, jaxlib, keras, tensorflow
-module-utilities==0.9.0   # via cmomy, -r requirements/docs.txt
+module-utilities==0.10.1  # via cmomy, -r requirements/docs.txt
 mpmath==1.3.0             # via sympy
 multipledispatch==1.0.0   # via gpflow
 myst-nb==1.0.0            # via -r requirements/docs.txt
@@ -132,7 +132,7 @@ termcolor==2.4.0          # via tensorflow
 tf-keras==2.16.0          # via tensorflow-probability
 tornado==6.4              # via ipykernel, jupyter-client, livereload
 traitlets==5.14.2         # via comm, ipykernel, ipython, jupyter-client, jupyter-core, matplotlib-inline, nbclient, nbformat
-typing-extensions==4.10.0  # via cmomy, gpflow, module-utilities, myst-nb, pydata-sphinx-theme, sqlalchemy, tensorflow
+typing-extensions==4.10.0  # via cmomy, gpflow, myst-nb, pydata-sphinx-theme, sqlalchemy, tensorflow
 tzdata==2024.1            # via pandas
 urllib3==2.2.1            # via requests
 wcwidth==0.2.13           # via prompt-toolkit

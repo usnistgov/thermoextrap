@@ -40,7 +40,7 @@ dynamic = [
 ]
 dependencies = [
     "attrs>=24.1.0",
-    "cmomy==0.22.0",
+    "cmomy>=0.24.0",
     "lazy-loader",
     "module-utilities[inherit]>=0.2",
     "numba==0.60.0",

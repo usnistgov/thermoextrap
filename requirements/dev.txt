@@ -9,7 +9,7 @@
 #
 attrs>=24.1.0
 bottleneck
-cmomy==0.22.0
+cmomy>=0.24.0
 dask[complete]
 gpflow>=2.6.0
 ipykernel

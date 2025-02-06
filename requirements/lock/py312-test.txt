@@ -7,7 +7,7 @@ certifi==2024.8.30        # via requests
 charset-normalizer==3.3.2  # via requests
 check-shapes==1.1.1       # via gpflow
 cloudpickle==3.0.0        # via tensorflow-probability
-cmomy==0.22.0             # via -r requirements/test.txt
+cmomy==0.24.0             # via -r requirements/test.txt
 coverage==7.6.1           # via pytest-cov
 decorator==5.1.1          # via tensorflow-probability
 deprecated==1.2.14        # via gpflow
@@ -35,7 +35,7 @@ markdown-it-py==3.0.0     # via rich
 markupsafe==2.1.5         # via werkzeug
 mdurl==0.1.2              # via markdown-it-py
 ml-dtypes==0.3.2          # via jax, jaxlib, keras, tensorflow
-module-utilities==0.9.0   # via cmomy, -r requirements/test.txt
+module-utilities==0.10.1  # via cmomy, -r requirements/test.txt
 mpmath==1.3.0             # via sympy
 multipledispatch==1.0.0   # via gpflow
 namex==0.0.8              # via keras
@@ -69,7 +69,7 @@ tensorflow==2.16.2        # via gpflow, tensorflow-probability, tf-keras, -r req
 tensorflow-probability==0.24.0  # via gpflow, -r requirements/test.txt
 termcolor==2.4.0          # via pytest-sugar, tensorflow
 tf-keras==2.16.0          # via tensorflow-probability
-typing-extensions==4.12.2  # via cmomy, gpflow, module-utilities, optree, tensorflow
+typing-extensions==4.12.2  # via cmomy, gpflow, optree, tensorflow
 tzdata==2024.1            # via pandas
 urllib3==2.2.3            # via requests
 werkzeug==3.0.4           # via tensorboard

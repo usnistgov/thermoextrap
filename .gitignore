@@ -132,3 +132,4 @@ tuna-loadtime.log
 /requirements/lock/py*-dev-user-conda-lock.yml*
 /requirements/lock/py*-dev-user.txt*
 /README.pdf
+/.numba_cache

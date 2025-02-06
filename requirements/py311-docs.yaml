@@ -13,7 +13,7 @@ dependencies:
   - python=3.11
   - attrs>=24.1.0
   - autodocsumm
-  - cmomy==0.22.0
+  - cmomy>=0.24.0
   - docstring-inheritance
   - lazy_loader
   - matplotlib-base
