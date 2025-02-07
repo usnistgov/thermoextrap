@@ -313,10 +313,6 @@ class AbstractData(
         """
         return self.deriv_dim is not None
 
-    @property
-    def x_isnot_u(self) -> bool:
-        return not self.x_is_u
-
     def pipe(self, func: Callable[..., _T], *args, **kwargs) -> _T:
         return func(self, *args, **kwargs)
 
@@ -344,8 +340,6 @@ class DataValuesBase(AbstractData):
     {umom_dim}
     {x_is_u}
     {deriv_dim}
-    {chunk}
-    {compute}
     {meta}
     """
 
@@ -360,27 +354,8 @@ class DataValuesBase(AbstractData):
     order: int = field()  # type: ignore[misc]
     #: Records dimension
     rec_dim: SingleDim = field(kw_only=True, default="rec")
-    #: Whether to chunk the xarray objects
-    chunk: int | Mapping[Hashable, int] | None = field(kw_only=True, default=None)
-    #: Whether to compute the chunked data
-    compute: bool | str | None = field(kw_only=True, default=None)
 
     _CENTRAL: ClassVar[bool] = False
-
-    def __attrs_post_init__(self):
-        if self.chunk is not None:
-            if isinstance(self.chunk, int):
-                self.chunk = {self.rec_dim: self.chunk}
-
-            self.uv = self.uv.chunk(self.chunk)
-            if self.xv is not None or self.x_isnot_u:
-                self.xv = self.xv.chunk(self.chunk)
-
-        if self.compute is None:
-            if self.chunk is None:
-                self.compute = False
-            else:
-                self.compute = True
 
     @classmethod
     @docfiller_shared.decorate
@@ -393,8 +368,6 @@ class DataValuesBase(AbstractData):
         rec_dim: SingleDim = "rec",
         umom_dim: SingleDim = "umom",
         deriv_dim: SingleDim | None = None,
-        chunk=None,
-        compute=None,
         meta: DataCallbackABC | None = None,
         x_is_u: bool = False,
     ) -> Self:
@@ -408,7 +381,6 @@ class DataValuesBase(AbstractData):
         {rec_dim}
         {umom_dim}
         {deriv_dim}
-        {chunk}
         {meta}
         {x_is_u}
         """
@@ -419,8 +391,6 @@ class DataValuesBase(AbstractData):
             rec_dim=rec_dim,
             umom_dim=umom_dim,
             deriv_dim=deriv_dim,
-            chunk=chunk,
-            compute=compute,
             meta=meta,
             x_is_u=x_is_u,
         )
@@ -438,8 +408,6 @@ class DataValuesBase(AbstractData):
         sampler: Sampler,
         *,
         rep_dim: SingleDim = "rep",
-        chunk=None,
-        compute="None",
         meta_kws: MetaKws = None,
     ) -> Self:
         """
@@ -449,18 +417,8 @@ class DataValuesBase(AbstractData):
         ----------
         {sampler}
         {rep_dim}
-        {chunk}
-        {compute}
         {meta_kws}
         """
-        if chunk is None:
-            chunk = self.chunk
-
-        if compute == "None":
-            compute = None
-        elif compute is None:
-            compute = self.compute
-
         sampler = cmomy.factory_sampler(sampler, data=self.xv, dim=self.rec_dim)
         indices = sampler.indices
         if not isinstance(indices, xr.DataArray):
@@ -472,17 +430,13 @@ class DataValuesBase(AbstractData):
             raise ValueError(msg)
 
         uv = self.uv.isel({self.rec_dim: indices})
-
-        # NOTE: Not sure if xv should be None or uv if `x_is_u`
-        xv = None if self.x_is_u else self.xv.isel({self.rec_dim: indices})
+        xv = uv if self.x_is_u else self.xv.isel({self.rec_dim: indices})
 
         meta = self.meta.resample(
             data=self,
             meta_kws={} if meta_kws is None else meta_kws,
             sampler=sampler,
             rep_dim=rep_dim,
-            chunk=chunk,
-            compute=compute,
         )
 
         return type(self)(
@@ -492,8 +446,6 @@ class DataValuesBase(AbstractData):
             rec_dim=self.rec_dim,
             umom_dim=self.umom_dim,
             deriv_dim=self.deriv_dim,
-            chunk=chunk,
-            compute=compute,
             meta=meta,
             x_is_u=self.x_is_u,
         )
@@ -616,22 +568,14 @@ class DataValues(DataValuesBase):
     @cached.prop
     def xu(self) -> XArrayObj:
         """Average of `x * u ** n`."""
-        out = self._mean()[1]
-        if self.compute:
-            out = out.compute()
-        return out
+        return self._mean()[1]
 
     @cached.prop
     def u(self) -> XArrayObj:  # Could make this DataArray
         """Average of `u ** n`."""
-        if self.x_isnot_u:
-            out = self._mean()[0]
-            if self.compute:
-                out = out.compute()
-        else:
-            out = _xu_to_u(self.xu, self.umom_dim)
-
-        return out
+        if self.x_is_u:
+            return _xu_to_u(self.xu, self.umom_dim)
+        return self._mean()[0]
 
     @cached.prop
     def u_selector(self) -> DataSelector:
@@ -647,10 +591,7 @@ class DataValues(DataValuesBase):
 
     @property
     def derivs_args(self) -> tuple[Any, ...]:
-        if self.x_isnot_u:
-            out = (self.u_selector, self.xu_selector)
-        else:
-            out = (self.u_selector,)
+        out = (self.u_selector,) if self.x_is_u else (self.u_selector, self.xu_selector)
         return self.meta.derivs_args(data=self, derivs_args=out)
 
 
@@ -674,30 +615,19 @@ class DataValuesCentral(DataValuesBase):
     @cached.prop
     def xave(self) -> XArrayObj:
         """Averages of `x`."""
-        out = self._mean()[0]
-        if self.compute:
-            out = out.compute()
-        return out
+        return self._mean()[0]
 
     @cached.prop
     def dxdu(self) -> XArrayObj:
         """Averages of `dx * du ** n`."""
-        out = self._mean()[2]
-        if self.compute:
-            out = out.compute()
-        return out
+        return self._mean()[2]
 
     @cached.prop
     def du(self) -> XArrayObj:
         """Averages of `du ** n`."""
-        if self.x_isnot_u:
-            out = self._mean()[1]
-            if self.compute:
-                out = out.compute()
-        else:
-            out = _xu_to_u(self.dxdu, dim=self.umom_dim)
-
-        return out
+        if self.x_is_u:
+            return _xu_to_u(self.dxdu, dim=self.umom_dim)
+        return self._mean()[1]
 
     @cached.prop
     def du_selector(self) -> DataSelector:
@@ -719,10 +649,12 @@ class DataValuesCentral(DataValuesBase):
 
     @property
     def derivs_args(self) -> tuple[Any, ...]:
-        if self.x_isnot_u:
-            out = (self.xave_selector, self.du_selector, self.dxdu_selector)
-        else:
-            out = (self.xave_selector, self.du_selector)
+        out = (
+            (self.xave_selector, self.du_selector)
+            if self.x_is_u
+            else (self.xave_selector, self.du_selector, self.dxdu_selector)
+        )
+
         return self.meta.derivs_args(data=self, derivs_args=out)
 
 
@@ -738,8 +670,6 @@ def factory_data_values(
     val_dims="val",
     rep_dim="rep",
     deriv_dim=None,
-    chunk=None,
-    compute=None,
     x_is_u=False,
     **kws,
 ):
@@ -759,8 +689,6 @@ def factory_data_values(
     {val_dims}
     {rep_dim}
     {deriv_dim}
-    {chunk}
-    {compute}
     {x_is_u}
     **kws :
         Extra arguments passed to constructor
@@ -799,8 +727,6 @@ def factory_data_values(
         rec_dim=rec_dim,
         umom_dim=umom_dim,
         deriv_dim=deriv_dim,
-        chunk=chunk,
-        compute=compute,
         x_is_u=x_is_u,
         **kws,
     )
@@ -1024,7 +950,7 @@ class DataCentralMomentsBase(AbstractData):
 
         For example, ``derivs(*self.derivs_args)``.
         """
-        if self.x_isnot_u:
+        if not self.x_is_u:
             if self.central:
                 out = (self.xave_selector, self.du_selector, self.dxdu_selector)
 
