@@ -38,7 +38,7 @@ from .docstrings import DOCFILLER_SHARED
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Mapping
-    from typing import Any
+    from typing import Any, ClassVar
 
     from cmomy.core.typing import (
         AxisReduce,
@@ -365,6 +365,8 @@ class DataValuesBase(AbstractData):
     #: Whether to compute the chunked data
     compute: bool | str | None = field(kw_only=True, default=None)
 
+    _CENTRAL: ClassVar[bool] = False
+
     def __attrs_post_init__(self):
         if self.chunk is not None:
             if isinstance(self.chunk, int):
@@ -471,6 +473,7 @@ class DataValuesBase(AbstractData):
 
         uv = self.uv.isel({self.rec_dim: indices})
 
+        # NOTE: Not sure if xv should be None or uv if `x_is_u`
         xv = None if self.x_is_u else self.xv.isel({self.rec_dim: indices})
 
         meta = self.meta.resample(
@@ -598,7 +601,7 @@ def _xu_to_u(xu: XArrayObj, dim: str = "umom") -> XArrayObj:
 class DataValues(DataValuesBase):
     """Class to hold uv/xv data."""
 
-    _CENTRAL = False
+    _CENTRAL: ClassVar[bool] = False
 
     @cached.meth
     def _mean(self) -> XArrayObj:
@@ -656,7 +659,7 @@ class DataValues(DataValuesBase):
 class DataValuesCentral(DataValuesBase):
     """Data class using values and central moments."""
 
-    _CENTRAL = True
+    _CENTRAL: ClassVar[bool] = True
 
     @cached.meth
     def _mean(self) -> XArrayObj:
