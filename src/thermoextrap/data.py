@@ -28,10 +28,8 @@ from module_utilities import cached
 
 from .core._attrs_utils import (
     MyAttrsMixin,
-    cache_field,
     convert_dims_to_tuple,
     convert_mapping_or_none_to_dict,
-    kw_only_field,
 )
 from .core.xrutils import xrwrap_uv, xrwrap_xv
 from .docstrings import DOCFILLER_SHARED
@@ -284,7 +282,7 @@ class AbstractData(
     #: Whether the observable `x` is the same as energy `u`
     x_is_u: bool = field(kw_only=True, default=False)
     # cache field
-    _cache: dict[str, Any] = cache_field()
+    _cache: dict[str, Any] = field(init=False, repr=False, factory=dict)
 
     @property
     @abstractmethod
@@ -1661,11 +1659,14 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     #: Stored observable values
     xv: XArrayObj = field(validator=attv.instance_of((xr.DataArray, xr.Dataset)))
     #: Expansion order
-    order: int | None = kw_only_field(
-        default=None, validator=attv.optional(attv.instance_of(int))
+    order: int | None = field(
+        kw_only=True,
+        default=None,
+        validator=attv.optional(attv.instance_of(int)),
     )
     #: Stored weights
-    weight: XArrayObj | None = kw_only_field(
+    weight: XArrayObj | None = field(
+        kw_only=True,
         validator=attv.optional(attv.instance_of((xr.DataArray, xr.Dataset))),
         default=None,
     )  # pyright: ignore[reportArgumentType]

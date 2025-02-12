@@ -199,37 +199,23 @@ If using virtualenvs across multiple python versions (e.g., `test`, `typing`,
 etc), you'll need to install python interpreters for each version. If using
 [pyenv], you should be good to go.
 
-Instead of using [pyenv], I use conda to create multiple invironments to hold
-different python version. You can use the following script to create the needed
-conda environments:
+Instead of using [pyenv], I use [uv] to manage python versions. For example:
 
 ```bash
-python tools/create_pythons.py -p 3.8 3.9 ...
+uv python install python3.12
 ```
 
-Run with `--help` for more options.
-
-To tell nox where to find python interpreters created like above, define the
-environment variable:
-
-```bash
-NOX_PYTHON_PATH="~/.conda/python-3.*/bin"
-```
-
-or the user config file `config/userconfig.toml` with:
+I also set the global [uv] config file (`~/.config/uv/uv.toml` on mac and linux)
+to use only managed python:
 
 ```toml
-# config/userconfig.toml
-[nox.python]
-paths = ["~/.conda/envs/python-3.*/bin"]
+python-preference = "only-managed"
 
 ```
 
-The variable `nox.python.paths` is a list of paths (with optional wildcards)
-added to the environment variable `PATH` to search for python interpreters. If
-using the environment variable `NOX_PYTHON_PATH`, paths should be separated with
-the colons (`:`). Either of the above will add the paths
-`~/.conda/envs/python-3.*/bin` to the search path.
+The `noxfile.py` is setup to automatically add the python interpreters installed
+by [uv] to the path. Note that the python version needs to be installed before
+it can be used with [nox]
 
 ### Nox session options
 
@@ -278,20 +264,23 @@ requirement files are under something like
 Additionally, requirement files for virtualenvs (e.g., `requirements.txt` like
 files) will be "locked" using `uv pip compile` from [uv]. These files are placed
 under `requirements/lock`. Note the the session `requirements` automatically
-calls the session `uv-compile`.
+calls the session `lock`.
 
 To upgrade the dependencies in the lock, you'll need to pass the option:
 
 ```bash
-nox -s uv-compile -- +L/++pip-compile-upgrade
+nox -s lock -- +L/++lock-upgrade
 ```
+
+This will also update `uv.lock` if it's being used.
 
 ## ipykernel
 
-The environments created by nox `dev` and `docs-conda` will try to add
-meaningful display names for ipykernel. These are installed at the user level.
-To cleanup the kernels (meaning, removing installed kernels that point to a
-removed environment), You can use the script `tools/clean_kernelspec.py`:
+The environments created by nox `dev`, or running `make install-kernel`, will
+try to add meaningful display names for ipykernel. These are installed at the
+user level. To cleanup the kernels (meaning, removing installed kernels that
+point to a removed environment), You can use the script
+`tools/clean_kernelspec.py`:
 
 ```bash
 python tools/clean_kernelspec.py
@@ -443,52 +432,55 @@ conda activate {env-name}
 pip install -e . --no-deps
 ```
 
-If you want to include some extra tools in the environment (instead of using
-[uvx], [condax], or [pipx]), use `requirements/py{version}-dev-complete.yaml`
-instead.
+### Create development environment with uv/pip
 
-### Create development environment with pip
-
-Run something like the following:
+The easiest way to create an development environment, if using `uv.lock`
+mechanism is:
 
 ```bash
+uv sync
+```
+
+If the project does not use `uv.lock`, or you don't want to use uv to manage
+your environment, then use one of the following:
+
+```bash
+# using venv
 python -m venv .venv
 source .venv/bin/activate
-# unlocked
-python -m pip install -r requirements/dev.txt
-# locked:
-pip-sync --python-path .venv/bin/python requirements/lock/py{version}-dev.txt
+python -m pip install -r requirements/lock/py{version}-dev.txt
 python -m pip install -e . --no-deps
+# using uv
+uv venv --python 3.11 .venv
+uv pip sync requirements/lock/py{version}-dev.txt
 ```
 
-If you want to include the extra tools, replace `dev.txt` with
-`dev-complete.txt`.
-
-### Create development environment with nox
-
-If you'd like to use nox to manage your development environment, use the
-following:
+Note that if the project is setup to use `uv.lock` but you'd like to use one of
+the above, you may have to run something like:
 
 ```bash
-nox -s dev -- [++dev-envname dev/dev-complete]
+uv export --dev > requirements.txt
 ```
 
-where the option `++dev-envname` (default `dev`) can be used to specify what
-kind of development environment you'd like. This will create a [conda]
-environment under `.venv`. To instead create a [virtualenv] based development
-environment, use `nox -s dev-venv ....`.
+and use this requirement file in the commands above.
 
-If you go this route, you may want to use something like
+If the project includes an ipython kernel, you can install it with:
+
+```bash
+make install-kernel
+```
+
+Alternatively, you can simply use:
+
+```bash
+nox -s dev
+```
+
+which will create a virtual environment under `.venv`. If you go this route, you
+may want to use something like
 [zsh-autoenv](https://github.com/Tarrasch/zsh-autoenv) (if using zsh shell) or
 [autoenv](https://github.com/hyperupcall/autoenv) (if using bash) to auto
 activate the development environment when in the parent directory.
-
-Note that you can bootstrap the whole process with [uvx] using:
-
-```bash
-uvx nox -s dev/dev-venv -- \
-     ++dev-envname dev/dev-complete
-```
 
 ### Development tools
 
@@ -504,8 +496,7 @@ Additional tools are:
 - [nbqa] (optional)
 
 We recommend installing these tools with [uv], but feel free to use [pipx] or
-[condax]. If you'd like to install them in the development environment instead,
-use the `dev-complete` version of the commands above.
+[condax].
 
 ```console
 uv tool/condax/pipx install pre-commit

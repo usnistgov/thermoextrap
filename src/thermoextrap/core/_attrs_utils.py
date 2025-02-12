@@ -57,8 +57,8 @@ def field_array_formatter(threshold: int = 3, **kws: Any):
     return wrapped
 
 
-def kw_only_field(kw_only: bool = True, **kws: Any):
-    return attrs.field(kw_only=kw_only, **kws)
+# def kw_only_field(kw_only: bool = True, **kws: Any):
+#     return attrs.field(kw_only=kw_only, **kws)
 
 
 def convert_dims_to_tuple(dims: MultDims | None) -> tuple[Hashable, ...]:
@@ -67,13 +67,13 @@ def convert_dims_to_tuple(dims: MultDims | None) -> tuple[Hashable, ...]:
     return (dims,) if isinstance(dims, str) else tuple(dims)
 
 
-def cache_field(
-    init: bool = False,
-    repr: bool = False,
-    factory: Callable[[], Any] = dict,
-    **kws: Any,
-):
-    return attrs.field(init=False, repr=False, factory=dict, **kws)
+# def cache_field(
+#     init: bool = False,
+#     repr: bool = False,
+#     factory: Callable[[], Any] = dict,
+#     **kws: Any,
+# ):
+#     return attrs.field(init=False, repr=False, factory=dict, **kws)
 
 
 # def validate_dims_in_object(self, attrs, dims):

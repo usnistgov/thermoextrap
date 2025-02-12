@@ -12,10 +12,8 @@ description = "Thermodynamic extrapolation"
 keywords = [
     "thermoextrap",
 ]
-license = { text = "NIST-PD" }
-license-files = { paths = [
-    "LICENSE",
-] }
+license = "NIST-PD"
+license-files = [ "LICENSE" ]
 authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" },
@@ -44,7 +42,7 @@ dependencies = [
     "dm-tree<0.1.9",
     "lazy-loader",
     "module-utilities[inherit]>=0.2",
-    "numba==0.60.0",
+    "numba>=0.60.0",
     "numpy>=1.26.0",
     "scipy",
     "sympy",
@@ -56,45 +54,15 @@ optional-dependencies.accel = [
 optional-dependencies.all = [
     "thermoextrap[mbar,gpr,accel,parallel,viz]",
 ]
-optional-dependencies.dev = [
-    "thermoextrap[dev-extras,test,typing,uvxrun,mypy,nbval,accel,viz,gpr,mbar,parallel]",
-]
-optional-dependencies.dev-complete = [
-    "thermoextrap[dev,tools]",
-]
-optional-dependencies.dev-extras = [
-    "ipykernel",
-    "ipython",
-    "nbclient>=0.10.0",
-    "nox>=2024.4.15",
-    "pytest-accept",
-]
-optional-dependencies.docs = [
-    "autodocsumm",
-    "myst-nb",
-    "pyenchant",
-    "sphinx>=5.3.0",
-    "sphinx-autobuild",
-    "sphinx-book-theme",
-    "sphinx-copybutton",
-    "sphinxcontrib-spelling",
-    "thermoextrap[gpr,mbar,viz]",
-]
 optional-dependencies.gpr = [
     "gpflow>=2.6.0",
     "tensorflow>=2.13",
-    "tensorflow-probability[tf]<0.25.0",
+    "tensorflow-probability[tf]>0.23.0,<0.25.0",
 ]
 optional-dependencies.mbar = [
     # NOTE: Getting all sorts of errors with pymbar with jax.  This seems to fix them for now...
     "jax[cpu]<0.4.25",
     "pymbar>=4.0",
-]
-optional-dependencies.mypy = [
-    "mypy>=1.11.2",
-]
-optional-dependencies.nbval = [
-    "nbval",
 ]
 optional-dependencies.openmm = [
     "openmm",
@@ -102,7 +70,50 @@ optional-dependencies.openmm = [
 optional-dependencies.parallel = [
     "dask[complete]",
 ]
-optional-dependencies.test = [
+optional-dependencies.viz = [
+    "matplotlib",
+]
+urls.Documentation = "https://pages.nist.gov/thermoextrap/"
+urls.Homepage = "https://github.com/usnistgov/thermoextrap"
+
+[dependency-groups]
+dev = [
+    "thermoextrap[all]",
+    { include-group = "dev-extras" },
+    { include-group = "mypy" },
+    { include-group = "nbval" },
+    { include-group = "test" },
+    { include-group = "typing" },
+    { include-group = "uvxrun" },
+]
+test = [
+    { include-group = "test-extras" },
+]
+docs = [
+    "autodocsumm",
+    "myst-nb",
+    "pyenchant",
+    "sphinx>=5.3.0",
+    "sphinx-book-theme",
+    "sphinx-copybutton",
+    "sphinxcontrib-spelling",
+    "thermoextrap[gpr,mbar,viz]",
+]
+cog = [ "cogapp" ]
+dev-extras = [
+    "ipykernel",
+    "ipython",
+    "nbclient>=0.10.0",
+    "nox>=2024.4.15",
+    "pytest-accept",
+]
+docs-live = [
+    "sphinx-autobuild",
+    { include-group = "docs" },
+]
+mypy = [ "mypy>=1.15.0" ]
+nbval = [ "nbclient>=0.10.0", "nbval" ]
+test-extras = [
     "pandas",
     "pytest",
     "pytest-cov",
@@ -110,33 +121,21 @@ optional-dependencies.test = [
     "pytest-xdist>3.6.0",
     "thermoextrap[mbar,gpr]",
 ]
-optional-dependencies.tools = [
-    "pre-commit",
-    "scriv",
+test-notebook = [
+    "thermoextrap[viz]",
+    { include-group = "nbval" },
+    { include-group = "test-extras" },
 ]
-optional-dependencies.typing = [
+typing = [
     "pandas-stubs",
+    "pylint",
     "pytest",
-    "thermoextrap[uvxrun,mbar,gpr]",
+    "thermoextrap[mbar,gpr]",
+    { include-group = "uvxrun" },
 ]
-optional-dependencies.uvxrun = [
-    # Anything needed to run tools/uvxrun.py
-    "packaging",
-]
-optional-dependencies.uvxrun-tools = [
-    # these used solely for specking tools to be used with tools/uvxrun.py
-    "conda-lock>=2.5.5",
-    "grayskull>=2.5.3",
-    "nbqa>=1.8.4",
-    "pyright>=1.1.380",
-    "thermoextrap[mypy]",
-    "twine>=5.0.0",
-]
-optional-dependencies.viz = [
-    "matplotlib",
-]
-urls.Documentation = "https://pages.nist.gov/thermoextrap/"
-urls.Homepage = "https://github.com/usnistgov/thermoextrap"
+# Anything needed to run tools/uvxrun.py
+# NOTE: uvxrun-tools defined explicitly in tool.pyproject2conda.envs.uvxrun-tools
+uvxrun = [ "packaging" ]
 
 [tool.hatch.version]
 source = "vcs"
@@ -440,15 +439,15 @@ exclude = [
 check_untyped_defs = true
 # strict = true
 
-[[tool.mypy.overrides]]
-ignore_missing_imports = true
-module = [
-]
+# [[tool.mypy.overrides]]
+# ignore_missing_imports = true
+# module = [
+# ]
 
-[[tool.mypy.overrides]]
-ignore_errors = true
-module = [
-]
+# [[tool.mypy.overrides]]
+# ignore_errors = true
+# module = [
+# ]
 
 [tool.pyright]
 include = [
@@ -503,29 +502,16 @@ inputs = [
 user_config = "config/userconfig.toml"
 template_python = "requirements/py{py}-{env}"
 template = "requirements/{env}"
-python = [
-    "3.11",
-]
-channels = [
-    "conda-forge",
-]
-style = [
-    "yaml",
-    "requirements",
-]
-default_envs = [
-    "test",
-    "typing",
-    "docs",
-    "dev",
-    "dev-complete",
-]
+python = "default"
+channels = "conda-forge"
+style = "yaml"
+deps = "pip"
 
 [tool.pyproject2conda.dependencies]
 pytest-accept = { pip = true }
-scriv = { pip = true }
-dask = { skip = true, packages = "dask" }
 matplotlib = { skip = true, packages = "matplotlib-base" }
+lazy-loader = { skip = true, packages = "lazy_loader" }
+dask = { skip = true, packages = "dask" }
 gpflow = { pip = true }
 tensorflow = { pip = true }
 tensorflow-probability = { pip = true }
@@ -533,58 +519,35 @@ pymbar = { pip = true }
 jax = { pip = true }
 jaxlib = { pip = true }
 module-utilities = { packages = "docstring-inheritance" }
-lazy-loader = { skip = true, packages = "lazy_loader" }
 
-[tool.pyproject2conda.envs.build]
-extras = "build-system.requires"
-reqs = [
-    "build",
-]
-skip_package = true
-style = "requirements"
+[tool.pyproject2conda.envs.dev]
+groups = [ "dev" ]
+python = "default"
+
+[tool.pyproject2conda.envs.test]
+groups = [ "test" ]
+python = "all"
 
 [tool.pyproject2conda.envs.uvxrun-tools]
-extras = "uvxrun-tools"
+# define these here so they don't override deps in uv.lock
+reqs = [
+    # these used solely for specking tools to be used with tools/uvxrun.py
+    "conda-lock>=2.5.5",
+    "grayskull>=2.5.3",
+    "nbqa>=1.8.4",
+    "pre-commit",
+    "pyright>=1.1.392",
+    "scriv",
+    "twine>=5.0.0",
+]
+groups = [ "mypy" ]
 skip_package = true
 style = "requirements"
 
 [tool.pyproject2conda.envs.test-extras]
-extras = [
-    "test",
-]
+groups = [ "test-extras" ]
 skip_package = true
-
-[tool.pyproject2conda.envs.test-notebook]
-extras = [
-    "test",
-    "nbval",
-    "viz",
-]
-
-[[tool.pyproject2conda.overrides]]
-# Ensure these have pip in yaml file
-envs = [
-    "test",
-    "docs",
-    "dev",
-    "dev-complete",
-]
-deps = [
-    "pip",
-]
-
-[[tool.pyproject2conda.overrides]]
-envs = [
-    "test",
-    "typing",
-    "test-extras",
-]
-python = [
-    "3.9",
-    "3.10",
-    "3.11",
-    "3.12",
-]
+python = "all"
 
 # * pip-tools (keeping for legacy) ---------------------------------------------
 
@@ -595,7 +558,10 @@ strip-extras = true
 # * uv -------------------------------------------------------------------------
 
 [tool.uv]
-managed = false
+managed = true
+default-groups = [ "dev" ]
+fork-strategy = "requires-python"
+required-version = ">=0.5.21"
 
 [tool.uv.pip]
 annotation-style = "line"

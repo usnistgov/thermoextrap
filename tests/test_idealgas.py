@@ -22,9 +22,9 @@ def test_idealgas() -> None:
     np.testing.assert_allclose(idealgas.x_cdf(x, b), model.cdfX(x, b))
 
     seed = 456
-    _a = idealgas.x_sample(5, b[:, None], rng=np.random.default_rng(seed))
-    _b = model.sampleX(b[:, None], 5, rng=np.random.default_rng(seed))
-    np.testing.assert_allclose(_a, _b)
+    a = idealgas.x_sample(5, b[:, None], rng=np.random.default_rng(seed))
+    b_ = model.sampleX(b[:, None], 5, rng=np.random.default_rng(seed))
+    np.testing.assert_allclose(a, b_)
 
     tota, coefa = model.extrapAnalytic(B=2.0, B0=1.0, order=5)
     totb, coefb = idealgas.x_beta_extrap(5, beta0=1.0, beta=2.0)
@@ -32,13 +32,13 @@ def test_idealgas() -> None:
     np.testing.assert_allclose(coefa, coefb)
 
     beta = rng.random()
-    _xa, _ua = model.genData(beta, 100, rng=np.random.default_rng(seed))
-    _xb, _ub = idealgas.generate_data(
+    xa, ua = model.genData(beta, 100, rng=np.random.default_rng(seed))
+    xb, ub = idealgas.generate_data(
         (100, 1000), beta, 1.0, rng=np.random.default_rng(seed)
     )
 
-    np.testing.assert_allclose(_xa, _xb)
-    np.testing.assert_allclose(_ua, _ub)
+    np.testing.assert_allclose(xa, xb)
+    np.testing.assert_allclose(ua, ub)
 
     tota, coefa = idealgas.x_vol_extrap(order=5, vol0=0.3, beta=beta, vol=1.0)
     totb, coefb = model.extrapAnalyticVolume(1.0, 0.3, 5, beta)

@@ -22,14 +22,13 @@ from module_utilities import cached
 
 from .core._attrs_utils import (
     MyAttrsMixin,
-    cache_field,
     convert_mapping_or_none_to_dict,
 )
 from .core._imports import has_pymbar
 from .core._imports import sympy as sp
 from .core.sputils import get_default_indexed, get_default_symbol
 from .core.xrutils import xrwrap_alpha
-from .data import AbstractData, kw_only_field
+from .data import AbstractData
 from .docstrings import DOCFILLER_SHARED
 
 if TYPE_CHECKING:
@@ -83,13 +82,13 @@ class SymFuncBase(sp.Function):
         msg = "must specify in subclass"
         raise NotImplementedError(msg)
 
-    def fdiff(self, argindex=1) -> None:  # noqa: PLR6301
+    def fdiff(self, argindex=1) -> None:
         """Derivative of function.  This will be used by :class:`thermoextrap.models.SymDerivBase`."""
         msg = "must specify in subclass"
         raise NotImplementedError(msg)
 
     @classmethod
-    def eval(cls, beta) -> None:  # noqa: ARG003
+    def eval(cls, beta) -> None:
         """
         Evaluate function.
 
@@ -182,7 +181,7 @@ class SymSubs:
     simplify: bool = field(default=False)
     expand: bool = field(default=True)
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     @cached.meth
     def __getitem__(self, order):
@@ -231,11 +230,13 @@ class Lambdify:
 
     exprs: Sequence[sp.Function] = field()
     args: Sequence | None = field(default=None)
-    lambdify_kws: Mapping | None = kw_only_field(
-        default=None, converter=attc.default_if_none(factory=dict)
+    lambdify_kws: Mapping | None = field(
+        kw_only=True,
+        default=None,
+        converter=attc.default_if_none(factory=dict),
     )
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     @cached.meth
     def __getitem__(self, order):
@@ -304,9 +305,9 @@ class Derivatives(MyAttrsMixin):
     #: Sequence of callable functions
     funcs: Sequence[Callable] = field()
     #: Sequence of sympy expressions, optional
-    exprs: Sequence[sp.Function] | None = kw_only_field(default=None)
+    exprs: Sequence[sp.Function] | None = field(kw_only=True, default=None)
     #: Arguments
-    args: Sequence | None = kw_only_field(default=None)
+    args: Sequence | None = field(kw_only=True, default=None)
 
     @staticmethod
     def _apply_minus_log(X, order):
@@ -445,13 +446,15 @@ class ExtrapModel(MyAttrsMixin):
     #: Maximum order of expansion
     order: int | None = field(default=attrs.Factory(lambda self: self.data.order))
     #: Whether to apply `X <- -log(X)`.
-    minus_log: bool | None = kw_only_field(
-        default=False, converter=attc.default_if_none(False)
+    minus_log: bool | None = field(
+        kw_only=True,
+        default=False,
+        converter=attc.default_if_none(False),
     )
     #: Name of `alpha`
-    alpha_name: str = kw_only_field(default="alpha", converter=str)
+    alpha_name: str = field(kw_only=True, default="alpha", converter=str)
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     @cached.meth
     def _derivs(self, order, order_dim, minus_log):
@@ -593,7 +596,7 @@ class StateCollection(MyAttrsMixin):
         kw_only=True, converter=convert_mapping_or_none_to_dict, default=None
     )
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -1103,6 +1106,6 @@ class MBARModel(StateCollection):
             out.reshape(shape), dims=(alpha.name,) + dims[2:]
         ).assign_coords(alpha=alpha)
 
-    def resample(self, *args, **kwargs) -> None:  # noqa: PLR6301
+    def resample(self, *args, **kwargs) -> None:
         msg = "resample not implemented for this class"
         raise NotImplementedError(msg)

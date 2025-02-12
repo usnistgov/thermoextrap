@@ -15,7 +15,6 @@ from attrs import validators as attv
 from cmomy import IndexSampler
 from module_utilities import cached
 
-from .core._attrs_utils import cache_field
 from .core.xrutils import xrwrap_xv
 from .data import DataCallbackABC, DataValues
 from .docstrings import DOCFILLER_SHARED
@@ -110,7 +109,7 @@ class VolumeDataCallback(DataCallbackABC):
     dxdqv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
     ndim: int = field(default=3, validator=attv.instance_of(int))
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     def check(self, data) -> None:
         pass

@@ -24,7 +24,7 @@ from attrs import validators as attv
 from module_utilities import cached
 
 from . import beta as beta_xpan
-from .core._attrs_utils import cache_field, convert_dims_to_tuple
+from .core._attrs_utils import convert_dims_to_tuple
 from .core.sputils import get_default_indexed, get_default_symbol
 from .data import DataCallbackABC
 from .docstrings import DOCFILLER_SHARED
@@ -215,7 +215,7 @@ class lnPiDataCallback(DataCallbackABC):
     #: Flag to allow/disallow resampling of ``lnPi0``.
     allow_resample: bool = field(default=False)
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
     # TODO(wpk): using dims_n, dims_comp naming because this is what is used in lnPi module
 
     # def __init__(self, lnPi0, mu, dims_n, dims_comp, ncoords=None):
