@@ -18,7 +18,7 @@ authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" },
 ]
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
@@ -349,12 +349,6 @@ style = "requirements"
 groups = [ "test-extras" ]
 skip_package = true
 python = "all"
-
-# * pip-tools (keeping for legacy) ---------------------------------------------
-
-[tool.pip-tools]
-allow-unsafe = true
-strip-extras = true
 
 # * uv -------------------------------------------------------------------------
 
