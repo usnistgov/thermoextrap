@@ -227,9 +227,11 @@ def test_deriv_kernel_self_1d() -> None:
     )
 
     # Test that splits x data correctly (told it that observation dims is 1)
-    check_locs, check_dorder = deriv_kern._split_x_into_locs_and_deriv_info(x_check)
+    check_locs, check_deriv_order = deriv_kern._split_x_into_locs_and_deriv_info(
+        x_check
+    )
     np.testing.assert_allclose(check_locs, x_check[:, :1])
-    np.testing.assert_allclose(check_dorder, x_check[:, 1:])
+    np.testing.assert_allclose(check_deriv_order, x_check[:, 1:])
 
     # Generate full output to check against various equivalent scenarios
     output = deriv_kern.K(x_check, x_check).numpy()
@@ -249,10 +251,10 @@ def test_deriv_kernel_self_1d() -> None:
     np.testing.assert_allclose(output_reorder, output)
 
     # And if switch around derivatives and points
-    x_check_dorder = x_check_reorder = np.roll(x_check, 1, axis=0)
-    output_dorder = deriv_kern.K(x_check_dorder, x_check_dorder).numpy()
-    output_dorder = np.roll(np.roll(output_dorder, -1, axis=0), -1, axis=1)
-    np.testing.assert_allclose(output_dorder, output)
+    x_check_deriv_order = x_check_reorder = np.roll(x_check, 1, axis=0)
+    output_deriv_order = deriv_kern.K(x_check_deriv_order, x_check_deriv_order).numpy()
+    output_deriv_order = np.roll(np.roll(output_deriv_order, -1, axis=0), -1, axis=1)
+    np.testing.assert_allclose(output_deriv_order, output)
 
 
 def test_deriv_kernel_self_multi_d() -> None:
@@ -281,9 +283,11 @@ def test_deriv_kernel_self_multi_d() -> None:
     )
 
     # Test that splits x data correctly (told it that observation dims is 2)
-    check_locs, check_dorder = deriv_kern._split_x_into_locs_and_deriv_info(x_check)
+    check_locs, check_deriv_order = deriv_kern._split_x_into_locs_and_deriv_info(
+        x_check
+    )
     np.testing.assert_allclose(check_locs, x_check[:, :2])
-    np.testing.assert_allclose(check_dorder, x_check[:, 2:])
+    np.testing.assert_allclose(check_deriv_order, x_check[:, 2:])
 
     # Generate full output to check against various equivalent scenarios
     output = deriv_kern.K(x_check, x_check).numpy()
@@ -303,10 +307,10 @@ def test_deriv_kernel_self_multi_d() -> None:
     np.testing.assert_allclose(output_reorder, output)
 
     # And if switch around derivatives and points
-    x_check_dorder = np.roll(x_check, 1, axis=0)
-    output_dorder = deriv_kern.K(x_check_dorder, x_check_dorder).numpy()
-    output_dorder = np.roll(np.roll(output_dorder, -1, axis=0), -1, axis=1)
-    np.testing.assert_allclose(output_dorder, output)
+    x_check_deriv_order = np.roll(x_check, 1, axis=0)
+    output_deriv_order = deriv_kern.K(x_check_deriv_order, x_check_deriv_order).numpy()
+    output_deriv_order = np.roll(np.roll(output_deriv_order, -1, axis=0), -1, axis=1)
+    np.testing.assert_allclose(output_deriv_order, output)
 
 
 # Testing mean functions is straightforward
@@ -482,7 +486,7 @@ def test_multiout_multivar_normal() -> None:
 def test_gp_likelihood() -> None:
     # Check that handles input correctly
     cov_id = np.eye(3)
-    d_orders = np.arange(3.0)[:, None]  # Add dimension since now handles nD inputs
+    d_orders = np.arange(3.0)[:, None]  # Add dimension since now handles n-d inputs
     x = np.hstack([d_orders, d_orders])
     check = HetGaussianDeriv(cov_id, 1)
     check_flat = HetGaussianDeriv(np.diag(cov_id), 1)

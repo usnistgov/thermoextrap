@@ -21,7 +21,7 @@ from .models import (
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta")
 
 ##############################################################################
-# recursive deriatives for beta expansion
+# recursive derivatives for beta expansion
 ###############################################################################
 
 ####################
@@ -429,7 +429,7 @@ class SymDerivBeta(SymDerivBase):
         cls, n, d=None, xalpha=False, expand=True, post_func=None, central=None
     ):
         r"""
-        Constructor for deriatives of :math:`\langle x^{{(d)}} u^n\rangle`.
+        Constructor for derivatives of :math:`\langle x^{{(d)}} u^n\rangle`.
 
         Parameters
         ----------

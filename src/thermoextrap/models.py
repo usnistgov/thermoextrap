@@ -59,7 +59,7 @@ __all__ = [
 ################################################################################
 class SymFuncBase(sp.Function):
     """
-    Base class to define a sympy function for user defined deriatives.
+    Base class to define a sympy function for user defined derivatives.
 
 
     See Also

@@ -372,3 +372,17 @@ new_fragment_template = "file: changelog.d/templates/new_fragment.md.j2"
 use_shortcuts = true
 
 [tool.cruft]
+
+[tool.typos.files]
+extend-exclude = [ "spelling_wordlist.txt" ]
+
+[tool.typos.default]
+extend-ignore-identifiers-re = [
+    "struc_.*",
+    ".*equil.*",
+]
+
+[tool.typos.default.extend-identifiers]
+gather_nd = "gather_nd"
+numer = "numer"
+pertNumer = "pertNumer"

@@ -56,7 +56,7 @@ def extrapWithSamples(B, B0, x, U, order):
         # Evaluate it using the appropriate mappings to averages
         # MUST provide average U then XU because of how symDerivAvgX returns
         outvec[o] = oDeriv(avgUfunc, avgXUfunc)
-        # Perform extrapolation using same deriatives and averages, just have many dBeta
+        # Perform extrapolation using same derivatives and averages, just have many dBeta
         # Taking the tensor product of two (really should be) 1D arrays to get the right shape
         outval += np.tensordot((dBeta**o), outvec[o], axes=0) / math.factorial(o)
 

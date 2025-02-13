@@ -1180,7 +1180,7 @@ class UpdateALMbrute(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1238,7 +1238,7 @@ class UpdateRandom(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1270,7 +1270,7 @@ class UpdateSpaceFill(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1324,7 +1324,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
         self.tol = tol
 
     def do_update(self, gpr, alpha_list):  # noqa: C901
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1433,7 +1433,7 @@ class UpdateALCbrute(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -2011,7 +2011,7 @@ class StopCriteria(UpdateStopABC):
         return tol_bools, out_dict
 
     def __call__(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model
+        # Create grid of alpha values to interrogate GP model
         # In case avoid_repeats gets set to True somehow, still only take alpha_grid
         # This should not get randomized
         alpha_grid, _ = self.create_alpha_grid(alpha_list)

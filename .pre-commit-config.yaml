@@ -204,9 +204,13 @@ repos:
         additional_dependencies: &typos-deps [typos==1.29.5] # make sure save version as above.
         stages: [manual]
         args: [typos, --nbqa-shell]
+        # this can lead to errors, so use with care
+        # args: [typos, --write-changes, --nbqa-shell]
       - id: nbqa
         alias: nbqa-typos
         name: nbqa-typos-markdown
         additional_dependencies: *typos-deps
         stages: [manual]
         args: [typos, --nbqa-shell, --nbqa-md]
+        # this can lead to errors, so use with care
+        # args: [typos, --write-changes, --nbqa-shell, --nbqa-md]
