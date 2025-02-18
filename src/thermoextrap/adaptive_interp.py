@@ -533,14 +533,17 @@ def factory_state_idealgas(
 
     rng = validate_rng(rng)
 
-    xdata, udata = idealgas.generate_data(shape=(nconfig, npart), beta=beta, rng=rng)
+    xdata, udata = (
+        xr.DataArray(_, dims="rec")
+        for _ in idealgas.generate_data(shape=(nconfig, npart), beta=beta, rng=rng)
+    )
     data = DataCentralMomentsVals.from_vals(xv=xdata, uv=udata, order=order)
 
     # use indices for reproducibility
     nrec = len(xdata)
     indices = rng.choice(nrec, (nrep, nrec))
     return xpan_beta.factory_extrapmodel(beta=beta, data=data).resample(
-        indices=indices, rep_dim=rep_dim
+        sampler={"indices": indices}, rep_dim=rep_dim
     )
 
 

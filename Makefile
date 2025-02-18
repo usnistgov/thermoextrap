@@ -235,7 +235,7 @@ list-dist: list-wheel list-sdist ## Cat out sdist and wheel contents
 
 
 # * NOTEBOOK -------------------------------------------------------------------
-NOTEBOOKS ?= examples/usage
+NOTEBOOKS ?= examples/usage/basic
 # NOTE: use this because nested call back in nox has errors with uv run...
 _PYTHON = $(shell which python)
 _NBQA_UVXRUN = $(_PYTHON) tools/uvxrun.py
