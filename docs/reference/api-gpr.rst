@@ -11,6 +11,6 @@ Gaussian process regression (:mod:`~thermoextrap.gpr_active`)
     :toctree: generated/
     :template: autodocsumm/module.rst
 
-    ~thermoextrap.gpr_active.gp_models
-    ~thermoextrap.gpr_active.active_utils
-    ~thermoextrap.gpr_active.ig_active
+    gp_models
+    active_utils
+    ig_active

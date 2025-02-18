@@ -59,7 +59,8 @@ DataCentralMoments
 init
 len
 repr
-xCentralMoments
+CentralMomentsArray
+CentralMomentsData
 cmomy
 wpk
 nist

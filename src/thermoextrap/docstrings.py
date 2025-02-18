@@ -55,7 +55,7 @@ xalpha : bool, default=False
     Flag whether `u` depends on variable `alpha`.
 central : bool
     If True, Use central moments.  Otherwise, use raw moments.
-dxduave : xCentralMoments
+dxduave : CentralMomentsData
     Central moments object.
 expand : bool
     If True, apply :meth:`~sympy.core.expr.Expr.expand`
