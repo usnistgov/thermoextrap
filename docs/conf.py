@@ -187,8 +187,8 @@ napoleon_type_aliases = {
     "Variable": "~xarray.Variable",
     "DatasetGroupBy": "~xarray.core.groupby.DatasetGroupBy",
     "DataArrayGroupBy": "~xarray.core.groupby.DataArrayGroupBy",
-    "CentralMoments": "~cmomy.CentralMoments",
-    "xCentralMoments": "~cmomy.xCentralMoments",
+    "CentralMomentsArray": "~cmomy.CentralMomentsArray",
+    "CentralMomentsData": "~cmomy.CentralMomentsData",
     # objects without namespace: numpy
     "ndarray": "~numpy.ndarray",
     "MaskedArray": "~numpy.ma.MaskedArray",

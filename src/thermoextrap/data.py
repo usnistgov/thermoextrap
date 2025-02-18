@@ -1164,7 +1164,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         {meta}
         {x_is_u}
         **kwargs
-            Extra arguments to :meth:`cmomy.wrap_reduce_vals`
+            Extra arguments to :func:`cmomy.wrap_reduce_vals`
 
 
         Returns
@@ -1173,7 +1173,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         See Also
         --------
-        :meth:`cmomy.CentralMomentsData.from_vals`
+        cmomy.wrap_reduce_vals
         """
         _raise_if_not_dataarray(uv)
         if axis is MISSING and dim is MISSING:
@@ -1250,7 +1250,7 @@ class DataCentralMoments(DataCentralMomentsBase):
         {meta}
         {x_is_u}
         **kwargs
-            Extra arguments to :meth:`cmomy.wrap`
+            Extra arguments to :func:`cmomy.wrap`
 
         Returns
         -------
@@ -1258,7 +1258,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         See Also
         --------
-        :meth:`cmomy.CentralMomentsData.from_data`
+        :class:`cmomy.CentralMomentsData`
         """
         _raise_if_not_dataarray(data)
 
@@ -1325,13 +1325,13 @@ class DataCentralMoments(DataCentralMomentsBase):
         {meta_kws}
         {x_is_u}
         **kwargs
-            Extra arguments to :meth:`cmomy.wrap_resample_vals`
+            Extra arguments to :func:`cmomy.wrap_resample_vals`
 
         See Also
         --------
         cmomy.wrap_resample_vals
         cmomy.resample.factory_sampler
-        cmomy.resmaple.IndexSampler
+        cmomy.resample.IndexSampler
         """
         if xv is None or x_is_u:
             xv = uv
@@ -1439,7 +1439,7 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         See Also
         --------
-        :meth:`cmomy.CentralMomentsData.from_raw`
+        cmomy.wrap_raw
         """
         _raise_if_not_dataarray(u)
         raw: DataT
@@ -1538,7 +1538,8 @@ class DataCentralMoments(DataCentralMomentsBase):
 
         See Also
         --------
-        :meth:`cmomy.CentralMomentsData.from_data`
+        :class:`cmomy.CentralMomentsData`
+
 
         """
         if dxdu is None or x_is_u:
@@ -1650,7 +1651,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
     {xv}
     {order}
     from_vals_kws : dict, optional
-        extra arguments passed to :meth:`cmomy.CentralMomentsData.from_vals`.
+        extra arguments passed to :func:`cmomy.wrap_reduce_vals`.
     {dxduave}
     """
 
@@ -1670,7 +1671,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         validator=attv.optional(attv.instance_of((xr.DataArray, xr.Dataset))),
         default=None,
     )  # pyright: ignore[reportArgumentType]
-    #: Optional parameters to :meth:`cmomy.CentralMomentsData.from_vals`
+    #: Optional parameters to :func:`cmomy.wrap_reduce_vals`
     from_vals_kws: dict[str, Any] = field(
         kw_only=True, converter=convert_mapping_or_none_to_dict, default=None
     )
@@ -1726,7 +1727,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
 
         See Also
         --------
-        :meth:`cmomy.CentralMomentsData.from_vals`
+        cmomy.wrap_reduce_vals
         """
         return cls(
             uv=uv,
@@ -1769,11 +1770,11 @@ class DataCentralMomentsVals(DataCentralMomentsBase):
         {parallel}
         {meta_kws}
         **kwargs
-            Keyword arguments to :meth:`cmomy.wrap_resample_vals`
+            Keyword arguments to :func:`cmomy.wrap_resample_vals`
 
         See Also
         --------
-        :meth:`cmomy.CentralMomentsData.from_resample_vals`
+        :func:`cmomy.wrap_resample_vals`
         """
         if dim is MISSING and axis is MISSING:
             dim = self.rec_dim
