@@ -136,6 +136,8 @@ repos:
     hooks:
       - id: uv-lock
         args: [--locked]
+      - id: uv-export
+        args: ["--frozen", "-q", "--output-file=requirements/lock/dev.txt"]
 
   # * pyproject2conda
   - repo: https://github.com/usnistgov/pyproject2conda

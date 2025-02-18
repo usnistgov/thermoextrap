@@ -401,7 +401,6 @@ def test_all(session: Session) -> None:
     """Run all tests and coverage."""
     for py in PYTHON_ALL_VERSIONS:
         session.notify(f"test-{py}")
-    session.notify("test-numpy1")
     session.notify("test-notebook")
     session.notify("coverage")
 
@@ -485,6 +484,10 @@ def lock(
 
     if opts.lock and opts.lock_upgrade:
         session.run("uv", "lock", "--upgrade", env={"VIRTUAL_ENV": ".venv"})
+
+    session.run(
+        "uv", "export", "--frozen", "-q", "--output-file=requirements/lock/dev.txt"
+    )
 
     reqs_path = Path("./requirements")
     for path in reqs_path.glob("*.txt"):
