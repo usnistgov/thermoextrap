@@ -8,13 +8,6 @@ import math
 import numpy as np
 from scipy.special import factorial
 
-try:
-    from pymbar import mbar
-except ImportError:
-    print(
-        "Could not find pymbar - will not import and functions involving this will not work."
-    )
-
 from .utilities import buildAvgFuncs, symDerivAvgX
 
 
@@ -63,7 +56,7 @@ def extrapWithSamples(B, B0, x, U, order):
         # Evaluate it using the appropriate mappings to averages
         # MUST provide average U then XU because of how symDerivAvgX returns
         outvec[o] = oDeriv(avgUfunc, avgXUfunc)
-        # Perform extrapolation using same deriatives and averages, just have many dBeta
+        # Perform extrapolation using same derivatives and averages, just have many dBeta
         # Taking the tensor product of two (really should be) 1D arrays to get the right shape
         outval += np.tensordot((dBeta**o), outvec[o], axes=0) / math.factorial(o)
 
@@ -210,6 +203,7 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
     B = np.array(B)
 
     if useMBAR:
+        from pymbar import mbar
         mbarObj = mbar.MBAR(np.array([refB * U]), [U.shape[0]])
         outval = np.zeros((len(B), x.shape[1]))
         for i in range(len(B)):

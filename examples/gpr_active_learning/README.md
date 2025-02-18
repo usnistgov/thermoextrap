@@ -16,7 +16,7 @@ tuned as major changes are possible.
 
 For the core tools in {mod}`thermoextrap.gpr_active`, the key dependencies are
 [sympy] and [GPflow], which are installed with with {mod}`thermoextrap`. Due to
-signicant changes in how [GPflow] handles likelihoods and custom models, we
+significant changes in how [GPflow] handles likelihoods and custom models, we
 currently require the [GPflow] version to be less then 2.6.0. Plans to ensure
 compatibility with newer versions of [GPflow] are underway.
 

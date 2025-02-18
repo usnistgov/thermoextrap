@@ -1363,7 +1363,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             method="L-BFGS-B",
             jac=jac_func,
         )
-        logging.info("optimization opt: %s", opt)
+        logger.info("optimization opt: %s", opt)
 
         # Set parameters based on optimization
         for i, s in enumerate(self.param_syms):

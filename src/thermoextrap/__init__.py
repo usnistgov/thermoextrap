@@ -4,7 +4,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from . import (  # noqa: TCH004
+    from . import (
         beta,
         data,
         idealgas,
@@ -14,26 +14,25 @@ if TYPE_CHECKING:
         volume,
         volume_idealgas,
     )
-    from .core.xrutils import xrwrap_alpha, xrwrap_uv, xrwrap_xv  # noqa: TCH004
+    from .core.xrutils import xrwrap_alpha, xrwrap_uv, xrwrap_xv
     from .data import (
-        DataCentralMoments,  # noqa: TCH004
-        DataCentralMomentsVals,  # noqa: TCH004
-        DataValues,  # noqa: TCH004
-        DataValuesCentral,  # noqa: TCH004
-        factory_data_values,  # noqa: TCH004
-        resample_indices,  # noqa: TCH004
+        DataCentralMoments,
+        DataCentralMomentsVals,
+        DataValues,
+        DataValuesCentral,
+        factory_data_values,
     )
 
     # expose some data/models
     from .models import (
-        Derivatives,  # noqa: TCH004
-        ExtrapModel,  # noqa: TCH004
-        ExtrapWeightedModel,  # noqa: TCH004
-        InterpModel,  # noqa: TCH004
-        InterpModelPiecewise,  # noqa: TCH004
-        MBARModel,  # noqa: TCH004
-        PerturbModel,  # noqa: TCH004
-        StateCollection,  # noqa: TCH004
+        Derivatives,
+        ExtrapModel,
+        ExtrapWeightedModel,
+        InterpModel,
+        InterpModelPiecewise,
+        MBARModel,
+        PerturbModel,
+        StateCollection,
     )
 else:
     import lazy_loader as lazy
@@ -57,7 +56,6 @@ else:
                 "DataValues",
                 "DataValuesCentral",
                 "factory_data_values",
-                "resample_indices",
             ],
             "models": [
                 "Derivatives",
@@ -105,7 +103,6 @@ __all__ = [
     "lnpi",
     "models",
     "random",
-    "resample_indices",
     "volume",
     "volume_idealgas",
     "xrwrap_alpha",

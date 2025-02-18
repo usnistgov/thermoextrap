@@ -209,7 +209,7 @@ def main():
         )  # Want std in mean, not just std
         resamp_stds = np.sqrt(
             this_dat.build_state(max_order=1)
-            .resample(nrep=100)
+            .resample(sampler={"nrep": 100})
             .derivs(norm=False)
             .var("rep")
             .values

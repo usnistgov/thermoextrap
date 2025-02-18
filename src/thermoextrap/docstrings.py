@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cmomy.docstrings import docfiller as docfiller_cmomy
+from cmomy.core.docstrings import docfiller as docfiller_cmomy
 
 # from .external.docfiller import DocFiller
 from module_utilities.docfiller import DocFiller
@@ -16,6 +16,8 @@ uv : xarray.DataArray
 xv : xarray.DataArray
     raw values of x (observable)
 w : array-like, optional
+    optional weight array.  Note that this array/xarray must be conformable to uv, xv
+weight : array-like or DataArray, optional
     optional weight array.  Note that this array/xarray must be conformable to uv, xv
 order : int
     maximum order of moments/expansion to calculate

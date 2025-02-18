@@ -45,28 +45,17 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosectionlabel",
-    # "IPython.sphinxext.ipython_directive",
-    # "IPython.sphinxext.ipython_console_highlighting",
-    # "nbsphinx",
-    # - easier external links
-    # "sphinx.ext.extlinks",
-    # - view source code on created page
-    # "sphinx.ext.viewcode",
-    # - view source code on github
     "sphinx.ext.linkcode",
-    # - add copy button
     "sphinx_copybutton",
-    # - redirect stuff?
-    # "sphinxext.rediraffe",
-    # - pretty things up?
-    # "sphinx_design"
-    # - myst stuff
     "myst_nb",
-    # "myst_parser",
 ]
 
-nitpicky = True
 autosectionlabel_prefix_document = True
+nitpicky = True
+suppress_warnings = ["autosectionlabel.*"]
+nitpick_ignore = [
+    # ("py:class", "Command"),
+]
 
 # -- myst stuff ---------------------------------------------------------
 myst_enable_extensions = [
@@ -436,8 +425,7 @@ intersphinx_mapping = {
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "numba": ("https://numba.pydata.org/numba-doc/latest", None),
-    # "matplotlib": ("https://matplotlib.org", None),
+    "numba": ("https://numba.readthedocs.io/en/stable/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "dask": ("https://docs.dask.org/en/latest", None),
     "cftime": ("https://unidata.github.io/cftime", None),

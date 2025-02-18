@@ -12,9 +12,9 @@ import attrs
 import xarray as xr
 from attrs import field
 from attrs import validators as attv
+from cmomy import IndexSampler
 from module_utilities import cached
 
-from .core._attrs_utils import cache_field
 from .core.xrutils import xrwrap_xv
 from .data import DataCallbackABC, DataValues
 from .docstrings import DOCFILLER_SHARED
@@ -62,7 +62,7 @@ class VolumeDerivFuncs:
         # Even if order is defined somewhere outside of this class, won't affect returned func
         def func(W, xW, dxdq, volume, ndim=1):  # noqa: N803
             """
-            Calculat function.  dxdq is <sum_{i=1}^N dy/dx_i x_i>.
+            Calculate function.  dxdq is <sum_{i=1}^N dy/dx_i x_i>.
 
             for ideal gas
             """
@@ -109,25 +109,26 @@ class VolumeDataCallback(DataCallbackABC):
     dxdqv: xr.DataArray = field(validator=attv.instance_of(xr.DataArray))
     ndim: int = field(default=3, validator=attv.instance_of(int))
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     def check(self, data) -> None:
         pass
 
     @cached.meth
-    def dxdq(self, rec_dim, skipna):
-        return self.dxdqv.mean(rec_dim, skipna=skipna)
+    def dxdq(self, rec_dim):
+        return self.dxdqv.mean(rec_dim)
 
-    def resample(self, data, meta_kws, indices, **kws):  # noqa: ARG002
+    def resample(self, data, meta_kws, sampler: IndexSampler, **kws):  # noqa: ARG002
         if not isinstance(data, DataValues):
             msg = "resampling only possible with DataValues style."
             raise NotImplementedError(msg)
-        return self.new_like(dxdqv=self.dxdqv[indices])
+
+        return self.new_like(dxdqv=self.dxdqv[sampler.indices])
 
     def derivs_args(self, data, derivs_args):
         return (
             *tuple(derivs_args),
-            self.dxdq(data.rec_dim, data.skipna),
+            self.dxdq(data.rec_dim),
             self.volume,
             self.ndim,
         )
@@ -193,8 +194,6 @@ def factory_extrapmodel(
         order=order,
         meta=meta,
         rec_dim=rec_dim,
-        rep_dim=rep_dim,
-        val_dims=val_dims,
         deriv_dim=None,
         **kws,
     )

@@ -10,7 +10,10 @@ import inspect
 import warnings
 from functools import wraps
 from textwrap import dedent
-from typing import Any, Callable, Mapping, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Callable, TypeVar, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 # to maintain type information across generic functions and parametrization
 T = TypeVar("T")
@@ -202,7 +205,7 @@ def deprecate_kwarg(
                 kwargs[new_arg_name] = new_arg_value
             return func(*args, **kwargs)
 
-        return cast(F, wrapper)
+        return cast("F", wrapper)
 
     return _deprecate_kwarg
 

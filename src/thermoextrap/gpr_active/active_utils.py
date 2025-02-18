@@ -20,7 +20,6 @@ import sympy as sp
 # import tensorflow as tf
 import xarray as xr
 from cmomy.random import validate_rng
-from pymbar import timeseries
 from scipy import integrate, linalg, special
 
 from thermoextrap import beta as xpan_beta
@@ -94,7 +93,7 @@ def input_GP_from_state(state, n_rep=100, log_scale=False):
 
     if isinstance(state.data, DataCentralMomentsVals):
         derivs = state.derivs(norm=False).values
-        resamp_derivs = state.resample(nrep=n_rep).derivs(norm=False)
+        resamp_derivs = state.resample(sampler={"nrep": n_rep}).derivs(norm=False)
     else:
         # Above with DataCentralMomentsVals is for simulation snapshots
         # Below is if things are pre-computed, so have multiple simulations
@@ -242,6 +241,8 @@ class DataWrapper:
         Loads data from files needed to generate data classes for thermoextrap.
         Will change significantly if using MBAR on trajectories with different biases.
         """
+        from pymbar import timeseries
+
         tot_pot = self.load_U_info()
         cv, bias = self.load_CV_info()
         # If the cv we bias along is the x of interest for extrapolation, return that
@@ -257,10 +258,8 @@ class DataWrapper:
         for k in range(x.shape[1]):
             this_g_x = timeseries.statistical_inefficiency(x[:, k])
             this_g_cross = timeseries.statistical_inefficiency(x[:, k], pot)
-            if this_g_x > g_x:
-                g_x = this_g_x
-            if this_g_cross > g_cross:
-                g_cross = this_g_cross
+            g_x = max(this_g_x, g_x)
+            g_cross = max(this_g_cross, g_cross)
         g_pot = timeseries.statistical_inefficiency(pot)
         g_max = np.max([g_x, g_pot, g_cross])
         # Get indices of uncorrelated data and subsample everything
@@ -1163,7 +1162,7 @@ class UpdateFuncBase(UpdateStopABC):
         new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)
 
         if self.log_scale:
-            new_alpha = 10.0 ** (new_alpha)  # noqa: PLR6104
+            new_alpha = 10.0 ** (new_alpha)
 
         return new_alpha, pred_mu, pred_std
 
@@ -1190,7 +1189,7 @@ class UpdateALMbrute(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1248,7 +1247,7 @@ class UpdateRandom(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1280,7 +1279,7 @@ class UpdateSpaceFill(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1334,7 +1333,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
         self.tol = tol
 
     def do_update(self, gpr, alpha_list):  # noqa: C901
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         _alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -1443,7 +1442,7 @@ class UpdateALCbrute(UpdateFuncBase):
         super().__init__(**kwargs)
 
     def do_update(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model and select new values
+        # Create grid of alpha values to interrogate GP model and select new values
         alpha_grid, alpha_select = self.create_alpha_grid(alpha_list)
 
         # Obtain predictions and uncertainties at all grid points
@@ -2021,7 +2020,7 @@ class StopCriteria(UpdateStopABC):
         return tol_bools, out_dict
 
     def __call__(self, gpr, alpha_list):
-        # Create grid of alpha values to interogate GP model
+        # Create grid of alpha values to interrogate GP model
         # In case avoid_repeats gets set to True somehow, still only take alpha_grid
         # This should not get randomized
         alpha_grid, _ = self.create_alpha_grid(alpha_list)
@@ -2234,10 +2233,9 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
         )
 
     if save_history and (stop_criteria is not None):
-        for key in train_history:
-            train_history[key] = np.array(train_history[key])
+        train_history = {k: np.array(v) for k, v in train_history.items()}
         np.savez(
-            "%s/active_history.npz" % base_dir,
+            f"{base_dir}/active_history.npz",
             pred_mu=stop_criteria.history[0],
             pred_std=stop_criteria.history[1],
             alpha=np.array(alpha_list),

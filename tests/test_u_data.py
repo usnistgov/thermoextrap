@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import thermoextrap as xtrap
+from thermoextrap.core.xrutils import xrwrap_uv, xrwrap_xv
 
 if TYPE_CHECKING:
     from typing import Any
@@ -51,7 +52,7 @@ class DataNamedTuple(NamedTuple):
     n: int
 
 
-@pytest.fixture()
+@pytest.fixture
 def data(nsamp) -> DataNamedTuple:
     rng = cmomy.random.default_rng()
 
@@ -67,7 +68,7 @@ def central(request):
 
 
 # test all other data constructors
-@pytest.fixture()
+@pytest.fixture
 def data_x(data, order, central):
     return xtrap.factory_data_values(xv=data.u, uv=data.u, order=order, central=central)
 
@@ -89,7 +90,11 @@ def data_other(request, data, xv_fixture, order, central):
         factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
         factory = xtrap.DataCentralMomentsVals.from_vals
-    return factory(xv=xv_fixture, uv=data.u, order=order, central=central)
+
+    xv = None if xv_fixture is None else xrwrap_xv(xv_fixture)
+    uv = xrwrap_uv(data.u)
+
+    return factory(xv=xv, uv=uv, order=order, central=central)
 
 
 def test_factory_0(data_x, data_other, central) -> None:
@@ -107,22 +112,22 @@ def betas_extrap(request):
     return request.param
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_x(data_x, central, beta):
     return xtrap.beta.factory_extrapmodel(beta=beta, data=data_x, central=central)
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_x_out(em_x, betas_extrap):
     return em_x.predict(betas_extrap, cumsum=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_other(data_other, central, beta):
     return xtrap.beta.factory_extrapmodel(beta=beta, data=data_other, central=central)
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_other_out(em_other, betas_extrap):
     return em_other.predict(betas_extrap, cumsum=True)
 
@@ -142,17 +147,20 @@ def data_x_is_u(request, data, order, central):
         factory = xtrap.DataCentralMoments.from_vals
     elif style == "cmom_vals":
         factory = xtrap.DataCentralMomentsVals.from_vals
-    return factory(xv=None, uv=data.u, order=order, central=central, x_is_u=True)
+
+    return factory(
+        xv=None, uv=xrwrap_uv(data.u), order=order, central=central, x_is_u=True
+    )
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_x_is_u(data_x_is_u, central, beta):
     return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_x_is_u, central=central, name="u_ave"
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_x_is_u_out(em_x_is_u, betas_extrap):
     return em_x_is_u.predict(betas_extrap, cumsum=True)
 
@@ -166,21 +174,21 @@ def test_em_x_is_u(em_x_out, em_x_is_u_out) -> None:
 # <du**2> = <u**2> - <u>**2
 
 
-@pytest.fixture()
+@pytest.fixture
 def data_u(data, order, central):
     return xtrap.factory_data_values(
         xv=None, uv=data.u, order=order, central=central, x_is_u=True
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_u(data_u, central, beta):
     return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_u, central=central, name="u_ave"
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_u_out(em_u, betas_extrap):
     return em_u.predict(betas_extrap, cumsum=True)
 
@@ -189,26 +197,26 @@ def test_data_u(em_u_out, em_x_is_u_out) -> None:
     np.testing.assert_allclose(em_u_out, em_x_is_u_out)
 
 
-@pytest.fixture()
+@pytest.fixture
 def data_x2(data, order, central):
     return xtrap.factory_data_values(
         xv=data.u**2, uv=data.u, order=order, central=central
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_x2(beta, order, central, data_x2):
     return xtrap.beta.factory_extrapmodel(
         beta=beta, data=data_x2, order=order - 1, central=central, name="x_ave"
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_x2_out(em_x2, betas_extrap):
     return em_x2.predict(betas_extrap, cumsum=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_u2(beta, data_u, order, central):
     if not central:
         return xtrap.beta.factory_extrapmodel(
@@ -223,7 +231,7 @@ def em_u2(beta, data_u, order, central):
     return None
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_u2_out(em_u2, betas_extrap, central):
     if not central:
         return em_u2.predict(betas_extrap, cumsum=True)

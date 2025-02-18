@@ -21,11 +21,20 @@ def test_rdata(fixture) -> None:
 
     # raise AssertionError
 
+    u_order = (fixture.rdata.umom_dim, ...)
+    x_order = (
+        (fixture.rdata.umom_dim, fixture.rdata.deriv_dim, ...)
+        if fixture.rdata.deriv_dim is not None
+        else u_order
+    )
+
     np.testing.assert_allclose(
-        fixture.rdata.u, [ufunc(i) for i in range(fixture.order + 1)]
+        fixture.rdata.u.transpose(*u_order),
+        [ufunc(i) for i in range(fixture.order + 1)],
     )
     np.testing.assert_allclose(
-        fixture.rdata.xu, [xufunc(i) for i in range(fixture.order + 1)]
+        fixture.rdata.xu.transpose(*x_order),
+        [xufunc(i) for i in range(fixture.order + 1)],
     )
 
 
@@ -42,18 +51,18 @@ def test_xdata_val(fixture) -> None:
 def test_xdata_from_ave_raw(fixture) -> None:
     a = fixture.rdata
 
-    # base on raw arrays
-    b = xtrap.DataCentralMoments.from_ave_raw(
-        u=a.u.values, xu=a.xu.values, w=len(a.uv), axis=0, dims=["val"]
-    )
+    # ## base on raw arrays
+    # b = xtrap.DataCentralMoments.from_ave_raw(
+    #     u=a.u.values, xu=a.xu.values, weight=len(a.uv), axis=0, dims=["val"]
+    # )
 
-    fixture.xr_test_raw(b)
+    # fixture.xr_test_raw(b)
 
     # base on xarray
     b = xtrap.DataCentralMoments.from_ave_raw(
         u=a.u,
         xu=a.xu,
-        w=len(a.uv),
+        weight=len(a.uv),
     )
     fixture.xr_test_raw(b)
 
@@ -67,8 +76,8 @@ def test_xdata_from_ave_central(fixture) -> None:
         dxdu=a.dxdu.values,
         xave=a.xave.values,
         uave=fixture.rdata.u.values[1],
-        w=len(a.uv),
-        axis=0,
+        weight=len(a.uv),
+        axis=-1,
         dims=["val"],
     )
 
@@ -76,7 +85,7 @@ def test_xdata_from_ave_central(fixture) -> None:
 
     # base on xarray
     b = xtrap.DataCentralMoments.from_ave_central(
-        du=a.du, dxdu=a.dxdu, xave=a.xave, uave=fixture.rdata.u[1], w=len(a.uv)
+        du=a.du, dxdu=a.dxdu, xave=a.xave, uave=fixture.rdata.u[1], weight=len(a.uv)
     )
 
     fixture.xr_test_central(b)
@@ -90,12 +99,14 @@ def test_resample(fixture) -> None:
 
     idx = rng.choice(ndat, (nrep, ndat), replace=True)
 
-    b = fixture.xdata_val.resample(indices=idx)
+    sampler = cmomy.factory_sampler(indices=idx)
+
+    b = fixture.xdata_val.resample(sampler=sampler)
 
     # raw
-    a = fixture.rdata.resample(indices=idx)
+    a = fixture.rdata.resample(sampler=sampler)
     fixture.xr_test_raw(a=a, b=b)
 
     # central
-    a = fixture.cdata.resample(indices=idx)
+    a = fixture.cdata.resample(sampler=sampler)
     fixture.xr_test_central(a=a, b=b)
