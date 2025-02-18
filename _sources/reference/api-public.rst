@@ -24,7 +24,6 @@ These classes/routines are made available at the top level by importing from :mo
     DataValuesCentral
 
     factory_data_values
-    resample_indices
 
 General extrapolation and interpolation models
 ----------------------------------------------

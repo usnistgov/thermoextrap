@@ -8,44 +8,47 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Temperature interpolation &#8212; thermoextrap v0.5.0 documentation</title>
+    <title>Temperature interpolation &#8212; thermoextrap 0.6.1 documentation</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-  
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css" />
     <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=91ffe994"></script>
-    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/documentation_options.js?v=810a7e51"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/usage/basic/Temperature_Interp';</script>
@@ -60,7 +63,8 @@
     <link rel="prev" title="Temperature dependent negative logarithm of average observable" href="Temperature_Extrap_Case4.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="2024-03-15"/>
+  <meta name="docsearch:version" content="0.6.1" />
+    <meta name="docbuild:last-update" content="2025-02-18"/>
   </head>
   
   
@@ -68,31 +72,16 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -100,7 +89,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -108,10 +96,15 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
     </header>
   
 
@@ -120,7 +113,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -135,6 +129,8 @@
         <div class="sidebar-primary-item">
 
   
+    
+  
 
 <a class="navbar-brand logo" href="../../../index.html">
   
@@ -143,20 +139,16 @@
   
   
   
-    <p class="title logo__title">thermoextrap v0.5.0 documentation</p>
+    <p class="title logo__title">thermoextrap 0.6.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
@@ -169,10 +161,10 @@
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">User guide</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Test_System_Ideal_Gas.html">Model system: 1D ideal gas in a linear external potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Data_Organization.html">Data Organization</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../thermoextrap.html">Temperature Extrapolation/interpolation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../thermoextrap.html">Temperature Extrapolation/interpolation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="Temperature_Extrap_Case1.html">Temperature independent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Temperature_Extrap_Case2.html">Temperature dependent average observable</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Temperature_Extrap_Case3.html">Temperature independent negative logarithm of average observable</a></li>
@@ -180,20 +172,19 @@
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">Temperature interpolation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="Macrostate_Dist_Extrap.html">Macrostate distribution extrapolation</a></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="Customized_Derivatives.html">Extrapolation in volume and custom derivatives</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../gpr.html">GP Models Utilizing Derivative Information and Active Learning</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../gpr/Ideal_Gas.html">Ideal Gas</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../gpr/LJ_lnPi.html">Lennard-Jones macrostate distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../gpr/SWF_Adsorption.html">Active learning: adsorption of a square-well fluid in a pore</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/api-public.html">Top level API (<code class="xref py py-mod docutils literal notranslate"><span class="pre">thermoextrap</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.data.html">Data handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">data</span></code>)</a></li>
-
 
 
 
@@ -263,14 +254,13 @@
 
 
 
-
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/generated/thermoextrap.lnpi.html">Inverse temperature expansion of macrostate distribution (<code class="xref py py-mod docutils literal notranslate"><span class="pre">lnpi</span></code>)</a></li>
 
 
 
 
 
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/api-gpr.html">Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gpr_active</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../reference/generated/thermoextrap.gpr_active.gp_models.html">Models for Gaussian process regression (<code class="xref py py-mod docutils literal notranslate"><span class="pre">gp_models</span></code>)</a></li>
 
 
@@ -322,20 +312,20 @@
 
 
 </ul>
-</li>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/api-baseclasses.html">Base classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference/api-random.html">Random number generator (<code class="xref py py-mod docutils literal notranslate"><span class="pre">random</span></code>)</a></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../navigation.html">Indices and tables</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../genindex.html">Index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 
     </div>
@@ -344,14 +334,19 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
 
@@ -360,14 +355,14 @@
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
-        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
-</label></div>
+</button></div>
       
     </div>
   
@@ -490,27 +485,19 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
-</label>
+</button>
 </div></div>
       
     </div>
@@ -557,13 +544,14 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 
-<span class="kn">import</span> <span class="nn">cmomy</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cmomy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="c1"># Import idealgas module</span>
-<span class="kn">import</span> <span class="nn">thermoextrap</span> <span class="k">as</span> <span class="nn">xtrap</span>
-<span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">idealgas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">thermoextrap</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xtrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">thermoextrap</span><span class="w"> </span><span class="kn">import</span> <span class="n">idealgas</span>
 
 <span class="c1"># seeded random number generator</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">cmomy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -573,15 +561,18 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_betas</span><span class="p">(</span><span class="n">nbeta</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">betamin</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">betamax</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_betas</span><span class="p">(</span><span class="n">nbeta</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">betamin</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">betamax</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
     <span class="n">dbeta</span> <span class="o">=</span> <span class="p">(</span><span class="n">betamax</span> <span class="o">-</span> <span class="n">betamin</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nbeta</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">betamin</span> <span class="o">+</span> <span class="n">dbeta</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbeta</span><span class="p">)])</span>
 
 
-<span class="k">def</span> <span class="nf">get_xems</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">nconfig</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">npart</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_xems</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">nconfig</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">npart</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">xems</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">beta</span> <span class="ow">in</span> <span class="n">betas</span><span class="p">:</span>
-        <span class="n">xdata</span><span class="p">,</span> <span class="n">udata</span> <span class="o">=</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">generate_data</span><span class="p">((</span><span class="n">nconfig</span><span class="p">,</span> <span class="n">npart</span><span class="p">),</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="n">vol</span><span class="p">)</span>
+        <span class="n">xdata</span><span class="p">,</span> <span class="n">udata</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;rec&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">idealgas</span><span class="o">.</span><span class="n">generate_data</span><span class="p">((</span><span class="n">nconfig</span><span class="p">,</span> <span class="n">npart</span><span class="p">),</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="n">vol</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">xem</span> <span class="o">=</span> <span class="n">xtrap</span><span class="o">.</span><span class="n">beta</span><span class="o">.</span><span class="n">factory_extrapmodel</span><span class="p">(</span>
             <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="n">xtrap</span><span class="o">.</span><span class="n">DataCentralMomentsVals</span><span class="o">.</span><span class="n">from_vals</span><span class="p">(</span>
@@ -612,6 +603,8 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -620,7 +613,7 @@ document.write(`
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 
 <span class="n">out</span> <span class="o">=</span> <span class="n">xemi</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">err</span> <span class="o">=</span> <span class="n">xemi</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">nrep</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s2">&quot;rep&quot;</span><span class="p">)</span>
+<span class="n">err</span> <span class="o">=</span> <span class="n">xemi</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">sampler</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;nrep&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">})</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s2">&quot;rep&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">err</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;interp poly&quot;</span><span class="p">)</span>
 
 <span class="n">xmbar</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">betas</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;mbar&quot;</span><span class="p">)</span>
@@ -635,10 +628,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x173261c90&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x13a8cc4a0&gt;
 </pre></div>
 </div>
-<img alt="../../../_images/bb2d2639c6597d723dce1e2e21d977810ba119af68386f0a65b7234a96af72a5.png" src="../../../_images/bb2d2639c6597d723dce1e2e21d977810ba119af68386f0a65b7234a96af72a5.png" />
+<img alt="../../../_images/7870356b695b532ccca45deb6c4a38a43ef16307c5df2cd64b4c178912b3149e.png" src="../../../_images/7870356b695b532ccca45deb6c4a38a43ef16307c5df2cd64b4c178912b3149e.png" />
 </div>
 </div>
 <p>The above compares polynomial interpolation and MBAR (really just BAR because using only 2 points). Both methods are used to interpolate between the two extreme values of beta. In both cases, the same data from the two edge points is used, making use of only derivatives up to 1st order for interpolation. The error bars are one standard deviation from bootstrap resampling of the predictions of each model. True values are represented by the black dashed line.</p>
@@ -660,10 +653,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x173546910&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x13aabf6e0&gt;]
 </pre></div>
 </div>
-<img alt="../../../_images/bed2a2b8764a344a489d9e6ac2744fd1628c5279429d1ed183e39cbce42888a8.png" src="../../../_images/bed2a2b8764a344a489d9e6ac2744fd1628c5279429d1ed183e39cbce42888a8.png" />
+<img alt="../../../_images/9af91f5d81a1051a86f487775fe9702130d42a80b6d02d5c5bd821310de63683.png" src="../../../_images/9af91f5d81a1051a86f487775fe9702130d42a80b6d02d5c5bd821310de63683.png" />
 </div>
 </div>
 </section>
@@ -673,7 +666,7 @@ document.write(`
 <p>A key feature of <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp" title="thermoextrap.recursive_interp.RecursiveInterp"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecursiveInterp</span></code></a> is a method called <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.get_data" title="thermoextrap.recursive_interp.RecursiveInterp.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_data()</span></code></a>. Simply put, this obtains data if provided a value of the variable over which we’re extrapolating. By default, this method is just set up to return data at a specified <span class="math notranslate nohighlight">\(\beta\)</span> for the 1D ideal gas model, so we don’t need to touch it. However, in the paper we modify this method to load in data from an MD simulation of water closest to the specified state point. If you want to generate new MD or MC data on the fly, you will need to create a new class that inherits from <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp" title="thermoextrap.recursive_interp.RecursiveInterp"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecursiveInterp</span></code></a> and just change the <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.get_data" title="thermoextrap.recursive_interp.RecursiveInterp.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_data()</span></code></a> method to run the appropriate simulation and load in the data you need.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">recursive_interp</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">thermoextrap</span><span class="w"> </span><span class="kn">import</span> <span class="n">recursive_interp</span>
 </pre></div>
 </div>
 </div>
@@ -715,10 +708,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/9e4183f72864e8b56f248d75e78545202427f1162a63a24954f1f7c7f3bc6aa0.png" src="../../../_images/9e4183f72864e8b56f248d75e78545202427f1162a63a24954f1f7c7f3bc6aa0.png" />
-<img alt="../../../_images/e7450afb1670e33d80d23ad38d78fd65b67ed196c04dd8cab92854c93070733b.png" src="../../../_images/e7450afb1670e33d80d23ad38d78fd65b67ed196c04dd8cab92854c93070733b.png" />
-<img alt="../../../_images/826addb57aa19b352d36c2b59e1a6734519df75c73dc426f0c0daafd40bf8f16.png" src="../../../_images/826addb57aa19b352d36c2b59e1a6734519df75c73dc426f0c0daafd40bf8f16.png" />
-<img alt="../../../_images/f973d6a8fe196230b36229efb7c8c74e8d08e22e514869b1d36eff724d31a5d6.png" src="../../../_images/f973d6a8fe196230b36229efb7c8c74e8d08e22e514869b1d36eff724d31a5d6.png" />
+<img alt="../../../_images/b379762da40e330df66de856f96d3e5f2b36657ef4c832645ecce84546617020.png" src="../../../_images/b379762da40e330df66de856f96d3e5f2b36657ef4c832645ecce84546617020.png" />
+<img alt="../../../_images/5cf9642fe186b58de22d5b9d0d0c0827159e97e9e8dda7f407ded67baf3a69cd.png" src="../../../_images/5cf9642fe186b58de22d5b9d0d0c0827159e97e9e8dda7f407ded67baf3a69cd.png" />
+<img alt="../../../_images/019e83f9e2c3d555e08529b3a91d1d5ff7a9a835253f187ab5ad0c42e2985b2e.png" src="../../../_images/019e83f9e2c3d555e08529b3a91d1d5ff7a9a835253f187ab5ad0c42e2985b2e.png" />
+<img alt="../../../_images/b9c587702412e1c166d82f408103a992f37b1f41be68c8240aa35c2a6dcd75f8.png" src="../../../_images/b9c587702412e1c166d82f408103a992f37b1f41be68c8240aa35c2a6dcd75f8.png" />
 </div>
 </div>
 <p>The above cell runs an automated algorithm for performing interpolation recursively. In the above example, polynomial interpolation is used. This is recommended, but the algorithm may also use weighted extrapolation or MBAR. In the figure, the true observable is shown as the dashed black line. The blue line is final result of the recursive algorithm. Note that there is no bootstrap method for <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp" title="thermoextrap.recursive_interp.RecursiveInterp"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecursiveInterp</span></code></a> since the algorithm guarantees the uncertainty to be within the tolerance.</p>
@@ -767,7 +760,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/9944d538d8dfc84b03a7552e78757da2accbaba12241a28c06fb438ea78bff5a.png" src="../../../_images/9944d538d8dfc84b03a7552e78757da2accbaba12241a28c06fb438ea78bff5a.png" />
+<img alt="../../../_images/4fec13ec0ba36591b35ed2c9dd73ae1c293ac5bae6fb6c77e9d7e64065928179.png" src="../../../_images/4fec13ec0ba36591b35ed2c9dd73ae1c293ac5bae6fb6c77e9d7e64065928179.png" />
 </div>
 </div>
 <p>In the above plot, interpolating polynomials are shown for sliding windows of three state points used in the recursive interpolation model. Colors change for each window. Within a window (same color) the interpolating polynomial for the lower subregion is shown with a dotted line, that for the upper subregion with a dashed line, and the whole window region using the two outermost edge points with a solid line. Outside of the region they were fitted over, the polynomials show large deviations from the true values. For interpolation, however, the polynomials all overlap quite well. By construction, the piecewise function created by the recursive procedure is continuous in both its value and first derivative at all points in the entire interval. Using higher order derivative information would result in continuity in even higher derivatives, but likely even more divergent behavior outside of the interpolated range.</p>
@@ -780,7 +773,7 @@ document.write(`
 <p>Like with <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.recursive_train" title="thermoextrap.recursive_interp.RecursiveInterp.recursive_train"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recursive_train()</span></code></a> and <a class="reference internal" href="../../../reference/generated/thermoextrap.recursive_interp.html#thermoextrap.recursive_interp.RecursiveInterp.sequential_train" title="thermoextrap.recursive_interp.RecursiveInterp.sequential_train"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sequential_train()</span></code></a>, there are two training modes. The first is identical to the recursive algorithm described previously and is called <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#thermoextrap.adaptive_interp.train_recursive" title="thermoextrap.adaptive_interp.train_recursive"><code class="xref py py-func docutils literal notranslate"><span class="pre">train_recursive()</span></code></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">thermoextrap</span> <span class="kn">import</span> <span class="n">adaptive_interp</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">thermoextrap</span><span class="w"> </span><span class="kn">import</span> <span class="n">adaptive_interp</span>
 </pre></div>
 </div>
 </div>
@@ -814,17 +807,17 @@ alphas: [0.1, 9.6]
 alpha_new: 4.6
 </pre></div>
 </div>
-<img alt="../../../_images/57099dae5be3016ee32a9066e9ad804ab3de6dab35fe46b566b2711bf8d58e5f.png" src="../../../_images/57099dae5be3016ee32a9066e9ad804ab3de6dab35fe46b566b2711bf8d58e5f.png" />
+<img alt="../../../_images/c01a96bb227be98c5ad05b5ae23d477e54a334213dc46d66ee0d734766c4eb1b.png" src="../../../_images/c01a96bb227be98c5ad05b5ae23d477e54a334213dc46d66ee0d734766c4eb1b.png" />
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 1
 alphas: [0.1, 4.6]
 </pre></div>
 </div>
-<img alt="../../../_images/61e525e321962d77d595f965d1d69c7b2da5e642ca30c23bc4201371b28c74a1.png" src="../../../_images/61e525e321962d77d595f965d1d69c7b2da5e642ca30c23bc4201371b28c74a1.png" />
+<img alt="../../../_images/e5a4d03d2df5017e9c2dacc38c72014af06675315374d6002f4be544d7a2c071.png" src="../../../_images/e5a4d03d2df5017e9c2dacc38c72014af06675315374d6002f4be544d7a2c071.png" />
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 1
 alphas: [4.6, 9.6]
 </pre></div>
 </div>
-<img alt="../../../_images/ec592bb2473e4ae6960287088a364f076df526bb91f4ee72b041b17e99301391.png" src="../../../_images/ec592bb2473e4ae6960287088a364f076df526bb91f4ee72b041b17e99301391.png" />
+<img alt="../../../_images/09da7dc133bcac93c8198a7dc1c829e9bfe79aa4d9b8a6b13251326e1da5a287.png" src="../../../_images/09da7dc133bcac93c8198a7dc1c829e9bfe79aa4d9b8a6b13251326e1da5a287.png" />
 </div>
 </div>
 <p>The other training option, <a class="reference internal" href="../../../reference/generated/thermoextrap.adaptive_interp.html#thermoextrap.adaptive_interp.train_iterative" title="thermoextrap.adaptive_interp.train_iterative"><code class="xref py py-func docutils literal notranslate"><span class="pre">train_iterative()</span></code></a>, also adds states as long as the relative error is greater than <code class="docutils literal notranslate"><span class="pre">tol</span></code>, but selects new states based on a different rule. A new state is also inserted at an alpha value from <code class="docutils literal notranslate"><span class="pre">alphas</span></code> that is at least <code class="docutils literal notranslate"><span class="pre">alpha_tol</span></code> away from existing states and has a maximum uncertainty. The difference from the recursive strategy is that the point is chosen globally from all alphas rather than choosing a new point for each interval between current points.</p>
@@ -853,12 +846,12 @@ alphas: [0.1, 9.6]
 alpha_new: 4.6
 </pre></div>
 </div>
-<img alt="../../../_images/ee96de60829622afecbf3436d9383f530005d813e1d039739146a07a07d9c1d4.png" src="../../../_images/ee96de60829622afecbf3436d9383f530005d813e1d039739146a07a07d9c1d4.png" />
+<img alt="../../../_images/08d3379bf98c42db8b58f2edac0fc91b6b64255de2a45ab8d5a59638df90a13e.png" src="../../../_images/08d3379bf98c42db8b58f2edac0fc91b6b64255de2a45ab8d5a59638df90a13e.png" />
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>depth: 1
 alphas: [0.1, 4.6, 9.6]
 </pre></div>
 </div>
-<img alt="../../../_images/b6529c30a3fe896482ecc12c60abfbf9feaacbb1d6351ccb8b1653f414a5caa8.png" src="../../../_images/b6529c30a3fe896482ecc12c60abfbf9feaacbb1d6351ccb8b1653f414a5caa8.png" />
+<img alt="../../../_images/80de373a9d556b219e35c16a266d58a12bcbcc2ea1d34c4f0a7b05063fe3ec84.png" src="../../../_images/80de373a9d556b219e35c16a266d58a12bcbcc2ea1d34c4f0a7b05063fe3ec84.png" />
 </div>
 </div>
 </section>
@@ -872,7 +865,7 @@ alphas: [0.1, 4.6, 9.6]
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -900,7 +893,8 @@ alphas: [0.1, 4.6, 9.6]
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -945,7 +939,7 @@ By William P. Krekelberg
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on 2024-03-15.
+  Last updated on 2025-02-18.
   <br/>
 </p>
   </div>
@@ -963,8 +957,8 @@ By William P. Krekelberg
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>
