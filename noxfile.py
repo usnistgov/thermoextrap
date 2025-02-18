@@ -202,7 +202,9 @@ class SessionParams(DataclassParser):
         | None
     ) = add_option("--docs", "-d", help="doc commands")
     docs_run: RUN_ANNO = None
-
+    docs_options: OPT_TYPE = add_option(
+        "--docs-options", help="Options to sphinx-build"
+    )
     # lint
     lint_options: OPT_TYPE = add_option(help="Options to pre-commit")
 
@@ -519,7 +521,7 @@ def lock(
                         "--universal",
                         f"--config-file={PIP_COMPILE_CONFIG}",
                         "-q",
-                        "-p",
+                        "--python-version",
                         python_version,
                         *options,
                         path,
@@ -724,7 +726,10 @@ def docs(  # noqa: PLR0912, C901
         cmd.remove("serve")
 
     if cmd:
-        common_opts = ["--doctree-dir=docs/_build/doctree"]
+        common_opts = [
+            "--doctree-dir=docs/_build/doctree",
+            *(opts.docs_options or ()),
+        ]
         for c in combine_list_str(cmd):
             if c == "clean":
                 for d in ("docs/_build", "generated", "reference/generated"):
