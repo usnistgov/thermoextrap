@@ -275,11 +275,10 @@ class lnPiDataCallback(DataCallbackABC):
         )
 
         # wrap in xarray object:
-        dc = cmomy.xCentralMoments.from_vals(
+        dc = cmomy.wrap_reduce_vals(
             self.lnPi0.expand_dims(dim="_new", axis=0),
             axis="_new",
             mom_dims="_mom",
-            mom=1,
         )
         # resample and reduce
         dc, _ = dc.resample_and_reduce(**kws)

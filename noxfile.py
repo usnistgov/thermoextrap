@@ -180,9 +180,6 @@ class SessionParams(DataclassParser):
     # coverage
     coverage: list[Literal["erase", "combine", "report", "html", "open"]] | None = None
 
-    # testdist
-    testdist_run: RUN_ANNO = None
-
     # docs
     docs: (
         list[
@@ -679,7 +676,7 @@ def testdist(
 
     _test(
         session=session,
-        run=opts.testdist_run,
+        run=opts.test_run,
         test_no_pytest=opts.test_no_pytest,
         test_options=opts.test_options,
         no_cov=opts.no_cov,
