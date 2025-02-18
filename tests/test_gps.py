@@ -430,7 +430,9 @@ def test_sympy_mean_func() -> None:
     y_check[: len(x_vals), 0] = y_vals
 
     # Create our mean function to test
-    check_sym = SympyMeanFunc(sig_expr, x_check, y_check, params=params)
+    check_sym = SympyMeanFunc(
+        sig_expr, x_check[: len(x_vals), :1], y_check[: len(x_vals)], params=params
+    )
 
     # Check that expression matches input
     assert sp.simplify(check_sym.expr - sig_expr) == 0

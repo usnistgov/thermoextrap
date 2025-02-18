@@ -724,7 +724,8 @@ def create_base_GP_model(
     # Or more generally may want to specify which order to pay attention to rather than just 0
     if likelihood_kwargs is None:
         likelihood_kwargs = {}
-    ref_d_bool = gpr_data[0][:, 1] == d_order_ref
+    n_x_dims = gpr_data[0].shape[1] // 2
+    ref_d_bool = np.all(gpr_data[0][:, n_x_dims:] == d_order_ref, axis=-1)
 
     # Create mean function, if not provided
     if mean_func is None:
@@ -732,17 +733,20 @@ def create_base_GP_model(
         # Would be as easy as fitting polynomial object (numpy or scipy) and integrals/diffs
         if d_order_ref == 0:
             # By default, fit linear model to help get rid of monotonicity
-            if len(np.unique(gpr_data[0][ref_d_bool, :1])) > 2:
+            if len(np.unique(gpr_data[0][ref_d_bool, :n_x_dims], axis=0)) > 2:
                 mean_func = LinearWithDerivs(
-                    gpr_data[0][ref_d_bool, :1], gpr_data[1][ref_d_bool, :]
+                    gpr_data[0][ref_d_bool, :n_x_dims], gpr_data[1][ref_d_bool, :]
                 )
             # Linear mean only meaningful if have at least 3 different input locations
             # If just have 1 or 2, just fit constant mean function
             else:
-                mean_func = ConstantMeanWithDerivs(gpr_data[1][ref_d_bool, :])
+                mean_func = ConstantMeanWithDerivs(
+                    gpr_data[1][ref_d_bool, :], x_dim=n_x_dims
+                )
         else:
             mean_func = ConstantMeanWithDerivs(
-                np.zeros_like(gpr_data[1][ref_d_bool, :])
+                np.zeros_like(gpr_data[1][ref_d_bool, :]),
+                x_dim=n_x_dims,
             )
 
     # For multiple output kernels, helpful to scale all outputs so have similar variance
@@ -750,7 +754,7 @@ def create_base_GP_model(
     # Also helps ensure kernel variance will be close to 1, so close to starting value
     # But can only do if have at least 2 values... really 3 for computing std, but
     # doing it with 2 won't hurt, will just scale by mean, technically
-    if len(np.unique(gpr_data[0][ref_d_bool, :1])) > 1:
+    if len(np.unique(gpr_data[0][ref_d_bool, :n_x_dims], axis=0)) > 1:
         std_scale = np.std(
             gpr_data[1][ref_d_bool, :] - mean_func(gpr_data[0][ref_d_bool, :]),
             axis=0,
@@ -828,7 +832,10 @@ def train_GPR(gpr, record_loss=False, start_params=None):
 
         # Set values to provided starting values
         for j in range(len(gpr.trainable_parameters)):
-            gpr.trainable_parameters[j].assign(start_params[j])
+            this_param = _catch_inf_unconstrained_param(
+                gpr.trainable_parameters[j], start_params[j]
+            )
+            gpr.trainable_parameters[j].assign(this_param)
 
         # Perform optimization starting with provided values
         loss_info_new = optim.minimize(
@@ -849,7 +856,10 @@ def train_GPR(gpr, record_loss=False, start_params=None):
         # In other words, update parameters if default loss less OR if new loss is NaN
         if (loss_info.fun < loss_info_new.fun) or (check_nan[1]):
             for j, tpar in enumerate(optim_params):
-                gpr.trainable_parameters[j].assign(tpar)
+                this_param = _catch_inf_unconstrained_param(
+                    gpr.trainable_parameters[j], tpar
+                )
+                gpr.trainable_parameters[j].assign(this_param)
         # Otherwise, change loss information that's potentially returned and leave params
         else:
             loss_info = loss_info_new
@@ -1042,13 +1052,12 @@ class UpdateStopABC:
         # But cannot unless have model for noise at new points, so just work with predict_f
         # If do have reason to work with predict_y, inherit this class and modify this method
 
-        # For x_vals, need extra dimension so can work with multidimensional y
-        # And need for creating GP input anyway
-        x_vals = x_vals[:, None]
+        # For x_vals, need to make multidimensional if not
+        if len(x_vals.shape) <= 1:
+            x_vals = x_vals[:, None]
+
         gpr_pred = gpr.predict_f(
-            np.concatenate(
-                [x_vals, self.d_order_pred * np.ones((x_vals.shape[0], 1))], axis=1
-            )
+            np.concatenate([x_vals, self.d_order_pred * np.ones_like(x_vals)], axis=1)
         )
         gpr_mu, gpr_std, gpr_conf_int = self.transform_func(
             x_vals,
@@ -1153,7 +1162,7 @@ class UpdateFuncBase(UpdateStopABC):
         new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)
 
         if self.log_scale:
-            new_alpha = 10.0 ** (new_alpha)
+            new_alpha = 10.0 ** (new_alpha)  # noqa: PLR6104
 
         return new_alpha, pred_mu, pred_std
 
@@ -2234,3 +2243,14 @@ def active_learning(  # noqa: C901, PLR0912, PLR0915
         )
 
     return data_list, train_history
+
+
+def _catch_inf_unconstrained_param(param, value):
+    # Need to make sure transformed variables are finite
+    # Optimization will not prevent infinite transformed variables
+    # that will then throw an error when assigning (catches, but does not fix, so circumventing)
+    # So attempt to catch that behavior here
+    this_transformed_param = param.transform.inverse(value).numpy()
+    if (not np.isfinite(this_transformed_param)) and (value == 0.0):
+        return np.finfo(np.float64).eps
+    return value
