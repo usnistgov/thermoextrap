@@ -118,6 +118,42 @@ dependencies via pip, as the conda-forge recipes are slightly out of date:
 pip install tensorflow tensorflow-probability "gpflow>=2.6.0"
 ```
 
+## Building [cmomy] library
+
+`thermoextrap` makes extensive use of the [cmomy] library. If using
+`thermoextrap`in parallel, you should either first compile cached numba code
+with
+
+```bash
+python -m cmomy.compile
+```
+
+Or run your command with the environment variable `CMOMY_NUMBA_CACHE` set to
+`false`
+
+```bash
+CMOMY_NUMBA_CACHE=false python ....
+```
+
+## Installing from source
+
+The repo is setup to use [uv](https://github.com/astral-sh/uv) to create a
+development environment. Use the following:
+
+```bash
+uv sync
+```
+
+This environment will include all additional dependencies mentioned above.
+
+Alternatively, you can install the (locked) development dependencies using:
+
+```bash
+pip install requirements/lock/dev.txt
+```
+
+It is not recommended to install the development dependencies with `conda`.
+
 <!-- end-installation -->
 
 ## Example usage

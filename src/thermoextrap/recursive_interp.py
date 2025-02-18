@@ -167,7 +167,7 @@ class RecursiveInterp:
         beta_vals = np.linspace(beta1, beta2, num=50)
         predict_vals = this_model.predict(beta_vals, order=self.max_order)
         boot_err = (
-            this_model.resample(nrep=100)
+            this_model.resample(sampler={"nrep": 100})
             .predict(beta_vals, order=self.max_order)
             .std("rep")
         )
@@ -327,7 +327,7 @@ class RecursiveInterp:
                 beta_vals = np.linspace(beta1, beta2, num=50)
                 predict_vals = this_model.predict(beta_vals, order=self.max_order)
                 boot_err = (
-                    this_model.resample(nrep=100)
+                    this_model.resample(sampler={"nrep": 100})
                     .predict(beta_vals, order=self.max_order)
                     .std("rep")
                 )
@@ -403,7 +403,7 @@ class RecursiveInterp:
         return predict_vals
 
     @deprecate_kwarg("doPlot", "do_plot")
-    def check_poly_consistency(self, do_plot=False):  # noqa: C901, PLR0914, PLR0915
+    def check_poly_consistency(self, do_plot=False):  # noqa: PLR0914, PLR0915
         """
         If the interpolation model is a polynomial, checks to see if the polynomials
         are locally consistent. In other words, we want the coefficients between
@@ -455,12 +455,16 @@ class RecursiveInterp:
             reg1model = self.model_cls((self.states[aset[0]], self.states[aset[1]]))
             reg1coeffs = reg1model.coefs(order=self.max_order)
             reg1err = (
-                reg1model.resample(nrep=100).coefs(order=self.max_order).std("rep")
+                reg1model.resample(sampler={"nrep": 100})
+                .coefs(order=self.max_order)
+                .std("rep")
             )
             reg2model = self.model_cls((self.states[aset[1]], self.states[aset[2]]))
             reg2coeffs = reg2model.coefs(order=self.max_order)
             reg2err = (
-                reg2model.resample(nrep=100).coefs(order=self.max_order).std("rep")
+                reg2model.resample(sampler={"nrep": 100})
+                .coefs(order=self.max_order)
+                .std("rep")
             )
             z12 = (reg1coeffs - reg2coeffs) / np.sqrt(reg1err**2 + reg2err**2)
             # Assuming Gaussian distributions for coefficients
@@ -476,7 +480,9 @@ class RecursiveInterp:
             fullmodel = self.model_cls((self.states[aset[0]], self.states[aset[2]]))
             fullcoeffs = fullmodel.coefs(order=self.max_order)
             fullerr = (
-                fullmodel.resample(nrep=100).coefs(order=self.max_order).std("rep")
+                fullmodel.resample(sampler={"nrep": 100})
+                .coefs(order=self.max_order)
+                .std("rep")
             )
             z1full = (reg1coeffs - fullcoeffs) / np.sqrt(reg1err**2 + fullerr**2)
             # p1full = 2.0*stats.norm.cdf(-abs(z1full))
@@ -507,10 +513,8 @@ class RecursiveInterp:
                 pax.plot(plotpoints, plotreg1, color=pcolors[i], linestyle=":")
                 pax.plot(plotpoints, plotreg2, color=pcolors[i], linestyle="--")
                 allploty = np.hstack((plotfull, plotreg1, plotreg2))
-                if np.min(allploty) < plotymin:
-                    plotymin = np.min(allploty)
-                if np.max(allploty) > plotymax:
-                    plotymax = np.max(allploty)
+                plotymin = min(np.min(allploty), plotymin)
+                plotymax = max(np.max(allploty), plotymax)
 
         if do_plot:
             for edge in self.edge_beta:

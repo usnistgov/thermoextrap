@@ -17,6 +17,15 @@ See the fragment files in [changelog.d]
 
 <!-- scriv-insert-here -->
 
+## v0.6.0 — 2025-02-18
+
+### Changed
+
+- Project now setup to use [uv](https://github.com/astral-sh/uv) with lock file.
+- Updated code to use latest version of
+  [cmomy](https://github.com/usnistgov/cmomy)
+- Initial work for adding typing to code.
+
 ## v0.5.0 — 2024-03-15
 
 ### Removed
@@ -37,7 +46,7 @@ See the fragment files in [changelog.d]
 - Updates to match with newer versions of GPflow
 - `HetGaussianDeriv` likelihood now accepts `X` (input data) argument for all
   methods
-- `HetGuassianDeriv` init now takes `obs_dims` argument instead of `d_order`
+- `HetGaussianDeriv` init now takes `obs_dims` argument instead of `d_order`
 - `build_scaled_cov_mat` method now takes `X`, which includes derivative orders
 - all mean functions inherit from gpflow.functions.MeanFunction (same behavior)
 
@@ -75,7 +84,7 @@ See the fragment files in [changelog.d]
 - New linters via pre-commit
 - Development env now handled by tox
 
-- Moved `modesl, data, idealgas` from `thermoextrap.core` to `thermoextrap`.
+- Moved `models, data, idealgas` from `thermoextrap.core` to `thermoextrap`.
   These were imported at top level anyway. This fixes issues with doing things
   like `from thermoextrap.data import ...`, etc.
 - Moved `core._docstrings_` to `docstrings`.

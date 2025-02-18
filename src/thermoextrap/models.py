@@ -6,26 +6,38 @@ General extrapolation/interpolation models (:mod:`~thermoextrap.models`)
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from functools import lru_cache
-from typing import Any, Callable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Callable
 
 import attrs
+import cmomy
 import numpy as np
 import pandas as pd
-import pymbar
 import xarray as xr
 from attrs import converters as attc
 from attrs import field
 from attrs import validators as attv
 from module_utilities import cached
 
-from .core._attrs_utils import MyAttrsMixin, cache_field
+from .core._attrs_utils import (
+    MyAttrsMixin,
+    convert_mapping_or_none_to_dict,
+)
 from .core._imports import has_pymbar
 from .core._imports import sympy as sp
 from .core.sputils import get_default_indexed, get_default_symbol
 from .core.xrutils import xrwrap_alpha
-from .data import AbstractData, kw_only_field
+from .data import AbstractData
 from .docstrings import DOCFILLER_SHARED
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from typing import Any
+
+    from cmomy.core.typing import Sampler
+
+    from thermoextrap.core.typing_compat import Self
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
@@ -47,7 +59,7 @@ __all__ = [
 ################################################################################
 class SymFuncBase(sp.Function):
     """
-    Base class to define a sympy function for user defined deriatives.
+    Base class to define a sympy function for user defined derivatives.
 
 
     See Also
@@ -70,13 +82,13 @@ class SymFuncBase(sp.Function):
         msg = "must specify in subclass"
         raise NotImplementedError(msg)
 
-    def fdiff(self, argindex=1) -> None:  # noqa: PLR6301
+    def fdiff(self, argindex=1) -> None:
         """Derivative of function.  This will be used by :class:`thermoextrap.models.SymDerivBase`."""
         msg = "must specify in subclass"
         raise NotImplementedError(msg)
 
     @classmethod
-    def eval(cls, beta) -> None:  # noqa: ARG003
+    def eval(cls, beta) -> None:
         """
         Evaluate function.
 
@@ -169,7 +181,7 @@ class SymSubs:
     simplify: bool = field(default=False)
     expand: bool = field(default=True)
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     @cached.meth
     def __getitem__(self, order):
@@ -218,11 +230,13 @@ class Lambdify:
 
     exprs: Sequence[sp.Function] = field()
     args: Sequence | None = field(default=None)
-    lambdify_kws: Mapping | None = kw_only_field(
-        default=None, converter=attc.default_if_none(factory=dict)
+    lambdify_kws: Mapping | None = field(
+        kw_only=True,
+        default=None,
+        converter=attc.default_if_none(factory=dict),
     )
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     @cached.meth
     def __getitem__(self, order):
@@ -291,9 +305,9 @@ class Derivatives(MyAttrsMixin):
     #: Sequence of callable functions
     funcs: Sequence[Callable] = field()
     #: Sequence of sympy expressions, optional
-    exprs: Sequence[sp.Function] | None = kw_only_field(default=None)
+    exprs: Sequence[sp.Function] | None = field(kw_only=True, default=None)
     #: Arguments
-    args: Sequence | None = kw_only_field(default=None)
+    args: Sequence | None = field(kw_only=True, default=None)
 
     @staticmethod
     def _apply_minus_log(X, order):
@@ -432,13 +446,15 @@ class ExtrapModel(MyAttrsMixin):
     #: Maximum order of expansion
     order: int | None = field(default=attrs.Factory(lambda self: self.data.order))
     #: Whether to apply `X <- -log(X)`.
-    minus_log: bool | None = kw_only_field(
-        default=False, converter=attc.default_if_none(False)
+    minus_log: bool | None = field(
+        kw_only=True,
+        default=False,
+        converter=attc.default_if_none(False),
     )
     #: Name of `alpha`
-    alpha_name: str = kw_only_field(default="alpha", converter=str)
+    alpha_name: str = field(kw_only=True, default="alpha", converter=str)
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     @cached.meth
     def _derivs(self, order, order_dim, minus_log):
@@ -457,7 +473,7 @@ class ExtrapModel(MyAttrsMixin):
             order = self.order
         out = self._derivs(order=order, order_dim=order_dim, minus_log=minus_log)
         if norm:
-            out = out * taylor_series_norm(order, order_dim)
+            return out * taylor_series_norm(order, order_dim)
         return out
 
     def coefs(self, order=None, order_dim="order", minus_log=None):
@@ -548,13 +564,13 @@ class ExtrapModel(MyAttrsMixin):
 
         return out
 
-    def resample(self, indices=None, nrep=None, **kws):
+    def resample(self, sampler: Sampler, **kws):
         """Create new object with resampled data."""
         return self.new_like(
             order=self.order,
             alpha0=self.alpha0,
             derivatives=self.derivatives,
-            data=self.data.resample(nrep=nrep, indices=indices, **kws),
+            data=self.data.resample(sampler=sampler, **kws),
             minus_log=self.minus_log,
             alpha_name=self.alpha_name,
         )
@@ -576,11 +592,11 @@ class StateCollection(MyAttrsMixin):
     """
 
     states: Sequence = field()
-    kws: Mapping | None = kw_only_field(
-        default=None, converter=attc.default_if_none(factory=dict)
+    kws: dict[str, Any] = field(
+        kw_only=True, converter=convert_mapping_or_none_to_dict, default=None
     )
 
-    _cache: dict = cache_field()
+    _cache: dict = field(init=False, repr=False, factory=dict)
 
     def __call__(self, *args, **kwargs):
         return self.predict(*args, **kwargs)
@@ -595,35 +611,31 @@ class StateCollection(MyAttrsMixin):
     def alpha_name(self):
         return getattr(self[0], "alpha_name", "alpha")
 
-    def resample(self, indices=None, nrep=None, **kws):
-        """Resample underlying models."""
-        if indices is None:
-            indices = [None] * len(self)
+    def resample(self, sampler: Sampler | Sequence[Sampler], **kws: Any) -> Self:
+        """
+        Resample underlying models.
 
-        if len(indices) != len(self):
-            msg = f"{len(indices)=} must equal {len(self)=}"
+        If pass in a single sampler, use it for all states. For example, to
+        resample all states with some ``nrep``, use
+        ``.resample(sampler={"nrep": nrep})``. Note that the if you pass a
+        single mapping, the mapping will be passed to each state ``resample``
+        method, which will in turn create unique sample for each state. To
+        specify a different sampler for each state, pass in a sequence of
+        sampler.
+        """
+        if isinstance(
+            sampler,
+            (np.ndarray, xr.DataArray, xr.Dataset, cmomy.IndexSampler, Mapping),
+        ):
+            sampler = [sampler] * len(self)
+        elif len(sampler) != len(self):
+            msg = f"{len(sampler)=} must equal {len(self)=}"
             raise ValueError(msg)
-
-        if "freq" in kws:
-            freq = kws.pop("freq")
-            if freq is None:
-                freq = [None] * len(self)
-            if len(freq) != len(self):
-                msg = f"{len(freq)=} must equal {len(self)=}"
-                raise ValueError(msg)
-
-            return type(self)(
-                states=tuple(
-                    state.resample(indices=idx, nrep=nrep, freq=fq, **kws)
-                    for state, idx, fq in zip(self.states, indices, freq)
-                ),
-                **self.kws,
-            )
 
         return type(self)(
             states=tuple(
-                state.resample(indices=idx, nrep=nrep, **kws)
-                for state, idx in zip(self.states, indices)
+                state.resample(sampler=sampler, **kws)
+                for state, sampler in zip(self.states, sampler)
             ),
             **self.kws,
         )
@@ -690,7 +702,7 @@ class StateCollection(MyAttrsMixin):
 
     @property
     def order(self):
-        return min([m.order for m in self])
+        return min(m.order for m in self)
 
     @property
     def alpha0(self):
@@ -1026,10 +1038,10 @@ class PerturbModel(MyAttrsMixin):
 
         return num / den
 
-    def resample(self, nrep, idx=None, **kws):
+    def resample(self, sampler: Sampler, **kws):
         return self.__class__(
             alpha0=self.alpha0,
-            data=self.data.resample(nrep=nrep, idx=idx, **kws),
+            data=self.data.resample(sampler=sampler, **kws),
             alpha_name=self.alpha_name,
         )
 
@@ -1046,6 +1058,8 @@ class MBARModel(StateCollection):
 
     @cached.meth
     def _default_params(self, state_dim="state", alpha_name="alpha"):
+        import pymbar
+
         # all xvalues:
         xv = xr.concat([m.data.xv for m in self], dim=state_dim)
         uv = xr.concat([m.data.uv for m in self], dim=state_dim)
@@ -1092,6 +1106,6 @@ class MBARModel(StateCollection):
             out.reshape(shape), dims=(alpha.name,) + dims[2:]
         ).assign_coords(alpha=alpha)
 
-    def resample(self, *args, **kwargs) -> None:  # noqa: PLR6301
+    def resample(self, *args, **kwargs) -> None:
         msg = "resample not implemented for this class"
         raise NotImplementedError(msg)

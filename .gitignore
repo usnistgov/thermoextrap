@@ -73,9 +73,6 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
-
 # celery beat schedule file
 celerybeat-schedule
 
@@ -132,3 +129,4 @@ tuna-loadtime.log
 /requirements/lock/py*-dev-user-conda-lock.yml*
 /requirements/lock/py*-dev-user.txt*
 /README.pdf
+/.numba_cache

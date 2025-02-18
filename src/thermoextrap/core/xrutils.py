@@ -1,33 +1,65 @@
 """Utilities for working with :mod:`xarray`."""
 
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import TYPE_CHECKING
+
 import numpy as np
 import xarray as xr
+from cmomy.core.validate import (
+    is_dataarray,
+    is_dataset,
+)
+
+if TYPE_CHECKING:
+    from collections.abc import Hashable, Sequence
+
+    from cmomy.core.typing import DataT
+    from numpy.typing import ArrayLike
+
+    from thermoextrap.core.typing import MultDims, SingleDim
+    from thermoextrap.core.typing_compat import TypeAlias
+
+    DimsMapping: TypeAlias = Sequence[Hashable] | Mapping[int, MultDims]
 
 
 ###############################################################################
 # Structure(s) to handle data
 ###############################################################################
-def _check_xr(x, dims, strict=True, name=None):
-    if isinstance(x, xr.Dataset):
-        # don't do anything to datasets
-        pass
+def _check_xr(
+    x: ArrayLike | DataT,
+    dims: DimsMapping,
+    name: str | None = None,
+    strict: bool = False,
+) -> xr.DataArray | DataT:
+    if is_dataset(x):
+        return x
 
-    elif not isinstance(x, xr.DataArray):
-        x = np.array(x)
-        if isinstance(dims, dict):
-            dims = dims[x.ndim]
-        x = xr.DataArray(x, dims=dims, name=name)
-    elif strict:
-        if isinstance(dims, dict):
-            dims = dims[x.ndim]
-        for d in dims:
-            if d not in x.dims:
-                msg = f"{d} not in dims"
-                raise ValueError(msg)
-    return x
+    if is_dataarray(x):
+        if strict:
+            if isinstance(dims, Mapping):
+                dims = dims[x.ndim]
+            for d in dims:
+                if d not in x.dims:
+                    msg = f"{d} not in dims"
+                    raise ValueError(msg)
+        return x
+
+    x = np.asarray(x)
+    if isinstance(dims, dict):
+        dims = dims[x.ndim]
+    return xr.DataArray(x, dims=dims, name=name)
 
 
-def xrwrap_uv(uv, dims=None, rec_dim="rec", rep_dim="rep", name="u", stict=True):
+def xrwrap_uv(
+    uv: ArrayLike | xr.DataArray,
+    dims: DimsMapping | None = None,
+    rec_dim: SingleDim = "rec",
+    rep_dim: SingleDim = "rep",
+    name: str | None = "u",
+    strict: bool = True,
+) -> xr.DataArray:
     """
     Wrap uv (energy values) array.
 
@@ -35,19 +67,19 @@ def xrwrap_uv(uv, dims=None, rec_dim="rec", rep_dim="rep", name="u", stict=True)
     """
     if dims is None:
         dims = {1: [rec_dim], 2: [rep_dim, rec_dim]}
-    return _check_xr(uv, dims, strict=stict, name=name)
+    return _check_xr(uv, dims, name=name, strict=strict)
 
 
 def xrwrap_xv(
-    xv,
-    dims=None,
-    rec_dim="rec",
-    rep_dim="rep",
-    deriv_dim=None,
-    val_dims="val",
-    name="x",
-    strict=None,
-):
+    xv: ArrayLike | DataT,
+    dims: DimsMapping | None = None,
+    rec_dim: SingleDim = "rec",
+    rep_dim: SingleDim = "rep",
+    deriv_dim: SingleDim | None = None,
+    val_dims: MultDims = "val",
+    name: str | None = "x",
+    strict: bool | None = None,
+) -> xr.DataArray | DataT:
     """
     Wraps xv (x values) array.
 
@@ -59,9 +91,10 @@ def xrwrap_xv(
     elif not isinstance(val_dims, list):
         val_dims = list(val_dims)
 
+    if strict is None:
+        strict = False
+
     if deriv_dim is None:
-        if strict is None:
-            strict = False
         if dims is None:
             rec_val = [rec_dim, *val_dims]
             rep_val = [rep_dim, rec_dim, *val_dims]
@@ -72,33 +105,34 @@ def xrwrap_xv(
                 len(rep_val): [rep_dim, rec_dim, *val_dims],
             }
 
-    else:
-        if strict is None:
-            strict = False
-        if dims is None:
-            rec_val = [rec_dim, deriv_dim, *val_dims]
-            rep_val = [rep_dim, rec_dim, deriv_dim, *val_dims]
-            dims = {
-                2: [rec_dim, deriv_dim],
-                len(rec_val): [rec_dim, deriv_dim, *val_dims],
-                len(rep_val): [rep_dim, rec_dim, deriv_dim, val_dims],
-            }
-    return _check_xr(xv, dims=dims, strict=strict, name=name)
+    elif dims is None:
+        rec_val = [rec_dim, deriv_dim, *val_dims]
+        rep_val = [rep_dim, rec_dim, deriv_dim, *val_dims]
+        dims = {
+            2: [rec_dim, deriv_dim],
+            len(rec_val): [rec_dim, deriv_dim, *val_dims],
+            len(rep_val): [rep_dim, rec_dim, deriv_dim, val_dims],
+        }
+    return _check_xr(xv, dims=dims, name=name, strict=strict)
 
 
-def xrwrap_alpha(alpha, dims=None, name="alpha"):
+def xrwrap_alpha(
+    alpha: ArrayLike | xr.DataArray,
+    dims: MultDims | None = None,
+    name: str = "alpha",
+) -> xr.DataArray:
     """Wrap alpha values."""
-    if isinstance(alpha, xr.DataArray):
-        pass
-    else:
-        alpha = np.array(alpha)
-        if dims is None:
-            dims = name
+    if is_dataarray(alpha):
+        return alpha
 
-        if alpha.ndim == 0:
-            alpha = xr.DataArray(alpha, coords={dims: alpha}, name=name)
-        elif alpha.ndim == 1:
-            alpha = xr.DataArray(alpha, dims=dims, coords={dims: alpha}, name=name)
-        else:
-            alpha = xr.DataArray(alpha, dims=dims, name=name)
-    return alpha
+    alpha = np.array(alpha)
+    if dims is None:
+        dims = name
+
+    if alpha.ndim == 0:
+        return xr.DataArray(alpha, coords={dims: alpha}, name=name)
+
+    if alpha.ndim == 1:
+        return xr.DataArray(alpha, dims=dims, coords={dims: alpha}, name=name)
+
+    return xr.DataArray(alpha, dims=dims, name=name)

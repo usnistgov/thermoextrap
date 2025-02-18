@@ -8,9 +8,10 @@ default_install_hook_types:
 repos:
   # * Top level
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
+        exclude: ^uv[.]lock
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: check-symlinks
@@ -22,70 +23,79 @@ repos:
       - id: mixed-line-ending
   # * Sync dependencies
   - repo: https://github.com/mxr/sync-pre-commit-deps
-    rev: v0.0.1
+    rev: v0.0.3
     hooks:
       - id: sync-pre-commit-deps
 
   # * Pyproject-fmt
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 1.7.0
+    rev: v2.5.0
     hooks:
       - id: pyproject-fmt
         args: [--indent=4, --keep-full-version]
-        files: ^pyproject.toml$
+        files: ""
+        types: [toml]
+
+  # * Pyproject validate
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.23
+    hooks:
+      - id: validate-pyproject
 
   # * Prettier
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.5.1
     hooks:
       - id: prettier
         alias: markdownlint
-        stages: [commit]
-        additional_dependencies:
-          - prettier-plugin-toml
+        stages: [pre-commit, manual]
 
   # * Markdown
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.12.1
+    rev: v0.17.2
     hooks:
       - id: markdownlint-cli2
         alias: markdownlint
         args: [--style, prettier]
+        # language_version: 10.9.0
 
   # * Linting
   # To be replace by ruff analog when I find one ...
   - repo: https://github.com/adamchainz/blacken-docs
-    rev: 1.16.0
+    rev: 1.19.1
     hooks:
       - id: blacken-docs
         additional_dependencies:
-          - black==24.2.0
+          - black==25.1.0
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.2
+    rev: v0.9.6
     hooks:
       - id: ruff
+        alias: ruff-all
         types_or: &ruff-types-or [python, pyi, jupyter]
         args: [--fix, --show-fixes]
       - id: ruff-format
+        alias: ruff-all
         types_or: *ruff-types-or
 
   # * Spelling
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.4.1
     hooks:
       - id: codespell
         additional_dependencies: [tomli]
         args: [-I, docs/spelling_wordlist.txt]
         exclude_types: [jupyter]
+        exclude: ^uv[.]lock$|^requirements
 
   # * Notebook spelling
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.8.4
+    rev: 1.9.1
     hooks:
       - id: nbqa
         alias: nbqa-codespell
         name: nbqa-codespell
-        additional_dependencies: &codespell-deps [codespell==2.2.6, tomli] # make sure same as above
+        additional_dependencies: &codespell-deps [codespell==2.4.1, tomli] # make sure same as above
         args:
           [codespell, --ignore-words=docs/spelling_wordlist.txt, --nbqa-shell]
       - id: nbqa
@@ -102,7 +112,7 @@ repos:
 
   # * Strip out metadata from notebooks
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.7.1
+    rev: 0.8.1
     hooks:
       - id: nbstripout
         args: [
@@ -114,46 +124,95 @@ repos:
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.18.3
+    rev: v4.2.1
     hooks:
       - id: commitizen
         stages: [commit-msg]
 
+  # * uv
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.6.0
+    hooks:
+      - id: uv-lock
+        args: [--locked]
+      - id: uv-export
+        args: ["--frozen", "-q", "--output-file=requirements/lock/dev.txt"]
+
+  # * pyproject2conda
+  - repo: https://github.com/usnistgov/pyproject2conda
+    rev: v0.19.0
+    hooks:
+      - id: pyproject2conda-project
+        alias: requirements
+
+  # * all lock files
+  - repo: local
+    hooks:
+      - id: requirements-lock
+        name: requirements-lock
+        alias: lock
+        entry: nox -s lock -- # ++lock-force
+        language: python
+        files: ^requirements/.*\.txt$
+        pass_filenames: false
+        additional_dependencies: ["nox==2025.2.9"]
+
   # * Manual Linting ------------------------------------------------------------
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.1
+  # - repo: https://github.com/asottile/pyupgrade
+  #   rev: v3.19.1
+  #   hooks:
+  #     - id: pyupgrade
+  #       stages: [manual]
+  #       args: [--py38-plus]
+  # - repo: https://github.com/nbQA-dev/nbQA
+  #   rev: 1.9.1
+  #   hooks:
+  #     - id: nbqa-pyupgrade
+  #       additional_dependencies: [pyupgrade]
+  #       stages: [manual]
+  #       args: [--py38-plus]
+
+  # pyproject-validate (schema-store)
+  - repo: https://github.com/henryiii/validate-pyproject-schema-store
+    rev: 2025.02.10
     hooks:
-      - id: pyupgrade
+      - id: validate-pyproject
+        alias: validate-pyproject-full
         stages: [manual]
-        args: [--py38-plus]
-  - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.8.4
+
+  # * checkmake
+  - repo: https://github.com/mrtazz/checkmake.git
+    # Or another commit hash or version
+    rev: 0.2.2
     hooks:
-      - id: nbqa-pyupgrade
-        additional_dependencies: [pyupgrade]
+      - id: checkmake
         stages: [manual]
-        args: [--py38-plus]
 
   # ** typos
   # Probably stick with codespell, but this might also be nice...
   - repo: https://github.com/crate-ci/typos
-    rev: v1.19.0
+    rev: typos-dict-v0.12.5
     hooks:
       - id: typos
         stages: [manual]
-        exclude: "[.]ipynb$"
+        exclude: "[.]ipynb$|^uv[.]lock$|^requirements"
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.8.4
+    rev: 1.9.1
     hooks:
       - id: nbqa
         alias: nbqa-typos
         name: nbqa-typos
-        additional_dependencies: &typos-deps [typos==1.19.0] # make sure save version as above.
+        additional_dependencies: &typos-deps [typos==1.29.7] # make sure save version as above.
         stages: [manual]
         args: [typos, --nbqa-shell]
+        # this can lead to errors, so use with care
+        # args: [typos, --write-changes, --nbqa-shell]
       - id: nbqa
         alias: nbqa-typos
         name: nbqa-typos-markdown
         additional_dependencies: *typos-deps
         stages: [manual]
         args: [typos, --nbqa-shell, --nbqa-md]
+        # this can lead to errors, so use with care
+        # args: [typos, --write-changes, --nbqa-shell, --nbqa-md]

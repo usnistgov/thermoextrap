@@ -1,8 +1,15 @@
-################################################################################
-# * Utilities
-################################################################################
-.PHONY: clean clean-test clean-pyc clean-build help
+# * Utilities -----------------------------------------------------------------
+.PHONY: all clean clean-test clean-pyc clean-build help
 .DEFAULT_GOAL := help
+
+
+_PY_DEFAULT = $(shell cat .python-version | sed "s/\.//")
+UVRUN = uv run --frozen
+UVXRUN = $(UVRUN) --no-config tools/uvxrun.py
+UVXRUN_OPTS = -r requirements/lock/py$(_PY_DEFAULT)-uvxrun-tools.txt -v
+UVXRUN_NO_PROJECT = uv run --with "packaging" --no-project tools/uvxrun.py
+NOX=uvx --from "nox>=2024.10.9" nox
+PRE_COMMIT = uvx pre-commit
 
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
@@ -24,10 +31,12 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
-BROWSER := python -c "$$BROWSER_PYSCRIPT"
+BROWSER := $(UVRUN) --no-config python -c "$$BROWSER_PYSCRIPT"
 
 help:
-	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
+	@$(UVRUN) python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
+
+all: help
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
@@ -39,10 +48,10 @@ clean-build: ## remove build artifacts
 
 
 clean-pyc: ## remove Python file artifacts
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
+	find ./src -name '*.pyc' -exec rm -f {} +
+	find ./src -name '*.pyo' -exec rm -f {} +
+	find ./src -name '*~' -exec rm -f {} +
+	find ./src -name '__pycache__' -exec rm -fr {} +
 
 clean-nox: ## remove all nox artifacts
 	rm -fr .nox
@@ -53,109 +62,110 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 
-
-################################################################################
-# * Pre-commit
-################################################################################
-.PHONY: pre-commit-init pre-commit pre-commit-all
+# * Pre-commit -----------------------------------------------------------------
+.PHONY: pre-commit-init lint codespell typos ruff ruff-format ruff-all checkmake
 pre-commit-init: ## install pre-commit
-	pre-commit install
+	$(PRE_COMMIT) install
 
-pre-commit-all: ## run pre-commit on all files
-	pre-commit run --all-files
+_PRE_COMMIT_RUN = $(PRE_COMMIT) run --all-files
+_PRE_COMMIT_RUN_MANUAL = $(_PRE_COMMIT_RUN) --hook-stage=manual
+lint: ## run pre-commit on all files
+	$(_PRE_COMMIT_RUN)
 
-pre-commit-codespell: ## run codespell. Note that this imports allowed words from docs/spelling_wordlist.txt
-	pre-commit run --all-files codespell
-	pre-commit run --all-files nbqa-codespell
+lint-all: ## run pre-commit using manual stage
+	$(_PRE_COMMIT_RUN_MANUAL)
 
-pre-commit-typos:  ## run typos.
-	pre-commit run --all-files --hook-stage manual typos
-	pre-commit run --all-files --hook-stage manual nbqa-typos
+codespell: ## run codespell. Note that this imports allowed words from docs/spelling_wordlist.txt
+	$(_PRE_COMMIT_RUN) codespell
+	$(_PRE_COMMIT_RUN) nbqa-codespell
 
-################################################################################
-# * User setup
-################################################################################
-.PHONY: user-autoenv-zsh user-all
+typos:  ## run typos.
+	$(_PRE_COMMIT_RUN_MANUAL) typos
+	$(_PRE_COMMIT_RUN_MANUAL) nbqa-typos
+
+ruff: ## run ruff linters
+	$(_PRE_COMMIT_RUN) ruff
+
+ruff-format: ## run ruff formatter
+	$(_PRE_COMMIT_RUN) ruff-format
+
+ruff-all: ## run ruff lint and format
+	$(_PRE_COMMIT_RUN) ruff-all
+
+checkmake:  ## run checkmake
+	$(_PRE_COMMIT_RUN_MANUAL) checkmake
+
+
+# * User setup -----------------------------------------------------------------
+.PHONY: user-autoenv-zsh dev user-all
 user-autoenv-zsh: ## create .autoenv.zsh files
-	echo conda activate ./.venv > .autoenv.zsh
-	echo conda deactivate > .autoenv_leave.zsh
+	echo source ./.venv/bin/activate > .autoenv.zsh
+	echo autostash NUMBA_CACHE_DIR=$(PWD)/.numba_cache >> .autoenv.zsh
+	echo deactivate > .autoenv_leave.zsh
 
 user-all: user-autoenv-zsh ## runs user scripts
 
 
-################################################################################
-# * Testing
-################################################################################
+# * Testing --------------------------------------------------------------------
 .PHONY: test coverage
 test: ## run tests quickly with the default Python
-	pytest -x -v
+	$(UVRUN) pytest
 
 test-accept: ## run tests and accept doctest results. (using pytest-accept)
-	DOCFILLER_SUB=False pytest -v --accept
-
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source thermoextrap -m pytest
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
+	DOCFILLER_SUB=False $(UVRUN) pytest -v --accept
 
 
-################################################################################
-# * Versioning
-################################################################################
+# * Versioning -----------------------------------------------------------------
 .PHONY: version-scm version-import version
 
 version-scm: ## check/update version of package from scm
-	nox -s build -- ++build version
+	$(NOX) -s build -- ++build version
 
 version-import: ## check version from python import
-	-python -c 'import thermoextrap; print(thermoextrap.__version__)'
+	-uv run python -c 'import thermoextrap; print(thermoextrap.__version__)'
 
 version: version-scm version-import
 
-################################################################################
-# * Requirements/Environment files
-################################################################################
+
+# * Requirements/Environment files ---------------------------------------------
 .PHONY: requirements
 requirements: ## rebuild all requirements/environment files
-	nox -s requirements
-requirements/%.yaml: pyproject.toml
-	nox -s requirements
-requirements/%.txt: pyproject.toml
-	nox -s requirements
+	$(NOX) -s requirements
 
-################################################################################
-# * Typing
-################################################################################
-PIPXRUN = python tools/pipxrun.py
-PIPXRUN_OPTS = -r requirements/lock/py311-pipxrun-tools.txt -v
-.PHONY: mypy pyright
+
+# * Typing ---------------------------------------------------------------------
+.PHONY: mypy pyright pyright-watch pylint _typecheck typecheck
+PYLINT_OPTS = --enable-all-extensions
 mypy: ## Run mypy
-	$(PIPXRUN) $(PIPXRUN_OPTS) -c mypy
+	$(UVXRUN) $(UVXRUN_OPTS) -c mypy
 pyright: ## Run pyright
-	$(PIPXRUN) $(PIPXRUN_OPTS) -c pyright
-typecheck: ## Run mypy and pyright
-	$(PIPXRUN) $(PIPXRUN_OPTS) -c mypy -c pyright
+	$(UVXRUN) $(UVXRUN_OPTS) -c pyright
+pyright-watch: ## Run pyright in watch mode
+	$(UVXRUN) $(UVXRUN_OPTS) -c "pyright -w"
+pylint: ## Run pylint
+	$(UVRUN) pylint $(PYLINT_OPTS) src tests
+_typecheck:
+	$(UVXRUN) $(UVXRUN_OPTS) -c mypy -c pyright
+typecheck: _typecheck pylint ## Run mypy and pyright
 
-.PHONY: typecheck-tools
-typecheck-tools:
-	$(PIPXRUN) $(PIPXRUN_OPTS) -c "mypy --strict" -c pyright -- noxfile.py tools/*.py
+.PHONY: tools-typecheck
+tools-typecheck:
+	$(UVXRUN) $(UVXRUN_OPTS) -c "mypy --strict" -c pyright -- noxfile.py tools/*.py
+	$(UVRUN) pylint $(PYLINT_OPTS) noxfile.py tools
 
-################################################################################
-# * NOX
-###############################################################################
-NOX=nox
+# * NOX ------------------------------------------------------------------------
 # ** docs
-.PHONY: docs-build docs-clean docs-clean-build docs-release
-docs-build: ## build docs in isolation
-	$(NOX) -s docs -- +d build
+.PHONY: docs-html docs-clean docs-clean-build docs-release
+docs-html: ## build html docs
+	$(NOX) -s docs -- +d html
+docs-build: docs-html ## alias to docs-html
 docs-clean: ## clean docs
 	rm -rf docs/_build/*
 	rm -rf docs/generated/*
 	rm -rf docs/reference/generated/*
 docs-clean-build: docs-clean docs-build ## clean and build
 docs-release: ## release docs.
-	$(PIPXRUN) $(PIPXRUN_OPTS) -c "ghp-import -o -n -m \"update docs\" -b nist-pages" docs/_build/html
+	$(UVXRUN_NO_PROJECT) $(UVXRUN_OPTS) -c "ghp-import -o -n -m \"update docs\" -b nist-pages" docs/_build/html
 
 .PHONY: docs-open docs-spelling docs-livehtml docs-linkcheck
 docs-open: ## open the build
@@ -168,22 +178,32 @@ docs-linkcheck: ## check links
 	$(NOX) -s docs -- +d linkcheck
 
 # ** typing
-.PHONY: typing-mypy typing-pyright typing-typecheck
+.PHONY: typing-mypy typing-pyright typing-pylint typing-typecheck
 typing-mypy: ## run mypy mypy_args=...
 	$(NOX) -s typing -- +m mypy
 typing-pyright: ## run pyright pyright_args=...
 	$(NOX) -s typing -- +m pyright
+typing-pylint: ## run pylint
+	$(NOX) -s pylint -- +m pylint
 typing-typecheck:
-	$(NOX) -s typing -- +m mypy pyright
+	$(NOX) -s typing -- +m mypy pyright pylint
 
 # ** dist pypi
-.PHONY: build testrelease release
+.PHONY: build publish publish-test
 build: ## build dist
 	$(NOX) -s build
-testrelease: ## test release on testpypi
-	$(NOX) -s publish -- +p test
-release: ## release to pypi, can pass posargs=...
+publish: ## publish to pypi
 	$(NOX) -s publish -- +p release
+publish-test: ## publish to testpypi
+	$(NOX) -s publish -- +p test
+
+.PHONY: uv-publish uv-publish-test
+_UV_PUBLISH = uv publish --username __token__ --keyring-provider subprocess
+uv-publish: ## uv release
+	$(_UV_PUBLISH)
+uv-publish-test: ## uv test release on testpypi
+	$(_UV_PUBLISH) --publish-url https://test.pypi.org/legacy/
+
 
 # ** dist conda
 .PHONY: conda-recipe conda-build
@@ -197,15 +217,15 @@ conda-build: ## build conda recipe can pass posargs=...
 nox-list:
 	$(NOX) --list
 
-################################################################################
-# ** sdist/wheel check
-################################################################################
+
+# ** sdist/wheel check ---------------------------------------------------------
 .PHONY: check-release check-wheel check-dist
 check-release: ## run twine check on dist
 	$(NOX) -s publish -- +p check
 check-wheel: ## Run check-wheel-contents (requires check-wheel-contents to be installed)
-	$(PIPXRUN) -c check-wheel-contents dist/*.whl
+	$(UVXRUN_NO_PROJECT) -c check-wheel-contents dist/*.whl
 check-dist: check-release check-wheel ## Run check-release and check-wheel
+
 .PHONY:  list-wheel list-sdist list-dist
 list-wheel: ## Cat out contents of wheel
 	unzip -vl dist/*.whl
@@ -213,43 +233,52 @@ list-sdist: ## Cat out contents of sdist
 	tar -tzvf dist/*.tar.gz
 list-dist: list-wheel list-sdist ## Cat out sdist and wheel contents
 
-################################################################################
-# * NOTEBOOK typing/testing
-################################################################################
-NOTEBOOKS ?= examples/usage
-NBQA = $(PIPXRUN) $(PIPXRUN_OPTS) -c "nbqa --nbqa-shell \"$(PIPXRUN)\" $(NOTEBOOKS) $(PIPXRUN_OPTS) $(_NBQA)"
-.PHONY: mypy-notebook pyright-notebook typecheck-notebook test-notebook
-mypy-notebook: _NBQA = -c mypy
-mypy-notebook: ## run nbqa mypy
+
+# * NOTEBOOK -------------------------------------------------------------------
+NOTEBOOKS ?= examples/usage/basic
+# NOTE: use this because nested call back in nox has errors with uv run...
+_PYTHON = $(shell which python)
+_NBQA_UVXRUN = $(_PYTHON) tools/uvxrun.py
+NBQA = $(_NBQA_UVXRUN) $(UVXRUN_OPTS) -c "nbqa --nbqa-shell \"$(_NBQA_UVXRUN)\" $(NOTEBOOKS) $(UVXRUN_OPTS) $(_NBQA)"
+.PHONY: notebook-mypy notebook-pyright notebook-pylint notebook-typecheck notebook-test
+notebook-mypy: _NBQA = -c mypy
+notebook-mypy: ## run nbqa mypy
 	$(NBQA)
-pyright-notebook: _NBQA = -c pyright
-pyright-notebook: ## run nbqa pyright
+notebook-pyright: _NBQA = -c pyright
+notebook-pyright: ## run nbqa pyright
 	$(NBQA)
-typecheck-notebook: _NBQA = -c mypy -c pyright
-typecheck-notebook: ## run nbqa mypy/pyright
+notebook-pylint:: ## run nbqa pylint
+	$(_NBQA_UVXRUN) $(UVXRUN_OPTS) -c "nbqa --nbqa-shell \"$(_PYTHON) -m pylint $(PYLINT_OPTS)\" $(NOTEBOOKS)"
+notebook-typecheck: _NBQA = -c mypy -c pyright
+notebook-typecheck: notebook-pylint ## run nbqa mypy/pyright
 	$(NBQA)
-test-notebook:  ## run pytest --nbval
-	pytest --nbval --nbval-current-env --nbval-sanitize-with=config/nbval.ini --dist loadscope -x $(NOTEBOOKS)
+notebook-test:  ## run pytest --nbval
+	$(UVRUN) pytest --nbval --nbval-current-env --nbval-sanitize-with=config/nbval.ini --dist loadscope -x $(NOTEBOOKS)
 
 .PHONY: clean-kernelspec
 clean-kernelspec: ## cleanup unused kernels (assuming notebooks handled by conda environment notebook)
-	python tools/clean_kernelspec.py
+	$(UVRUN) tools/clean_kernelspec.py
 
-################################################################################
-# * Other tools
-################################################################################
+.PHONY: install-kernel
+install-kernel:  ## install kernel
+	$(UVRUN) python -m ipykernel install --user \
+	--name thermoextrap-dev \
+    --display-name "Python [venv: thermoextrap-dev]"
+
+
+# * Other tools ----------------------------------------------------------------
 # Note that this requires `auto-changelog`, which can be installed with pip(x)
 .PHONY: auto-changelog
 auto-changelog: ## autogenerate changelog and print to stdout
-	auto-changelog -u -r usnistgov -v unreleased --tag-prefix v --stdout --template changelog.d/templates/auto-changelog/template.jinja2
+	uvx auto-changelog -u -r usnistgov -v unreleased --tag-prefix v --stdout --template changelog.d/templates/auto-changelog/template.jinja2
 
 .PHONY:
 commitizen-changelog:
-	cz changelog --unreleased-version unreleased --dry-run --incremental
+	uvx --from="commitizen" cz changelog --unreleased-version unreleased --dry-run --incremental
 
 # tuna analyze load time:
 .PHONY: tuna-analyze
-tuna-import: ## Analyze load time for module
-	python -X importtime -c 'import thermoextrap' 2> tuna-loadtime.log
-	$(PIPXRUN) -c tuna tuna-loadtime.log
+tuna-import	: ## Analyze load time for module
+	$(UVRUN) python -X importtime -c 'import thermoextrap' 2> tuna-loadtime.log
+	uvx tuna tuna-loadtime.log
 	rm tuna-loadtime.log

@@ -47,10 +47,11 @@ def load_data():
 def prepare_data(lnpi_data, energy, mu, temp, order, beta):
     beta = 1.0 / temp
     mu = xr.DataArray(np.atleast_1d(mu), dims=["comp"])
-    lnpi_data = xr.DataArray(lnpi_data, dims=["n"])
-
-    # adjust lnpi_data to have lnpi_data[n=0] = 0
-    lnpi_data = lnpi_data - lnpi_data.sel(n=0)
+    lnpi_data = (
+        xr.DataArray(lnpi_data, dims=["n"])
+        # adjust lnpi_data to have lnpi_data[n=0] = 0
+        .pipe(lambda x: x - x.sel(n=0))
+    )
 
     # have to include mom = 0
     a = np.ones_like(lnpi_data)
@@ -67,7 +68,7 @@ def prepare_data(lnpi_data, energy, mu, temp, order, beta):
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_data():
     ref, samples = load_data()
     ref = prepare_data(**ref)
@@ -75,22 +76,22 @@ def sample_data():
     return ref, samples
 
 
-@pytest.fixture()
-def ref(sample_data):
+@pytest.fixture
+def ref(sample_data):  # noqa: FURB118
     return sample_data[0]
 
 
-@pytest.fixture()
-def samples(sample_data):
+@pytest.fixture
+def samples(sample_data):  # noqa: FURB118
     return sample_data[1]
 
 
-@pytest.fixture()
+@pytest.fixture
 def betas(samples):
     return np.unique([s["beta"] for s in samples])
 
 
-@pytest.fixture()
+@pytest.fixture
 def temps(betas):
     return np.round(1.0 / betas, 3)
 
@@ -101,19 +102,19 @@ def test_data(ref, samples, betas) -> None:
     assert isinstance(betas, np.ndarray)
 
 
-@pytest.fixture()
+@pytest.fixture
 def data_u(ref, central):
     return xtrap.DataCentralMoments.from_ave_raw(
         u=ref["energy"], xu=None, x_is_u=True, central=central, meta=None
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_u(data_u, ref):
     return xtrap.beta.factory_extrapmodel(beta=ref["beta"], data=data_u, name="u_ave")
 
 
-@pytest.fixture()
+@pytest.fixture
 def out_u(em_u, betas):
     return em_u.predict(betas, cumsum=True)
 
@@ -125,24 +126,24 @@ def test_out_u(samples, out_u) -> None:
         np.testing.assert_allclose(a, b, rtol=1e-5)
 
 
-@pytest.fixture()
+@pytest.fixture
 def meta_lnpi(ref):
     return xtrap.lnpi.lnPiDataCallback(
         ref["lnpi_data"], ref["mu"], dims_n=["n"], dims_comp="comp"
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def data_lnpi(data_u, meta_lnpi):
     return data_u.new_like(meta=meta_lnpi)
 
 
-@pytest.fixture()
+@pytest.fixture
 def em_lnpi(data_lnpi, ref):
     return xtrap.lnpi.factory_extrapmodel_lnPi(beta=ref["beta"], data=data_lnpi)
 
 
-@pytest.fixture()
+@pytest.fixture
 def out_lnpi(em_lnpi, betas):
     return (
         em_lnpi.predict(betas, cumsum=True)

@@ -185,7 +185,7 @@ def to_mean_var(da, dim, concat_dim=None, concat_kws=None, **kws):
 
 def states_derivs_concat(states, dim=None, concat_kws=None, **kws):
     """
-    Concatanate [s.derivs(norm=False) for s in states].
+    Concatenate [s.derivs(norm=False) for s in states].
 
     Parameters
     ----------
@@ -446,7 +446,7 @@ class StackedDerivatives:
         )
 
     @classmethod
-    def from_states(  # noqa: PLR0913
+    def from_states(
         cls,
         states,
         x_dims,
