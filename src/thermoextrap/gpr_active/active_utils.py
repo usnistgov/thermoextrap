@@ -1162,7 +1162,7 @@ class UpdateFuncBase(UpdateStopABC):
         new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)
 
         if self.log_scale:
-            new_alpha = 10.0 ** (new_alpha)  # noqa: PLR6104
+            new_alpha = 10.0 ** (new_alpha)
 
         return new_alpha, pred_mu, pred_std
 
