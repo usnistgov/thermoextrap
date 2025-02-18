@@ -17,6 +17,15 @@ See the fragment files in [changelog.d]
 
 <!-- scriv-insert-here -->
 
+## v0.6.0 — 2025-02-18
+
+### Changed
+
+- Project now setup to use [uv](https://github.com/astral-sh/uv) with lock file.
+- Updated code to use latest version of
+  [cmomy](https://github.com/usnistgov/cmomy)
+- Initial work for adding typing to code.
+
 ## v0.5.0 — 2024-03-15
 
 ### Removed
