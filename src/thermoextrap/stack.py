@@ -47,7 +47,7 @@ def stack_dataarray(  # noqa: C901
         input DataArray
     x_dims : str or sequence of str
         dimensions stacked under `xstack_dim`
-    y_dims : str or sequance of str, optional
+    y_dims : str or sequence of str, optional
         dimensions stacked under `ystack_dim`.
         Defaults to all dimensions not specified by `x_dims` or `stats_dim`.
     xstack_dim, ystack_dim : str
