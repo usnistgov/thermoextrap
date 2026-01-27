@@ -1,5 +1,6 @@
 """Classes/routines to deal with thermodynamic extrapolation."""
 # pylint: disable=duplicate-code
+# ruff: noqa: RUF067
 
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _version

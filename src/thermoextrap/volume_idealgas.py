@@ -151,7 +151,7 @@ def factory_extrapmodel_data(
         reference value of volume
     data : object
         Note that this data object should have central=False, deriv_dim=None
-    alpha_name, str, default='volume'
+    alpha_name : str, default='volume'
         name of expansion parameter
 
     Returns
