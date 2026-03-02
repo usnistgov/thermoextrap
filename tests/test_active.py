@@ -302,9 +302,19 @@ def test_train_gp(sampler: SamplerType) -> None:
     output = active_utils.train_GPR(gp, record_loss=True)
     assert output is not None
 
-    ref_params = [4.9320208698871015, 17.07650174925236, 0.0, 4.3460319697777543e-16]
+    # ref_params = [4.9320208698871015, 17.07650174925236, 0.0, 4.3460319697777543e-16]  # with L-BFGS-B minimize
+    ref_params = [
+        5.0146512540878225,
+        18.083488371624117,
+        0.0,
+        1.0677842958152827e-09,
+    ]  # with SLSQP minimize
+
+    # print(gp.parameters)
+    # raise ValueError(f"hello {gp.parameters}")
     for p, rp in zip(gp.parameters, ref_params):
-        np.testing.assert_allclose(p.numpy(), rp, rtol=1e-01, atol=1e-12)
+        # np.testing.assert_allclose(p.numpy(), rp, rtol=1e-1, atol=1e-12)  # for L-BFGS-B
+        np.testing.assert_allclose(p.numpy(), rp, rtol=1e-7, atol=0)
 
     # Also test training from a different starting point
     # Not checking for specific behavior here, just seeing if runs

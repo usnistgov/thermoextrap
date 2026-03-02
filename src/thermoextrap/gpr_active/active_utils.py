@@ -883,7 +883,11 @@ def train_GPR(
 
         # Perform optimization starting with provided values
         loss_info_new = optim.minimize(
-            gpr.training_loss, gpr.trainable_variables, method="SLSQP", compile=False
+            # gpr.training_loss, gpr.trainable_variables, method="SLSQP", compile=False
+            gpr.training_loss,
+            gpr.trainable_variables,
+            method="SLSQP",
+            compile=False,
         )
 
         # Make sure one or both losses are not NaN

@@ -1321,7 +1321,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         whether or not to constrain parameters when training GP model
     """
 
-    def __init__(  # noqa: C901
+    def __init__(  # noqa: C901, PLR0912
         self,
         expr: Expr,
         x_data: NDArrayAny,
@@ -1408,7 +1408,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
                 method="L-BFGS-B",
                 jac=jac_func,
             )
-            logging.info("optimization opt: %s", opt)
+            logger.info("optimization opt: %s", opt)
 
             # Set parameters based on optimization
             for i, s in enumerate(self.param_syms):
