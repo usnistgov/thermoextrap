@@ -1,38 +1,9 @@
-[tool.pylint.similarities]
-ignore-imports = "yes"
-
-[tool.pylint.basic]
-no-docstring-rgx = "__.*__|test[A-Z_].*|_decorator|_wrapper|_.*__.*"
-
-[tool.pylint.classes]
-defining-attr-methods = [
-    "__init__",
-    "__new__",
-    "__post_init__",
-    "setUp",
-    "reset",
-    "_reset",
-]
-
-[tool.pylint.design]
-max-args = 15
-max-attributes = 40
-max-bool-expr = 5
-max-branches = 50
-max-locals = 50
-max-parents = 12
-max-positional-arguments = 15
-max-public-methods = 500
-max-returns = 20
-max-statements = 150
-min-public-methods = 0
-
-[tool.pylint."messages control"]
-enable = [
+[tool.pylint]
+"messages control".enable = [
     # "useless-suppression",
     "all",
 ]
-disable = [
+"messages control".disable = [
     # defer to ruff
     "line-too-long",
     "missing-module-docstring",
@@ -66,6 +37,25 @@ disable = [
     "consider-using-augmented-assign",
     "import-error",                                   # defer to pyright
 ]
-
-[tool.pylint.reports]
-output-format = "colorized"
+basic.no-docstring-rgx = "__.*__|test[A-Z_].*|_decorator|_wrapper|_.*__.*"
+classes.defining-attr-methods = [
+    "__init__",
+    "__new__",
+    "__post_init__",
+    "setUp",
+    "reset",
+    "_reset",
+]
+design.max-args = 15
+design.max-attributes = 40
+design.max-bool-expr = 5
+design.max-branches = 50
+design.max-locals = 50
+design.max-parents = 12
+design.max-positional-arguments = 15
+design.max-public-methods = 500
+design.max-returns = 20
+design.max-statements = 150
+design.min-public-methods = 0
+reports.output-format = "colorized"
+similarities.ignore-imports = "yes"
