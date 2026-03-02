@@ -1313,15 +1313,23 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         dictionary specifying starting parameter values for the mean function;
         in other words, these values will be substituted into the sympy
         expression to start with
+    x_dim : int, default 1
+        dimension of the input (x)
+    do_fit : bool, default True
+        whether or not to fit on data before training GP model
+    constrain_params : bool, default True
+        whether or not to constrain parameters when training GP model
     """
 
-    def __init__(  # noqa: C901
+    def __init__(  # noqa: C901, PLR0912
         self,
         expr: Expr,
         x_data: NDArrayAny,
         y_data: NDArrayAny,
         params: OptionalKwsAny | None = None,
         x_dim: int = 1,
+        do_fit: bool = True,
+        constrain_params: bool = True,
     ) -> None:
         super().__init__()
         # Set dimensions of y data and x data
@@ -1333,7 +1341,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         x_syms = []
         param_syms = []
         for s in expr.free_symbols:
-            if s.name.casefold() == "x":  # pyright: ignore[reportAttributeAccessIssue]
+            if "x" in s.name.casefold():  # pyright: ignore[reportAttributeAccessIssue]
                 x_syms.append(s)
             else:
                 param_syms.append(s)
@@ -1344,8 +1352,8 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         self.param_syms = param_syms
 
         # Make sure that parameters here match those in params, if it's provided
-        if params:
-            if [s.name for s in self.param_syms].sort() != list(params.keys()).sort():
+        if params is not None:
+            if {s.name for s in self.param_syms} != set(params.keys()):
                 raise ValueError("Symbol names in expr must match keys in " + "params!")
             # If they are the same, obtain parameter values from params dictionary
             # Need to set as gpflow Parameter objects so can optimize over them
@@ -1357,58 +1365,72 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             for s in self.param_syms:
                 setattr(self, s.name, 1.0)
 
-        # Create function at zeroth order
-        mean_func = lambdify_with_defaults(
-            (*self.x_syms, *self.param_syms), self.expr, modules="numpy"
-        )
-        # And also wrap derivatives w.r.t. parameters for Jacobian
-        deriv_funcs = []
-        for p_sym in self.param_syms:
-            this_jac = sp.diff(self.expr, p_sym, 1)
-            deriv_funcs.append(
-                lambdify_with_defaults(
-                    (*self.x_syms, *self.param_syms), this_jac, modules="numpy"
-                )
+        if do_fit:
+            # Create function at zeroth order
+            mean_func = lambdify_with_defaults(
+                (*self.x_syms, *self.param_syms), self.expr, modules="numpy"
             )
+            # And also wrap derivatives w.r.t. parameters for Jacobian
+            deriv_funcs = []
+            for p_sym in self.param_syms:
+                this_jac = sp.diff(self.expr, p_sym, 1)
+                deriv_funcs.append(
+                    lambdify_with_defaults(
+                        (*self.x_syms, *self.param_syms), this_jac, modules="numpy"
+                    )
+                )
 
-        # Create loss function
-        def loss_func(params: Iterable[Any]) -> float:
-            return float(
-                np.sum(
+            # Create loss function
+            def loss_func(params: Iterable[Any]) -> float:
+                return np.sum(  # type: ignore[no-any-return]
                     (
                         mean_func(*np.split(x_data, self.x_dim, axis=-1), *params)
                         - y_data
                     )
                     ** 2
                 )
+
+            # And create Jacobian function
+            def jac_func(params: Iterable[Any]) -> NDArrayAny:
+                prefac = 2.0 * (mean_func(x_data, *params) - y_data)
+                jac = [
+                    np.sum(
+                        prefac * deriv(*np.split(x_data, self.x_dim, axis=-1), *params)
+                    )
+                    for deriv in deriv_funcs
+                ]
+                return np.array(jac)
+
+            # Perform optimization with scipy
+            opt = optimize.minimize(
+                loss_func,
+                np.array([getattr(self, s.name) for s in self.param_syms]),
+                method="L-BFGS-B",
+                jac=jac_func,
             )
+            logger.info("optimization opt: %s", opt)
 
-        # And create Jacobian function
-        def jac_func(params: Iterable[Any]) -> NDArrayAny:
-            prefac = 2.0 * (mean_func(x_data, *params) - y_data)
-            jac = [
-                np.sum(prefac * deriv(*np.split(x_data, self.x_dim, axis=-1), *params))
-                for deriv in deriv_funcs
-            ]
-            return np.array(jac)
+            # Set parameters based on optimization
+            for i, s in enumerate(self.param_syms):
+                setattr(
+                    self,
+                    s.name,
+                    gpflow.Parameter(opt.x[i], trainable=(not constrain_params)),
+                )
 
-        # Perform optimization with scipy
-        opt = optimize.minimize(
-            loss_func,
-            np.array([getattr(self, s.name) for s in self.param_syms]),
-            method="L-BFGS-B",
-            jac=jac_func,
-        )
-        logger.info("optimization opt: %s", opt)
-
-        # Set parameters based on optimization
-        for i, s in enumerate(self.param_syms):
-            setattr(self, s.name, opt.x[i])
+        else:
+            for s in self.param_syms:
+                this_val = getattr(self, s.name)
+                setattr(
+                    self,
+                    s.name,
+                    gpflow.Parameter(this_val, trainable=(not constrain_params)),
+                )
 
     def __call__(self, X: TensorType) -> tf.Tensor:
         """Closely follows K_diag from DerivativeKernel."""
         x_vals = X[:, : self.x_dim]
-        d_vals = X[:, self.x_dim :]
+        d_vals = tf.cast(X[:, self.x_dim :], tf.int32)
         unique_d = tf.raw_ops.UniqueV2(x=d_vals, axis=[0])[0]
         unique_d = tf.cast(unique_d, tf.int32)
         f_list = []
