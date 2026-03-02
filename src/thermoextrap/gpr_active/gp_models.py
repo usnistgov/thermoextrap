@@ -1352,8 +1352,8 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         self.param_syms = param_syms
 
         # Make sure that parameters here match those in params, if it's provided
-        if bool(params):
-            if [s.name for s in self.param_syms].sort() != list(params.keys()).sort():
+        if params is not None:
+            if {s.name for s in self.param_syms} != set(params.keys()):
                 raise ValueError("Symbol names in expr must match keys in " + "params!")
             # If they are the same, obtain parameter values from params dictionary
             # Need to set as gpflow Parameter objects so can optimize over them
@@ -1382,7 +1382,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
 
             # Create loss function
             def loss_func(params: Iterable[Any]) -> float:
-                return np.sum(
+                return np.sum(  # type: ignore[no-any-return]
                     (
                         mean_func(*np.split(x_data, self.x_dim, axis=-1), *params)
                         - y_data
