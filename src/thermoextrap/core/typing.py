@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import (
-    Callable,
-    Hashable,
-    Iterable,
+    Callable,  # noqa: F401
+    Hashable,  # noqa: F401
+    Iterable,  # noqa: F401
     Iterator,
     Mapping,
     Sequence,
@@ -22,7 +22,6 @@ from typing import (
     Literal,
     Protocol,
     SupportsIndex,
-    Union,
     overload,
     runtime_checkable,
 )
@@ -35,10 +34,12 @@ from numpy.typing import NDArray
 from .typing_compat import Self, TypeAlias, TypeVar
 
 if TYPE_CHECKING:
-    import tensorflow as tf
+    import tensorflow as tf  # noqa: F401
     from cmomy.resample.typing import SamplerType
     from numpy.typing import ArrayLike
-    from sympy.core.expr import Expr  # pyright: ignore[reportMissingTypeStubs]
+    from sympy.core.expr import (  # pyright: ignore[reportMissingTypeStubs]
+        Expr,  # noqa: F401
+    )
 
 
 DataT = TypeVar("DataT", xr.DataArray, xr.Dataset, default=xr.DataArray)
@@ -50,20 +51,21 @@ T_co = TypeVar("T_co", covariant=True)
 _T = TypeVar("_T")
 
 NDArrayOrDataArrayT = TypeVar(
-    "NDArrayOrDataArrayT", bound=Union[NDArray[Any], xr.DataArray]
+    "NDArrayOrDataArrayT",
+    bound="NDArray[Any] | xr.DataArray",
 )
 
 # * Alias
-XArrayObj: TypeAlias = Union[xr.DataArray, xr.Dataset]
-OptionalKws: TypeAlias = Union[Mapping[str, _T], None]
-OptionalKwsAny: TypeAlias = OptionalKws[Any]
+XArrayObj: TypeAlias = "xr.DataArray | xr.Dataset"
+OptionalKws: TypeAlias = "Mapping[str, _T]| None"
+OptionalKwsAny: TypeAlias = "OptionalKws[Any]"
 SingleDim: TypeAlias = str
-MultDims: TypeAlias = Union[str, Sequence[Hashable]]
-PostFunc: TypeAlias = Union[str, Callable[["Expr"], "Expr"], None]
-OptionalRng: TypeAlias = Union[np.random.Generator, None]
+MultDims: TypeAlias = "str | Sequence[Hashable]"
+PostFunc: TypeAlias = "str | Callable[[Expr], Expr] | None"
+OptionalRng: TypeAlias = "np.random.Generator | None"
 NDArrayAny: TypeAlias = NDArray[Any]
 
-TensorType: TypeAlias = Union[NDArrayAny, "tf.Tensor"]
+TensorType: TypeAlias = "NDArrayAny| tf.Tensor"
 
 # DataDerivArgs: TypeAlias = "tuple[XArrayObj | DataSelector[xr.DataArray] | DataSelector[xr.Dataset], ...]"   # more specific, but not needed.
 DataDerivArgs: TypeAlias = "tuple[Any, ...]"
@@ -75,11 +77,9 @@ SymDerivNames = Literal[
 ]
 
 StackPolicy = Literal["infer", "raise"]
-ApplyReduceFuncs: TypeAlias = Union[
-    str,
-    Callable[..., Any],
-    Iterable[Union[str, Callable[..., Any]]],
-]
+ApplyReduceFuncs: TypeAlias = (
+    "str | Callable[..., Any] | Iterable[str | Callable[..., Any]]"
+)
 
 
 # * Protocols

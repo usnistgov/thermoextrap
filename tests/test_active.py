@@ -516,7 +516,7 @@ def test_metrics(rng: Generator, sampler: SamplerType) -> None:
     # Use to test _check_history function for all inheriting classes
     # pylint: disable=protected-access
     np.testing.assert_raises(ValueError, check_base._check_history, None)
-    np.testing.assert_raises(ValueError, check_base._check_history, x)  # type: ignore[call-overload]  # pyright: ignore[reportArgumentType]
+    np.testing.assert_raises(ValueError, check_base._check_history, x)  # type: ignore[call-overload]
     check_base._check_history(hist)
     # And generic call and calc_metric both work
     np.testing.assert_raises(NotImplementedError, check_base, hist, x, None)

@@ -16,6 +16,7 @@ import tensorflow as tf
 from scipy import optimize
 
 from thermoextrap.core.sputils import lambdify_with_defaults
+from thermoextrap.core.typing_compat import override
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -162,6 +163,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         # return self.lengthscales.shape.ndims > 0
         return False
 
+    @override
     def K(self, X: TensorType, X2: TensorType | None = None) -> Tensor:
         if X2 is None:
             X2 = X
@@ -236,6 +238,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         # Reshape to the correct output
         return tf.reshape(k_list_stitch, (x1.shape[0], x2.shape[0]))
 
+    @override
     def K_diag(self, X: TensorType) -> Tensor:
         # Same as for K but don't need every combination, just every x with itself
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
@@ -926,6 +929,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         out_diag += self.stable_var_min
         return tf.linalg.set_diag(output, out_diag)
 
+    @override
     def _scalar_log_prob(
         self,
         X: TensorType,
@@ -936,14 +940,17 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
             Y, F, tf.linalg.cholesky(self.build_scaled_cov_mat(X))
         )
 
+    @override
     def _conditional_mean(self, X: TensorType, F: TensorType) -> tf.Tensor:
         return tf.identity(F)  # type: ignore[no-any-return]
 
+    @override
     def _conditional_variance(self, X: TensorType, F: TensorType) -> tf.Tensor:
         # Returns full covariance for INPUT Y data
         # May not fit with expected behavior, so could consider making "Not Implemented"
         return self.build_scaled_cov_mat(X)
 
+    @override
     def _predict_mean_and_var(
         self,
         X: TensorType,
@@ -955,6 +962,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
         raise NotImplementedError(msg)
 
+    @override
     def _predict_log_density(
         self,
         X: TensorType,
@@ -967,6 +975,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
         raise NotImplementedError(msg)
 
+    @override
     def _variational_expectations(
         self,
         X: TensorType,
@@ -1093,6 +1102,7 @@ class HeteroscedasticGPR(
         super().__init__(kernel, likelihood, mean_function, num_latent_gps=1)
         self.data = gpflow.models.util.data_input_to_tensor((X_data, Y_data))
 
+    @override
     def maximum_log_likelihood_objective(self) -> tf.Tensor:  # pylint: disable=arguments-differ
         return self.log_marginal_likelihood()
 
@@ -1108,6 +1118,7 @@ class HeteroscedasticGPR(
 
         return tf.reduce_sum(log_prob)
 
+    @override
     def predict_f(
         self,
         Xnew: gpflow.base.InputData,
@@ -1178,6 +1189,7 @@ class HeteroscedasticGPR(
 
         return f_mean, f_var
 
+    @override
     def predict_y(
         self,
         Xnew: gpflow.base.InputData,
@@ -1188,6 +1200,7 @@ class HeteroscedasticGPR(
         msg = "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
         raise NotImplementedError(msg)
 
+    @override
     def predict_log_density(
         self,
         data: gpflow.base.RegressionData,
@@ -1219,6 +1232,7 @@ class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
         self.dim = y_data.shape[1]
         self.x_dim = int(x_dim)
 
+    @override
     def __call__(self, X: TensorType) -> tf.Tensor:
         filled_mean = tf.ones([tf.shape(X)[0], self.dim], dtype=X.dtype) * self.c
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
@@ -1266,6 +1280,7 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
         self.dim = y_data.shape[1]
         self.x_dim = x_data.shape[1]
 
+    @override
     def __call__(self, X: TensorType) -> tf.Tensor:
         # Fill in mean function for 0th order for all X
         filled_mean_0 = tf.tensordot(X[:, : self.x_dim], self.slope, 1) + self.b
@@ -1427,6 +1442,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
                     gpflow.Parameter(this_val, trainable=(not constrain_params)),
                 )
 
+    @override
     def __call__(self, X: TensorType) -> tf.Tensor:
         """Closely follows K_diag from DerivativeKernel."""
         x_vals = X[:, : self.x_dim]

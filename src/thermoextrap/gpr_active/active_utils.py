@@ -24,6 +24,7 @@ from scipy import linalg, special
 
 from thermoextrap import beta as xpan_beta
 from thermoextrap.core.typing import SupportsModelDerivs
+from thermoextrap.core.typing_compat import override
 from thermoextrap.data import DataCentralMomentsVals
 from thermoextrap.gpr_active.gp_models import HeteroscedasticGPR
 
@@ -986,7 +987,7 @@ def create_GPR(
     # Create GPR
     gpr = create_base_GP_model(data_input, **base_kwargs)
     # And train
-    train_GPR(gpr, start_params=start_params)
+    _ = train_GPR(gpr, start_params=start_params)
 
     #     #Want to catch tf.python.framework.errors_impl.InvalidArgumentError
     #     #Associated with invalid Cholesky decomposition, typically associated with off derivatives
@@ -1188,23 +1189,23 @@ class UpdateFuncBase(UpdateStopABC):
         )
         # Need loop to handle multiple outputs if have them
         for k in range(y.shape[1]):
-            ax.plot(x, y[:, k])
-            ax.fill_between(x, err[0][:, k], err[1][:, k], alpha=0.2)
+            _ = ax.plot(x, y[:, k])
+            _ = ax.fill_between(x, err[0][:, k], err[1][:, k], alpha=0.2)
             if compare_y is not None:
-                ax.plot(x, compare_y[:, k], "k--")
+                _ = ax.plot(x, compare_y[:, k], "k--")
         # Use compare_func output to set range of plot
         if compare_y is not None:
             compare_min = np.min(compare_y)
             compare_max = np.max(compare_y)
             compare_range = compare_max - compare_min
-            ax.set_ylim(
+            _ = ax.set_ylim(
                 (compare_min - 0.05 * compare_range, compare_max + 0.05 * compare_range)
             )
         # Plot points where collected data for GPR
         y_lims = ax.get_ylim()
         y_range = y_lims[1] - y_lims[0]
-        ax.set_ylim((y_lims[0] - 0.10 * y_range, y_lims[1]))
-        ax.plot(
+        _ = ax.set_ylim((y_lims[0] - 0.10 * y_range, y_lims[1]))
+        _ = ax.plot(
             alpha_list,
             (y_lims[0] - 0.05 * y_range) * np.ones_like(alpha_list),
             marker="^",
@@ -1212,10 +1213,10 @@ class UpdateFuncBase(UpdateStopABC):
             linestyle="",
         )
         if self.log_scale:
-            ax.set_xlabel(r"log$_{10}$Alpha")
+            _ = ax.set_xlabel(r"log$_{10}$Alpha")
         else:
-            ax.set_xlabel(r"Alpha")
-        ax.set_ylabel(r"GP output")
+            _ = ax.set_xlabel(r"Alpha")
+        _ = ax.set_ylabel(r"GP output")
         fig.tight_layout()
         if self.save_plot:
             # save_dir = os.path.split(data_list[-1].sim_info_files[0])[0]
@@ -1262,6 +1263,7 @@ class UpdateALMbrute(UpdateFuncBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
+    @override
     def do_update(
         self, gpr: Any, alpha_list: Sequence[Any]
     ) -> tuple[float, NDArrayAny, NDArrayAny]:
@@ -1322,6 +1324,7 @@ class UpdateRandom(UpdateFuncBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
+    @override
     def do_update(
         self, gpr: Any, alpha_list: Sequence[Any]
     ) -> tuple[float, NDArrayAny, NDArrayAny]:
@@ -1356,6 +1359,7 @@ class UpdateSpaceFill(UpdateFuncBase):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
+    @override
     def do_update(
         self, gpr: Any, alpha_list: Sequence[Any]
     ) -> tuple[float, NDArrayAny, NDArrayAny]:
@@ -1412,6 +1416,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
         super().__init__(**kwargs)
         self.tol = tol
 
+    @override
     def do_update(  # noqa: C901, PLR0912
         self,
         gpr: Any,
@@ -1645,6 +1650,7 @@ class MaxVar(MetricBase):
     def __init__(self, tol: float, name: str = "MaxVar") -> None:
         super().__init__(tol=tol, name=name)
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         gp_std = history[1][-1, ...]
         return np.max(gp_std)
@@ -1667,6 +1673,7 @@ class AvgVar(MetricBase):
     def __init__(self, tol: float, name: str = "AvgVar") -> None:
         super().__init__(tol=tol, name=name)
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         gp_std = history[1][-1, ...]
         return np.average(gp_std)
@@ -1695,6 +1702,7 @@ class MaxRelVar(MetricBase):
         super().__init__(tol=tol, name=name)
         self.threshold = threshold
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         gp_mu = history[0][-1, ...].copy()
         gp_std = history[1][-1, ...].copy()
@@ -1721,6 +1729,7 @@ class MaxRelGlobalVar(MetricBase, UpdateStopABC):
     def __init__(self, tol: float, name: str = "MaxRelGlobalVar") -> None:
         super().__init__(tol=tol, name=name)
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         # Compute full std over y data, not just subtracting mean function as for GP data
         # d_bool = (gp.data[0].numpy()[:, 1] == self.d_order_pred)
@@ -1754,6 +1763,7 @@ class AvgRelVar(MetricBase):
         super().__init__(tol=tol, name=name)
         self.threshold = threshold
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         gp_mu = history[0][-1, ...].copy()
         gp_std = history[1][-1, ...].copy()
@@ -1779,6 +1789,7 @@ class MSD(MetricBase):
     def __init__(self, tol: float, name: str = "MSD") -> None:
         super().__init__(tol=tol, name=name)
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         gp_mu = history[0][-1, ...]
 
@@ -1811,6 +1822,7 @@ class MaxAbsRelDeviation(MetricBase):
         super().__init__(tol=tol, name=name)
         self.threshold = threshold
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         gp_mu = history[0][-1, ...].copy()
         # For stability, points where gp_mu is small need to be handled differently
@@ -1843,6 +1855,7 @@ class MaxAbsRelGlobalDeviation(MetricBase, UpdateStopABC):
     def __init__(self, tol: float, name: str = "MaxAbsRelGlobalDeviation") -> None:
         super().__init__(tol=tol, name=name)
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         # Compute full std over y data, not just subtracting mean function as for GP data
         # d_bool = (gp.data[0].numpy()[:, 1] == self.d_order_pred)
@@ -1879,6 +1892,7 @@ class AvgAbsRelDeviation(MetricBase):
         super().__init__(tol=tol, name=name)
         self.threshold = threshold
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         gp_mu = history[0][-1, ...].copy()
         # For stability, points where gp_mu is small need to be handled differently
@@ -1920,6 +1934,7 @@ class ErrorStability(MetricBase, UpdateStopABC):
         # Need to set up normalization - will just use first r calculated
         self.r1: float | None = None
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         # Get input data points for current active learning step (current GP model)
         input_x = gp.data[0].numpy()
@@ -1984,7 +1999,7 @@ class ErrorStability(MetricBase, UpdateStopABC):
         # Even though passed in kernel, need to set trainable parameters (for likelihood)
         gp_params = [p.numpy() for p in gp.trainable_parameters]
         for i, tpar in enumerate(gp_params):
-            prev_gp.trainable_parameters[i].assign(tpar)
+            _ = prev_gp.trainable_parameters[i].assign(tpar)
         # And make prediction with GP with only previous inputs, but at all current inputs
         mu_prev_tensor, cov_prev = prev_gp.predict_f(pred_x, full_cov=True)
         mu_prev = self.transform_func(pred_x[:, :1], mu_prev_tensor.numpy(), 1.0)[0]
@@ -2053,6 +2068,7 @@ class MaxIter(MetricBase):
     def __init__(self, tol: float = 1.0, name: str = "MaxIter") -> None:
         super().__init__(tol=1.0, name=name)
 
+    @override
     def calc_metric(self, history: Sequence[Any], x_vals: Any, gp: Any) -> Any:
         return self.tol + 1.0  # Always bigger than tol
 

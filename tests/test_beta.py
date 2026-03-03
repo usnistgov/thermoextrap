@@ -542,13 +542,13 @@ def test_extrapmodel_minuslog_slow(fixture) -> None:
     # test coefs
     xem = xtrap.beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
     b = xem.derivatives.derivs(xem.data, norm=False, minus_log=False)
-    np.testing.assert_allclose(a, b)  # pyright: ignore[reportCallIssue,reportArgumentType]
+    np.testing.assert_allclose(a, b)
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
 
     # or passing minus_log to predict
     xem = xtrap.beta.factory_extrapmodel(beta0, fixture.rdata, post_func=None)
     b = xem.derivatives.derivs(xem.data, norm=False, minus_log=True)
-    np.testing.assert_allclose(a, b)  # pyright: ignore[reportCallIssue,reportArgumentType]
+    np.testing.assert_allclose(a, b)
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
 
 
@@ -854,7 +854,7 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture, rng: np.random.Generator) -
         ),
     )
     b = xem.derivatives.derivs(xem.data, minus_log=False, norm=False)
-    np.testing.assert_allclose(a, b)  # pyright: ignore[reportCallIssue,reportArgumentType]
+    np.testing.assert_allclose(a, b)
 
     # test prediction
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas))
@@ -868,7 +868,7 @@ def test_extrapmodel_alphadep_minuslog_slow(fixture, rng: np.random.Generator) -
         ),
     )
     b = xem.derivatives.derivs(xem.data, minus_log=True, norm=False)
-    np.testing.assert_allclose(a, b)  # pyright: ignore[reportCallIssue,reportArgumentType]
+    np.testing.assert_allclose(a, b)
     # test prediction
     np.testing.assert_allclose(em.predict(betas), xem.predict(betas, minus_log=True))
 

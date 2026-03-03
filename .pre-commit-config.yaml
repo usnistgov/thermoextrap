@@ -40,12 +40,9 @@ repos:
   # * pyproject.toml
   # ** format
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.11.1
+    rev: v2.16.2
     hooks:
       - id: pyproject-fmt
-        args: [--indent=4, --keep-full-version]
-        files: ""
-        types: [toml]
   # ** validate
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.24.1
@@ -159,14 +156,6 @@ repos:
           done' --
         language: system
         files: \.?[jJ]ustfile|.*\.just$
-        stages: [manual]
-
-  # * Cruft
-  - repo: https://github.com/cruft/cruft.git
-    rev: 2.16.0
-    hooks:
-      - id: cruft
-        args: [--checkout, main]
         stages: [manual]
 
   # * Notebook specific --------------------------------------------------------

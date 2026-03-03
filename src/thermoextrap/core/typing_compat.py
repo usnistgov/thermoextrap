@@ -17,6 +17,11 @@ else:
     EllipsisType: TypeAlias = "builtins.ellipsis"
 
 
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
+
 if sys.version_info >= (3, 11):
     from typing import NotRequired, Required, Self, Unpack
 else:
@@ -40,4 +45,5 @@ __all__ = [
     "TypeIs",
     "TypeVar",
     "Unpack",
+    "override",
 ]

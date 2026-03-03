@@ -33,6 +33,7 @@ from .core._attrs_utils import (
 )
 from .core.docstrings import DOCFILLER_SHARED
 from .core.typing import DataT
+from .core.typing_compat import override
 from .core.validate import validator_dims, validator_xarray_typevar
 from .core.xrutils import xrwrap_uv, xrwrap_xv
 
@@ -202,6 +203,7 @@ class DataSelector(MyAttrsMixin, Generic[DataT]):
         selector = dict(zip(self.dims, idx))
         return self.data.isel(selector, drop=True)
 
+    @override
     def __repr__(self) -> str:
         return repr(self.data)
 
@@ -260,6 +262,7 @@ class DataCallbackABC(
         """Reduce along dimension."""
         raise NotImplementedError
 
+    @override
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}>"
 
@@ -272,9 +275,11 @@ class DataCallback(DataCallbackABC):
     Implemented to pass things through unchanged.  Will be used for default construction
     """
 
+    @override
     def check(self, data: SupportsData[Any]) -> None:
         pass
 
+    @override
     def deriv_args(  # noqa: PLR6301
         self,
         data: SupportsData[Any],  # noqa: ARG002
@@ -283,6 +288,7 @@ class DataCallback(DataCallbackABC):
     ) -> DataDerivArgs:
         return deriv_args
 
+    @override
     def resample(
         self,
         data: SupportsData[Any],  # noqa: ARG002
@@ -293,6 +299,7 @@ class DataCallback(DataCallbackABC):
     ) -> Self:
         return self
 
+    @override
     def reduce(
         self,
         data: SupportsData[Any],  # noqa: ARG002
@@ -401,6 +408,7 @@ class DataCentralMomentsBase(AbstractData, Generic[DataT]):
         raise NotImplementedError
 
     @property
+    @override
     def order(self) -> int:
         """Order of expansion."""
         return self.dxduave.sizes[self.umom_dim] - 1
@@ -520,6 +528,7 @@ class DataCentralMomentsBase(AbstractData, Generic[DataT]):
         )
 
     @property
+    @override
     def deriv_args(self) -> DataDerivArgs:
         """
         Arguments to be passed to derivative function.
@@ -552,9 +561,11 @@ class DataCentralMoments(DataCentralMomentsBase[DataT]):
     )
 
     @property
+    @override
     def dxduave(self) -> cmomy.CentralMomentsData[DataT]:
         return self._dxduave
 
+    @override
     def __len__(self) -> int:
         return self.values.sizes[self.rec_dim]
 
@@ -586,6 +597,7 @@ class DataCentralMoments(DataCentralMomentsBase[DataT]):
         )
 
     @docfiller_shared.decorate
+    @override
     def resample(
         self,
         sampler: SamplerType,
@@ -1231,6 +1243,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase[DataT]):
         return self._dxduave
 
     @property
+    @override
     def order(self) -> int:
         if self._order is None:
             return super().order
@@ -1300,10 +1313,12 @@ class DataCentralMomentsVals(DataCentralMomentsBase[DataT]):
             x_is_u=x_is_u,
         )
 
+    @override
     def __len__(self) -> int:
         return len(self.uv[self.rec_dim])
 
     @docfiller_shared.inherit(DataCentralMoments.resample)
+    @override
     def resample(
         self,
         sampler: SamplerType,
@@ -1330,14 +1345,13 @@ class DataCentralMomentsVals(DataCentralMomentsBase[DataT]):
         **kwargs
             Keyword arguments to :func:`cmomy.wrap_resample_vals`
 
+        See Also
+        --------
+        :func:`cmomy.wrap_resample_vals`
 
         Notes
         -----
         ``resample_values`` defaults to ``self.resample_values``.
-
-        See Also
-        --------
-        :func:`cmomy.wrap_resample_vals`
         """
         if dim is MISSING and axis is MISSING:
             dim = self.rec_dim

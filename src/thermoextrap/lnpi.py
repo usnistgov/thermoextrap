@@ -25,13 +25,13 @@ from attrs import field
 from attrs import validators as attv
 from module_utilities import cached
 
-from thermoextrap.core.validate import validator_xarray_typevar
-
 from . import beta as beta_xpan
 from .core._attrs_utils import convert_dims_to_tuple
 from .core.docstrings import DOCFILLER_SHARED
 from .core.sputils import get_default_indexed, get_default_symbol
 from .core.typing import DataT
+from .core.typing_compat import override
+from .core.validate import validator_xarray_typevar
 from .data import DataCallbackABC
 from .models import Derivatives, ExtrapModel, SymFuncBase
 
@@ -93,22 +93,27 @@ class lnPi_func_central(SymFuncBase):
     mudotN = get_default_symbol("mudotN")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[Symbol, IndexedBase, Symbol, Symbol]:
         return (*beta_xpan.u_func_central.deriv_args(), cls.lnPi0, cls.mudotN)
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         (beta,) = self.args
         return self.mudotN - beta_xpan.u_func_central.tcall(beta)
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         return self.lnPi0
 
     @classmethod
+    @override
     def eval(cls, beta: Symbol) -> Any:  # noqa: ARG003
         return None
 
     @classmethod
+    @override
     def tcall(cls, beta: Symbol) -> Expr:
         return cls(beta)
 
@@ -122,22 +127,27 @@ class lnPi_func_raw(SymFuncBase):
     mudotN = get_default_symbol("mudotN")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[IndexedBase, Symbol, Symbol]:
         return (*beta_xpan.u_func.deriv_args(), cls.lnPi0, cls.mudotN)
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         (beta,) = self.args
         return self.mudotN - beta_xpan.u_func.tcall(beta, n=1)
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         return self.lnPi0
 
     @classmethod
+    @override
     def eval(cls, beta: Symbol) -> Any:  # noqa: ARG003
         return None
 
     @classmethod
+    @override
     def tcall(cls, beta: Symbol) -> Expr:
         return cls(beta)
 
@@ -255,6 +265,7 @@ class lnPiDataCallback(DataCallbackABC, Generic[DataT]):
     _cache: dict[str, Any] = field(init=False, repr=False, factory=dict[str, "Any"])
     # TODO(wpk): using dims_n, dims_comp naming because this is what is used in lnPi module
 
+    @override
     def check(self, data: SupportsData[Any]) -> None:
         pass
 
@@ -269,6 +280,7 @@ class lnPiDataCallback(DataCallbackABC, Generic[DataT]):
 
         return xr_dot(self.mu, self.ncoords, dim=self.dims_comp)
 
+    @override
     def resample(
         self,
         data: SupportsData[Any],
@@ -307,6 +319,7 @@ class lnPiDataCallback(DataCallbackABC, Generic[DataT]):
         # return new object
         return self.new_like(lnPi0=dc.obj.sel(_mom=1, drop=True))  # pyright: ignore[reportUnknownMemberType]
 
+    @override
     def deriv_args(
         self, data: SupportsData[Any], *, deriv_args: DataDerivArgs
     ) -> DataDerivArgs:
