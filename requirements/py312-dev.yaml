@@ -31,8 +31,8 @@ dependencies:
   - numpy>=1.26.0
   - orjson
   - packaging
-  - pandas
   - pandas-stubs
+  - pandas<3.0
   - pylint
   - pytest
   - pytest-cov
@@ -42,6 +42,7 @@ dependencies:
   - righttyper
   - scipy
   - scipy-stubs
+  - setuptools<81.0.0
   - sympy
   - types-tensorflow
   - xarray>=2024.7.0
@@ -50,4 +51,6 @@ dependencies:
       - gpflow>=2.6.0
       - pymbar[jax]>=4.0
       - tensorflow-probability[tf]~=0.24.0
-      - tensorflow>=2.13
+      - tensorflow<2.17,>=2.16;python_version<"3.13"and(sys_platform=="darwin"andplatform_machine=="x86_64")
+      - tensorflow>=2.16;python_version<"3.13"and(sys_platform!="darwin"orplatform_machine!="x86_64")
+      - tensorflow>=2.16;python_version>="3.13"
