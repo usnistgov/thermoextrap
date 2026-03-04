@@ -9,6 +9,7 @@ ci:
   skip:
     - uv-lock
     - pip-compile
+    - nbqa-typos-markdown
 default_install_hook_types:
   - pre-commit
   - commit-msg

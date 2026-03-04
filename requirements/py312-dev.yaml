@@ -49,9 +49,9 @@ dependencies:
   - xarray>=2024.7.0
   - pip
   - pip:
-      - gpflow>=2.6.0
+      - gpflow>=2.9.0
       - pymbar[jax]>=4.0
       - tensorflow-probability[tf]~=0.24.0
       - tensorflow<2.17,>=2.16;python_version<"3.13"and(sys_platform=="darwin"andplatform_machine=="x86_64")
       - tensorflow>=2.16;python_version<"3.13"and(sys_platform!="darwin"orplatform_machine!="x86_64")
-      - tensorflow>=2.16;python_version>="3.13"
+      - tensorflow>=2.20;python_version>="3.13"andsys_platform=="linux"
