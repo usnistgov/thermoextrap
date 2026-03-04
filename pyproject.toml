@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "uv_build"
 requires = [
-    "uv-build>=0.8.22,<0.9.0",
+    "uv-build>=0.10.4,<0.11.0",
 ]
 
 [project]
@@ -54,7 +54,8 @@ all = [
 ]
 gpr = [
     "gpflow>=2.6.0",
-    "setuptools<81.0.0",                                                                                         # gpflow bug.  Needs this, but doesn't include by default.
+    # gpflow bug.  Needs this, but doesn't include by default
+    "setuptools<81.0.0",
     "tensorflow>=2.16,<2.17; python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
     "tensorflow>=2.16; python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
     "tensorflow>=2.16; python_version>='3.13'",
@@ -88,7 +89,7 @@ dev = [
     # { include-group = "pytest-accept" },
     { include-group = "test" },
     { include-group = "test-notebook" },
-    { include-group = "typecheck" },
+    { include-group = "type" },
 ]
 test = [
     "pytest-cov",
@@ -98,6 +99,16 @@ test = [
     "thermoextrap[gpr,mbar]",
     { include-group = "pandas" },
     { include-group = "pytest" },
+]
+type = [
+    "matplotlib; python_version=='3.12'",
+    "pandas-stubs",
+    "scipy-stubs; python_version>='3.10'",
+    "thermoextrap[gpr,mbar]",
+    "types-tensorflow",
+    { include-group = "pylint" },
+    { include-group = "pytest" },
+    { include-group = "typecheck-runner" },
 ]
 docs = [
     "autodocsumm",
@@ -110,7 +121,8 @@ docs = [
     "sphinxcontrib-spelling",
     "thermoextrap[gpr,mbar,viz]",
 ]
-# other environments
+# other groups
+basedpyright = [ "basedpyright>=1.31.3" ]
 docs-live = [
     "sphinx-autobuild",
     { include-group = "docs" },
@@ -121,7 +133,7 @@ docs-spelling = [
     { include-group = "docs" },
 ]
 ipython = [ "ipython" ]
-mypy = [ "mypy>=1.15.0", "orjson" ]
+mypy = [ "mypy[faster-cache]>=1.15.0" ]
 notebook = [ "ipykernel", "nbclient" ]
 nox = [ "nox>=2025.5.1" ]
 pandas = [ "pandas>=2.3" ]
@@ -132,19 +144,12 @@ test-extras = [
     { include-group = "test" },
 ]
 test-notebook = [
+    "coverage<=7.13.0",
     "nbval",
     "thermoextrap[viz]",
     { include-group = "test" },
 ]
-typecheck = [
-    "matplotlib; python_version=='3.12'",
-    "pandas-stubs",
-    "scipy-stubs; python_version>='3.10'",
-    "thermoextrap[gpr,mbar]",
-    "types-tensorflow",
-    { include-group = "pylint" },
-    { include-group = "pytest" },
-]
+typecheck-runner = [ "typecheck-runner>=0.1.0; python_version>'3.9'" ]
 
 # * uv -------------------------------------------------------------------------
 
@@ -176,24 +181,16 @@ nox.requires-python = ">=3.12"
 
 [tool.repo-review]
 ignore = [
-    "GH",     # enable for actions
     "NOX103", # I prefer using "nox.options.sessions"
+    "PC111",  # use doccmd instead of blacken-docs
     "PC140",  # do this externally
+    "PC160",  # use typos
     "PC170",  # pygrep
-    "PC901",  # ci message
-    "RTD",
 ]
-
-[tool.codespell]
-skip = "examples/*"
 
 [tool.check-wheel-contents]
-src_dir = [
-    "src",
-]
-toplevel = [
-    "thermoextrap",
-]
+src_dir = [ "src" ]
+toplevel = [ "thermoextrap" ]
 
 [tool.pyproject-fmt]
 expand_tables = [
@@ -220,6 +217,7 @@ extend-ignore-identifiers-re = [
 ]
 
 [tool.typos.default.extend-identifiers]
+CPY = "CPY"
 gather_nd = "gather_nd"
 numer = "numer"
 pertNumer = "pertNumer"
@@ -267,14 +265,13 @@ filterwarnings = [
 log_cli_level = "INFO"
 log_level = "INFO"
 minversion = "8"
-xfail_strict = true
+strict_xfail = "true"
 
 [tool.pytest_env]
 NUMBA_CACHE_DIR = { value = "{PWD}/.numba_cache", transform = true, skip_if_set = true }
 
 [tool.coverage]
 run.branch = true
-run.parallel = true
 paths.source = [
     "src/",
     # needed for testing source if not editable install
@@ -291,6 +288,7 @@ report.omit = [
     "*/_typing.py",
     "*/vendored/*",
 ]
+report.show_missing = true
 
 # report.show_missing = true
 
@@ -343,9 +341,11 @@ module = [
 
 [[tool.mypy.overrides]]
 check_untyped_defs = false
-module = [
-    "tests.legacy.*",
-]
+module = [ "tests.legacy.*" ]
+
+[tool.pyrefly]
+enabled-ignores = [ "pyrefly" ]
+project-includes = [ "src", "tests" ]
 
 [tool.pyright]
 exclude = [
@@ -407,11 +407,10 @@ root = "tests"
 reportUnusedCallResult = false
 root = "examples/usage"
 
-[tool.pytype]
-inputs = [
-    "src",
-    "tests",
-]
+[tool.ty]
+# Disable support for `type: ignore` comments
+analysis.respect-type-ignore-comments = false
+src.include = [ "src", "tests" ]
 
 # * Dependency creation --------------------------------------------------------
 
@@ -438,8 +437,14 @@ jax = { pip = true }
 module-utilities = { packages = "docstring-inheritance" }
 
 [tool.pyproject2conda.envs.dev]
-groups = [ "dev" ]
-python = "default"
+groups = "dev"
+
+[tool.pyproject2conda.envs.pre-commit-additional-dependencies]
+reqs = [
+    "rust-just",
+]
+skip-package = true
+style = "requirements"
 
 [tool.pyproject2conda.envs.test]
 groups = [ "test" ]
@@ -447,15 +452,15 @@ python = "all"
 
 [tool.pyproject2conda.envs.test-extras]
 groups = [ "test-extras" ]
-skip-package = true
 python = "all"
+skip-package = true
 
 [tool.pyproject2conda.envs.uvx-tools]
 reqs = [
     # these used solely for specking tools to be used with uvx ...
-    "basedpyright>=1.31.3",
     "conda-lock>=2.5.5",
-    "cruft",
+    "copier",
+    "copier-template-extensions>=0.3.1",
     "grayskull>=2.5.3",
     "nbqa>=1.8.4",
     "prek",
@@ -463,11 +468,13 @@ reqs = [
     "pyright>=1.1.396",
     "scriv",
     "twine>=5.0.0",
-    "ty",
+    "ty>=0.0.14",
 ]
 groups = [
+    "basedpyright",
     "mypy",
     "nox",
+    "typecheck-runner",
 ]
 skip-package = true
 style = "requirements"

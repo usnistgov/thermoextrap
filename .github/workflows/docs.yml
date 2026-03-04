@@ -1,0 +1,62 @@
+name: Docs build and deploy
+
+on:
+  workflow_call:
+    inputs:
+      deploy:
+        description: "Deploy docs to nist-page."
+        required: false
+        type: boolean
+        default: false
+      no-history:
+        description: "Force new commit without parent history."
+        required: false
+        type: boolean
+        default: true
+
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy docs to nist-page."
+        required: false
+        type: boolean
+        default: false
+      no-history:
+        description: "Force new commit without parent history."
+        required: false
+        type: boolean
+        default: true
+
+env:
+  FORCE_COLOR: "3"
+
+jobs:
+  build:
+    name: Build/deploy docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-cached-uv-and-python
+        with:
+          python-version-file: ".python-version"
+          cache-dependency-path: uv.lock
+
+      - name: Build docs
+        run:
+          uvx -crequirements/lock/uvx-tools.txt nox -s docs -- ++docs-options -W
+          -T
+
+      - name: Deploy docs
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        if: ${{ inputs.deploy }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
+          publish_branch: nist-pages
+          force_orphan: ${{ inputs.no-history }}
+          commit_message: ${{ github.event.head_commit.message }}

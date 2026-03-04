@@ -1252,7 +1252,9 @@ class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
         filled_mean = tf.ones([tf.shape(X)[0], self.dim], dtype=X.dtype) * self.c
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
         deriv_zero_bool = tf.math.reduce_all(
-            (X[:, self.x_dim :] == 0.0), axis=-1, keepdims=True
+            tf.experimental.numpy.isclose(X[:, self.x_dim :], 0.0),
+            axis=-1,
+            keepdims=True,
         )
         return tf.where(deriv_zero_bool, filled_mean, filled_zeros)
 
@@ -1307,10 +1309,16 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
         # For 1st derivative boolean, must be where have at least one 1 (first derivative)
         # and no derivatives higher than 1
         deriv_zero_bool = tf.math.reduce_all(
-            (X[:, self.x_dim :] == 0.0), axis=-1, keepdims=True
+            tf.experimental.numpy.isclose(X[:, self.x_dim :], 0.0),
+            axis=-1,
+            keepdims=True,
         )
         deriv_one_bool = tf.math.logical_or(
-            tf.math.reduce_any((X[:, self.x_dim :] == 1.0), axis=-1, keepdims=True),
+            tf.math.reduce_any(
+                tf.experimental.numpy.isclose(X[:, self.x_dim :], 1.0),
+                axis=-1,
+                keepdims=True,
+            ),
             tf.math.reduce_all((X[:, self.x_dim :] < 2.0), axis=-1, keepdims=True),
         )
         output_0 = tf.where(deriv_zero_bool, filled_mean_0, filled_zeros)

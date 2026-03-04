@@ -7,27 +7,27 @@ NOTEBOOKS := "examples/usage/basic"
 _nbqa_typecheck checker *files:
     {{ UVX_WITH_OPTS }} \
     nbqa --nbqa-shell \
-    "uv run --active --no-project {{ TYPECHECK }} {{ UVX_OPTS }} -x {{ checker }}" {{ files }}
+    "uv run --active --no-project --no-config {{ TYPECHECK }} --stdout {{ UVX_OPTS }} {{ checker }}" -- {{ files }}
 
 [group("notebook")]
 [group("typecheck")]
-mypy-notebook *files=NOTEBOOKS: (_nbqa_typecheck "mypy" files)
+mypy-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cmypy[faster-cache]" files)
 
 [group("notebook")]
 [group("typecheck")]
-pyright-notebook *files=NOTEBOOKS: (_nbqa_typecheck "pyright" files)
+pyright-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cpyright" files)
 
 [group("notebook")]
 [group("typecheck")]
-basedpyright-notebook *files=NOTEBOOKS: (_nbqa_typecheck "basedpyright" files)
+basedpyright-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cbasedpyright" files)
 
 [group("notebook")]
 [group("typecheck")]
-ty-notebook *files=NOTEBOOKS: (_nbqa_typecheck "ty" files)
+ty-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cty" files)
 
 [group("notebook")]
 [group("typecheck")]
-pyrefly-notebook *files=NOTEBOOKS: (_nbqa_typecheck "pyrefly" files)
+pyrefly-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cpyrefly" files)
 
 [group("lint")]
 [group("notebook")]
@@ -38,7 +38,7 @@ pylint-notebook *files=NOTEBOOKS:
 
 [group("notebook")]
 [group("typecheck")]
-typecheck-notebook *files=NOTEBOOKS: (mypy-notebook files) (basedpyright-notebook files)
+typecheck-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cmypy[faster-cache] -cbasedpyright" files)
 
 [group("notebook")]
 [group("test")]
@@ -50,11 +50,12 @@ test-notebook *files=NOTEBOOKS:
     -x {{ files }}
 
 [group("notebook")]
-install-ipykernel: (nox "-s install-ipykernel")
+install-ipykernel:
+    uv run -m ipykernel install --user --name {{ PACKAGE_NAME }} --display-name "PYTHON [venv: {{ PACKAGE_NAME }}]"
 
 # Execute notebooks inplace using nbclient
 [group("notebook")]
-execute-notebooks *files="examples/usage/*.ipynb":
+execute-notebooks *files="examples/usage/basic/*.ipynb":
     {{ UVRUN }} --group="notebook" --no-dev \
     jupyter execute --inplace --allow-errors {{ files }}
     just pre-commit run nbstripout --all-files  || true

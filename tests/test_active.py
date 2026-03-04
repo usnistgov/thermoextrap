@@ -266,8 +266,8 @@ def test_base_gp_creation(rng: Generator, sampler: SamplerType) -> None:
     )
     assert isinstance(check_kernel.kernel, gpflow.kernels.SharedIndependent)
     assert check_kernel.kernel.kernel == k_rbf
-    assert check_kernel.kernel.kernel.l_0.numpy() == 0.5  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-    assert check_kernel.kernel.kernel.var.numpy() == 5.0  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    np.testing.assert_allclose(check_kernel.kernel.kernel.l_0.numpy(), 0.5)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    np.testing.assert_allclose(check_kernel.kernel.kernel.var.numpy(), 5.0)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
 # Simple test for checking training of GP model
@@ -566,7 +566,7 @@ def test_metrics(rng: Generator, sampler: SamplerType) -> None:
     out_errorstability = check_errorstability(hist, x, gp_3)
     assert isinstance(check_errorstability.r1, float)
     assert isinstance(out_errorstability, float)  # type: ignore[unreachable]
-    assert out_errorstability == 1.0
+    np.testing.assert_allclose(out_errorstability, 1.0)
     # Check with 4 points
     out_errorstability_4 = check_errorstability(hist, x, gp_4)
     assert isinstance(out_errorstability, float)

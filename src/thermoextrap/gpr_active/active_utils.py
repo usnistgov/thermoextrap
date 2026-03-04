@@ -2377,6 +2377,6 @@ def _catch_inf_unconstrained_param(param: Any, value: Any) -> Any:
     # that will then throw an error when assigning (catches, but does not fix, so circumventing)
     # So attempt to catch that behavior here
     this_transformed_param = param.transform.inverse(value).numpy()
-    if (not np.isfinite(this_transformed_param)) and (value == 0.0):
+    if (not np.isfinite(this_transformed_param)) and np.isclose(value, 0.0):
         return np.finfo(np.float64).eps
     return value
