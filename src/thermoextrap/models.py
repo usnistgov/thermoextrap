@@ -1093,9 +1093,9 @@ class InterpModel(StateCollection[DataT, SupportsModelDerivsDataT]):
 
         coefs = cast(
             "DataT",
-            xr.concat(  # type: ignore[type-var]  # pyright: ignore[reportCallIssue]
+            xr.concat(  # pyright: ignore[reportCallIssue]
                 (  # pyright: ignore[reportArgumentType]
-                    m.derivs(order, norm=False, minus_log=minus_log, order_dim="order")
+                    m.derivs(order, norm=False, minus_log=minus_log, order_dim="order")  # type: ignore[misc]
                     for m in self.states
                 ),
                 dim="state",

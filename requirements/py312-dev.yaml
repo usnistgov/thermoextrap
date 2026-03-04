@@ -32,7 +32,7 @@ dependencies:
   - orjson
   - packaging
   - pandas-stubs
-  - pandas<3.0
+  - pandas>=2.3
   - pylint
   - pytest
   - pytest-cov

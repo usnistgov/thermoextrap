@@ -187,7 +187,7 @@ def to_mean_var(
         concat_kws = {}
 
     if concat_dim is None:
-        concat_dim = pd.Index(["mean", "var"], name="stats")
+        concat_dim = xr.DataArray(["mean", "var"], dims="stats")
 
     return xr.concat(
         (da.mean(dim, **kws), da.var(dim, **kws)), dim=concat_dim, **concat_kws

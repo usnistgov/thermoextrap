@@ -22,18 +22,26 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from typing import Any
 
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
     from sympy.core.expr import Expr
     from tensorflow import Tensor
     from tensorflow_probability.python.bijectors.softplus import Softplus
 
     from thermoextrap.core.typing import NDArrayAny, OptionalKwsAny, TensorType
+    from thermoextrap.core.typing_compat import TypeVar
+
+    TensorOrArrayT = TypeVar("TensorOrArrayT", NDArray[Any], tf.Tensor)
 
 
 logger = logging.getLogger(__name__)
-
-
 GPFLOW_POSITIVE = gpflow.utilities.positive()
+
+
+def _get_tensor_size(x: tf.Tensor, index: int = 0) -> int:
+    if (size := x.shape[index]) is None:
+        msg = "expected sized tensor"
+        raise ValueError(msg)
+    return size
 
 
 # TODO(wpk): Bunch of cleanup here
@@ -165,11 +173,16 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
     @override
     def K(self, X: TensorType, X2: TensorType | None = None) -> Tensor:
-        if X2 is None:
-            X2 = X
+        X = tf.convert_to_tensor(X)
+        X2 = X if X2 is None else tf.convert_to_tensor(X2)
 
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
         x2, d2 = self._split_x_into_locs_and_deriv_info(X2)
+
+        d1_size = _get_tensor_size(d1)
+        d2_size = _get_tensor_size(d2)
+        x1_size = _get_tensor_size(x1)
+        x2_size = _get_tensor_size(x2)
 
         # Output should be a tensor that is len(X) by len(X2)
         # And must be traceable with tensorflow's autodifferentiation
@@ -177,21 +190,21 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
         # Want full list of all combinations of derivative pairs
         expand_d1 = tf.reshape(
-            tf.tile(d1, (1, d2.shape[0])),
-            (d1.shape[0] * d2.shape[0], -1),  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]
+            tf.tile(d1, (1, d2_size)),
+            (d1_size * d2_size, -1),
         )
         expand_d1 = tf.cast(expand_d1, tf.int32)
-        expand_d2 = tf.tile(d2, (d1.shape[0], 1))
+        expand_d2 = tf.tile(d2, (d1_size, 1))
         expand_d2 = tf.cast(expand_d2, tf.int32)
         deriv_pairs = tf.stack([expand_d1, expand_d2], axis=1)
 
         # For convenience, do same with x, but no need to stack
         # Sort of same idea as creating a mesh grid
         expand_x1 = tf.reshape(
-            tf.tile(x1, (1, x2.shape[0])),
-            (x1.shape[0] * x2.shape[0], -1),  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]
+            tf.tile(x1, (1, x2_size)),
+            (x1_size * x2_size, -1),
         )
-        expand_x2 = tf.tile(x2, (x1.shape[0], 1))
+        expand_x2 = tf.tile(x2, (x1_size, 1))
 
         # Now need UNIQUE derivative pairs because will be faster to loop over
         unique_pairs = tf.raw_ops.UniqueV2(x=deriv_pairs, axis=[0])[0]
@@ -236,14 +249,14 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         k_list_stitch = tf.dynamic_stitch(inds_list, k_list)
 
         # Reshape to the correct output
-        return tf.reshape(k_list_stitch, (x1.shape[0], x2.shape[0]))
+        return tf.reshape(k_list_stitch, (x1_size, x2_size))
 
     @override
     def K_diag(self, X: TensorType) -> Tensor:
         # Same as for K but don't need every combination, just every x with itself
+        X = tf.convert_to_tensor(X)
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
         unique_d1 = tf.raw_ops.UniqueV2(x=d1, axis=[0])[0]
-        unique_d1 = tf.cast(unique_d1, tf.int32)
 
         k_list = []
         inds_list = []
@@ -251,10 +264,12 @@ class DerivativeKernel(gpflow.kernels.Kernel):
             this_inds = tf.cast(
                 tf.where(tf.reduce_all(d1 == d, axis=1))[:, :1], tf.int32
             )
+
+            d_numpy = d.numpy().astype(np.int32)
             this_expr = sp.diff(
                 self.kernel_expr,
-                *zip(self.x_syms[: self.obs_dims], d.numpy()),
-                *zip(self.x_syms[self.obs_dims :], d.numpy()),
+                *zip(self.x_syms[: self.obs_dims], d_numpy),
+                *zip(self.x_syms[self.obs_dims :], d_numpy),
             )
             this_func = lambdify_with_defaults(
                 (*self.x_syms, *self.param_syms),
@@ -274,8 +289,8 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         return tf.reshape(k_list_stitch, (x1.shape[0],))
 
     def _split_x_into_locs_and_deriv_info(
-        self, x: TensorType
-    ) -> tuple[TensorType, TensorType]:
+        self, x: TensorOrArrayT
+    ) -> tuple[TensorOrArrayT, TensorOrArrayT]:
         """Splits input into actual observable input and derivative labels"""
         locs = x[:, : self.obs_dims]
         grad_info = x[:, -self.obs_dims :]
@@ -775,7 +790,7 @@ def multioutput_multivariate_normal(
         to sum over locations as would for multivariate Gaussian over each
         dimension
     """
-    d = tf.expand_dims(tf.transpose(x - mu), -1)
+    d = tf.expand_dims(tf.transpose(tf.convert_to_tensor(x - mu)), -1)
     alpha = tf.linalg.triangular_solve(L, d, lower=True)
     alpha = tf.squeeze(alpha, axis=-1)
     num_locs = tf.cast(tf.shape(d)[1], L.dtype)
