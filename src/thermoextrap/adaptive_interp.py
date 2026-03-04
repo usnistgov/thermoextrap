@@ -14,12 +14,13 @@ from __future__ import annotations
 
 import logging
 from itertools import chain, islice, pairwise
-from typing import TYPE_CHECKING, Generic, TypedDict
+from typing import TYPE_CHECKING, Generic
 
 import numpy as np
 import xarray as xr
 
 from .core.typing import DataT
+from .core.typing_compat import TypedDict
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence

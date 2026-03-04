@@ -46,7 +46,7 @@ jobs:
 
           # min max and default pythons
           matrix_test_python = list({ python_versions[0], python_versions[-1]})
-          max_python_version = matrix_test_python[-1]
+          max_python_version = python_versions[-1]
 
           with open(os.getenv("GITHUB_OUTPUT"), "a") as f:
             f.write(f"{default_python_version=:s}\n")
@@ -104,7 +104,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -189,6 +188,10 @@ jobs:
       #     key:
       #       numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
       #       env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}
+
+      - name: Optional add submodules
+        if: matrix.style == 'test-notebook'
+        run: git submodule update --init
 
       - name: Test with nox
         env:

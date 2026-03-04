@@ -7,6 +7,11 @@ import sys
 from types import EllipsisType
 from typing import Concatenate, TypeAlias, TypeGuard
 
+if sys.version_info >= (3, 11):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
+
 if sys.version_info >= (3, 12):
     from typing import override
 else:
@@ -34,6 +39,7 @@ __all__ = [
     "TypeGuard",
     "TypeIs",
     "TypeVar",
+    "TypedDict",
     "Unpack",
     "override",
 ]
