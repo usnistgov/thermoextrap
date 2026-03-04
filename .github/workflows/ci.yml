@@ -170,9 +170,21 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache-dependency-path: uv.lock
 
+      # numba cache
+      - name: Numba cache
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        if: matrix.session != 'test-numpy1'
+        with:
+          path: |
+            ${{ github.workspace }}/.numba_cache
+          key:
+            numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
+            env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}
+
       - name: Test with nox
         env:
           python_version: ${{ matrix.python-version }}
+          style: ${{ matrix.style }}
           options: ${{ matrix.options }}
         run: >-
           $UVX_COMMAND nox -s "${style}-${python_version}" -- ++installpkg

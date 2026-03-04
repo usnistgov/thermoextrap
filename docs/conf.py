@@ -56,9 +56,9 @@ suppress_warnings = ["autosectionlabel.*"]
 nitpick_ignore = [
     # ("py:class", "Command"),
 ]
-# nitpick_ignore_regex = [
-#     (r"py:.*", r".*IndexSampler.*"),
-# ]
+nitpick_ignore_regex = [
+    (r"py:class.*", r".*xr\.DataArray \| xr.Dataset.*"),
+]
 
 # -- myst stuff ---------------------------------------------------------
 myst_enable_extensions = [

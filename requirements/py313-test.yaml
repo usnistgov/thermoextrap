@@ -13,7 +13,7 @@ channels:
 dependencies:
   - python=3.13
   - attrs>=24.1.0
-  - cmomy>=1.0.2
+  - cmomy>=1.0.3
   - dm-tree
   - docstring-inheritance
   - lazy_loader

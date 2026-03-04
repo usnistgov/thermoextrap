@@ -97,7 +97,7 @@ def input_GP_from_state(
     ----------
     state : :class:`~.core.typing.SupportsModelDerivs`
       object containing derivative information
-    sampler : :obj:`~cmomy.core.typing.SamplerType`
+    sampler : :obj:`~cmomy.resample.typing.SamplerType`
         SamplerType object.
     log_scale : bool, default=False
         Whether or not to apply a log scale in the input locations

@@ -14,7 +14,7 @@ dependencies:
   - python=3.12
   - attrs>=24.1.0
   - bottleneck
-  - cmomy>=1.0.2
+  - cmomy>=1.0.3
   - coverage<=7.13.0
   - dask
   - dm-tree

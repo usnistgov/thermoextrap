@@ -5731,7 +5731,7 @@ typecheck-runner = [
 requires-dist = [
     { name = "attrs", specifier = ">=24.1.0" },
     { name = "bottleneck", marker = "extra == 'accel'" },
-    { name = "cmomy", specifier = ">=1.0.2" },
+    { name = "cmomy", specifier = ">=1.0.3" },
     { name = "dask", extras = ["complete"], marker = "extra == 'parallel'" },
     { name = "dm-tree" },
     { name = "gpflow", marker = "extra == 'gpr'", specifier = ">=2.6.0" },

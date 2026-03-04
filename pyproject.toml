@@ -33,7 +33,7 @@ classifiers = [
 ]
 dependencies = [
     "attrs>=24.1.0",
-    "cmomy>=1.0.2",
+    "cmomy>=1.0.3",
     "dm-tree",
     "lazy-loader",
     "module-utilities[inherit]>=0.11.0",

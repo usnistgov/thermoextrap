@@ -57,7 +57,6 @@ if TYPE_CHECKING:
         OptionalKwsAny,
         SingleDim,
         SupportsData,
-        XArrayObj,
     )
     from .core.typing_compat import Self, TypeVar
 
@@ -414,7 +413,7 @@ class DataCentralMomentsBase(AbstractData, Generic[DataT]):
         return self.dxduave.sizes[self.umom_dim] - 1
 
     @property
-    def values(self) -> XArrayObj:
+    def values(self) -> xr.DataArray | xr.Dataset:
         """
         Data underlying :attr:`dxduave`.
 
