@@ -200,7 +200,7 @@ class DataSelector(MyAttrsMixin, Generic[DataT]):
         if len(idx) != len(self.dims):
             msg = f"bad idx {idx}, vs dims {self.dims}"
             raise ValueError(msg)
-        selector = dict(zip(self.dims, idx))
+        selector = dict(zip(self.dims, idx, strict=True))
         return self.data.isel(selector, drop=True)
 
     @override

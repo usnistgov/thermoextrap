@@ -822,7 +822,7 @@ class StateCollection(
         return type(self)(
             states=tuple(
                 state.resample(sampler=sampler, **kws)
-                for state, sampler in zip(self.states, sampler)
+                for state, sampler in zip(self.states, sampler, strict=True)
             ),
             **self.kws,
         )

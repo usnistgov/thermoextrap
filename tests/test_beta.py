@@ -338,7 +338,7 @@ def test_interpmodel_slow(fixture, rng: np.random.Generator) -> None:
                 uv=u, xv=x, order=fixture.order, central=False
             ),
         )
-        for beta, u, x in zip(beta0, energy, observable)
+        for beta, u, x in zip(beta0, energy, observable, strict=True)
     ]
 
     xemi = xtrap.InterpModel(xems)

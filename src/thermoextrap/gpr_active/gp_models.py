@@ -221,8 +221,8 @@ class DerivativeKernel(gpflow.kernels.Kernel):
             # Use sympy to obtain right derivative
             this_expr = sp.diff(
                 self.kernel_expr,
-                *zip(self.x_syms[: self.obs_dims], pair[0].numpy()),
-                *zip(self.x_syms[self.obs_dims :], pair[1].numpy()),
+                *zip(self.x_syms[: self.obs_dims], pair[0].numpy(), strict=True),
+                *zip(self.x_syms[self.obs_dims :], pair[1].numpy(), strict=True),
             )
             # Get lambdified function compatible with tensorflow
             this_func = lambdify_with_defaults(
@@ -268,8 +268,8 @@ class DerivativeKernel(gpflow.kernels.Kernel):
             d_numpy = d.numpy().astype(np.int32)
             this_expr = sp.diff(
                 self.kernel_expr,
-                *zip(self.x_syms[: self.obs_dims], d_numpy),
-                *zip(self.x_syms[self.obs_dims :], d_numpy),
+                *zip(self.x_syms[: self.obs_dims], d_numpy, strict=True),
+                *zip(self.x_syms[self.obs_dims :], d_numpy, strict=True),
             )
             this_func = lambdify_with_defaults(
                 (*self.x_syms, *self.param_syms),
@@ -1472,7 +1472,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             )
             this_expr = sp.diff(
                 self.expr,
-                *zip(self.x_syms, d.numpy()),
+                *zip(self.x_syms, d.numpy(), strict=True),
             )
             this_func = lambdify_with_defaults(
                 (*self.x_syms, *self.param_syms),

@@ -284,6 +284,6 @@ class SupportsStateCollection(Protocol[T_co, SupportsModelT_co]):
         return self.new_like(
             states=tuple(
                 state.resample(sampler=sampler, **kws)
-                for state, sampler in zip(self.states, sampler)
+                for state, sampler in zip(self.states, sampler, strict=True)
             ),
         )

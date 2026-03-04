@@ -878,7 +878,9 @@ def train_GPR(
         optim_params = [tpar.numpy() for tpar in gpr.trainable_parameters]
 
         # Set values to provided starting values
-        for trainable_param, start_param in zip(gpr.trainable_parameters, start_params):
+        for trainable_param, start_param in zip(
+            gpr.trainable_parameters, start_params, strict=True
+        ):
             this_param = _catch_inf_unconstrained_param(trainable_param, start_param)
             trainable_param.assign(this_param)
 

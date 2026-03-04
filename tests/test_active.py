@@ -312,7 +312,7 @@ def test_train_gp(sampler: SamplerType) -> None:
 
     # print(gp.parameters)
     # raise ValueError(f"hello {gp.parameters}")
-    for p, rp in zip(gp.parameters, ref_params):
+    for p, rp in zip(gp.parameters, ref_params, strict=True):
         # np.testing.assert_allclose(p.numpy(), rp, rtol=1e-1, atol=1e-12)  # for L-BFGS-B
         np.testing.assert_allclose(p.numpy(), rp, rtol=1e-7, atol=0)
 

@@ -13,7 +13,7 @@ See :ref:`examples/usage/basic/temperature_interp:adaptive interpolation` for ex
 from __future__ import annotations
 
 import logging
-from itertools import chain, islice
+from itertools import chain, islice, pairwise
 from typing import TYPE_CHECKING, Generic, TypedDict
 
 import numpy as np
@@ -471,7 +471,7 @@ def train_recursive(  # noqa: C901,PLR0913,PLR0914,PLR0917
 
     else:
         alphas_states = {s.alpha0 for s in states}
-        for alpha, state in zip([alpha0, alpha1], [state0, state1]):
+        for alpha, state in zip([alpha0, alpha1], [state0, state1], strict=True):
             if alpha not in alphas_states:
                 states.append(state)
         states = sorted(states, key=lambda x: x.alpha0)
@@ -521,7 +521,9 @@ def check_polynomial_consistency(
         statecollection_kws = {}
 
     key: tuple[Any, ...]
-    for state_pair in chain(zip(states[:-1], states[1:]), zip(states[:-2], states[2:])):
+    for state_pair in chain(
+        pairwise(states), zip(states[:-2], states[2:], strict=True)
+    ):
         model = factory_statecollection(list(state_pair), **statecollection_kws)
         key = tuple(model.alpha0)
         coef = model.coefs(order=None)
