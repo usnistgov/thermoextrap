@@ -170,10 +170,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache-dependency-path: uv.lock
 
-      - name: Compile cmomy
-        run: >-
-          python -m cmomy.compile
-
       - name: Test with nox
         env:
           python_version: ${{ matrix.python-version }}
