@@ -13,6 +13,7 @@ env:
   FORCE_COLOR: "3"
   UVX_CONSTRAINT: requirements/lock/uvx-tools.txt
   UVX_COMMAND: uvx -crequirements/lock/uvx-tools.txt
+  CMOMY_NUMBA_CACHE: false
 
 permissions: {}
 
@@ -136,10 +137,19 @@ jobs:
           ${{ fromJson(needs.build-package.outputs.matrix-test-python) }}
         style:
           - test
-        include:
-          - options: ""
-          - python-version:
+        options:
+          - ""
+        exclude:
+          - os: ubuntu-latest
+            python-version:
               ${{ needs.build-package.outputs.max-python-version }}
+            style: test
+            options: ""
+        include:
+          - os: ubuntu-latest
+            python-version:
+              ${{ needs.build-package.outputs.max-python-version }}
+            style: test
             options: "--run-slow"
           - os: ubuntu-latest
             python-version:
@@ -170,15 +180,15 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache-dependency-path: uv.lock
 
-      # numba cache
-      - name: Numba cache
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
-        with:
-          path: |
-            ${{ github.workspace }}/.numba_cache
-          key:
-            numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
-            env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}
+      # # numba cache
+      # - name: Numba cache
+      #   uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+      #   with:
+      #     path: |
+      #       ${{ github.workspace }}/.numba_cache
+      #     key:
+      #       numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
+      #       env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}
 
       - name: Test with nox
         env:
@@ -187,8 +197,7 @@ jobs:
           options: ${{ matrix.options }}
         run: >-
           $UVX_COMMAND nox -s "${style}-${python_version}" -- ++installpkg
-          dist/*.whl ++test-run python -m cmomy.compile ++test-options -n auto
-          "${options}"
+          dist/*.whl ++test-options -n auto "${options}"
         shell: bash
 
       - name: Upload coverage data

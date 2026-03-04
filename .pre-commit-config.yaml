@@ -9,7 +9,6 @@ ci:
   skip:
     - uv-lock
     - pip-compile
-    - nbqa-typos-markdown
 default_install_hook_types:
   - pre-commit
   - commit-msg
@@ -235,6 +234,7 @@ repos:
         # args: [typos, --write-changes, --nbqa-shell]
       - id: nbqa
         name: nbqa-typos-markdown
+        stages: [manual]
         alias: typos
         additional_dependencies: *typos-deps
         args: [typos, --nbqa-shell, --nbqa-md]
