@@ -91,7 +91,8 @@ jobs:
 
       - name: Run prek
         env:
-          SKIP: "typecheck,markdownlint-cli2"
+          # problem with markdownlint-cli2, and false positives from nbqa hooks
+          SKIP: "typecheck,markdownlint-cli2,nbqa"
         run: >-
           prek run --show-diff-on-failure --color=always --all-files
           --hook-stage=manual -v
