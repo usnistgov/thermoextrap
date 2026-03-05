@@ -190,7 +190,7 @@ jobs:
       # numba cache
       - name: Numba cache
         id: numba-cache-restore
-        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: |
             ${{ github.workspace }}/.numba_cache
