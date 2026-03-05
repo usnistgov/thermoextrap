@@ -200,6 +200,7 @@ jobs:
             hashFiles('uv.lock')}}
 
       - name: Cache contents before
+        if: steps.numba-cache-restore.outputs.cache-hit
         run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
         shell: bash
 
