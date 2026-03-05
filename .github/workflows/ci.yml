@@ -223,8 +223,10 @@ jobs:
           echo "compile: ${compile}"
           echo "options: ${options}"
 
-          $UVX_COMMAND nox -s "${command}" -- ++installpkg
-          "dist/*.whl" "${compile}" ++test-options -n auto "${options}"
+          $UVX_COMMAND nox -s "${command}" -- \
+            ++installpkg "dist/*.whl" \
+            "${compile}" \
+            ++test-options -n auto "${options}"
         shell: bash
 
       - name: Cache contents after
