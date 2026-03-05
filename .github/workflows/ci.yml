@@ -212,9 +212,9 @@ jobs:
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
         run: |
           if [ "$CACHE_HIT" = "true" ]; then
-            compile=""
+            compile="python -v"
           else
-            compile="++test-run='python -m cmomy.compile'"
+            compile="python -m cmomy.compile"
           fi
 
           command="${style}-${python_version}"
@@ -225,7 +225,7 @@ jobs:
 
           $UVX_COMMAND nox -s "${command}" -- \
             ++installpkg dist/*.whl \
-            "${compile}" \
+            ++test-run "${compile}" \
             ++test-options -n auto "${options}"
         shell: bash --noprofile --norc -euxo pipefail {0}
 
