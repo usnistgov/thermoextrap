@@ -211,10 +211,10 @@ jobs:
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
         run: |
-          if [ $CACHE_HIT == 'true' ]; then
+          if [ "$CACHE_HIT" = "true" ]; then
             compile=""
           else
-            compile = "++test-run python -m cmomy.compile"
+            compile="++test-run python -m cmomy.compile"
           fi
 
           command="${style}-${python_version}"
@@ -223,8 +223,8 @@ jobs:
           echo "compile: ${compile}"
           echo "options: ${options}"
 
-          $UVX_COMMAND nox -s "${style}-${python_version}" -- ++installpkg
-          dist/*.whl "${compile}" ++test-options -n auto "${options}"
+          $UVX_COMMAND nox -s "${command}" -- ++installpkg
+          "dist/*.whl" "${compile}" ++test-options -n auto "${options}"
         shell: bash
 
       - name: Cache contents after
