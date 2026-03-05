@@ -238,6 +238,7 @@ addopts = [
     "--cov-config=pyproject.toml",
     "--doctest-glob=*.md",
     "--doctest-modules",
+    "--force-sugar",
     "--ignore-glob='**/legacy/**",
     "--pyargs",
     "--strict-config",

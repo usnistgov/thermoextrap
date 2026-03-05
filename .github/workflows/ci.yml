@@ -188,14 +188,16 @@ jobs:
 
       # numba cache
       - name: Numba cache
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        id: numba-cache-restore
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: |
             ${{ github.workspace }}/.numba_cache
             ${{ github.workspace }}\.numba_cache
           key:
             numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
-            env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}
+            env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}|${{
+            hashFiles('uv.lock')}}
 
       - name: Cache contents before
         run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
@@ -206,13 +208,25 @@ jobs:
           python_version: ${{ matrix.python-version }}
           style: ${{ matrix.style }}
           options: ${{ matrix.options }}
-        run: >-
+          CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
+        run: |
+          if [ $CACHE_HIT == 'true' ]; then
+            compile=""
+          else
+            compile = "++test-run python -m cmomy.compile"
+          fi
+
+          command="${style}-${python_version}"
+
+          echo "command: ${command}"
+          echo "compile: ${compile}"
+          echo "options: ${options}"
+
           $UVX_COMMAND nox -s "${style}-${python_version}" -- ++installpkg
-          dist/*.whl ++test-run python -m cmomy.compile ++test-options -n auto
-          "${options}"
+          dist/*.whl "${compile}" ++test-options -n auto "${options}"
         shell: bash
 
-      - name: Cache contents before
+      - name: Cache contents after
         run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
         shell: bash
 
