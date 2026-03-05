@@ -200,10 +200,10 @@ jobs:
             env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}|${{
             hashFiles('uv.lock')}}
 
-      # - name: Cache contents before
-      #   if: steps.numba-cache-restore.outputs.cache-hit
-      #   run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
-      #   shell: bash
+      - name: Cache contents before
+        if: steps.numba-cache-restore.outputs.cache-hit
+        run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+        shell: bash
 
       - name: Test with nox
         env:
@@ -217,7 +217,7 @@ jobs:
           # else
           #   compile="python -m cmomy.compile"
           # fi
-          compile = "python -m cmomy.compile"
+          compile="python -m cmomy.compile"
 
           command="${style}-${python_version}"
 
@@ -231,12 +231,12 @@ jobs:
             ++test-options -n auto "${options}"
         shell: bash --noprofile --norc -euxo pipefail {0}
 
-      # - name: Cache contents after
-      #   run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
-      #   shell: bash
+      - name: Cache contents after
+        run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+        shell: bash
 
       - name: Numba cache save
-        uses: actions/cache/savee@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: |
             ${{ github.workspace }}/.numba_cache
