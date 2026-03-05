@@ -211,6 +211,7 @@ jobs:
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
         run: |
+          set -euxo pipefail
           if [ "$CACHE_HIT" = "true" ]; then
             compile=""
           else
