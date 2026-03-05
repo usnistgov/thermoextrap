@@ -197,6 +197,10 @@ jobs:
             numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
             env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}
 
+      - name: Cache contents before
+        run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+        shell: bash
+
       - name: Test with nox
         env:
           python_version: ${{ matrix.python-version }}
@@ -206,6 +210,10 @@ jobs:
           $UVX_COMMAND nox -s "${style}-${python_version}" -- ++installpkg
           dist/*.whl ++test-run python -m cmomy.compile ++test-options -n auto
           "${options}"
+        shell: bash
+
+      - name: Cache contents before
+        run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
         shell: bash
 
       - name: Upload coverage data
