@@ -218,6 +218,9 @@ extend-ignore-identifiers-re = [
     "NDArray.*",
     "struc_.*",
 ]
+extend-ignore-re = [
+    "# %%NBQA-.*",
+]
 
 [tool.typos.default.extend-identifiers]
 CPY = "CPY"
