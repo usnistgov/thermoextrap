@@ -211,7 +211,6 @@ jobs:
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
         run: |
-          set -euxo pipefail
           if [ "$CACHE_HIT" = "true" ]; then
             compile=""
           else
@@ -228,7 +227,7 @@ jobs:
             ++installpkg "dist/*.whl" \
             "${compile}" \
             ++test-options -n auto "${options}"
-        shell: bash
+        shell: bash --noprofile --norc -euxo pipefail {0}
 
       - name: Cache contents after
         run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
