@@ -276,6 +276,7 @@ minversion = "8"
 strict_xfail = "true"
 
 [tool.pytest_env]
+CMOMY_NUMBA_PARALLEL = { value = "false", skip_if_set = true }
 NUMBA_CACHE_DIR = { value = "{PWD}/.numba_cache", transform = true, skip_if_set = true }
 
 [tool.coverage]

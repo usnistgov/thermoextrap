@@ -13,6 +13,7 @@ env:
   FORCE_COLOR: "3"
   UVX_CONSTRAINT: requirements/lock/uvx-tools.txt
   UVX_COMMAND: uvx -crequirements/lock/uvx-tools.txt
+  CMOMY_NUMBA_PARALLEL: false
   # CMOMY_NUMBA_CACHE: false
 
 permissions: {}
@@ -217,7 +218,7 @@ jobs:
           # else
           #   compile="python -m cmomy.compile"
           # fi
-          compile="python -m cmomy.compile"
+          compile="python -m cmomy.compile --no-parallel"
 
           command="${style}-${python_version}"
 
