@@ -214,7 +214,7 @@ jobs:
           if [ "$CACHE_HIT" = "true" ]; then
             compile=""
           else
-            compile="++test-run python -m cmomy.compile"
+            compile="++test-run='python -m cmomy.compile'"
           fi
 
           command="${style}-${python_version}"
