@@ -9,9 +9,9 @@ defining-attr-methods = [
     "__init__",
     "__new__",
     "__post_init__",
-    "setUp",
-    "reset",
     "_reset",
+    "reset",
+    "setUp",
 ]
 
 [tool.pylint.design]
@@ -32,15 +32,17 @@ enable = [
     # "useless-suppression",
     "all",
 ]
+# disable options
 disable = [
     # defer to ruff
     "line-too-long",
-    "missing-module-docstring",
     "missing-function-docstring",
-    "redefined-outer-name",
-    "unused-argument",
-    "too-complex",
+    "missing-module-docstring",
     "missing-param-doc",
+    "redefined-outer-name",
+    "too-complex",
+    "unused-argument",
+    "unused-import",
     # Silly
     "docstring-first-line-empty",
     "magic-value-comparison",
@@ -52,19 +54,19 @@ disable = [
     "superfluous-parens",
     "too-many-lines",
     # Messages that are noisy for now, eventually maybe we'll turn them on:
-    "invalid-name",
-    # "protected-access",
-    "unspecified-encoding",
     "consider-using-f-string",
+    "invalid-name",
+    "unspecified-encoding",
+    # "protected-access",
     # "duplicate-code",
     # "cyclic-import",
     # project specific
-    "use-implicit-booleaness-not-comparison-to-zero",
-    "too-many-arguments",
-    "too-many-positional-arguments",
     "abstract-method",
     "consider-using-augmented-assign",
     "import-error",                                   # defer to pyright
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "use-implicit-booleaness-not-comparison-to-zero",
 ]
 
 [tool.pylint.reports]

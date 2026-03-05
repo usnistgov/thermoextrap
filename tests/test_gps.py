@@ -570,7 +570,7 @@ def test_gp() -> None:  # noqa: PLR0915
     ref_like = HetGaussianDeriv(
         cov_data,
         1,
-        **like_kwargs,  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+        **like_kwargs,  # type: ignore[arg-type]
     )
     np.testing.assert_allclose(ref_like.cov, check_1d.likelihood.cov)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
     np.testing.assert_allclose(

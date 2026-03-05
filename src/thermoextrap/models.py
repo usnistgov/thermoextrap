@@ -49,6 +49,7 @@ from .core.typing import (
     SupportsModelDataT_co,
     SupportsModelDerivsDataT,
 )
+from .core.typing_compat import override
 from .core.validate import validate_alpha
 from .core.xrutils import xrwrap_alpha
 
@@ -748,6 +749,7 @@ class StateCollection(
 
     _cache: dict[str, Any] = field(init=False, repr=False, factory=dict)
 
+    @override
     def __len__(self) -> int:
         return len(self.states)
 
@@ -756,6 +758,7 @@ class StateCollection(
     @overload
     def __getitem__(self, idx: slice[Any, Any, Any], /) -> Self: ...
 
+    @override
     def __getitem__(  # pyright: ignore[reportIncompatibleMethodOverride]  # NOTE: adding slice functionality...
         self, idx: SupportsIndex | slice[Any, Any, Any], /
     ) -> SupportsModelDataT_co | Self:
@@ -819,7 +822,7 @@ class StateCollection(
         return type(self)(
             states=tuple(
                 state.resample(sampler=sampler, **kws)
-                for state, sampler in zip(self.states, sampler)
+                for state, sampler in zip(self.states, sampler, strict=True)
             ),
             **self.kws,
         )
@@ -946,6 +949,7 @@ class ExtrapWeightedModel(
         Extrap models to consider.
     """
 
+    @override
     def predict(
         self,
         alpha: ArrayLike,
@@ -1089,9 +1093,9 @@ class InterpModel(StateCollection[DataT, SupportsModelDerivsDataT]):
 
         coefs = cast(
             "DataT",
-            xr.concat(  # type: ignore[type-var]  # pyright: ignore[reportCallIssue]
+            xr.concat(  # pyright: ignore[reportCallIssue]
                 (  # pyright: ignore[reportArgumentType]
-                    m.derivs(order, norm=False, minus_log=minus_log, order_dim="order")
+                    m.derivs(order, norm=False, minus_log=minus_log, order_dim="order")  # type: ignore[misc]
                     for m in self.states
                 ),
                 dim="state",
@@ -1099,6 +1103,7 @@ class InterpModel(StateCollection[DataT, SupportsModelDerivsDataT]):
         )
         return xr_dot(mat_inv, coefs)
 
+    @override
     def predict(
         self,
         alpha: ArrayLike,
@@ -1139,6 +1144,7 @@ class InterpModelPiecewise(PiecewiseStateCollection[DataT, SupportsModelDerivsDa
         state0, state1 = (self[i] for i in state_indices)
         return InterpModel([state0, state1])
 
+    @override
     def predict(
         self,
         alpha: ArrayLike,
@@ -1275,6 +1281,7 @@ class MBARModel(StateCollection[xr.DataArray, Any]):
 
         return uv, xv, alpha0, mbar_obj
 
+    @override
     def predict(
         self, alpha: ArrayLike, *, alpha_name: str | None = None, **kwargs: Any
     ) -> xr.DataArray:
@@ -1305,6 +1312,7 @@ class MBARModel(StateCollection[xr.DataArray, Any]):
             out.reshape(shape), dims=(alpha.name, *dims[2:])
         ).assign_coords(alpha=alpha)
 
+    @override
     def resample(self, *args: Any, **kwargs: Any) -> Self:
         msg = "resample not implemented for this class"
         raise NotImplementedError(msg)

@@ -234,13 +234,15 @@ class RecursiveInterp:
             else:
                 toplot = predict_vals
             plt.clf()
-            plt.plot(beta_vals, toplot)
+            _ = plt.plot(beta_vals, toplot)
             if new_beta is not None:
-                plt.plot([new_beta, new_beta], [np.min(toplot), np.max(toplot)], "k:")
+                _ = plt.plot(
+                    [new_beta, new_beta], [np.min(toplot), np.max(toplot)], "k:"
+                )
             if plot_func is not None:
-                plt.plot(beta_vals, plot_func(beta_vals), "k--")
-            plt.xlabel(r"$\beta$")
-            plt.ylabel(r"Observable, $X$")
+                _ = plt.plot(beta_vals, plot_func(beta_vals), "k--")
+            _ = plt.xlabel(r"$\beta$")
+            _ = plt.ylabel(r"Observable, $X$")
             plt.gcf().tight_layout()
             plt.show(block=False)
             plt.pause(5)
@@ -529,9 +531,9 @@ class RecursiveInterp:
                 plotfull = np.polynomial.polynomial.polyval(plotpoints, fullcoeffs)  # type: ignore[no-untyped-call]  # pyright: ignore[reportUnknownVariableType]
                 plotreg1 = np.polynomial.polynomial.polyval(plotpoints, reg1coeffs)  # type: ignore[no-untyped-call]  # pyright: ignore[reportUnknownVariableType]
                 plotreg2 = np.polynomial.polynomial.polyval(plotpoints, reg2coeffs)  # type: ignore[no-untyped-call]  # pyright: ignore[reportUnknownVariableType]
-                pax.plot(plotpoints, plotfull, color=pcolors[i], linestyle="-")
-                pax.plot(plotpoints, plotreg1, color=pcolors[i], linestyle=":")
-                pax.plot(plotpoints, plotreg2, color=pcolors[i], linestyle="--")
+                _ = pax.plot(plotpoints, plotfull, color=pcolors[i], linestyle="-")
+                _ = pax.plot(plotpoints, plotreg1, color=pcolors[i], linestyle=":")
+                _ = pax.plot(plotpoints, plotreg2, color=pcolors[i], linestyle="--")
                 allploty = np.hstack(  # pyright: ignore[reportUnknownVariableType]
                     (plotfull, plotreg1, plotreg2)
                 )
@@ -540,9 +542,9 @@ class RecursiveInterp:
 
         if do_plot:
             for edge in self.edge_beta:
-                pax.plot([edge] * 2, [plotymin, plotymax], "k-")
-            pax.set_xlabel(r"$\beta$")
-            pax.set_ylabel(r"$\langle x \rangle$")
+                _ = pax.plot([edge] * 2, [plotymin, plotymax], "k-")
+            _ = pax.set_xlabel(r"$\beta$")
+            _ = pax.set_ylabel(r"$\langle x \rangle$")
             pfig.tight_layout()
             plt.show()
 

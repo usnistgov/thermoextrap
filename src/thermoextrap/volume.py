@@ -23,6 +23,7 @@ from thermoextrap.models import Derivatives, ExtrapModel
 
 from .core.docstrings import DOCFILLER_SHARED
 from .core.typing import DataDerivArgs, DataT, OptionalKwsAny, SupportsData
+from .core.typing_compat import override
 from .core.xrutils import xrwrap_xv
 from .data import DataCallbackABC
 
@@ -130,6 +131,7 @@ class VolumeDataCallback(DataCallbackABC, Generic[DataT]):
 
     _cache: dict[str, Any] = field(init=False, repr=False, factory=dict[str, "Any"])
 
+    @override
     def check(self, data: SupportsData[Any]) -> None:
         pass
 
@@ -137,6 +139,7 @@ class VolumeDataCallback(DataCallbackABC, Generic[DataT]):
     def dxdq(self, rec_dim: str) -> DataT:
         return self.dxdqv.mean(rec_dim)
 
+    @override
     def resample(
         self,
         data: SupportsData[Any],
@@ -151,6 +154,7 @@ class VolumeDataCallback(DataCallbackABC, Generic[DataT]):
 
         return self.new_like(dxdqv=self.dxdqv[sampler.indices])
 
+    @override
     def deriv_args(
         self, data: SupportsData[Any], *, deriv_args: DataDerivArgs
     ) -> DataDerivArgs:

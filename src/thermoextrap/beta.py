@@ -19,6 +19,7 @@ from .core.sputils import (
     get_default_indexed,
     get_default_symbol,
 )
+from .core.typing_compat import override
 from .core.validate import validate_positive_integer
 from .models import (
     Derivatives,
@@ -67,9 +68,11 @@ class du_func(SymFuncBase):
     du = get_default_indexed("du")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[IndexedBase]:
         return (cls.du,)
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         beta, n = self.args
         return -(
@@ -77,12 +80,14 @@ class du_func(SymFuncBase):
             - n * self.tcall(beta, n=n - 1) * self.tcall(beta, n=2)
         )
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         n = self.args[1]
         return self.du[n]  # pyright: ignore[reportReturnType, reportUnknownVariableType]
 
     @classmethod
+    @override
     def eval(cls, beta: Symbol, n: int | Number = 0) -> Any:
         if n == 0:
             return Number(1)
@@ -91,6 +96,7 @@ class du_func(SymFuncBase):
         return None
 
     @classmethod
+    @override
     def tcall(cls, beta: Symbol, *, n: int | Number = 0) -> Expr:
         return cls(beta, n)
 
@@ -106,22 +112,27 @@ class u_func_central(SymFuncBase):
     u = get_default_symbol("u")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[Symbol, IndexedBase]:
         return (cls.u, *du_func.deriv_args())
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         (beta,) = self.args
         return -du_func.tcall(beta, n=2)
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         return self.u
 
     @classmethod
+    @override
     def eval(cls, beta: Symbol) -> Any:
         return None
 
     @classmethod
+    @override
     def tcall(cls, beta: Symbol) -> Expr:
         return cls(beta)
 
@@ -143,9 +154,11 @@ class dxdu_func(SymFuncBase):
     dxdu = get_default_indexed("dxdu")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[IndexedBase, IndexedBase]:
         return (*du_func.deriv_args(), cls.dxdu)
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         if len(self.args) == 2:
             (beta, n), d = self.args, None
@@ -162,6 +175,7 @@ class dxdu_func(SymFuncBase):
             return out
         return out + self.tcall(beta, n=n, deriv=d + 1)
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         if len(self.args) == 2:
@@ -171,6 +185,7 @@ class dxdu_func(SymFuncBase):
         return cast("Expr", self.dxdu[n, deriv])
 
     @classmethod
+    @override
     def eval(
         cls,
         beta: Symbol,
@@ -182,6 +197,7 @@ class dxdu_func(SymFuncBase):
         return None
 
     @classmethod
+    @override
     def tcall(
         cls,
         beta: Symbol,
@@ -208,9 +224,11 @@ class x_func_central(SymFuncBase):
     x1_indexed = get_default_indexed("x1")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[IndexedBase, IndexedBase, IndexedBase]:
         return (cls.x1_indexed, *dxdu_func.deriv_args())
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         if len(self.args) == 1:
             (beta,), d = self.args, None
@@ -222,6 +240,7 @@ class x_func_central(SymFuncBase):
             return out
         return out + self.tcall(beta, deriv=d + 1)
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         if len(self.args) == 1:
@@ -230,10 +249,12 @@ class x_func_central(SymFuncBase):
         return cast("Expr", self.x1_indexed[deriv])
 
     @classmethod
+    @override
     def eval(cls, beta: Symbol, deriv: int | Number | None = None) -> Any:
         return None
 
     @classmethod
+    @override
     def tcall(cls, beta: Symbol, *, deriv: int | Number | None = None) -> Expr:
         if deriv is None:
             return cls(beta)
@@ -248,27 +269,32 @@ class u_func(SymFuncBase):
     u = get_default_indexed("u")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[IndexedBase]:
         return (cls.u,)
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         beta, n = self.args
         return -(
             self.tcall(beta, n=n + 1) - self.tcall(beta, n=n) * self.tcall(beta, n=1)
         )
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         _, n = self.args
         return cast("Expr", self.u[n])
 
     @classmethod
+    @override
     def eval(cls, beta: Symbol, n: int | Number = 0) -> Any:
         if n == 0:
             return Number(1)
         return None
 
     @classmethod
+    @override
     def tcall(cls, beta: Symbol, *, n: int | Number = 0) -> Expr:
         return cls(beta, n)
 
@@ -285,9 +311,11 @@ class xu_func(SymFuncBase):
     xu = get_default_indexed("xu")
 
     @classmethod
+    @override
     def deriv_args(cls) -> tuple[IndexedBase, IndexedBase]:
         return (*u_func.deriv_args(), cls.xu)
 
+    @override
     def fdiff(self, argindex: int | Number = 1) -> Expr:
         if len(self.args) == 2:
             (beta, n), d = self.args, None
@@ -302,6 +330,7 @@ class xu_func(SymFuncBase):
             return out
         return out + self.tcall(beta, n=n, deriv=d + 1)
 
+    @override
     def doit(self, deep: bool = False, **hints: Any) -> Expr:
         self._doit_args(deep, **hints)
         if len(self.args) == 2:
@@ -311,6 +340,7 @@ class xu_func(SymFuncBase):
         return cast("Expr", self.xu[n, deriv])
 
     @classmethod
+    @override
     def eval(
         cls,
         beta: Symbol,
@@ -320,6 +350,7 @@ class xu_func(SymFuncBase):
         return None
 
     @classmethod
+    @override
     def tcall(
         cls,
         beta: Symbol,
@@ -711,15 +742,14 @@ def factory_extrapmodel(
     -------
     extrapmodel : :class:`~thermoextrap.models.ExtrapModel`
 
+    See Also
+    --------
+    ~thermoextrap.models.ExtrapModel
 
     Notes
     -----
     Note that default values for parameters ``order``, ``xalpha``, and ``central``
     are inferred from corresponding attributes of ``data``.
-
-    See Also
-    --------
-    ~thermoextrap.models.ExtrapModel
     """
     if xalpha is None:
         xalpha = data.xalpha

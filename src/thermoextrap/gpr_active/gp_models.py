@@ -16,23 +16,32 @@ import tensorflow as tf
 from scipy import optimize
 
 from thermoextrap.core.sputils import lambdify_with_defaults
+from thermoextrap.core.typing_compat import override
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from typing import Any
 
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
     from sympy.core.expr import Expr
     from tensorflow import Tensor
     from tensorflow_probability.python.bijectors.softplus import Softplus
 
     from thermoextrap.core.typing import NDArrayAny, OptionalKwsAny, TensorType
+    from thermoextrap.core.typing_compat import TypeVar
+
+    TensorOrArrayT = TypeVar("TensorOrArrayT", NDArray[Any], tf.Tensor)
 
 
 logger = logging.getLogger(__name__)
-
-
 GPFLOW_POSITIVE = gpflow.utilities.positive()
+
+
+def _get_tensor_size(x: tf.Tensor, index: int = 0) -> int:
+    if (size := x.shape[index]) is None:
+        msg = "expected sized tensor"
+        raise ValueError(msg)
+    return size
 
 
 # TODO(wpk): Bunch of cleanup here
@@ -162,12 +171,18 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         # return self.lengthscales.shape.ndims > 0
         return False
 
+    @override
     def K(self, X: TensorType, X2: TensorType | None = None) -> Tensor:
-        if X2 is None:
-            X2 = X
+        X = tf.convert_to_tensor(X)
+        X2 = X if X2 is None else tf.convert_to_tensor(X2)
 
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
         x2, d2 = self._split_x_into_locs_and_deriv_info(X2)
+
+        d1_size = _get_tensor_size(d1)
+        d2_size = _get_tensor_size(d2)
+        x1_size = _get_tensor_size(x1)
+        x2_size = _get_tensor_size(x2)
 
         # Output should be a tensor that is len(X) by len(X2)
         # And must be traceable with tensorflow's autodifferentiation
@@ -175,21 +190,21 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
         # Want full list of all combinations of derivative pairs
         expand_d1 = tf.reshape(
-            tf.tile(d1, (1, d2.shape[0])),
-            (d1.shape[0] * d2.shape[0], -1),  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]
+            tf.tile(d1, (1, d2_size)),
+            (d1_size * d2_size, -1),
         )
         expand_d1 = tf.cast(expand_d1, tf.int32)
-        expand_d2 = tf.tile(d2, (d1.shape[0], 1))
+        expand_d2 = tf.tile(d2, (d1_size, 1))
         expand_d2 = tf.cast(expand_d2, tf.int32)
         deriv_pairs = tf.stack([expand_d1, expand_d2], axis=1)
 
         # For convenience, do same with x, but no need to stack
         # Sort of same idea as creating a mesh grid
         expand_x1 = tf.reshape(
-            tf.tile(x1, (1, x2.shape[0])),
-            (x1.shape[0] * x2.shape[0], -1),  # type: ignore[operator]  # pyright: ignore[reportOperatorIssue]
+            tf.tile(x1, (1, x2_size)),
+            (x1_size * x2_size, -1),
         )
-        expand_x2 = tf.tile(x2, (x1.shape[0], 1))
+        expand_x2 = tf.tile(x2, (x1_size, 1))
 
         # Now need UNIQUE derivative pairs because will be faster to loop over
         unique_pairs = tf.raw_ops.UniqueV2(x=deriv_pairs, axis=[0])[0]
@@ -206,8 +221,8 @@ class DerivativeKernel(gpflow.kernels.Kernel):
             # Use sympy to obtain right derivative
             this_expr = sp.diff(
                 self.kernel_expr,
-                *zip(self.x_syms[: self.obs_dims], pair[0].numpy()),
-                *zip(self.x_syms[self.obs_dims :], pair[1].numpy()),
+                *zip(self.x_syms[: self.obs_dims], pair[0].numpy(), strict=True),
+                *zip(self.x_syms[self.obs_dims :], pair[1].numpy(), strict=True),
             )
             # Get lambdified function compatible with tensorflow
             this_func = lambdify_with_defaults(
@@ -234,13 +249,14 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         k_list_stitch = tf.dynamic_stitch(inds_list, k_list)
 
         # Reshape to the correct output
-        return tf.reshape(k_list_stitch, (x1.shape[0], x2.shape[0]))
+        return tf.reshape(k_list_stitch, (x1_size, x2_size))
 
+    @override
     def K_diag(self, X: TensorType) -> Tensor:
         # Same as for K but don't need every combination, just every x with itself
+        X = tf.convert_to_tensor(X)
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
         unique_d1 = tf.raw_ops.UniqueV2(x=d1, axis=[0])[0]
-        unique_d1 = tf.cast(unique_d1, tf.int32)
 
         k_list = []
         inds_list = []
@@ -248,10 +264,12 @@ class DerivativeKernel(gpflow.kernels.Kernel):
             this_inds = tf.cast(
                 tf.where(tf.reduce_all(d1 == d, axis=1))[:, :1], tf.int32
             )
+
+            d_numpy = d.numpy().astype(np.int32)
             this_expr = sp.diff(
                 self.kernel_expr,
-                *zip(self.x_syms[: self.obs_dims], d.numpy()),
-                *zip(self.x_syms[self.obs_dims :], d.numpy()),
+                *zip(self.x_syms[: self.obs_dims], d_numpy, strict=True),
+                *zip(self.x_syms[self.obs_dims :], d_numpy, strict=True),
             )
             this_func = lambdify_with_defaults(
                 (*self.x_syms, *self.param_syms),
@@ -271,8 +289,8 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         return tf.reshape(k_list_stitch, (x1.shape[0],))
 
     def _split_x_into_locs_and_deriv_info(
-        self, x: TensorType
-    ) -> tuple[TensorType, TensorType]:
+        self, x: TensorOrArrayT
+    ) -> tuple[TensorOrArrayT, TensorOrArrayT]:
         """Splits input into actual observable input and derivative labels"""
         locs = x[:, : self.obs_dims]
         grad_info = x[:, -self.obs_dims :]
@@ -772,7 +790,7 @@ def multioutput_multivariate_normal(
         to sum over locations as would for multivariate Gaussian over each
         dimension
     """
-    d = tf.expand_dims(tf.transpose(x - mu), -1)
+    d = tf.expand_dims(tf.transpose(tf.convert_to_tensor(x - mu)), -1)
     alpha = tf.linalg.triangular_solve(L, d, lower=True)
     alpha = tf.squeeze(alpha, axis=-1)
     num_locs = tf.cast(tf.shape(d)[1], L.dtype)
@@ -926,6 +944,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         out_diag += self.stable_var_min
         return tf.linalg.set_diag(output, out_diag)
 
+    @override
     def _scalar_log_prob(
         self,
         X: TensorType,
@@ -936,14 +955,17 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
             Y, F, tf.linalg.cholesky(self.build_scaled_cov_mat(X))
         )
 
+    @override
     def _conditional_mean(self, X: TensorType, F: TensorType) -> tf.Tensor:
         return tf.identity(F)  # type: ignore[no-any-return]
 
+    @override
     def _conditional_variance(self, X: TensorType, F: TensorType) -> tf.Tensor:
         # Returns full covariance for INPUT Y data
         # May not fit with expected behavior, so could consider making "Not Implemented"
         return self.build_scaled_cov_mat(X)
 
+    @override
     def _predict_mean_and_var(
         self,
         X: TensorType,
@@ -955,6 +977,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
         raise NotImplementedError(msg)
 
+    @override
     def _predict_log_density(
         self,
         X: TensorType,
@@ -967,6 +990,7 @@ class HetGaussianDeriv(gpflow.likelihoods.ScalarLikelihood):
         msg = "Predicting noise at new points is not possible for this likelihood (would require prediction of full covariance between derivative orders at new points)."
         raise NotImplementedError(msg)
 
+    @override
     def _variational_expectations(
         self,
         X: TensorType,
@@ -1093,6 +1117,7 @@ class HeteroscedasticGPR(
         super().__init__(kernel, likelihood, mean_function, num_latent_gps=1)
         self.data = gpflow.models.util.data_input_to_tensor((X_data, Y_data))
 
+    @override
     def maximum_log_likelihood_objective(self) -> tf.Tensor:  # pylint: disable=arguments-differ
         return self.log_marginal_likelihood()
 
@@ -1108,6 +1133,7 @@ class HeteroscedasticGPR(
 
         return tf.reduce_sum(log_prob)
 
+    @override
     def predict_f(
         self,
         Xnew: gpflow.base.InputData,
@@ -1178,6 +1204,7 @@ class HeteroscedasticGPR(
 
         return f_mean, f_var
 
+    @override
     def predict_y(
         self,
         Xnew: gpflow.base.InputData,
@@ -1188,6 +1215,7 @@ class HeteroscedasticGPR(
         msg = "Predicting y would require knowledge of the noise at new data points, which is not modeled here."
         raise NotImplementedError(msg)
 
+    @override
     def predict_log_density(
         self,
         data: gpflow.base.RegressionData,
@@ -1219,11 +1247,14 @@ class ConstantMeanWithDerivs(gpflow.functions.MeanFunction):
         self.dim = y_data.shape[1]
         self.x_dim = int(x_dim)
 
+    @override
     def __call__(self, X: TensorType) -> tf.Tensor:
         filled_mean = tf.ones([tf.shape(X)[0], self.dim], dtype=X.dtype) * self.c
         filled_zeros = tf.zeros([tf.shape(X)[0], self.dim], dtype=X.dtype)
         deriv_zero_bool = tf.math.reduce_all(
-            (X[:, self.x_dim :] == 0.0), axis=-1, keepdims=True
+            tf.experimental.numpy.isclose(X[:, self.x_dim :], 0.0),
+            axis=-1,
+            keepdims=True,
         )
         return tf.where(deriv_zero_bool, filled_mean, filled_zeros)
 
@@ -1266,6 +1297,7 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
         self.dim = y_data.shape[1]
         self.x_dim = x_data.shape[1]
 
+    @override
     def __call__(self, X: TensorType) -> tf.Tensor:
         # Fill in mean function for 0th order for all X
         filled_mean_0 = tf.tensordot(X[:, : self.x_dim], self.slope, 1) + self.b
@@ -1277,10 +1309,16 @@ class LinearWithDerivs(gpflow.functions.MeanFunction):
         # For 1st derivative boolean, must be where have at least one 1 (first derivative)
         # and no derivatives higher than 1
         deriv_zero_bool = tf.math.reduce_all(
-            (X[:, self.x_dim :] == 0.0), axis=-1, keepdims=True
+            tf.experimental.numpy.isclose(X[:, self.x_dim :], 0.0),
+            axis=-1,
+            keepdims=True,
         )
         deriv_one_bool = tf.math.logical_or(
-            tf.math.reduce_any((X[:, self.x_dim :] == 1.0), axis=-1, keepdims=True),
+            tf.math.reduce_any(
+                tf.experimental.numpy.isclose(X[:, self.x_dim :], 1.0),
+                axis=-1,
+                keepdims=True,
+            ),
             tf.math.reduce_all((X[:, self.x_dim :] < 2.0), axis=-1, keepdims=True),
         )
         output_0 = tf.where(deriv_zero_bool, filled_mean_0, filled_zeros)
@@ -1427,6 +1465,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
                     gpflow.Parameter(this_val, trainable=(not constrain_params)),
                 )
 
+    @override
     def __call__(self, X: TensorType) -> tf.Tensor:
         """Closely follows K_diag from DerivativeKernel."""
         x_vals = X[:, : self.x_dim]
@@ -1441,7 +1480,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             )
             this_expr = sp.diff(
                 self.expr,
-                *zip(self.x_syms, d.numpy()),
+                *zip(self.x_syms, d.numpy(), strict=True),
             )
             this_func = lambdify_with_defaults(
                 (*self.x_syms, *self.param_syms),

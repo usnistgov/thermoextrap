@@ -1,0 +1,15 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v0.7.0-109-g667a118
+_src_path: https://github.com/usnistgov/cookiecutter-nist-python.git
+command_line_interface: none
+conda_channel: conda-forge
+email: wpk@nist.gov
+full_name: William P. Krekelberg
+github_username: usnistgov
+project_name: thermoextrap
+project_short_description: Thermodynamic extrapolation
+project_slug: thermoextrap
+pypi_username: wpk-nist
+sphinx_theme: sphinx_book_theme
+sphinx_use_autodocsumm: true
+year: '2020'

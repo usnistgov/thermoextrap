@@ -266,8 +266,8 @@ def test_base_gp_creation(rng: Generator, sampler: SamplerType) -> None:
     )
     assert isinstance(check_kernel.kernel, gpflow.kernels.SharedIndependent)
     assert check_kernel.kernel.kernel == k_rbf
-    assert check_kernel.kernel.kernel.l_0.numpy() == 0.5  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
-    assert check_kernel.kernel.kernel.var.numpy() == 5.0  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    np.testing.assert_allclose(check_kernel.kernel.kernel.l_0.numpy(), 0.5)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
+    np.testing.assert_allclose(check_kernel.kernel.kernel.var.numpy(), 5.0)  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue]
 
 
 # Simple test for checking training of GP model
@@ -312,7 +312,7 @@ def test_train_gp(sampler: SamplerType) -> None:
 
     # print(gp.parameters)
     # raise ValueError(f"hello {gp.parameters}")
-    for p, rp in zip(gp.parameters, ref_params):
+    for p, rp in zip(gp.parameters, ref_params, strict=True):
         # np.testing.assert_allclose(p.numpy(), rp, rtol=1e-1, atol=1e-12)  # for L-BFGS-B
         np.testing.assert_allclose(p.numpy(), rp, rtol=1e-7, atol=0)
 
@@ -516,7 +516,7 @@ def test_metrics(rng: Generator, sampler: SamplerType) -> None:
     # Use to test _check_history function for all inheriting classes
     # pylint: disable=protected-access
     np.testing.assert_raises(ValueError, check_base._check_history, None)
-    np.testing.assert_raises(ValueError, check_base._check_history, x)  # type: ignore[call-overload]  # pyright: ignore[reportArgumentType]
+    np.testing.assert_raises(ValueError, check_base._check_history, x)  # type: ignore[call-overload]
     check_base._check_history(hist)
     # And generic call and calc_metric both work
     np.testing.assert_raises(NotImplementedError, check_base, hist, x, None)
@@ -566,7 +566,7 @@ def test_metrics(rng: Generator, sampler: SamplerType) -> None:
     out_errorstability = check_errorstability(hist, x, gp_3)
     assert isinstance(check_errorstability.r1, float)
     assert isinstance(out_errorstability, float)  # type: ignore[unreachable]
-    assert out_errorstability == 1.0
+    np.testing.assert_allclose(out_errorstability, 1.0)
     # Check with 4 points
     out_errorstability_4 = check_errorstability(hist, x, gp_4)
     assert isinstance(out_errorstability, float)

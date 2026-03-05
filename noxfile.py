@@ -6,13 +6,15 @@
 # ]
 # ///
 
-# pylint: disable=wrong-import-position
 """Config file for nox."""
+# pyright: reportUnusedCallResult=false
+# pylint: disable=wrong-import-position
 
 # * Imports ----------------------------------------------------------------------------
 from __future__ import annotations
 
 import os
+import platform
 import shlex
 import shutil
 import sys
@@ -59,7 +61,6 @@ if TYPE_CHECKING:
 
 PACKAGE_NAME = "thermoextrap"
 IMPORT_NAME = "thermoextrap"
-KERNEL_NAME = "thermoextrap"
 
 # * nox options ------------------------------------------------------------------------
 
@@ -72,16 +73,23 @@ nox.options.default_venv_backend = "uv"
 
 # * Options ---------------------------------------------------------------------------
 
+os.environ["NUMBA_CACHE_DIR"] = str(ROOT / ".numba_cache")
+
+
 # if True, use uv lock/sync.  If False, use uv pip compile/sync...
 UV_LOCK = True
 
-PYTHON_ALL_VERSIONS = [
-    c.split()[-1]
-    for c in nox.project.load_toml("pyproject.toml")["project"]["classifiers"]
-    if c.startswith("Programming Language :: Python :: 3.")
-]
-PYTHON_DEFAULT_VERSION = Path(".python-version").read_text(encoding="utf-8").strip()
+PYTHON_ALL_VERSIONS = nox.project.python_versions(
+    nox.project.load_toml("pyproject.toml"),
+)
 
+if sys.platform != "darwin" or platform.machine() != "x86_64":
+    PYTHON_TEST_VERSIONS = PYTHON_ALL_VERSIONS
+else:
+    PYTHON_TEST_VERSIONS = PYTHON_ALL_VERSIONS.copy()
+    PYTHON_TEST_VERSIONS.remove("3.13")
+
+PYTHON_DEFAULT_VERSION = Path(".python-version").read_text(encoding="utf-8").strip()
 UVX_LOCK_CONSTRAINTS = "requirements/lock/uvx-tools.txt"
 UVX_MIN_CONSTRAINTS = "requirements/uvx-tools.txt"
 PIP_COMPILE_CONFIG = "requirements/uv.toml"
@@ -91,7 +99,7 @@ class SessionOptionsDict(TypedDict, total=False):
     """Dict for options to nox.session."""
 
     python: str | list[str]
-    venv_backend: str | Callable[..., CondaEnv]
+    venv_backend: str | None
 
 
 CONDA_DEFAULT_KWS: SessionOptionsDict = {
@@ -156,7 +164,13 @@ class SessionParams(DataclassParser):
     no_cov: bool = False
 
     # coverage
-    coverage: list[Literal["erase", "combine", "report", "html", "open"]] | None = None
+    coverage: (
+        list[Literal["erase", "combine", "report", "html", "open", "markdown"]] | None
+    ) = None
+
+    coverage_options: OPT_TYPE = add_option(
+        "--coverage-options", help="Options to coverage commands"
+    )
 
     # docs
     docs: (
@@ -403,7 +417,7 @@ def get_package_wheel(
     if reuse and getattr(get_package_wheel, "_called", False):
         session.log("Reuse isolated build")
     else:
-        shutil.rmtree(dist_location)
+        shutil.rmtree(dist_location, ignore_errors=True)
         session.run_always("uv", "build", f"--out-dir={dist_location}", "--wheel")
 
         # save that this was called:
@@ -470,57 +484,10 @@ def pre_commit_run(
 def test_all(session: Session) -> None:
     """Run all tests and coverage."""
     session.notify("coverage-erase")
-    for py in PYTHON_ALL_VERSIONS:
+    for py in PYTHON_TEST_VERSIONS:
         session.notify(f"test-{py}")
     session.notify("test-notebook")
     session.notify("coverage")
-
-
-# ** dev
-@nox.session(name="dev", python=False)
-@add_opts
-def dev(
-    session: Session,
-    opts: SessionParams,
-) -> None:
-    """Create development environment."""
-    session.run("uv", "venv", ".venv", "--allow-existing", "--prompt", PACKAGE_NAME)
-
-    python_opt = "--python=.venv/bin/python"
-
-    install_dependencies(
-        session,
-        python_opt,
-        name="dev",
-        opts=opts,
-        python_version=PYTHON_DEFAULT_VERSION,
-        location=".venv",
-        no_dev=False,
-        include_editable_package=True,
-    )
-    session.notify("install-ipykernel")
-
-
-@nox.session(name="install-ipykernel", python=False)
-@add_opts
-def install_ipykernel(session: Session, opts: SessionParams) -> None:
-    """Install ipykernel for .venv"""
-    session.run(
-        "uv",
-        "run",
-        *opts.uv_sync_options,
-        "--python=.venv/bin/python",
-        "python",
-        "-m",
-        "ipykernel",
-        "install",
-        "--user",
-        "--name",
-        KERNEL_NAME,
-        "--display-name",
-        f"Python [venv: {KERNEL_NAME}]",
-        success_codes=[0, 1],
-    )
 
 
 # ** testing
@@ -537,7 +504,9 @@ def _test(
     if not test_no_pytest:
         opts = combine_list_str(test_options or [])
         if not no_cov:
-            session.env["COVERAGE_FILE"] = str(Path(session.create_tmp()) / ".coverage")
+            session.env["COVERAGE_FILE"] = str(
+                Path(session.create_tmp()) / f".coverage-{sys.platform}"
+            )
 
             if not any(o.startswith("--cov") for o in opts):
                 opts.append(f"--cov={IMPORT_NAME}")
@@ -571,11 +540,11 @@ def test(
     )
 
 
-nox.session(**ALL_KWS)(test)
+nox.session(python=PYTHON_TEST_VERSIONS)(test)
 nox.session(name="test-conda", **CONDA_ALL_KWS)(test)
 
 
-@nox.session(name="test-notebook", **DEFAULT_KWS)
+@nox.session(name="test-notebook", python=[PYTHON_DEFAULT_VERSION])
 @add_opts
 def test_notebook(session: nox.Session, opts: SessionParams) -> None:
     """Run pytest --nbval."""
@@ -629,6 +598,8 @@ def coverage(
                 session.log(f"removing {path}")
                 path.unlink()
 
+    coverage_options = combine_list_str(opts.coverage_options or [])
+
     for c in cmd:
         if c == "combine":
             uvx_run(
@@ -642,11 +613,22 @@ def coverage(
         elif c == "open":
             open_webpage(path="htmlcov/index.html")
 
+        elif c == "markdown":
+            with Path("coverage.md").open("w", encoding="utf-8") as f:
+                uvx_run(
+                    session,
+                    "coverage",
+                    "report",
+                    "--format=markdown",
+                    *coverage_options,
+                    stdout=f,
+                )
         else:
             uvx_run(
                 session,
                 "coverage",
                 c,
+                *coverage_options,
             )
 
 
@@ -686,7 +668,7 @@ def testdist(
     )
 
 
-nox.session(name="testdist-pypi", **ALL_KWS)(testdist)
+nox.session(name="testdist-pypi", python=PYTHON_TEST_VERSIONS)(testdist)
 nox.session(name="testdist-conda", **CONDA_ALL_KWS)(testdist)
 
 
@@ -709,8 +691,10 @@ def docs(  # noqa: C901
     )
 
     install_dependencies(session, name=name, opts=opts, include_editable_package=True)
-
     session_run_commands(session, opts.docs_run)
+
+    # enable docstring-inheritance
+    session.env["DOCSTRING_INHERITANCE_ENABLE"] = "1"
 
     if open_page := "open" in cmd:
         cmd.remove("open")
@@ -803,9 +787,7 @@ def typecheck(  # noqa: C901
     opts: SessionParams,
 ) -> None:
     """Run type checkers (mypy, pyright, etc)."""
-    install_dependencies(
-        session, name="typecheck", opts=opts, include_editable_package=True
-    )
+    install_dependencies(session, name="type", opts=opts, include_editable_package=True)
     session_run_commands(session, opts.typecheck_run)
 
     cmd = opts.typecheck or []
@@ -813,7 +795,7 @@ def typecheck(  # noqa: C901
         cmd = ["mypy", "basedpyright"]
 
     if "all" in cmd:
-        cmd = ["mypy", "basedpyright", "pylint"]
+        cmd = ["mypy", "basedpyright", "pyrefly", "ty", "pylint"]
 
     # set the cache directory for mypy
     session.env["MYPY_CACHE_DIR"] = str(Path(session.create_tmp()) / ".mypy_cache")
@@ -835,19 +817,14 @@ def typecheck(  # noqa: C901
         if c.endswith("-notebook"):
             session.run("just", c, external=True)
         elif c in {"mypy", "pyright", "basedpyright", "ty", "pyrefly"}:
+            checker = "mypy[faster-cache]" if c == "mypy" else c
             session.run(
-                "python",
-                "tools/typecheck.py",
+                "typecheck-runner",
                 *get_uvx_constraint_args(),
                 "--verbose",
-                f"--checker={c}",
+                f"--check={checker}",
                 "--allow-errors",
-                "--",
-                *(
-                    opts.typecheck_options
-                    or (["src", "tests"] if c in {"ty", "pyrefly"} else [])
-                ),
-                *(["--color-output"] if c == "mypy" else []),
+                external=False,
             )
         elif c == "pylint":
             session.run(
