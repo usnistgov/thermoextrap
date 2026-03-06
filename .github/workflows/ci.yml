@@ -233,6 +233,7 @@ jobs:
         shell: bash --noprofile --norc -euxo pipefail {0}
 
       - name: Cache contents after
+        if: always()
         run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
         shell: bash
 
