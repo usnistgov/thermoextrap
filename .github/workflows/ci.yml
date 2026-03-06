@@ -14,6 +14,7 @@ env:
   UVX_CONSTRAINT: requirements/lock/uvx-tools.txt
   UVX_COMMAND: uvx -crequirements/lock/uvx-tools.txt
   CMOMY_NUMBA_PARALLEL: false
+  NUMBA_CPU_NAME: "generic"
   # CMOMY_NUMBA_CACHE: false
 
 permissions: {}
@@ -214,7 +215,7 @@ jobs:
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
         run: |
           if [ "$CACHE_HIT" = "true" ]; then
-            compile="python -v"
+            compile="python --version"
           else
             compile="python -m cmomy.compile --no-parallel"
           fi
