@@ -189,9 +189,9 @@ jobs:
           cache-dependency-path: uv.lock
 
       # numba cache
-      - name: Numba cache restore
+      - name: Numba cache
         id: numba-cache-restore
-        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: |
             ${{ github.workspace }}/.numba_cache
@@ -213,12 +213,11 @@ jobs:
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
         run: |
-          # if [ "$CACHE_HIT" = "true" ]; then
-          #   compile="python -v"
-          # else
-          #   compile="python -m cmomy.compile"
-          # fi
-          compile="python -m cmomy.compile --no-parallel"
+          if [ "$CACHE_HIT" = "true" ]; then
+            compile="python -v"
+          else
+            compile="python -m cmomy.compile --no-parallel"
+          fi
 
           command="${style}-${python_version}"
 
@@ -235,14 +234,6 @@ jobs:
       - name: Cache contents after
         run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
         shell: bash
-
-      - name: Numba cache save
-        uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
-        with:
-          path: |
-            ${{ github.workspace }}/.numba_cache
-            ${{ github.workspace }}\.numba_cache
-          key: ${{ steps.numba-cache-restore.outputs.cache-primary-key }}
 
       - name: Upload coverage data
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
