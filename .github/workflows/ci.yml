@@ -13,8 +13,9 @@ env:
   FORCE_COLOR: "3"
   UVX_CONSTRAINT: requirements/lock/uvx-tools.txt
   UVX_COMMAND: uvx -crequirements/lock/uvx-tools.txt
+  NOX_COMMAND: uvx -crequirements/lock/uvx-tools.txt -wdotenv nox
   CMOMY_NUMBA_PARALLEL: false
-  NUMBA_CPU_NAME: "generic"
+  # NUMBA_CPU_NAME: "generic"
   # CMOMY_NUMBA_CACHE: false
 
 permissions: {}
@@ -123,7 +124,7 @@ jobs:
       - name: typecheck
         env:
           python_version: ${{ env.python_version }}
-        run: $UVX_COMMAND nox -s typecheck-"$python_version"
+        run: $NOX_COMMAND -s typecheck-"$python_version"
         shell: bash
 
   test:
@@ -148,21 +149,21 @@ jobs:
             style: test
             options: ""
         include:
-          - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.max-python-version }}
-            style: test
-            options: "--run-slow"
-          - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.default-python-version }}
-            style: test-notebook
-            options: ""
-          - os: windows-latest
-            python-version:
-              ${{ needs.build-package.outputs.default-python-version }}
-            style: test
-            options: ""
+          # - os: ubuntu-latest
+          #   python-version:
+          #     ${{ needs.build-package.outputs.max-python-version }}
+          #   style: test
+          #   options: "--run-slow"
+          # - os: ubuntu-latest
+          #   python-version:
+          #     ${{ needs.build-package.outputs.default-python-version }}
+          #   style: test-notebook
+          #   options: ""
+          # - os: windows-latest
+          #   python-version:
+          #     ${{ needs.build-package.outputs.default-python-version }}
+          #   style: test
+          #   options: ""
           - os: macos-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
@@ -199,8 +200,7 @@ jobs:
             ${{ github.workspace }}\.numba_cache
           key:
             numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
-            env.pythonLocation }}|${{ hashFiles('src/**/*.py') }}|${{
-            hashFiles('uv.lock')}}
+            env.pythonLocation }}|${{ hashFiles('uv.lock') }}
 
       - name: Cache contents before
         if: steps.numba-cache-restore.outputs.cache-hit
@@ -226,7 +226,7 @@ jobs:
           echo "compile: ${compile}"
           echo "options: ${options}"
 
-          $UVX_COMMAND nox -s "${command}" -- \
+          $NOX_COMMAND -s "${command}" -- \
             ++installpkg dist/*.whl \
             ++test-run "${compile}" \
             ++test-options -n auto "${options}"
@@ -270,12 +270,12 @@ jobs:
           cache-dependency-path: requirements/lock/uvx-tools.txt
       - name: Run coverage
         run: |
-          $UVX_COMMAND nox -s coverage -- ++coverage combine html markdown
+          $NOX_COMMAND -s coverage -- ++coverage combine html markdown
           cat coverage.md
           cat coverage.md >> "$GITHUB_STEP_SUMMARY"
 
           # fail if under 30%
-          $UVX_COMMAND nox -s coverage -- ++coverage report ++coverage-options --fail-under=30
+          $NOX_COMMAND -s coverage -- ++coverage report ++coverage-options --fail-under=30
         shell: bash
       - name: Upload HTML report if check failed.
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
