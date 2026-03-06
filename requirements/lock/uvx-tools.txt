@@ -16,6 +16,9 @@ copier-template-extensions==0.3.3 ; python_full_version < '3.13' or sys_platform
     --hash=sha256:86bd5e2e89c94b6f9321e4078781b4456c5658b820bcae49ac60fd1e1dd23c10 \
     --hash=sha256:bf6bbdebada26132640d6e1128723fa1ff7eb59d008de07a7543c51e0facb0ea
     # via -r requirements/uvx-tools.txt
+dotenv==0.9.9 ; python_full_version < '3.13' or sys_platform == 'linux' \
+    --hash=sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9
+    # via -r requirements/uvx-tools.txt
 grayskull==3.1.0 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:625a60a7036eaedcc5e4e44ed68eec79aaade35f662729ec564b6120d2b3b7c5 \
     --hash=sha256:6ccbcc7455c08b68d95ed880fe486d87ad321ee483ccb375bfd8163c19a0fdfa
