@@ -277,7 +277,7 @@ strict_xfail = "true"
 
 [tool.pytest_env]
 CMOMY_NUMBA_PARALLEL = { value = "false", skip_if_set = true }
-NUMBA_CACHE_DIR = { value = "{PWD}/.numba_cache", transform = true, skip_if_set = true }
+NUMBA_CACHE_DIR = { value = "{PWD}/.numba_cache", transform = true, skip_if_set = false }
 NUMBA_CACHE_LOCATOR_CLASSES = { value = "tools.numba_cache_tools.SharedHashCacheLocator", skip_if_set = true }
 NUMBA_CACHE_TOOLS_MAGIC = { value = "0", skip_if_set = true }
 env_files = [ ".numba_env" ]
