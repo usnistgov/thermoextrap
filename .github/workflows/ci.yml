@@ -213,8 +213,9 @@ jobs:
           style: ${{ matrix.style }}
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
+          OS: ${{ matrix.os }}
         run: |
-          if [ "$CACHE_HIT" = "true" ]; then
+          if [ "$CACHE_HIT" = "true" ] && [ "$OS" != "windows-latest" ]; then
             compile="python --version"
           else
             compile="python -m cmomy.compile --no-parallel"
