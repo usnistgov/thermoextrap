@@ -231,7 +231,7 @@ jobs:
             ++installpkg dist/*.whl \
             ++test-run "${compile}" \
             ++test-options -n auto "${options}"
-        shell: bash --noprofile --norc -euxo pipefail {0}
+        shell: bash -euxo pipefail {0}
 
       - name: Cache contents after
         if: always()
