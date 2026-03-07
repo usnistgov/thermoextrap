@@ -149,21 +149,21 @@ jobs:
             style: test
             options: ""
         include:
-          # - os: ubuntu-latest
-          #   python-version:
-          #     ${{ needs.build-package.outputs.max-python-version }}
-          #   style: test
-          #   options: "--run-slow"
-          # - os: ubuntu-latest
-          #   python-version:
-          #     ${{ needs.build-package.outputs.default-python-version }}
-          #   style: test-notebook
-          #   options: ""
-          # - os: windows-latest
-          #   python-version:
-          #     ${{ needs.build-package.outputs.default-python-version }}
-          #   style: test
-          #   options: ""
+          - os: ubuntu-latest
+            python-version:
+              ${{ needs.build-package.outputs.max-python-version }}
+            style: test
+            options: "--run-slow"
+          - os: ubuntu-latest
+            python-version:
+              ${{ needs.build-package.outputs.default-python-version }}
+            style: test-notebook
+            options: ""
+          - os: windows-latest
+            python-version:
+              ${{ needs.build-package.outputs.default-python-version }}
+            style: test
+            options: ""
           - os: macos-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
