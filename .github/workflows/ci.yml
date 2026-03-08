@@ -230,7 +230,7 @@ jobs:
           fi
 
           # Use generic for windows
-          if [ "$OS" == "windows-latest" ]; then
+          if [ "$OS" = "windows-latest" ]; then
             echo "NUMBA_CPU_NAME=generic" >> $GITHUB_ENV
           if
 
