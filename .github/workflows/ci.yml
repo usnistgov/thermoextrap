@@ -258,6 +258,9 @@ jobs:
 
       - name: Check windows numba cache
         run: |
+          $NOX_COMMAND -s coverage -- ++coverage combine report
+
+          ls -aR
           cd .numba_cache/cmomy*
           for x in *; do
             diff "$x" "../tmp/$x"
