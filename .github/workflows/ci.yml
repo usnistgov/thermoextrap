@@ -134,41 +134,41 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-        python-version:
-          ${{ fromJson(needs.build-package.outputs.matrix-test-python) }}
-        style:
-          - test
-        options:
-          - ""
-        exclude:
-          - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.max-python-version }}
-            style: test
-            options: ""
+        # os:
+        #   - ubuntu-latest
+        # python-version:
+        #   ${{ fromJson(needs.build-package.outputs.matrix-test-python) }}
+        # style:
+        #   - test
+        # options:
+        #   - ""
+        # exclude:
+        #   - os: ubuntu-latest
+        #     python-version:
+        #       ${{ needs.build-package.outputs.max-python-version }}
+        #     style: test
+        #     options: ""
         include:
-          - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.max-python-version }}
-            style: test
-            options: "--run-slow"
-          - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.default-python-version }}
-            style: test-notebook
-            options: ""
+          # - os: ubuntu-latest
+          #   python-version:
+          #     ${{ needs.build-package.outputs.max-python-version }}
+          #   style: test
+          #   options: "--run-slow"
+          # - os: ubuntu-latest
+          #   python-version:
+          #     ${{ needs.build-package.outputs.default-python-version }}
+          #   style: test-notebook
+          #   options: ""
           - os: windows-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
             style: test
             options: ""
-          - os: macos-latest
-            python-version:
-              ${{ needs.build-package.outputs.default-python-version }}
-            style: test
-            options: ""
+          # - os: macos-latest
+          #   python-version:
+          #     ${{ needs.build-package.outputs.default-python-version }}
+          #   style: test
+          #   options: ""
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -204,7 +204,10 @@ jobs:
 
       - name: Cache contents before
         if: steps.numba-cache-restore.outputs.cache-hit
-        run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+        run: |
+          ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+          cd .numba_cache
+          cp -r cmomy* tmp
         shell: bash
 
       - name: Test with nox
@@ -215,11 +218,21 @@ jobs:
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
           OS: ${{ matrix.os }}
         run: |
-          if [ "$CACHE_HIT" = "true" ] && [ "$OS" != "windows-latest" ]; then
+          # if [ "$CACHE_HIT" = "true" ] && [ "$OS" != "windows-latest" ]; then
+          #   compile="python --version"
+          # else
+          #   compile="python -m cmomy.compile --no-parallel"
+          # fi
+          if [ "$CACHE_HIT" = "true" ]; then
             compile="python --version"
           else
             compile="python -m cmomy.compile --no-parallel"
           fi
+
+          # Use generic for windows
+          if [ "$OS" == "windows-latest" ]; then
+            echo "NUMBA_CPU_NAME=generic" >> $GITHUB_ENV
+          if
 
           command="${style}-${python_version}"
 
@@ -235,7 +248,15 @@ jobs:
 
       - name: Cache contents after
         if: always()
-        run: ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+        run: |
+          ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+
+          if [ -d .numba_cache/tmp ]; do
+            cd .numba_cache/cmomy*
+            for x in *; do
+              diff $x ../tmp/$x
+            done
+          fi
         shell: bash
 
       - name: Upload coverage data
