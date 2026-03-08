@@ -231,8 +231,8 @@ jobs:
 
           # Use generic for windows
           if [ "$OS" = "windows-latest" ]; then
-            echo "NUMBA_CPU_NAME=generic" >> $GITHUB_ENV
-          if
+            echo "NUMBA_CPU_NAME=generic" >> "$GITHUB_ENV"
+          fi
 
           command="${style}-${python_version}"
 
@@ -251,10 +251,10 @@ jobs:
         run: |
           ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
 
-          if [ -d .numba_cache/tmp ]; do
+          if [ -d ".numba_cache/tmp" ]; then
             cd .numba_cache/cmomy*
             for x in *; do
-              diff $x ../tmp/$x
+              diff "$x" "../tmp/$x"
             done
           fi
         shell: bash
