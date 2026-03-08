@@ -206,9 +206,13 @@ jobs:
         if: steps.numba-cache-restore.outputs.cache-hit
         run: |
           ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+        shell: bash -euxo pipefail {0}
+
+      - run: |
           cd .numba_cache
           cp -r cmomy* tmp
-        shell: bash
+        if: matrix.os == 'windows-latest'
+        shell: bash -euxo pipefail {0}
 
       - name: Test with nox
         env:
@@ -218,16 +222,16 @@ jobs:
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
           OS: ${{ matrix.os }}
         run: |
-          # if [ "$CACHE_HIT" = "true" ] && [ "$OS" != "windows-latest" ]; then
+          if [ "$CACHE_HIT" = "true" ] && [ "$OS" != "windows-latest" ]; then
+            compile="python --version"
+            else
+            compile="python -m cmomy.compile --no-parallel"
+          fi
+          # if [ "$CACHE_HIT" = "true" ]; then
           #   compile="python --version"
           # else
           #   compile="python -m cmomy.compile --no-parallel"
           # fi
-          if [ "$CACHE_HIT" = "true" ]; then
-            compile="python --version"
-          else
-            compile="python -m cmomy.compile --no-parallel"
-          fi
 
           # Use generic for windows
           if [ "$OS" = "windows-latest" ]; then
@@ -250,14 +254,16 @@ jobs:
         if: always()
         run: |
           ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+        shell: bash -euxo pipefail {0}
 
-          if [ -d ".numba_cache/tmp" ]; then
-            cd .numba_cache/cmomy*
-            for x in *; do
-              diff "$x" "../tmp/$x"
-            done
-          fi
-        shell: bash
+      - name: Check windows numba cache
+        run: |
+          cd .numba_cache/cmomy*
+          for x in *; do
+            diff "$x" "../tmp/$x"
+          done
+        if: matrix.os == 'windows-latest'
+        shell: bash -euxo pipefail {0}
 
       - name: Upload coverage data
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
