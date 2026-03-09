@@ -17,7 +17,7 @@ TYPECHECK := "-m typecheck_runner -v"
 # run nox
 [group("tools")]
 nox *options:
-    {{ UVX_WITH_OPTS }} nox {{ options }}
+    {{ UVX_WITH_OPTS }} --with dotenv nox {{ options }}
 
 # run pre-commit
 [group("lint")]

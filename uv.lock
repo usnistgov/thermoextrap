@@ -1040,6 +1040,17 @@ wheels = [
 ]
 
 [[package]]
+name = "dotenv"
+version = "0.9.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dotenv", marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b2/b7/545d2c10c1fc15e48653c91efde329a790f2eecfbbf2bd16003b5db2bab0/dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9", size = 1892, upload-time = "2025-02-19T22:15:01.647Z" },
+]
+
+[[package]]
 name = "dropstackframe"
 version = "0.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1632,11 +1643,11 @@ resolution-markers = [
     "python_full_version == '3.13.*' and sys_platform == 'linux'",
 ]
 dependencies = [
-    { name = "jaxlib", version = "0.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
-    { name = "ml-dtypes", version = "0.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
-    { name = "numpy", version = "2.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
-    { name = "opt-einsum", marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "jaxlib", version = "0.9.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "ml-dtypes", version = "0.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "numpy", version = "2.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "opt-einsum", marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/25/4d/f45853fdc2b811e78b866d5f80b8a21a848278361f66c066706132f415cf/jax-0.9.1.tar.gz", hash = "sha256:ce1b82477ee192f0b1d9801b095aa0cf3839bc1fe0cbc071c961a24b3ff30361", size = 2625994, upload-time = "2026-03-02T11:24:18.382Z" }
 wheels = [
@@ -1692,9 +1703,9 @@ resolution-markers = [
     "python_full_version == '3.13.*' and sys_platform == 'linux'",
 ]
 dependencies = [
-    { name = "ml-dtypes", version = "0.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
-    { name = "numpy", version = "2.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'win32') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "ml-dtypes", version = "0.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "numpy", version = "2.4.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and sys_platform == 'emscripten') or (python_full_version >= '3.13' and sys_platform == 'linux')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/26/04/b42037bfa38e5506a02a17a42abb494a601b78f02a8756dc1745cd3efb56/jaxlib-0.9.1-cp311-cp311-manylinux_2_27_aarch64.whl", hash = "sha256:dc1085450dfd582d648426a65e5bd87f7f2f14dad66a6bda4aace26471f450bf", size = 76830011, upload-time = "2026-03-02T11:23:05.706Z" },
@@ -5409,6 +5420,7 @@ basedpyright = [
 ]
 dev = [
     { name = "coverage", marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
+    { name = "dotenv", marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
     { name = "ipykernel", marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
     { name = "matplotlib", marker = "python_full_version == '3.12.*'" },
     { name = "mypy", extra = ["faster-cache"], marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
@@ -5472,6 +5484,7 @@ notebook = [
     { name = "nbclient", marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
 ]
 nox = [
+    { name = "dotenv", marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
     { name = "nox", marker = "(python_full_version == '3.12.*' and sys_platform != 'linux') or (python_full_version >= '3.12' and sys_platform == 'linux')" },
 ]
 pandas = [
@@ -5567,6 +5580,7 @@ provides-extras = ["accel", "all", "gpr", "mbar", "openmm", "parallel", "viz"]
 basedpyright = [{ name = "basedpyright", specifier = ">=1.31.3" }]
 dev = [
     { name = "coverage", marker = "python_full_version >= '3.12'", specifier = "<=7.13.0" },
+    { name = "dotenv", marker = "python_full_version >= '3.12'" },
     { name = "ipykernel", marker = "python_full_version >= '3.12'" },
     { name = "matplotlib", marker = "python_full_version == '3.12.*'" },
     { name = "mypy", extras = ["faster-cache"], marker = "python_full_version >= '3.12'", specifier = ">=1.15.0" },
@@ -5627,7 +5641,10 @@ notebook = [
     { name = "ipykernel", marker = "python_full_version >= '3.12'" },
     { name = "nbclient", marker = "python_full_version >= '3.12'" },
 ]
-nox = [{ name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2025.5.1" }]
+nox = [
+    { name = "dotenv", marker = "python_full_version >= '3.12'" },
+    { name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2025.5.1" },
+]
 pandas = [{ name = "pandas", specifier = ">=2.3" }]
 pylint = [{ name = "pylint" }]
 pytest = [{ name = "pytest" }]

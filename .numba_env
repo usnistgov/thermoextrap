@@ -1,0 +1,4 @@
+CMOMY_NUMBA_PARALLEL=false
+NUMBA_CACHE_DIR=${PWD}/.numba_cache
+NUMBA_CACHE_LOCATOR_CLASSES=tools.numba_cache_tools.SharedHashCacheLocator
+NUMBA_CACHE_TOOLS_MAGIC=0

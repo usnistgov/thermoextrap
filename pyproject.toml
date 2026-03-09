@@ -135,7 +135,7 @@ docs-spelling = [
 ipython = [ "ipython" ]
 mypy = [ "mypy[faster-cache]>=1.15.0" ]
 notebook = [ "ipykernel", "nbclient" ]
-nox = [ "nox>=2025.5.1" ]
+nox = [ "dotenv", "nox>=2025.5.1" ]
 pandas = [ "pandas>=2.3" ]
 pylint = [ "pylint" ]
 pytest = [ "pytest" ]
@@ -218,9 +218,8 @@ extend-ignore-identifiers-re = [
     "NDArray.*",
     "struc_.*",
 ]
-extend-ignore-re = [
-    "# %%NBQA-.*",
-]
+# nbqa generated
+extend-ignore-re = [ "# %%NBQA-.*" ]
 
 [tool.typos.default.extend-identifiers]
 CPY = "CPY"
@@ -231,6 +230,10 @@ pertNumer = "pertNumer"
 [tool.typos.files]
 extend-exclude = [ "spelling_wordlist.txt" ]
 
+[tool.typos.type.jupyter]
+# only check file name for notebooks.  Use nbaq for contents.
+check-file = false
+
 # * Testing --------------------------------------------------------------------
 
 [tool.pytest.ini_options]
@@ -238,9 +241,9 @@ addopts = [
     "--cov-config=pyproject.toml",
     "--doctest-glob=*.md",
     "--doctest-modules",
-    "--force-sugar",
     "--ignore-glob='**/legacy/**",
     "--pyargs",
+    "--pytest-env-verbose",
     "--strict-config",
     "--strict-markers",
     "-ra",
@@ -276,14 +279,24 @@ minversion = "8"
 strict_xfail = "true"
 
 [tool.pytest_env]
+CMOMY_NUMBA_PARALLEL = { value = "false", skip_if_set = true }
 NUMBA_CACHE_DIR = { value = "{PWD}/.numba_cache", transform = true, skip_if_set = true }
+NUMBA_CACHE_LOCATOR_CLASSES = { value = "tools.numba_cache_tools.SharedHashCacheLocator", skip_if_set = true }
+NUMBA_CACHE_TOOLS_MAGIC = { value = "0", skip_if_set = true }
+env_files = [ ".numba_env" ]
 
 [tool.coverage]
 run.branch = true
+run.source = [
+    "thermoextrap",
+]
+# run.relative_files = true
 paths.source = [
-    "src/",
+    "src",
     # needed for testing source if not editable install
-    ".nox/**/site-packages/",
+    ".nox/**/site-packages",
+    "*/.nox/**/site-packages",
+    "*/src",
 ]
 report.exclude_also = [
     "@overload",
@@ -297,8 +310,6 @@ report.omit = [
     "*/vendored/*",
 ]
 report.show_missing = true
-
-# report.show_missing = true
 
 # * typecheck ---------------------------------------------------------------------
 

@@ -19,6 +19,7 @@ dependencies:
   - dask
   - dm-tree
   - docstring-inheritance
+  - dotenv
   - ipykernel
   - lazy_loader
   - matplotlib-base

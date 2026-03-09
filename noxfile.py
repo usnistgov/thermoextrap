@@ -3,6 +3,7 @@
 # /// script
 # dependencies = [
 #     "nox>=2024.10.9",
+#     "dotenv>=0.9.0"
 # ]
 # ///
 
@@ -30,6 +31,7 @@ from typing import (
 )
 
 import nox
+from dotenv import load_dotenv
 from nox.virtualenv import CondaEnv
 
 sys.path.insert(0, ".")
@@ -73,8 +75,8 @@ nox.options.default_venv_backend = "uv"
 
 # * Options ---------------------------------------------------------------------------
 
+load_dotenv(".numba_env")
 os.environ["NUMBA_CACHE_DIR"] = str(ROOT / ".numba_cache")
-
 
 # if True, use uv lock/sync.  If False, use uv pip compile/sync...
 UV_LOCK = True
