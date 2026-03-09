@@ -141,7 +141,6 @@ repos:
     rev: v1.44.0
     hooks:
       - id: typos
-        exclude_types: [jupyter]
         exclude: ^uv[.]lock$|^requirements
 
   # * Dependencies
@@ -229,17 +228,23 @@ repos:
         alias: typos
         additional_dependencies: &typos-deps
           - typos==1.44.0
-        args: [typos, --nbqa-shell]
-        # this can lead to errors, so use with care
-        # args: [typos, --write-changes, --nbqa-shell]
+        args:
+          - typos
+          - --force-exclude
+          - --no-check-filenames
+          - --write-changes
+          - --nbqa-shell
       - id: nbqa
         name: nbqa-typos-markdown
-        stages: [manual]
         alias: typos
         additional_dependencies: *typos-deps
-        args: [typos, --nbqa-shell, --nbqa-md]
-        # this can lead to errors, so use with care
-        # args: [typos, --write-changes, --nbqa-shell, --nbqa-md]
+        args:
+          - typos
+          - --force-exclude
+          - --no-check-filenames
+          - --write-changes
+          - --nbqa-shell
+          - --nbqa-md
 
   # ** symlink in notebooks from example/usage to docs/example/usage
   - repo: local
