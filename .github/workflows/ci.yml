@@ -132,36 +132,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os:
-        #   - ubuntu-latest
-        # python-version:
-        #   ${{ fromJson(needs.build-package.outputs.matrix-test-python) }}
-        # style:
-        #   - test
-        # options:
-        #   - ""
-        # exclude:
-        #   - os: ubuntu-latest
-        #     python-version:
-        #       ${{ needs.build-package.outputs.max-python-version }}
-        #     style: test
-        #     options: ""
+        os:
+          - ubuntu-latest
+        python-version:
+          ${{ fromJson(needs.build-package.outputs.matrix-test-python) }}
+        style:
+          - test
+        options:
+          - ""
+        exclude:
+          - os: ubuntu-latest
+            python-version:
+              ${{ needs.build-package.outputs.max-python-version }}
+            style: test
+            options: ""
         include:
-          # - os: ubuntu-latest
-          #   python-version:
-          #     ${{ needs.build-package.outputs.max-python-version }}
-          #   style: test
-          #   options: "--run-slow"
-          # - os: ubuntu-latest
-          #   python-version:
-          #     ${{ needs.build-package.outputs.default-python-version }}
-          #   style: test-notebook
-          #   options: ""
-          # - os: macos-latest
-          #   python-version:
-          #     ${{ needs.build-package.outputs.default-python-version }}
-          #   style: test
-          #   options: ""
+          - os: ubuntu-latest
+            python-version:
+              ${{ needs.build-package.outputs.max-python-version }}
+            style: test
+            options: "--run-slow"
+          - os: ubuntu-latest
+            python-version:
+              ${{ needs.build-package.outputs.default-python-version }}
+            style: test-notebook
+            options: ""
+          - os: macos-latest
+            python-version:
+              ${{ needs.build-package.outputs.default-python-version }}
+            style: test
+            options: ""
           - os: windows-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
@@ -280,7 +280,6 @@ jobs:
     name: Combine coverage
     needs: test
     runs-on: ubuntu-latest
-    # runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
