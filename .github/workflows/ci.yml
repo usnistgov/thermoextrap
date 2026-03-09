@@ -206,12 +206,6 @@ jobs:
           ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
         shell: bash -euxo pipefail {0}
 
-      - run: |
-          cd .numba_cache
-          cp -r cmomy* tmp
-        if: matrix.os == 'windows-latest'
-        shell: bash -euxo pipefail {0}
-
       - name: Test with nox
         env:
           python_version: ${{ matrix.python-version }}
@@ -252,18 +246,6 @@ jobs:
         if: always()
         run: |
           ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
-        shell: bash -euxo pipefail {0}
-
-      - name: Check windows numba cache
-        run: |
-          $NOX_COMMAND -s coverage -- ++coverage combine report
-
-          ls -aR
-          cd .numba_cache/cmomy*
-          for x in *; do
-            diff "$x" "../tmp/$x"
-          done
-        if: matrix.os == 'windows-latest'
         shell: bash -euxo pipefail {0}
 
       - name: Upload coverage data
