@@ -219,10 +219,6 @@ extend-ignore-identifiers-re = [
 # nbqa generated
 extend-ignore-re = [ "# %%NBQA-.*" ]
 
-[tool.typos.default]
-# nbqa generated
-extend-ignore-re = [ "# %%NBQA-.*" ]
-
 [tool.typos.default.extend-identifiers]
 CPY = "CPY"
 gather_nd = "gather_nd"
@@ -231,10 +227,6 @@ pertNumer = "pertNumer"
 
 [tool.typos.files]
 extend-exclude = [ "spelling_wordlist.txt" ]
-
-[tool.typos.type.jupyter]
-# only check file name for notebooks.  Use nbaq for contents.
-check-file = false
 
 [tool.typos.type.jupyter]
 # only check file name for notebooks.  Use nbaq for contents.
@@ -295,18 +287,10 @@ run.branch = true
 run.source = [
     "thermoextrap",
 ]
-<<<<<<< before updating
-# run.relative_files = true
-=======
->>>>>>> after updating
 paths.source = [
     "src",
     # needed for testing source if not editable install
-<<<<<<< before updating
     ".nox/**/site-packages",
-=======
-    ".nox/**/site-packages/",
->>>>>>> after updating
     "*/.nox/**/site-packages",
     "*/src",
 ]
@@ -350,7 +334,6 @@ warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
 
-<<<<<<< before updating
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
 module = [
@@ -374,16 +357,6 @@ module = [
 check_untyped_defs = false
 module = [ "tests.legacy.*" ]
 
-=======
-# [[tool.mypy.overrides]]
-# ignore_missing_imports = true
-# module = [  ]
-#
-# [[tool.mypy.overrides]]
-# ignore_errors = true
-# module = [  ]
-#
->>>>>>> after updating
 [tool.pyrefly]
 enabled-ignores = [ "pyrefly" ]
 project-includes = [ "src", "tests" ]

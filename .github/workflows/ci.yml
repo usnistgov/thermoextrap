@@ -13,12 +13,8 @@ env:
   FORCE_COLOR: "3"
   UVX_CONSTRAINT: requirements/lock/uvx-tools.txt
   UVX_COMMAND: uvx -crequirements/lock/uvx-tools.txt
-<<<<<<< before updating
   NOX_COMMAND: uvx -crequirements/lock/uvx-tools.txt -wdotenv nox
-  CMOMY_NUMBA_PARALLEL: false
-=======
   # EXTRA_PYTHON_VERSIONS: "pypy-3.11"
->>>>>>> after updating
 
 permissions: {}
 
@@ -74,16 +70,6 @@ jobs:
           print("{minmax_default_python_versions=}")
           print("{all_python_version=}")
 
-<<<<<<< before updating
-          # min max and default pythons
-          matrix_test_python = list({ python_versions[0], python_versions[-1]})
-          max_python_version = python_versions[-1]
-
-          with open(os.getenv("GITHUB_OUTPUT"), "a") as f:
-            f.write(f"{default_python_version=:s}\n")
-            f.write(f"{max_python_version=:s}\n")
-            f.write(f"matrix_test_python={json.dumps(matrix_test_python)}\n")
-=======
 
           with open(os.getenv("GITHUB_OUTPUT"), "a") as f:
             f.write(f"{default_python_version=:s}\n")
@@ -92,15 +78,10 @@ jobs:
             f.write(f"minmax_python_versions={json.dumps(minmax_python_versions)}\n")
             f.write(f"minmax_default_python_versions={json.dumps(minmax_default_python_versions)}\n")
             f.write(f"all_python_versions={json.dumps(all_python_versions)}\n")
->>>>>>> after updating
 
     outputs:
       default-python-version:
         ${{ steps.versions.outputs.default_python_version }}
-<<<<<<< before updating
-      max-python-version: ${{ steps.versions.outputs.max_python_version }}
-      matrix-test-python: ${{ steps.versions.outputs.matrix_test_python }}
-=======
       min-python-version: ${{ steps.versions.outputs.min_python_version }}
       max-python-version: ${{ steps.versions.outputs.max_python_version }}
       minmax-python-versions:
@@ -108,7 +89,6 @@ jobs:
       minmax-default-python-versions:
         ${{ steps.versions.outputs.minmax_default_python_versions }}
       all-python-version: ${{ steps.versions.outputs.all_python_versions }}
->>>>>>> after updating
 
   lint:
     # only run checks not covered by pre-commit.ci
@@ -142,8 +122,7 @@ jobs:
 
       - name: Run prek
         env:
-          # problem with markdownlint-cli2, and false positives from nbqa hooks.
-          SKIP: "typecheck,markdownlint-cli2"
+          SKIP: "typecheck"
         run: >-
           prek run --show-diff-on-failure --color=always --all-files
           --hook-stage=manual -v
@@ -175,10 +154,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-<<<<<<< before updating
-=======
           # - windows-latest
->>>>>>> after updating
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -211,8 +187,7 @@ jobs:
         os:
           - ubuntu-latest
         python-version:
-<<<<<<< before updating
-          ${{ fromJson(needs.build-package.outputs.matrix-test-python) }}
+          ${{ fromJson(needs.build-package.outputs.minmax-python-versions) }}
         style:
           - test
         options:
@@ -223,11 +198,6 @@ jobs:
               ${{ needs.build-package.outputs.max-python-version }}
             style: test
             options: ""
-=======
-          ${{
-          fromJson(needs.build-package.outputs.minmax-default-python-versions)
-          }}
->>>>>>> after updating
         include:
           - os: ubuntu-latest
             python-version:
