@@ -232,81 +232,6 @@ extend-exclude = [ "spelling_wordlist.txt" ]
 # only check file name for notebooks.  Use nbaq for contents.
 check-file = false
 
-# * Testing --------------------------------------------------------------------
-[tool.pytest.ini_options]
-addopts = [
-    "--cov-config=pyproject.toml",
-    "--doctest-glob=*.md",
-    "--doctest-modules",
-    "--ignore-glob='**/legacy/**",
-    "--pyargs",
-    "--pytest-env-verbose",
-    "--strict-config",
-    "--strict-markers",
-    "-ra",
-    # xdist
-    "-n",
-    "4",
-]
-testpaths = [
-    "README.md",
-    "tests",
-    "thermoextrap",
-]
-# options
-filterwarnings = [
-    "error",
-    "ignore: A kernel object:UserWarning",
-    "ignore: FNV hashing is not implemented in Numba:UserWarning",
-    "ignore: Module thermoextrap was never imported:coverage.exceptions.CoverageWarning",
-    "ignore: No data was collected:coverage.exceptions.CoverageWarning",
-    "ignore: The default datetime:DeprecationWarning",
-    "ignore: Type google:DeprecationWarning",
-    "ignore: Unknown solver options",
-    "ignore: distutils Version classes are deprecated:DeprecationWarning",
-    "ignore: importing 'Const' from 'astroid' is deprecated:DeprecationWarning",
-    "ignore: invalid escape sequence:DeprecationWarning",
-    "ignore: invalid escape sequence:SyntaxWarning",
-    "ignore: pkg_resources is deprecated as an API:DeprecationWarning",
-    "ignore: pkg_resources is deprecated:UserWarning",
-]
-log_cli_level = "INFO"
-log_level = "INFO"
-minversion = "8"
-strict_xfail = "true"
-
-[tool.pytest_env]
-CMOMY_NUMBA_PARALLEL = { value = "false", skip_if_set = true }
-NUMBA_CACHE_DIR = { value = "{PWD}/.numba_cache", transform = true, skip_if_set = true }
-NUMBA_CACHE_LOCATOR_CLASSES = { value = "tools.numba_cache_tools.SharedHashCacheLocator", skip_if_set = true }
-NUMBA_CACHE_TOOLS_MAGIC = { value = "0", skip_if_set = true }
-env_files = [ ".numba_env" ]
-
-[tool.coverage]
-run.branch = true
-run.source = [
-    "thermoextrap",
-]
-paths.source = [
-    "src",
-    # needed for testing source if not editable install
-    ".nox/**/site-packages",
-    "*/.nox/**/site-packages",
-    "*/src",
-]
-report.exclude_also = [
-    "@overload",
-    "if TYPE_CHECKING:",
-]
-report.include = [
-    "src/*",
-]
-report.omit = [
-    "*/_typing.py",
-    "*/vendored/*",
-]
-report.show_missing = true
-
 # * typecheck ---------------------------------------------------------------------
 [tool.mypy]
 exclude = [
@@ -425,6 +350,81 @@ root = "examples/usage"
 # Disable support for `type: ignore` comments
 analysis.respect-type-ignore-comments = false
 src.include = [ "src", "tests" ]
+
+# * Testing --------------------------------------------------------------------
+[tool.pytest.ini_options]
+addopts = [
+    "--cov-config=pyproject.toml",
+    "--doctest-glob=*.md",
+    "--doctest-modules",
+    "--ignore-glob='**/legacy/**",
+    "--pyargs",
+    "--pytest-env-verbose",
+    "--strict-config",
+    "--strict-markers",
+    "-ra",
+    # xdist
+    "-n",
+    "4",
+]
+testpaths = [
+    "README.md",
+    "tests",
+    "thermoextrap",
+]
+# options
+filterwarnings = [
+    "error",
+    "ignore: A kernel object:UserWarning",
+    "ignore: FNV hashing is not implemented in Numba:UserWarning",
+    "ignore: Module thermoextrap was never imported:coverage.exceptions.CoverageWarning",
+    "ignore: No data was collected:coverage.exceptions.CoverageWarning",
+    "ignore: The default datetime:DeprecationWarning",
+    "ignore: Type google:DeprecationWarning",
+    "ignore: Unknown solver options",
+    "ignore: distutils Version classes are deprecated:DeprecationWarning",
+    "ignore: importing 'Const' from 'astroid' is deprecated:DeprecationWarning",
+    "ignore: invalid escape sequence:DeprecationWarning",
+    "ignore: invalid escape sequence:SyntaxWarning",
+    "ignore: pkg_resources is deprecated as an API:DeprecationWarning",
+    "ignore: pkg_resources is deprecated:UserWarning",
+]
+log_cli_level = "INFO"
+log_level = "INFO"
+minversion = "8"
+strict_xfail = "true"
+
+[tool.pytest_env]
+CMOMY_NUMBA_PARALLEL = { value = "false", skip_if_set = true }
+NUMBA_CACHE_DIR = { value = "{PWD}/.numba_cache", transform = true, skip_if_set = true }
+NUMBA_CACHE_LOCATOR_CLASSES = { value = "tools.numba_cache_tools.SharedHashCacheLocator", skip_if_set = true }
+NUMBA_CACHE_TOOLS_MAGIC = { value = "0", skip_if_set = true }
+env_files = [ ".numba_env" ]
+
+[tool.coverage]
+run.branch = true
+run.source = [
+    "thermoextrap",
+]
+paths.source = [
+    "src",
+    # needed for testing source if not editable install
+    ".nox/**/site-packages",
+    "*/.nox/**/site-packages",
+    "*/src",
+]
+report.exclude_also = [
+    "@overload",
+    "if TYPE_CHECKING:",
+]
+report.include = [
+    "src/*",
+]
+report.omit = [
+    "*/_typing.py",
+    "*/vendored/*",
+]
+report.show_missing = true
 
 # * Dependency creation --------------------------------------------------------
 [tool.pyproject2conda]
