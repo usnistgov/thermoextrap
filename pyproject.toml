@@ -156,6 +156,7 @@ typecheck-runner = [ "typecheck-runner>=0.1.0; python_version>'3.9'" ]
 required-version = ">=0.7.15"
 default-groups = [ "dev" ]
 fork-strategy = "requires-python"
+<<<<<<< before updating
 environments = [
     "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
     "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
@@ -163,6 +164,9 @@ environments = [
     # "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
     # "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
 ]
+=======
+exclude-newer = "7 days"
+>>>>>>> after updating
 managed = true
 build-backend.source-include = [ "tests/**" ]
 pip.annotation-style = "line"
@@ -232,6 +236,7 @@ extend-exclude = [ "spelling_wordlist.txt" ]
 # only check file name for notebooks.  Use nbaq for contents.
 check-file = false
 
+<<<<<<< before updating
 # * Testing --------------------------------------------------------------------
 [tool.pytest.ini_options]
 addopts = [
@@ -307,6 +312,8 @@ report.omit = [
 ]
 report.show_missing = true
 
+=======
+>>>>>>> after updating
 # * typecheck ---------------------------------------------------------------------
 [tool.mypy]
 exclude = [
@@ -426,6 +433,54 @@ root = "examples/usage"
 analysis.respect-type-ignore-comments = false
 src.include = [ "src", "tests" ]
 
+# * Testing --------------------------------------------------------------------
+[tool.pytest.ini_options]
+addopts = [
+    "--cov-config=pyproject.toml",
+    "--doctest-glob=*.md",
+    "--doctest-modules",
+    "--pyargs",
+    "--strict-config",
+    "--strict-markers",
+    "-ra",
+]
+testpaths = [
+    "README.md",
+    "thermoextrap",
+    "tests",
+]
+# options
+filterwarnings = [ "error" ]
+log_cli_level = "INFO"
+log_level = "INFO"
+minversion = "8"
+strict_xfail = "true"
+
+[tool.coverage]
+run.branch = true
+run.source = [
+    "thermoextrap",
+]
+paths.source = [
+    "src/",
+    # needed for testing source if not editable install
+    ".nox/**/site-packages/",
+    "*/.nox/**/site-packages",
+    "*/src",
+]
+report.exclude_also = [
+    "@overload",
+    "if TYPE_CHECKING:",
+]
+report.include = [
+    "src/*",
+]
+report.omit = [
+    "*/_typing.py",
+    "*/vendored/*",
+]
+report.show_missing = true
+
 # * Dependency creation --------------------------------------------------------
 [tool.pyproject2conda]
 user-config = "config/userconfig.toml"
@@ -479,6 +534,7 @@ reqs = [
     "prek",
     "pyrefly>=0.37.0",
     "pyright>=1.1.396",
+    "rooster>=0.1.1",
     "scriv",
     "twine>=5.0.0",
     "ty>=0.0.14",
@@ -500,3 +556,22 @@ new_fragment_template = "file: changelog.d/templates/new_fragment.md.j2"
 
 [tool.commitizen]
 use_shortcuts = true
+
+[tool.rooster]
+changelog_contributors = true
+major-labels = [ "breaking" ]
+minor_labels = [ "enhancement" ]
+patch-labels = [ "bug", "documentation" ]
+# options
+ignore-labels = [ "internal", "testing" ]
+require-labels = [ "breaking", "bug", "documentation", "enhancement" ]
+version_files = [
+    "pyproject.toml",
+]
+# sections
+section-labels."Breaking changes" = [ "breaking" ]
+section-labels."Bug fixes" = [ "bug" ]
+section-labels.Documentation = [ "documentation" ]
+section-labels.Enhancements = [ "enhancement" ]
+section-labels.Internal = [ "internal" ]
+section-labels."Other changes" = [ "__unknown__" ]

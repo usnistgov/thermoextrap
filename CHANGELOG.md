@@ -1,14 +1,9 @@
-<!-- markdownlint-disable MD024 -->
-<!-- markdownlint-disable MD013 -->
-<!-- prettier-ignore-start -->
 # Changelog
 
-Changelog for `thermoextrap`
+<!-- markdownlint-disable-file -->
 
-## Unreleased
 
-[changelog.d]: https://github.com/usnistgov/thermoextrap/tree/main/changelog.d
-
+<<<<<<< before updating
 See the fragment files in [changelog.d]
 
 <!-- prettier-ignore-end -->
@@ -142,3 +137,8 @@ Full set of changes:
 [`v0.1.7...v0.1.8`](https://github.com/usnistgov/thermoextrap/compare/v0.1.7...v0.1.8)
 
 ## v0.1.7 - 2023-02-14
+=======
+Changelog for `thermoextrap`
+
+## Initial release
+>>>>>>> after updating

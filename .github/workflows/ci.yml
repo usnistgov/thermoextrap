@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
   workflow_dispatch:
 
 concurrency:
@@ -13,7 +18,11 @@ env:
   FORCE_COLOR: "3"
   UVX_CONSTRAINT: requirements/lock/uvx-tools.txt
   UVX_COMMAND: uvx -crequirements/lock/uvx-tools.txt
+<<<<<<< before updating
   NOX_COMMAND: uvx -crequirements/lock/uvx-tools.txt -wdotenv nox
+=======
+  NOX_COMMAND: uvx -crequirements/lock/uvx-tools.txt nox
+>>>>>>> after updating
   # EXTRA_PYTHON_VERSIONS: "pypy-3.11"
 
 permissions: {}
@@ -25,6 +34,12 @@ jobs:
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
+      - name: Don't run CI on draft PR
+        if:
+          github.event_name == 'pull_request' && github.event.pull_request.draft
+          == true
+        run: exit 1
+
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@f75f66ce1886f00957d99748a42c724f4330bdcf # v5.3.1
         with:
@@ -69,7 +84,6 @@ jobs:
           print("{minmax_python_versions=}")
           print("{minmax_default_python_versions=}")
           print("{all_python_version=}")
-
 
           with open(os.getenv("GITHUB_OUTPUT"), "a") as f:
             f.write(f"{default_python_version=:s}\n")
@@ -155,6 +169,8 @@ jobs:
         os:
           - ubuntu-latest
           # - windows-latest
+        session:
+          - typecheck
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -164,14 +180,21 @@ jobs:
           python-version-file: ".python-version"
           cache-dependency-path: uv.lock
       - name: Get python version
+        id: python_version
         run: |
           python_version=$(cat .python-version)
-          echo "python_version=${python_version}" >> "$GITHUB_ENV"
+          echo "python_version=${python_version}" >> "$GITHUB_OUTPUT"
         shell: bash
       - name: typecheck
         env:
+<<<<<<< before updating
           python_version: ${{ env.python_version }}
         run: $NOX_COMMAND -s typecheck-"$python_version"
+=======
+          python_version: ${{ steps.python_version.outputs.python_version }}
+          session: ${{ matrix.session }}
+        run: $NOX_COMMAND -s "${session}-${python_version}"
+>>>>>>> after updating
         shell: bash
 
   test:
@@ -187,6 +210,7 @@ jobs:
         os:
           - ubuntu-latest
         python-version:
+<<<<<<< before updating
           ${{ fromJson(needs.build-package.outputs.minmax-python-versions) }}
         style:
           - test
@@ -198,6 +222,13 @@ jobs:
               ${{ needs.build-package.outputs.max-python-version }}
             style: test
             options: ""
+=======
+          ${{
+          fromJson(needs.build-package.outputs.minmax-default-python-versions)
+          }}
+        session:
+          - test
+>>>>>>> after updating
         include:
           - os: ubuntu-latest
             python-version:
@@ -217,9 +248,13 @@ jobs:
           - os: windows-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
+<<<<<<< before updating
             style: test
             options: ""
 
+=======
+            session: test
+>>>>>>> after updating
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         if: matrix.style != 'test-notebook'
@@ -261,6 +296,7 @@ jobs:
       - name: Test with nox
         env:
           python_version: ${{ matrix.python-version }}
+<<<<<<< before updating
           style: ${{ matrix.style }}
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
@@ -298,6 +334,13 @@ jobs:
         if: always()
         run: |
           ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
+=======
+          options: "++installpkg dist/*.whl"
+          session: ${{ matrix.session }}
+        run: |
+          # shellcheck disable=SC2086
+          $NOX_COMMAND -s "${session}-${python_version}" -- $options
+>>>>>>> after updating
         shell: bash -euxo pipefail {0}
 
       - name: Upload coverage data
@@ -305,7 +348,11 @@ jobs:
         with:
           name:
             coverage-data-${{ matrix.os }}-${{ matrix.python-version }}-${{
+<<<<<<< before updating
             matrix.style }}
+=======
+            matrix.session }}
+>>>>>>> after updating
           path: .nox/test-*/tmp/.coverage*
           include-hidden-files: true
           if-no-files-found: ignore
@@ -341,8 +388,13 @@ jobs:
           cat coverage.md
           cat coverage.md >> "$GITHUB_STEP_SUMMARY"
 
+<<<<<<< before updating
           # fail if under 30%
           $NOX_COMMAND -s coverage -- ++coverage report ++coverage-options --fail-under=30
+=======
+          # fail if under 100%
+          $NOX_COMMAND -s coverage -- ++coverage report ++coverage-options --fail-under=100
+>>>>>>> after updating
         shell: bash
       - name: Upload HTML report if check failed.
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
