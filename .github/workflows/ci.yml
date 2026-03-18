@@ -18,11 +18,7 @@ env:
   FORCE_COLOR: "3"
   UVX_CONSTRAINT: requirements/lock/uvx-tools.txt
   UVX_COMMAND: uvx -crequirements/lock/uvx-tools.txt
-<<<<<<< before updating
   NOX_COMMAND: uvx -crequirements/lock/uvx-tools.txt -wdotenv nox
-=======
-  NOX_COMMAND: uvx -crequirements/lock/uvx-tools.txt nox
->>>>>>> after updating
   # EXTRA_PYTHON_VERSIONS: "pypy-3.11"
 
 permissions: {}
@@ -187,14 +183,9 @@ jobs:
         shell: bash
       - name: typecheck
         env:
-<<<<<<< before updating
-          python_version: ${{ env.python_version }}
-        run: $NOX_COMMAND -s typecheck-"$python_version"
-=======
           python_version: ${{ steps.python_version.outputs.python_version }}
           session: ${{ matrix.session }}
         run: $NOX_COMMAND -s "${session}-${python_version}"
->>>>>>> after updating
         shell: bash
 
   test:
@@ -210,9 +201,8 @@ jobs:
         os:
           - ubuntu-latest
         python-version:
-<<<<<<< before updating
           ${{ fromJson(needs.build-package.outputs.minmax-python-versions) }}
-        style:
+        session:
           - test
         options:
           - ""
@@ -220,48 +210,37 @@ jobs:
           - os: ubuntu-latest
             python-version:
               ${{ needs.build-package.outputs.max-python-version }}
-            style: test
+            session: test
             options: ""
-=======
-          ${{
-          fromJson(needs.build-package.outputs.minmax-default-python-versions)
-          }}
-        session:
-          - test
->>>>>>> after updating
         include:
           - os: ubuntu-latest
             python-version:
               ${{ needs.build-package.outputs.max-python-version }}
-            style: test
+            session: test
             options: "--run-slow"
           - os: ubuntu-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
-            style: test-notebook
+            session: test-notebook
             options: ""
           - os: macos-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
-            style: test
+            session: test
             options: ""
           - os: windows-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
-<<<<<<< before updating
-            style: test
+            session: test
             options: ""
 
-=======
-            session: test
->>>>>>> after updating
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        if: matrix.style != 'test-notebook'
+        if: matrix.session != 'test-notebook'
         with:
           persist-credentials: false
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        if: matrix.style == 'test-notebook'
+        if: matrix.session == 'test-notebook'
         with:
           persist-credentials: false
           submodules: true
@@ -296,8 +275,7 @@ jobs:
       - name: Test with nox
         env:
           python_version: ${{ matrix.python-version }}
-<<<<<<< before updating
-          style: ${{ matrix.style }}
+          session: ${{ matrix.session }}
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
           OS: ${{ matrix.os }}
@@ -318,7 +296,7 @@ jobs:
             echo "NUMBA_CPU_NAME=generic" >> "$GITHUB_ENV"
           fi
 
-          command="${style}-${python_version}"
+          command="${session}-${python_version}"
 
           echo "command: ${command}"
           echo "compile: ${compile}"
@@ -334,13 +312,6 @@ jobs:
         if: always()
         run: |
           ls -aR "${GITHUB_WORKSPACE}/.numba_cache"
-=======
-          options: "++installpkg dist/*.whl"
-          session: ${{ matrix.session }}
-        run: |
-          # shellcheck disable=SC2086
-          $NOX_COMMAND -s "${session}-${python_version}" -- $options
->>>>>>> after updating
         shell: bash -euxo pipefail {0}
 
       - name: Upload coverage data
@@ -348,11 +319,7 @@ jobs:
         with:
           name:
             coverage-data-${{ matrix.os }}-${{ matrix.python-version }}-${{
-<<<<<<< before updating
-            matrix.style }}
-=======
             matrix.session }}
->>>>>>> after updating
           path: .nox/test-*/tmp/.coverage*
           include-hidden-files: true
           if-no-files-found: ignore
@@ -388,13 +355,8 @@ jobs:
           cat coverage.md
           cat coverage.md >> "$GITHUB_STEP_SUMMARY"
 
-<<<<<<< before updating
           # fail if under 30%
           $NOX_COMMAND -s coverage -- ++coverage report ++coverage-options --fail-under=30
-=======
-          # fail if under 100%
-          $NOX_COMMAND -s coverage -- ++coverage report ++coverage-options --fail-under=100
->>>>>>> after updating
         shell: bash
       - name: Upload HTML report if check failed.
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0

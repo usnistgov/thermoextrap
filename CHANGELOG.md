@@ -3,14 +3,7 @@
 <!-- markdownlint-disable-file -->
 
 
-<<<<<<< before updating
-See the fragment files in [changelog.d]
-
-<!-- prettier-ignore-end -->
-
-<!-- markdownlint-enable MD013 -->
-
-<!-- scriv-insert-here -->
+Changelog for `thermoextrap`
 
 ## v1.0.0 — 2025-09-29
 
@@ -137,8 +130,6 @@ Full set of changes:
 [`v0.1.7...v0.1.8`](https://github.com/usnistgov/thermoextrap/compare/v0.1.7...v0.1.8)
 
 ## v0.1.7 - 2023-02-14
-=======
 Changelog for `thermoextrap`
 
 ## Initial release
->>>>>>> after updating
