@@ -11,7 +11,7 @@ Released on 2026-03-18.
 
 ### Enhancements
 
-- feat(SympyMeanFuction): Add more flexibility in fitting process ([#25](https://github.com/usnistgov/thermoextrap/pull/25))
+- feat(SympyMeanFunction): Add more flexibility in fitting process ([#25](https://github.com/usnistgov/thermoextrap/pull/25))
 
 ### Contributors
 
