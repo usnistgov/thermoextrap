@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
   workflow_dispatch:
 
 concurrency:
@@ -25,6 +30,12 @@ jobs:
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
+      - name: Don't run CI on draft PR
+        if:
+          github.event_name == 'pull_request' && github.event.pull_request.draft
+          == true
+        run: exit 1
+
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@f75f66ce1886f00957d99748a42c724f4330bdcf # v5.3.1
         with:
@@ -69,7 +80,6 @@ jobs:
           print("{minmax_python_versions=}")
           print("{minmax_default_python_versions=}")
           print("{all_python_version=}")
-
 
           with open(os.getenv("GITHUB_OUTPUT"), "a") as f:
             f.write(f"{default_python_version=:s}\n")
@@ -155,6 +165,8 @@ jobs:
         os:
           - ubuntu-latest
           # - windows-latest
+        session:
+          - typecheck
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -164,14 +176,16 @@ jobs:
           python-version-file: ".python-version"
           cache-dependency-path: uv.lock
       - name: Get python version
+        id: python_version
         run: |
           python_version=$(cat .python-version)
-          echo "python_version=${python_version}" >> "$GITHUB_ENV"
+          echo "python_version=${python_version}" >> "$GITHUB_OUTPUT"
         shell: bash
       - name: typecheck
         env:
-          python_version: ${{ env.python_version }}
-        run: $NOX_COMMAND -s typecheck-"$python_version"
+          python_version: ${{ steps.python_version.outputs.python_version }}
+          session: ${{ matrix.session }}
+        run: $NOX_COMMAND -s "${session}-${python_version}"
         shell: bash
 
   test:
@@ -188,7 +202,7 @@ jobs:
           - ubuntu-latest
         python-version:
           ${{ fromJson(needs.build-package.outputs.minmax-python-versions) }}
-        style:
+        session:
           - test
         options:
           - ""
@@ -196,37 +210,37 @@ jobs:
           - os: ubuntu-latest
             python-version:
               ${{ needs.build-package.outputs.max-python-version }}
-            style: test
+            session: test
             options: ""
         include:
           - os: ubuntu-latest
             python-version:
               ${{ needs.build-package.outputs.max-python-version }}
-            style: test
+            session: test
             options: "--run-slow"
           - os: ubuntu-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
-            style: test-notebook
+            session: test-notebook
             options: ""
           - os: macos-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
-            style: test
+            session: test
             options: ""
           - os: windows-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}
-            style: test
+            session: test
             options: ""
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        if: matrix.style != 'test-notebook'
+        if: matrix.session != 'test-notebook'
         with:
           persist-credentials: false
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        if: matrix.style == 'test-notebook'
+        if: matrix.session == 'test-notebook'
         with:
           persist-credentials: false
           submodules: true
@@ -261,7 +275,7 @@ jobs:
       - name: Test with nox
         env:
           python_version: ${{ matrix.python-version }}
-          style: ${{ matrix.style }}
+          session: ${{ matrix.session }}
           options: ${{ matrix.options }}
           CACHE_HIT: ${{ steps.numba-cache-restore.outputs.cache-hit }}
           OS: ${{ matrix.os }}
@@ -282,7 +296,7 @@ jobs:
             echo "NUMBA_CPU_NAME=generic" >> "$GITHUB_ENV"
           fi
 
-          command="${style}-${python_version}"
+          command="${session}-${python_version}"
 
           echo "command: ${command}"
           echo "compile: ${compile}"
@@ -305,7 +319,7 @@ jobs:
         with:
           name:
             coverage-data-${{ matrix.os }}-${{ matrix.python-version }}-${{
-            matrix.style }}
+            matrix.session }}
           path: .nox/test-*/tmp/.coverage*
           include-hidden-files: true
           if-no-files-found: ignore
