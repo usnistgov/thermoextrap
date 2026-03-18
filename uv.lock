@@ -23,7 +23,7 @@ supported-markers = [
 ]
 
 [options]
-exclude-newer = "2026-03-11T00:57:47.13607Z"
+exclude-newer = "2026-03-11T01:12:02.911334573Z"
 exclude-newer-span = "P7D"
 
 [[package]]
@@ -5369,7 +5369,7 @@ wheels = [
 
 [[package]]
 name = "thermoextrap"
-version = "1.0.0"
+version = "1.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "attrs", marker = "python_full_version < '3.13' or sys_platform == 'linux'" },
