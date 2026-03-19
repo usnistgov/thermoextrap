@@ -8,9 +8,9 @@ conda-lock==4.0.0 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:050305a490861baa98d6c3876ed7b394707a67587d939548aac5e20b91b41d36 \
     --hash=sha256:979aacb4f67eb375f5d84ffbc7afc93c881ab9a513558c7461ed955fe243a3f6
     # via -r requirements/uvx-tools.txt
-copier==9.12.0 ; python_full_version < '3.13' or sys_platform == 'linux' \
-    --hash=sha256:87986637205a0443dbf7e5946502e5c71962a559c25f436642a08203cf61ef54 \
-    --hash=sha256:a1bc84dfd2a4b85dbe034999026c0e24ca02a6bc1574f45df07fd76d935c2ea9
+copier==9.13.1 ; python_full_version < '3.13' or sys_platform == 'linux' \
+    --hash=sha256:698ff6e053de7e7a4685423cadce3cbd7638dc9d5877aae44d714a8478ce00e4 \
+    --hash=sha256:c3c88965b9f1420523bfc0a56c2f9b23d3b33c460e8484eb63c91cd20f5a240b
     # via -r requirements/uvx-tools.txt
 copier-template-extensions==0.3.3 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:86bd5e2e89c94b6f9321e4078781b4456c5658b820bcae49ac60fd1e1dd23c10 \
@@ -71,39 +71,43 @@ nox==2026.2.9 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:1b7143bc8ecdf25f2353201326152c5303ae4ae56ca097b1fb6179ad75164c47 \
     --hash=sha256:1bc8a202ee8cd69be7aaada63b2a7019126899a06fc930a7aee75585bf8ee41b
     # via -r requirements/uvx-tools.txt
-prek==0.3.4 ; python_full_version < '3.13' or sys_platform == 'linux' \
-    --hash=sha256:10a621a690d9c127afc3d21c275030d364d1fbef3296c095068d3ae80a59546e \
-    --hash=sha256:37449ae82f4dc08b72e542401e3d7318f05d1163e87c31ab260a40f425d6516e \
-    --hash=sha256:3975c61139c7b3200e38dc3955e050b0f2615701d3deb9715696a902e850509e \
-    --hash=sha256:486bdae8f4512d3b4f6eb61b83e5b7595da2adca385af4b2b7823c0ab38d1827 \
-    --hash=sha256:4bbb1d3912a88935f35c6ba4466b4242732e3e3a8c608623c708e83cea85de00 \
-    --hash=sha256:50a43f522625e8c968e8c9992accf9e29017abad6c782d6d176b73145ad680b7 \
-    --hash=sha256:56a74d02d8b7dfe3c774ecfcd8c1b4e5f1e1b84369043a8003e8e3a779fce72d \
-    --hash=sha256:60e9aa86ca65de963510ae28c5d94b9d7a97bcbaa6e4cdb5bf5083ed4c45dc71 \
-    --hash=sha256:65b23268456b5a763278d4e1ec532f2df33918f13ded85869a1ddff761eb9697 \
-    --hash=sha256:6f784d78de72a8bbe58a5fe7bde787c364ae88f0aff5222c5c5c7287876c510a \
-    --hash=sha256:7fb6395f6eb76133bb1e11fc718db8144522466cdc2e541d05e7813d1bbcae7d \
-    --hash=sha256:8060c72b764f0b88112616763da9dd3a7c293e010f8520b74079893096160a2f \
-    --hash=sha256:a8e089a030f0a023c22a4bb2ec4ff3fcc153585d701cff67acbfca2f37e173ae \
-    --hash=sha256:aae17813239ddcb4ae7b38418de4d49afff740f48f8e0556029c96f58e350412 \
-    --hash=sha256:c35192d6e23fe7406bd2f333d1c7dab1a4b34ab9289789f453170f33550aa74d \
-    --hash=sha256:ca4d4134db8f6e8de3c418317becdf428957e3cab271807f475318105fd46d04 \
-    --hash=sha256:d978c31bc3b1f0b3d58895b7c6ac26f077e0ea846da54f46aeee4c7088b1b105
+prek==0.3.5 ; python_full_version < '3.13' or sys_platform == 'linux' \
+    --hash=sha256:01d031b684f7e1546225393af1268d9b4451a44ef6cb9be4101c85c7862e08db \
+    --hash=sha256:44b3e12791805804f286d103682b42a84e0f98a2687faa37045e9d3375d3d73d \
+    --hash=sha256:4511e15d34072851ac88e4b2006868fbe13655059ad941d7a0ff9ee17138fd9f \
+    --hash=sha256:45ee84199bb48e013bdfde0c84352c17a44cc42d5792681b86d94e9474aab6f8 \
+    --hash=sha256:499c56a94a155790c75a973d351a33f8065579d9094c93f6d451ada5d1e469be \
+    --hash=sha256:64cad21cb9072d985179495b77b312f6b81e7b45357d0c68dc1de66e0408eabc \
+    --hash=sha256:70b2152ecedc58f3f4f69adc884617b0cf44259f7414c44d6268ea6f107672eb \
+    --hash=sha256:a1c4869e45ee341735d07179da3a79fa2afb5959cef8b3c8a71906eb52dc6933 \
+    --hash=sha256:aa774168e3d868039ff79422bdef2df8d5a016ed804a9914607dcdd3d41da053 \
+    --hash=sha256:abcee520d31522bcbad9311f21326b447694cd5edba33618c25fd023fc9865ec \
+    --hash=sha256:ad8f5f0d8da53dc94d00b76979af312b3dacccc9dcbc6417756c5dca3633c052 \
+    --hash=sha256:ca40b6685a4192256bc807f32237af94bf9b8799c0d708b98735738250685642 \
+    --hash=sha256:de1065b59f194624adc9dea269d4ff6b50e98a1b5bb662374a9adaa496b3c1eb \
+    --hash=sha256:e3cb451cc51ac068974557491beb4c7d2d41dfde29ed559c1694c8ce23bf53e8 \
+    --hash=sha256:f43275e5d564e18e52133129ebeb5cb071af7ce4a547766c7f025aa0955dfbb6 \
+    --hash=sha256:f5fc0d78c3896a674aeb8247a83bbda7efec85274dbdfbc978ceff8d37e4ed20 \
+    --hash=sha256:fcc0b63b8337e2046f51267facaac63ba755bc14aad53991840a5eccba3e5c28
     # via -r requirements/uvx-tools.txt
-pyrefly==0.55.0 ; python_full_version < '3.13' or sys_platform == 'linux' \
-    --hash=sha256:233b861b4cff008b1aff62f4f941577ed752e4d0060834229eb9b6826e6973c9 \
-    --hash=sha256:23f786a78536a56fed331b245b7d10ec8945bebee7b723491c8d66fdbc155fe6 \
-    --hash=sha256:2827426e6b28397c13badb93c0ede0fb0f48046a7a89e3d774cda04e8e2067cd \
-    --hash=sha256:434c3282532dd4525c4840f2040ed0eb79b0ec8224fe18d957956b15471f2441 \
-    --hash=sha256:49aafcefe5e2dd4256147db93e5b0ada42bff7d9a60db70e03d1f7055338eec9 \
-    --hash=sha256:732ff490e0e863b296e7c0b2471e08f8ba7952f9fa6e9de09d8347fd67dde77f \
-    --hash=sha256:7346b2d64dc575bd61aa3bca854fbf8b5a19a471cbdb45e0ca1e09861b63488c \
-    --hash=sha256:d465b49e999b50eeb069ad23f0f5710651cad2576f9452a82991bef557df91ee \
-    --hash=sha256:f5aa85657d76da1d25d081a49f0e33c8fc3ec91c1a0f185a8ed393a5a3d9e178
+pyrefly==0.56.0 ; python_full_version < '3.13' or sys_platform == 'linux' \
+    --hash=sha256:1e5f53781875024086a5b9f31a89c57d2977487fc3f819d9255008ad34b86fe2 \
+    --hash=sha256:21f018f47debc0842b2c3072201e53c138ae32bcda4f3119bfc8d23f59c16b3e \
+    --hash=sha256:4683f5e8820d5fbfb84231b643b2c5f6cd40b982cac48ef756d4e3d9b09a39cc \
+    --hash=sha256:5478229b09f4bba5bfea000b5ba20ea405f62dc7619ea81197e7ea637d6cba8d \
+    --hash=sha256:95366056ceb224571b9f1c20e801d949f2c1fa2cf4ed6ceaadf85ca2ebe6fb27 \
+    --hash=sha256:ec6ab3f9e2c03bae8dfa520f52778f47b6762020929a664177d36aa3b941db22 \
+    --hash=sha256:f0440a4bbf119ab646468f360e0bd047df051352db1e5d5b9fd58f89e8458809 \
+    --hash=sha256:f4948021639288b1ccda5f124c9562dc7f0a2679111eb314fa266c7bfd9f8603 \
+    --hash=sha256:f84d21d9b9b58481eea02204e2f73cabb93751b21ab2cd99178b4bde24be6a82
     # via -r requirements/uvx-tools.txt
 pyright==1.1.408 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:090b32865f4fdb1e0e6cd82bf5618480d48eecd2eb2e70f960982a3d9a4c17c1 \
     --hash=sha256:f28f2321f96852fa50b5829ea492f6adb0e6954568d1caa3f3af3a5f555eb684
+    # via -r requirements/uvx-tools.txt
+rooster==0.1.1 ; python_full_version < '3.13' or sys_platform == 'linux' \
+    --hash=sha256:c9823122f0c2b035985e70384323cdd353477af988e0f065bc302646a49da482 \
+    --hash=sha256:d052503f84e6847842d946f64a4e217032a8f3177edf954da8a886896c574f84
     # via -r requirements/uvx-tools.txt
 scriv==1.8.0 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:7b1a105dd411ac541998250fc8594742419f94cee984ca1257c5ebf5af21918b \
@@ -113,24 +117,24 @@ twine==6.2.0 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:418ebf08ccda9a8caaebe414433b0ba5e25eb5e4a927667122fbe8f829f985d8 \
     --hash=sha256:e5ed0d2fd70c9959770dce51c8f39c8945c574e18173a7b81802dab51b4b75cf
     # via -r requirements/uvx-tools.txt
-ty==0.0.20 ; python_full_version < '3.13' or sys_platform == 'linux' \
-    --hash=sha256:0e3ffbae58f9f0d17cdc4ac6d175ceae560b7ed7d54f9ddfb1c9f31054bcdc2c \
-    --hash=sha256:176e52bc8bb00b0e84efd34583962878a447a3a0e34ecc45fd7097a37554261b \
-    --hash=sha256:245ceef5bd88df366869385cf96411cb14696334f8daa75597cf7e41c3012eb8 \
-    --hash=sha256:3662f890518ce6cf4d7568f57d03906912d2afbf948a01089a28e325b1ef198c \
-    --hash=sha256:3b777c1bf13bc0a95985ebb8a324b8668a4a9b2e514dde5ccf09e4d55d2ff232 \
-    --hash=sha256:53f7a5c12c960e71f160b734f328eff9a35d578af4b67a36b0bb5990ac5cdc27 \
-    --hash=sha256:6846427b8b353a43483e9c19936dc6a25612573b44c8f7d983dfa317e7f00d4c \
-    --hash=sha256:7cc12769c169c9709a829c2248ee2826b7aae82e92caeac813d856f07c021eae \
-    --hash=sha256:a5e10f40fc4a0a1cbcb740a4aad5c7ce35d79f030836ea3183b7a28f43170248 \
-    --hash=sha256:b2a4a7db48bf8cba30365001bc2cad7fd13c1a5aacdd704cc4b7925de8ca5eb3 \
-    --hash=sha256:b2bc73025418e976ca4143dde71fb9025a90754a08ac03e6aa9b80d4bed1294b \
-    --hash=sha256:b6594b58d8b0e9d16a22b3045fc1305db4b132c8d70c17784ab8c7a7cc986807 \
-    --hash=sha256:bd4ffd907d1bd70e46af9e9a2f88622f215e1bf44658ea43b32c2c0b357299e4 \
-    --hash=sha256:c4d21d1cdf67a444d3c37583c17291ddba9382a9871021f3f5d5735e09e85efe \
-    --hash=sha256:c7d32bfe93f8fcaa52b6eef3f1b930fd7da410c2c94e96f7412c30cfbabf1d17 \
-    --hash=sha256:d52f7c9ec6e363e094b3c389c344d5a140401f14a77f0625e3f28c21918552f5 \
-    --hash=sha256:ebba6be7974c14efbb2a9adda6ac59848f880d7259f089dfa72a093039f1dcc6
+ty==0.0.21 ; python_full_version < '3.13' or sys_platform == 'linux' \
+    --hash=sha256:210e7568c9f886c4d01308d751949ee714ad7ad9d7d928d2ba90d329dd880367 \
+    --hash=sha256:53508e345b11569f78b21ba8e2b4e61df38a9754947fb3cd9f2ef574367338fb \
+    --hash=sha256:553e43571f4a35604c36cfd07d8b61a5eb7a714e3c67f8c4ff2cf674fefbaef9 \
+    --hash=sha256:56b01fd2519637a4ca88344f61c96225f540c98ff18bca321d4eaa7bb0f7aa2f \
+    --hash=sha256:56d3b198b64dd0a19b2b66e257deaed2ecea568e722ae5352f3c6fb62027f89d \
+    --hash=sha256:62f7f5b235c4f7876db305c36997aea07b7af29b1a068f373d0e2547e25f32ff \
+    --hash=sha256:666f6822e3b9200abfa7e95eb0ddd576460adb8d66b550c0ad2c70abc84a2048 \
+    --hash=sha256:7bdf2f572378de78e1f388d24691c89db51b7caf07cf90f2bfcc1d6b18b70a76 \
+    --hash=sha256:7e9613994610431ab8625025bd2880dbcb77c5c9fabdd21134cda12d840a529d \
+    --hash=sha256:a0854d008347ce4a5fb351af132f660a390ab2a1163444d075251d43e6f74b9b \
+    --hash=sha256:a4c2ba5d67d64df8fcdefd8b280ac1149d24a73dbda82fa953a0dff9d21400ed \
+    --hash=sha256:a709d576e5bea84b745d43058d8b9cd4f27f74a0b24acb4b0cbb7d3d41e0d050 \
+    --hash=sha256:bef3ab4c7b966bcc276a8ac6c11b63ba222d21355b48d471ea782c4104eee4e0 \
+    --hash=sha256:d23d2c34f7a77d974bb08f0860ef700addc8a683d81a0319f71c08f87506cfd0 \
+    --hash=sha256:e9de7e11c63c6afc40f3e9ba716374add171aee7fabc70b5146a510705c6d41b \
+    --hash=sha256:ee8399f7c453a425291e6688efe430cfae7ab0ac4ffd50eba9f872bf878b54f6 \
+    --hash=sha256:f72047996598ac20553fb7e21ba5741e3c82dee4e9eadf10d954551a5fe09391
     # via -r requirements/uvx-tools.txt
 typecheck-runner==0.1.6 ; python_full_version < '3.13' or sys_platform == 'linux' \
     --hash=sha256:a97f7ce67bf6397fe0e0e4072c1813a8961dc8e8233d0745d2702c29cd61e88d \

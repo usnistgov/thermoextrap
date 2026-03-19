@@ -1,44 +1,43 @@
-<!-- markdownlint-disable MD024 -->
-<!-- markdownlint-disable MD013 -->
-<!-- prettier-ignore-start -->
 # Changelog
+
+<!-- markdownlint-disable-file -->
+
 
 Changelog for `thermoextrap`
 
-## Unreleased
+## 1.1.0
 
-[changelog.d]: https://github.com/usnistgov/thermoextrap/tree/main/changelog.d
+Released on 2026-03-18.
 
-See the fragment files in [changelog.d]
+### Enhancements
 
-<!-- prettier-ignore-end -->
+- feat(SympyMeanFunction): Add more flexibility in fitting process ([#25](https://github.com/usnistgov/thermoextrap/pull/25))
 
-<!-- markdownlint-enable MD013 -->
+### Contributors
 
-<!-- scriv-insert-here -->
+- [@wpk-nist-gov](https://github.com/wpk-nist-gov)
 
 ## v1.0.0 — 2025-09-29
 
 ### Removed
 
 - Removed `DataValues` and `DataValuesCentral` classes. Addition of
-  `resample_values` option to `DataCentralMomentsVals`, and addition of
-  `Dataset` support from `cmomy` package, made these classes redundant.
+`resample_values` option to `DataCentralMomentsVals`, and addition of
+`Dataset` support from `cmomy` package, made these classes redundant.
 
 ### Added
 
 - Added type annotations/checking. The core functionality is fully covered. GPR
-  modules are mostly covered (there are still so `Any` objects about). This
-  caught several edge case bugs.
-
+modules are mostly covered (there are still so `Any` objects about). This
+caught several edge case bugs.
 - Added `resample_values` option to `DataCentralMomentsVals` class. This allows
-  resampling on `uv` and `xv` instead of resampling during construction of
-  `dxduave`. Used in `PerturbModel`, etc.
+resampling on `uv` and `xv` instead of resampling during construction of
+`dxduave`. Used in `PerturbModel`, etc.
 
 ### Changed
 
 - Moved thermoextrap.legacy submodule to tests/legacy, as this module is used
-  solely for regression testing.
+solely for regression testing.
 
 ## v0.6.0 — 2025-02-18
 
@@ -46,7 +45,7 @@ See the fragment files in [changelog.d]
 
 - Project now setup to use [uv](https://github.com/astral-sh/uv) with lock file.
 - Updated code to use latest version of
-  [cmomy](https://github.com/usnistgov/cmomy)
+[cmomy](https://github.com/usnistgov/cmomy)
 - Initial work for adding typing to code.
 
 ## v0.5.0 — 2024-03-15
@@ -62,33 +61,31 @@ See the fragment files in [changelog.d]
 - Testing around basic multiD input GPRs
 - Updated `make_rbf_expr` in `active_utils` (old 1D in `make_rbf_expr_old`)
 - Updated `DerivativeKernel`, `HetGaussianDeriv`, `HeteroscedasticGPR` in
-  `gpr_models`
+`gpr_models`
 
 ### Changed
 
 - Updates to match with newer versions of GPflow
 - `HetGaussianDeriv` likelihood now accepts `X` (input data) argument for all
-  methods
+methods
 - `HetGaussianDeriv` init now takes `obs_dims` argument instead of `d_order`
 - `build_scaled_cov_mat` method now takes `X`, which includes derivative orders
 - all mean functions inherit from gpflow.functions.MeanFunction (same behavior)
-
 - Changed structure of the repo to better support some third party tools.
 - Moved nox environments from `.nox` to `.nox/{project-name}/envs`. This fixes
-  issues with ipykernel giving odd names for locally installed environments.
+issues with ipykernel giving odd names for locally installed environments.
 - Moved repo specific dot files to the `config` directory (e.g.,
-  `.noxconfig.toml` to `config/userconfig.toml`). This cleans up the top level
-  of the repo.
+`.noxconfig.toml` to `config/userconfig.toml`). This cleans up the top level
+of the repo.
 - added some support for using `nbqa` to run mypy/pyright on notebooks.
 - Added ability to bootstrap development environment using pipx. This should
-  simplify initial setup. See Contributing for more info.
+simplify initial setup. See Contributing for more info.
 
 ## v0.4.0 — 2023-06-15
 
 ### Added
 
 - Package now available on conda-forge
-
 - Now support python3.11
 - Bumped pymbar version to pymbar>=4.0
 
@@ -106,10 +103,9 @@ See the fragment files in [changelog.d]
 
 - New linters via pre-commit
 - Development env now handled by tox
-
 - Moved `models, data, idealgas` from `thermoextrap.core` to `thermoextrap`.
-  These were imported at top level anyway. This fixes issues with doing things
-  like `from thermoextrap.data import ...`, etc.
+These were imported at top level anyway. This fixes issues with doing things
+like `from thermoextrap.data import ...`, etc.
 - Moved `core._docstrings_` to `docstrings`.
 - Now using `cmomy.docstrings` instead of repeating them here.
 
@@ -142,3 +138,6 @@ Full set of changes:
 [`v0.1.7...v0.1.8`](https://github.com/usnistgov/thermoextrap/compare/v0.1.7...v0.1.8)
 
 ## v0.1.7 - 2023-02-14
+Changelog for `thermoextrap`
+
+## Initial release
