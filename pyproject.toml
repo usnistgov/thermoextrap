@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "uv_build"
 requires = [
-    "uv-build>=0.10.11,<0.11.0",
+    "uv-build>=0.11.0,<0.12.0",
 ]
 
 [project]
@@ -115,7 +115,7 @@ docs = [
     "myst-nb",
     "pyenchant",
     "sphinx>=5.3.0",
-    # options
+    # other
     "sphinx-book-theme",
     "sphinx-copybutton",
     "sphinxcontrib-spelling",
@@ -481,7 +481,6 @@ reqs = [
     "pyrefly>=0.37.0",
     "pyright>=1.1.396",
     "rooster>=0.1.1",
-    "scriv",
     "twine>=5.0.0",
     "ty>=0.0.14",
 ]
@@ -495,11 +494,6 @@ skip-package = true
 style = "requirements"
 
 # * Other tools ----------------------------------------------------------------
-[tool.scriv]
-format = "md"
-md_header_level = "2"
-new_fragment_template = "file: changelog.d/templates/new_fragment.md.j2"
-
 [tool.commitizen]
 use_shortcuts = true
 
@@ -509,7 +503,7 @@ major-labels = [ "breaking" ]
 minor_labels = [ "enhancement" ]
 patch-labels = [ "bug", "documentation" ]
 # options
-ignore-labels = [ "internal", "testing" ]
+ignore-labels = [ "internal" ]
 require-labels = [ "breaking", "bug", "documentation", "enhancement" ]
 version_files = [
     "pyproject.toml",
