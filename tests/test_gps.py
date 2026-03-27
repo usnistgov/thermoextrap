@@ -137,30 +137,24 @@ def test_deriv_kernel_manual_1d() -> None:
         np.testing.assert_allclose(ref, to_check)
 
     # Next test with multiple points provided at once
-    x_check = np.block(
-        [
-            [0.0 * np.ones((3, 1)), np.arange(3)[:, None]],
-            [1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
-        ]
-    )
+    x_check = np.block([
+        [0.0 * np.ones((3, 1)), np.arange(3)[:, None]],
+        [1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
+    ])
     to_check = deriv_kern.K(x_check, x_check).numpy()
-    ref = np.block(
-        [
-            [rbf_check(0.0, 0.0), rbf_check(0.0, 1.0)],
-            [rbf_check(1.0, 0.0), rbf_check(1.0, 1.0)],
-        ]
-    )
+    ref = np.block([
+        [rbf_check(0.0, 0.0), rbf_check(0.0, 1.0)],
+        [rbf_check(1.0, 0.0), rbf_check(1.0, 1.0)],
+    ])
     np.testing.assert_allclose(ref, to_check)
 
 
 def test_deriv_kernel_manual_multi_d() -> None:
     # Create manually implemented RBF class to use as reference
-    rbf_check = MultiDRBFCovs(
-        [
-            RBFCovs(1.0, 2.0),
-            RBFCovs(1.0, 1.0),
-        ]
-    )
+    rbf_check = MultiDRBFCovs([
+        RBFCovs(1.0, 2.0),
+        RBFCovs(1.0, 1.0),
+    ])
 
     # Create a derivative kernel to check
     kern_expr, kern_params = make_rbf_expr(2)
@@ -197,19 +191,15 @@ def test_deriv_kernel_manual_multi_d() -> None:
     # Next test with multiple points provided at once
     pt1 = np.array([0.0, 0.0])
     pt2 = np.array([1.0, 1.0])
-    x_check = np.block(
-        [
-            [np.tile(pt1, (9, 1)), d_combos],
-            [np.tile(pt2, (9, 1)), d_combos],
-        ]
-    )
+    x_check = np.block([
+        [np.tile(pt1, (9, 1)), d_combos],
+        [np.tile(pt2, (9, 1)), d_combos],
+    ])
     to_check = deriv_kern.K(x_check, x_check).numpy()
-    ref = np.block(
-        [
-            [rbf_check(pt1, pt1), rbf_check(pt1, pt2)],
-            [rbf_check(pt2, pt1), rbf_check(pt2, pt2)],
-        ]
-    )
+    ref = np.block([
+        [rbf_check(pt1, pt1), rbf_check(pt1, pt2)],
+        [rbf_check(pt2, pt1), rbf_check(pt2, pt2)],
+    ])
     np.testing.assert_allclose(ref, to_check)
 
 
@@ -220,13 +210,11 @@ def test_deriv_kernel_self_1d() -> None:
     deriv_kern = DerivativeKernel(kern_expr, 1, kernel_params=kern_params)
 
     # Create test input
-    x_check = np.block(
-        [
-            [0.0 * np.ones((3, 1)), np.arange(3)[:, None]],
-            [1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
-            [-1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
-        ]
-    )
+    x_check = np.block([
+        [0.0 * np.ones((3, 1)), np.arange(3)[:, None]],
+        [1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
+        [-1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
+    ])
 
     # Test that splits x data correctly (told it that observation dims is 1)
     check_locs, check_deriv_order = deriv_kern._split_x_into_locs_and_deriv_info(
@@ -276,13 +264,11 @@ def test_deriv_kernel_self_multi_d() -> None:
     pt1 = np.array([0.0, 0.0])
     pt2 = np.array([1.0, 1.0])
     pt3 = np.array([-1.0, 0.0])
-    x_check = np.block(
-        [
-            [np.tile(pt1, (9, 1)), d_combos],
-            [np.tile(pt2, (9, 1)), d_combos],
-            [np.tile(pt3, (9, 1)), d_combos],
-        ]
-    )
+    x_check = np.block([
+        [np.tile(pt1, (9, 1)), d_combos],
+        [np.tile(pt2, (9, 1)), d_combos],
+        [np.tile(pt3, (9, 1)), d_combos],
+    ])
 
     # Test that splits x data correctly (told it that observation dims is 2)
     check_locs, check_deriv_order = deriv_kern._split_x_into_locs_and_deriv_info(
@@ -319,13 +305,11 @@ def test_deriv_kernel_self_multi_d() -> None:
 # First define some data to use for testing
 def mean_funcs_check_data():
     # Define points to check at
-    x_check = np.block(
-        [
-            [0.0 * np.ones((3, 1)), np.arange(3)[:, None]],
-            [0.5 * np.ones((3, 1)), np.arange(3)[:, None]],
-            [1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
-        ]
-    )
+    x_check = np.block([
+        [0.0 * np.ones((3, 1)), np.arange(3)[:, None]],
+        [0.5 * np.ones((3, 1)), np.arange(3)[:, None]],
+        [1.0 * np.ones((3, 1)), np.arange(3)[:, None]],
+    ])
 
     # Will use y=x^2, so just have that at zero order
     # Then for first order derivative, it's just 2*x
@@ -420,9 +404,9 @@ def test_sympy_mean_func() -> None:
 
     # Create some x data
     x_vals = np.linspace(-10.0, 10.0, 10)
-    x_check = np.vstack(
-        [np.vstack([x_vals, d_o * np.ones_like(x_vals)]).T for d_o in range(3)]
-    )
+    x_check = np.vstack([
+        np.vstack([x_vals, d_o * np.ones_like(x_vals)]).T for d_o in range(3)
+    ])
 
     # And some y data
     m_check = 0.26
@@ -643,26 +627,22 @@ def test_gp() -> None:  # noqa: PLR0915
     x_val = np.block([[x_val, np.zeros_like(x_val)], [x_val, np.ones_like(x_val)]])
 
     pred_val_base = check_base.predict_f(x_val)
-    ref_pred_means = np.array(
-        [
-            [-0.12116922],
-            [0.54235242],
-            [0.02270773],
-            [-1.12612318],
-            [0.87582276],
-            [-1.10413224],
-        ]
-    )
-    ref_pred_vars = np.array(
-        [
-            [0.00460669],
-            [0.00413819],
-            [0.01032148],
-            [0.00841806],
-            [0.00238915],
-            [0.01527506],
-        ]
-    )
+    ref_pred_means = np.array([
+        [-0.12116922],
+        [0.54235242],
+        [0.02270773],
+        [-1.12612318],
+        [0.87582276],
+        [-1.10413224],
+    ])
+    ref_pred_vars = np.array([
+        [0.00460669],
+        [0.00413819],
+        [0.01032148],
+        [0.00841806],
+        [0.00238915],
+        [0.01527506],
+    ])
     np.testing.assert_allclose(pred_val_base[0].numpy(), ref_pred_means, rtol=1e-03)
     np.testing.assert_allclose(pred_val_base[1].numpy(), ref_pred_vars, rtol=1e-03)
 
@@ -693,26 +673,22 @@ def test_gp() -> None:  # noqa: PLR0915
     # Produce output and compare to below - will depend on optimization procedure
     # But better than nothing?
     pred_val_multi_d = check_multi_d.predict_f(x_val)
-    ref_multi_d_means = np.array(
-        [
-            [-0.12177132, -0.8197274],
-            [0.54288101, 0.97107731],
-            [0.02439859, -0.74359773],
-            [-1.11681105, -0.42663647],
-            [0.87410287, -0.01394911],
-            [-1.0930425, -0.48817702],
-        ]
-    )
-    ref_multi_d_vars = np.array(
-        [
-            [0.00461916, 0.00477108],
-            [0.00430657, 0.00396219],
-            [0.01033009, 0.00807202],
-            [0.00865764, 0.00895764],
-            [0.00256747, 0.00244668],
-            [0.01557182, 0.01329149],
-        ]
-    )
+    ref_multi_d_means = np.array([
+        [-0.12177132, -0.8197274],
+        [0.54288101, 0.97107731],
+        [0.02439859, -0.74359773],
+        [-1.11681105, -0.42663647],
+        [0.87410287, -0.01394911],
+        [-1.0930425, -0.48817702],
+    ])
+    ref_multi_d_vars = np.array([
+        [0.00461916, 0.00477108],
+        [0.00430657, 0.00396219],
+        [0.01033009, 0.00807202],
+        [0.00865764, 0.00895764],
+        [0.00256747, 0.00244668],
+        [0.01557182, 0.01329149],
+    ])
     np.testing.assert_allclose(
         pred_val_multi_d[0].numpy(), ref_multi_d_means, rtol=1e-03
     )

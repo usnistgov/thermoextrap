@@ -453,13 +453,6 @@ module-utilities = { packages = "docstring-inheritance" }
 [tool.pyproject2conda.envs.dev]
 groups = "dev"
 
-[tool.pyproject2conda.envs.pre-commit-additional-dependencies]
-reqs = [
-    "rust-just",
-]
-skip-package = true
-style = "requirements"
-
 [tool.pyproject2conda.envs.test]
 groups = [ "test" ]
 python = "all"

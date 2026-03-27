@@ -59,9 +59,12 @@ def test_rbf_expr() -> None:
         for volume in check_l:
             for x1 in check_x:
                 for x2 in check_x:
-                    out_expr = check_expr.subs(
-                        [(var_sym, v), (l_sym, volume), (x1_sym, x1), (x2_sym, x2)]
-                    )
+                    out_expr = check_expr.subs([
+                        (var_sym, v),
+                        (l_sym, volume),
+                        (x1_sym, x1),
+                        (x2_sym, x2),
+                    ])
                     np.testing.assert_allclose(float(out_expr), rbf(v, volume, x1, x2))
 
 
