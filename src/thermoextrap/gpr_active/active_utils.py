@@ -157,20 +157,15 @@ def input_GP_from_state(
         y_data = log_derivs
         # Compute full covariance matrix
         # Note loop over output dimensions since will have independent covariance for each
-        cov_data = np.array(
-            [
-                np.cov(resamp_log_derivs.values[..., k])
-                for k in range(resamp_log_derivs.shape[-1])
-            ]
-        )
+        cov_data = np.array([
+            np.cov(resamp_log_derivs.values[..., k])
+            for k in range(resamp_log_derivs.shape[-1])
+        ])
     else:
         y_data = derivs
-        cov_data = np.array(
-            [
-                np.cov(resamp_derivs.values[..., k])
-                for k in range(resamp_derivs.shape[-1])
-            ]
-        )
+        cov_data = np.array([
+            np.cov(resamp_derivs.values[..., k]) for k in range(resamp_derivs.shape[-1])
+        ])
 
     return x_data, y_data, cov_data
 
@@ -829,9 +824,9 @@ def create_base_GP_model(
             kernel(), output_dim=gpr_data[1].shape[-1]
         )
     else:
-        full_kernel = gpflow.kernels.SeparateIndependent(
-            [kernel() for _ in range(gpr_data[1].shape[-1])]
-        )
+        full_kernel = gpflow.kernels.SeparateIndependent([
+            kernel() for _ in range(gpr_data[1].shape[-1])
+        ])
 
     return HeteroscedasticGPR(
         gpr_data,
@@ -978,12 +973,10 @@ def create_GPR(
     # Derivatives from same simulation correlated, between independent
     # And different outputs are also independent in their likelihood model (covariance matrix)
     # So loop to treat each dimension separately
-    noise_cov_mat = np.array(
-        [
-            linalg.block_diag(*[cov[k, ...] for cov in cov_data])
-            for k in range(y_data.shape[1])
-        ]
-    )
+    noise_cov_mat = np.array([
+        linalg.block_diag(*[cov[k, ...] for cov in cov_data])
+        for k in range(y_data.shape[1])
+    ])
     data_input = (x_data, y_data, noise_cov_mat)
 
     # Create GPR
@@ -1098,15 +1091,13 @@ class UpdateStopABC:
         # If want to avoid repeats, randomize a bit and exclude end points
         alpha_select = alpha_grid.copy()
         if self.avoid_repeats:
-            alpha_select += np.hstack(
-                [
-                    [0.0],
-                    2.0
-                    * (alpha_grid[1] - alpha_grid[0])
-                    * (self.rng.random(len(alpha_grid) - 2) - 0.5),
-                    [0.0],
-                ]
-            )
+            alpha_select += np.hstack([
+                [0.0],
+                2.0
+                * (alpha_grid[1] - alpha_grid[0])
+                * (self.rng.random(len(alpha_grid) - 2) - 0.5),
+                [0.0],
+            ])
             alpha_select = alpha_select[1:-1]
         return alpha_grid, alpha_select
 
@@ -1200,9 +1191,10 @@ class UpdateFuncBase(UpdateStopABC):
             compare_min = np.min(compare_y)
             compare_max = np.max(compare_y)
             compare_range = compare_max - compare_min
-            _ = ax.set_ylim(
-                (compare_min - 0.05 * compare_range, compare_max + 0.05 * compare_range)
-            )
+            _ = ax.set_ylim((
+                compare_min - 0.05 * compare_range,
+                compare_max + 0.05 * compare_range,
+            ))
         # Plot points where collected data for GPR
         y_lims = ax.get_ylim()
         y_range = y_lims[1] - y_lims[0]
@@ -2299,9 +2291,9 @@ def active_learning(  # noqa: C901, PLR0912
         gpflow.utilities.print_summary(this_GP)
         # Add to training history
         train_history["loss"].append(this_GP.training_loss().numpy())
-        train_history["params"].append(
-            [p.numpy() for p in this_GP.trainable_parameters]
-        )
+        train_history["params"].append([
+            p.numpy() for p in this_GP.trainable_parameters
+        ])
 
         # Check if should stop
         if stop_criteria is not None:

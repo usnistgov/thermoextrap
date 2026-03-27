@@ -1084,7 +1084,8 @@ class InterpModel(StateCollection[DataT, SupportsModelDerivsDataT]):
         mat[np.isinf(mat)] = 0.0
 
         mat_inv = (
-            xr.DataArray(np.linalg.inv(mat), dims=[order_dim, "state_order"])
+            xr
+            .DataArray(np.linalg.inv(mat), dims=[order_dim, "state_order"])
             .assign_coords(state=("state_order", states))
             .assign_coords(order=("state_order", orders))
             .set_index(state_order=["state", "order"])
@@ -1299,12 +1300,10 @@ class MBARModel(StateCollection[xr.DataArray, Any]):
         x_flat = x.reshape(x.shape[0] * x.shape[1], -1)
         u = uv.to_numpy().reshape(-1)
 
-        out = np.array(
-            [
-                mbar_obj.compute_multiple_expectations(x_flat.T, b * u)["mu"]
-                for b in alpha.values
-            ]
-        )
+        out = np.array([
+            mbar_obj.compute_multiple_expectations(x_flat.T, b * u)["mu"]
+            for b in alpha.values
+        ])
 
         # reshape
         shape = (out.shape[0], *x.shape[2:])

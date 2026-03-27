@@ -151,7 +151,8 @@ def em_lnpi(data_lnpi, ref):
 @pytest.fixture
 def out_lnpi(em_lnpi, betas):
     return (
-        em_lnpi.predict(betas, cumsum=True)
+        em_lnpi
+        .predict(betas, cumsum=True)
         .pipe(lambda x: x - x.sel(n=0))
         .assign_coords(temp=lambda x: np.round(1.0 / x["beta"], 3))
     )

@@ -86,12 +86,10 @@ def _shared_hash_suitable_cache_subpath(py_file: str) -> str:
     package = subpath.parts[0]
     package_version = import_module(package).__version__
 
-    return "-".join(
-        [
-            *subpath.parts,
-            config.magic,
-            package,
-            package_version,
-            *MACHINE_HASH,
-        ]
-    )
+    return "-".join([
+        *subpath.parts,
+        config.magic,
+        package,
+        package_version,
+        *MACHINE_HASH,
+    ])

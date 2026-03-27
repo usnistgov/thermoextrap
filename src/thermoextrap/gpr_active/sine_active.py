@@ -85,12 +85,10 @@ def make_data(
         y_vals = np.hstack([y_vals, deriv_vals])
         y_err = np.hstack([y_err, this_noise])
 
-    X = np.vstack(
-        [
-            np.tile(x_vals, (max_order + 1)),
-            np.hstack([np.ones(x_vals.shape[0]) * k for k in range(max_order + 1)]),
-        ]
-    ).T
+    X = np.vstack([
+        np.tile(x_vals, (max_order + 1)),
+        np.hstack([np.ones(x_vals.shape[0]) * k for k in range(max_order + 1)]),
+    ]).T
 
     # Sample outputs Y from Gaussian
     Y = rng.normal(y_vals, np.sqrt(y_err))[:, None]

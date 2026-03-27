@@ -511,9 +511,9 @@ class LogAvgExtrapModel(legacy.ExtrapModel):  # pylint: disable=missing-class-do
                 continue
             for k in range(1, o + 1):
                 # Get the derivatives of the average quantity
-                this_diffs = np.array(
-                    [self.derivF[v](avg_ufunc, avg_xufunc) for v in range(1, o - k + 2)]
-                )
+                this_diffs = np.array([
+                    self.derivF[v](avg_ufunc, avg_xufunc) for v in range(1, o - k + 2)
+                ])
                 # Loop to apply the chain rule to each element of the observable array
                 for v in range(x.shape[1]):
                     deriv_vals[o, v] += (
@@ -651,9 +651,10 @@ class ExtrapModelDependent(legacy.ExtrapModel):
             x, energy, self.maxOrder
         )  # Change this line to use dependent function
 
-        deriv_vals = np.zeros(
-            (self.maxOrder + 1, x.shape[2])
-        )  # And change this line because x data is of different shape
+        deriv_vals = np.zeros((
+            self.maxOrder + 1,
+            x.shape[2],
+        ))  # And change this line because x data is of different shape
         for o in range(self.maxOrder + 1):
             deriv_vals[o] = self.derivF[o](avg_ufunc, avg_xufunc)
         return deriv_vals
@@ -735,7 +736,8 @@ def test_extrapmodel_alphadep_ig() -> None:
     xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     xdata = (
-        xr.concat([xdata * ref_beta, xdata], dim="deriv")
+        xr
+        .concat([xdata * ref_beta, xdata], dim="deriv")
         .assign_coords(deriv=lambda x: np.arange(x.sizes["deriv"]))
         .reindex(deriv=np.arange(max_order + 1))
         .fillna(0.0)
@@ -801,9 +803,10 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
             x, energy, self.maxOrder
         )  # Change this line to use dependent function
 
-        deriv_vals = np.zeros(
-            (self.maxOrder + 1, x.shape[2])
-        )  # And change this line because x data is of different shape
+        deriv_vals = np.zeros((
+            self.maxOrder + 1,
+            x.shape[2],
+        ))  # And change this line because x data is of different shape
         for o in range(self.maxOrder + 1):
             if o == 0:
                 deriv_vals[o] = -np.log(
@@ -813,9 +816,9 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
             for k in range(1, o + 1):
                 # Get the derivatives of the average quantity
 
-                this_diffs = np.array(
-                    [self.derivF[v](avg_ufunc, avg_xufunc) for v in range(1, o - k + 2)]
-                )
+                this_diffs = np.array([
+                    self.derivF[v](avg_ufunc, avg_xufunc) for v in range(1, o - k + 2)
+                ])
                 # Loop to apply the chain rule to each element of the observable array
                 for v in range(x.shape[2]):
                     deriv_vals[o, v] += (
@@ -930,7 +933,8 @@ def test_extrapmodel_alphadep_minuslog_ig() -> None:
     xdata, udata = xtrap.idealgas.generate_data((100_000, 1), ref_beta, ref_vol)
     xdata = xr.DataArray(xdata, dims=["rec"])
     xdata = (
-        xr.concat([xdata * ref_beta, xdata], dim="deriv")
+        xr
+        .concat([xdata * ref_beta, xdata], dim="deriv")
         .assign_coords(deriv=lambda x: np.arange(x.sizes["deriv"]))
         .reindex(deriv=np.arange(max_order + 1))
         .fillna(0.0)

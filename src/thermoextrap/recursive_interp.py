@@ -185,7 +185,8 @@ class RecursiveInterp:
         beta_vals = np.linspace(float(beta1), float(beta2), num=50)
         predict_vals = this_model.predict(beta_vals, order=self.max_order)
         boot_err = (
-            this_model.resample(sampler={"nrep": 100})
+            this_model
+            .resample(sampler={"nrep": 100})
             .predict(beta_vals, order=self.max_order)
             .std("rep")
         )
@@ -348,7 +349,8 @@ class RecursiveInterp:
                 beta_vals = np.linspace(beta1, beta2, num=50)  # pyright: ignore[reportUnknownVariableType]
                 predict_vals = this_model.predict(beta_vals, order=self.max_order)
                 boot_err = (
-                    this_model.resample(sampler={"nrep": 100})
+                    this_model
+                    .resample(sampler={"nrep": 100})
                     .predict(beta_vals, order=self.max_order)
                     .std("rep")
                 )
@@ -477,14 +479,16 @@ class RecursiveInterp:
             reg1model = self.model_cls((self.states[aset[0]], self.states[aset[1]]))
             reg1coeffs = reg1model.coefs(order=self.max_order)
             reg1err = (
-                reg1model.resample(sampler={"nrep": 100})
+                reg1model
+                .resample(sampler={"nrep": 100})
                 .coefs(order=self.max_order)
                 .std("rep")
             )
             reg2model = self.model_cls((self.states[aset[1]], self.states[aset[2]]))
             reg2coeffs = reg2model.coefs(order=self.max_order)
             reg2err = (
-                reg2model.resample(sampler={"nrep": 100})
+                reg2model
+                .resample(sampler={"nrep": 100})
                 .coefs(order=self.max_order)
                 .std("rep")
             )
@@ -502,7 +506,8 @@ class RecursiveInterp:
             fullmodel = self.model_cls((self.states[aset[0]], self.states[aset[2]]))
             fullcoeffs = fullmodel.coefs(order=self.max_order)
             fullerr = (
-                fullmodel.resample(sampler={"nrep": 100})
+                fullmodel
+                .resample(sampler={"nrep": 100})
                 .coefs(order=self.max_order)
                 .std("rep")
             )
