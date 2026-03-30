@@ -68,7 +68,7 @@ repos:
       - id: pyproject-fmt
   # ** validate (schema-store)
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.03.27
+    rev: 2026.03.29
     hooks:
       - id: validate-pyproject
         name: validate-pyproject-schema-store
@@ -101,7 +101,7 @@ repos:
 
   # Just
   - repo: https://github.com/wpk-nist-gov/just-pre-commit
-    rev: v1.48.0
+    rev: v1.48.1
     hooks:
       - id: justfile-format
 
