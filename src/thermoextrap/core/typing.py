@@ -2,7 +2,6 @@
 Typing aliases (:mod:`thermoextrap.core.typing`)
 ================================================
 """
-# pylint: disable=consider-alternative-union-syntax
 
 from __future__ import annotations
 
@@ -28,7 +27,7 @@ from typing import (
 
 import numpy as np
 import xarray as xr
-from cmomy import IndexSampler
+from cmomy import IndexSampler  # pylint: disable=no-name-in-module
 from numpy.typing import NDArray
 
 from .typing_compat import Self, TypeAlias, TypeVar

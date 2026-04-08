@@ -1373,7 +1373,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase[DataT]):
 
             indices = sampler.indices
             if not isinstance(indices, xr.DataArray):
-                indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))  # pylint: disable=redefined-variable-type
+                indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))
 
             # assert indices.sizes[self.rec_dim] == len(self)
             if indices.sizes[self.rec_dim] != len(self):

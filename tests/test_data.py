@@ -108,7 +108,7 @@ def test_resample_data(fixture) -> None:
     b = fixture.cdata.resample(sampler=sampler)
     c = fixture.xdata_val.resample(sampler=sampler, resample_values=True)
 
-    for x, y in [(a, b), (b, c)]:
+    for x, y in ((a, b), (b, c)):
         xr.testing.assert_allclose(x.xv, y.xv)
         xr.testing.assert_allclose(x.uv, y.uv)
 

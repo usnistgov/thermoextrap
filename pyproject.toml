@@ -101,15 +101,12 @@ test = [
     { include-group = "pytest" },
 ]
 type = [
-<<<<<<< before updating
     "matplotlib; python_version=='3.12'",
     "pandas-stubs",
     "scipy-stubs; python_version>='3.10'",
     "thermoextrap[gpr,mbar]",
     "types-tensorflow",
-=======
     { include-group = "nox" },
->>>>>>> after updating
     { include-group = "pylint" },
     { include-group = "pytest" },
     { include-group = "typecheck-runner" },
@@ -263,6 +260,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 module = [
     "matplotlib.*",
+    "numba.*",
     "pymbar.*",
     "scipy.*",
     "sympy.*",

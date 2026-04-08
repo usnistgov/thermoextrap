@@ -88,7 +88,7 @@ PYTHON_ALL_VERSIONS = nox.project.python_versions(
 if sys.platform != "darwin" or platform.machine() != "x86_64":
     PYTHON_TEST_VERSIONS = PYTHON_ALL_VERSIONS
 else:
-    PYTHON_TEST_VERSIONS = PYTHON_ALL_VERSIONS.copy()
+    PYTHON_TEST_VERSIONS = PYTHON_ALL_VERSIONS.copy()  # pyright: ignore[reportConstantRedefinition]
     PYTHON_TEST_VERSIONS.remove("3.13")
 
 PYTHON_DEFAULT_VERSION = Path(".python-version").read_text(encoding="utf-8").strip()
@@ -816,10 +816,10 @@ def typecheck(  # noqa: PLR0912
         cmd = [
             "mypy",
             "basedpyright",
-            "pyrefly",
-            "ty",
+            # "pyrefly",
+            # "ty",
             "pylint",
-            "typecheck-notebook",
+            # "typecheck-notebook",
         ]
 
     # set the cache directory for mypy

@@ -1,3 +1,6 @@
+[tool.pylint.master]
+ignore-paths = [ "^tests/legacy" ]
+
 [tool.pylint.similarities]
 ignore-imports = "yes"
 

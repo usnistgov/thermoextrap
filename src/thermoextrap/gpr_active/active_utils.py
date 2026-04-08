@@ -1206,10 +1206,11 @@ class UpdateFuncBase(UpdateStopABC):
             color="k",
             linestyle="",
         )
-        if self.log_scale:
-            _ = ax.set_xlabel(r"log$_{10}$Alpha")
-        else:
-            _ = ax.set_xlabel(r"Alpha")
+        _ = (
+            ax.set_xlabel(r"log$_{10}$Alpha")
+            if self.log_scale
+            else ax.set_xlabel(r"Alpha")
+        )
         _ = ax.set_ylabel(r"GP output")
         fig.tight_layout()
         if self.save_plot:
