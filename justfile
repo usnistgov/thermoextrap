@@ -151,7 +151,7 @@ sync *options: (_requirements "--sync" options)
 [group("requirements")]
 lock *options: (_requirements "--lock" options)
 
-# Rebuild requirements, lock requirements, and run uv sync if .venv exists or uv lock if not.  Pass --upgrade/-U to upgrade
+# Rebu         ild requirements, lock requirements, and run uv sync if .venv exists or uv lock if not.  Pass --upgrade/-U to upgrade
 [group("requirements")]
 requirements *options: (_requirements "--sync-or-lock" options)
 
@@ -198,8 +198,17 @@ pyrefly *options: (_typecheck "-cpyrefly" options)
 # Run pylint (with optional args)
 [group("lint")]
 [group("typecheck")]
-pylint *options="src tests":
-    {{ UVRUN }} {{ TYPECHECK_UVRUN_OPTS }} pylint {{ PYLINT_OPTS }} {{ options }}
+pylint:
+    #!/usr/bin/env sh
+    set -exu
+    possible=("src" "tests" "noxfile.py" "tools" "scripts")
+    options=()
+    for d in "${possible[@]}"; do
+        if [ -e "$d" ]; then
+            options+=("$d")
+        fi
+    done
+    {{ UVRUN }} {{ TYPECHECK_UVRUN_OPTS }} pylint {{ PYLINT_OPTS }} "${options[@]}"
 
 # Run all checkers (with optional directories)
 [group("typecheck")]
@@ -209,8 +218,7 @@ typecheck *options: (_typecheck "-cmypy[faster-cache] -cbasedpyright" options)
 [group("tools")]
 [group("typecheck")]
 @typecheck-tools *files="noxfile.py tools/*.py":
-    -just TYPECHECK_UVRUN_OPTS="--only-group=nox --only-group=typecheck-runner" mypy -- --strict {{ files }}
-    just TYPECHECK_UVRUN_OPTS="--only-group=nox --only-group=typecheck-runner" basedpyright -- {{ files }}
+    -just TYPECHECK_UVRUN_OPTS="--only-group=nox --only-group=typecheck-runner" _typecheck "-c'mypy[faster-cache] --strict' -cbasedpyright -cpyrefly -cty" {{ files }}
     just TYPECHECK_UVRUN_OPTS="--only-group=nox --only-group=pylint" pylint {{ files }}
 
 # ** typecheck all
