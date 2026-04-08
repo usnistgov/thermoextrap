@@ -106,6 +106,7 @@ type = [
     "scipy-stubs; python_version>='3.10'",
     "thermoextrap[gpr,mbar]",
     "types-tensorflow",
+    { include-group = "nox" },
     { include-group = "pylint" },
     { include-group = "pytest" },
     { include-group = "typecheck-runner" },
@@ -235,17 +236,12 @@ check-file = false
 
 # * typecheck ---------------------------------------------------------------------
 [tool.mypy]
-exclude = [
-    ".eggs",
-    ".nox",
-    ".numba_cache",
-    ".tox",
-    ".venv",
-    "docs",
-]
 files = [
     "src",
     "tests",
+    # tools
+    "noxfile.py",
+    "tools",
 ]
 strict = true
 # options
@@ -264,6 +260,7 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 module = [
     "matplotlib.*",
+    "numba.*",
     "pymbar.*",
     "scipy.*",
     "sympy.*",
@@ -285,7 +282,14 @@ module = [ "tests.legacy.*" ]
 
 [tool.pyrefly]
 enabled-ignores = [ "pyrefly" ]
-project-includes = [ "src", "tests" ]
+project-includes = [
+    "src",
+    "tests",
+    # tools
+    "noxfile.py",
+    "tools",
+]
+search-path = [ "." ]
 
 [tool.pyright]
 exclude = [
@@ -300,6 +304,9 @@ exclude = [
 include = [
     "src",
     "tests",
+    # tools
+    "noxfile.py",
+    "tools",
 ]
 strict = [
     "noxfile.py",
@@ -350,7 +357,13 @@ root = "examples/usage"
 [tool.ty]
 # Disable support for `type: ignore` comments
 analysis.respect-type-ignore-comments = false
-src.include = [ "src", "tests" ]
+src.include = [
+    "src",
+    "tests",
+    # tools
+    "noxfile.py",
+    "tools",
+]
 
 # * Testing --------------------------------------------------------------------
 [tool.pytest.ini_options]

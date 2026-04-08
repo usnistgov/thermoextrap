@@ -2,6 +2,7 @@
 
 # ruff: noqa: D102
 # pyright: reportMissingTypeStubs=false, reportImplicitOverride=false
+# pylint: disable=missing-class-docstring
 from __future__ import annotations
 
 import hashlib
@@ -42,7 +43,7 @@ class _Config:
 config = _Config()
 
 
-class HashCacheLocator(UserProvidedCacheLocator):
+class HashCacheLocator(UserProvidedCacheLocator):  # type: ignore[misc]
     """User defined caching function"""
 
     def get_source_stamp(self) -> Any:
@@ -73,8 +74,7 @@ def _shared_hash_suitable_cache_subpath(py_file: str) -> str:
     rel_dir = path.resolve().parent
 
     for _ in range(100):
-        name = rel_dir.name
-        if name in {"src", "site-packages"}:
+        if rel_dir.name in {"src", "site-packages"}:
             break
         rel_dir = rel_dir.parent
     else:

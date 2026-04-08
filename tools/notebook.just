@@ -38,7 +38,7 @@ pylint-notebook *files=NOTEBOOKS:
 
 [group("notebook")]
 [group("typecheck")]
-typecheck-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cmypy[faster-cache] -cbasedpyright" files)
+typecheck-notebook *files=NOTEBOOKS: (_nbqa_typecheck "-cmypy[faster-cache] -cbasedpyright -cpyrefly -cty" files) (pylint-notebook files)
 
 [group("notebook")]
 [group("test")]
@@ -57,5 +57,5 @@ install-ipykernel:
 [group("notebook")]
 execute-notebooks *files="examples/usage/basic/*.ipynb":
     {{ UVRUN }} --group="notebook" --no-dev \
-    jupyter execute --inplace --allow-errors {{ files }}
+    jupyter execute --inplace {{ files }}
     just pre-commit run nbstripout --all-files  || true
