@@ -134,7 +134,7 @@ docs-spelling = [
     { include-group = "docs" },
 ]
 ipython = [ "ipython" ]
-mypy = [ "mypy[faster-cache]>=1.15.0" ]
+mypy = [ "mypy[faster-cache]>=1.20.0" ]
 notebook = [ "ipykernel", "nbclient" ]
 nox = [ "dotenv", "nox>=2025.5.1" ]
 pandas = [ "pandas>=2.3" ]
