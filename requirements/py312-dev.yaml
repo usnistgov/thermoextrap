@@ -24,11 +24,11 @@ dependencies:
   - lazy_loader
   - matplotlib-base
   - module-utilities>=0.11.0
-  - mypy>=1.20.0
+  - mypy>=1.20.1
   - nbclient
   - nbconvert
   - nbval
-  - nox>=2025.5.1
+  - nox>=2026.4.10
   - numba>=0.60.0
   - numpy>=1.26.0
   - packaging
@@ -45,7 +45,7 @@ dependencies:
   - scipy-stubs
   - setuptools<81.0.0
   - sympy
-  - typecheck-runner>=0.1.6
+  - typecheck-runner>=0.2.0
   - types-tensorflow
   - xarray>=2024.7.0
   - pip

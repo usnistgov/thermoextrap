@@ -136,12 +136,8 @@ docs-spelling = [
 ipython = [ "ipython" ]
 mypy = [ "mypy[faster-cache]>=1.20.1" ]
 notebook = [ "ipykernel", "nbclient" ]
-<<<<<<< before updating
-nox = [ "dotenv", "nox>=2025.5.1" ]
+nox = [ "dotenv", "nox>=2026.4.10" ]
 pandas = [ "pandas>=2.3" ]
-=======
-nox = [ "nox>=2026.4.10" ]
->>>>>>> after updating
 pylint = [ "pylint" ]
 pytest = [ "pytest" ]
 pytest-accept = [ "pytest-accept" ]
