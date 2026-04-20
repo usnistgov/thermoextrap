@@ -94,7 +94,7 @@ repos:
 
   # Just
   - repo: https://github.com/wpk-nist-gov/just-pre-commit
-    rev: v1.49.0
+    rev: v1.50.0
     hooks:
       - id: justfile-format
 
@@ -116,7 +116,12 @@ repos:
     rev: v1.45.1
     hooks:
       - id: typos
+<<<<<<< before updating
         exclude: ^uv[.]lock$|^requirements
+=======
+        exclude_types: [jupyter]
+        exclude: ^uv[.]lock$|^requirements|^\.copier-answers\.ya?ml$
+>>>>>>> after updating
 
   # * Dependencies
   # ** pyproject2conda

@@ -134,10 +134,14 @@ docs-spelling = [
     { include-group = "docs" },
 ]
 ipython = [ "ipython" ]
-mypy = [ "mypy[faster-cache]>=1.20.0" ]
+mypy = [ "mypy[faster-cache]>=1.20.1" ]
 notebook = [ "ipykernel", "nbclient" ]
+<<<<<<< before updating
 nox = [ "dotenv", "nox>=2025.5.1" ]
 pandas = [ "pandas>=2.3" ]
+=======
+nox = [ "nox>=2026.4.10" ]
+>>>>>>> after updating
 pylint = [ "pylint" ]
 pytest = [ "pytest" ]
 pytest-accept = [ "pytest-accept" ]
@@ -150,7 +154,7 @@ test-notebook = [
     "thermoextrap[viz]",
     { include-group = "test" },
 ]
-typecheck-runner = [ "typecheck-runner>=0.1.6; python_version>'3.9'" ]
+typecheck-runner = [ "typecheck-runner>=0.2.0; python_version>'3.9'" ]
 
 # * uv -------------------------------------------------------------------------
 [tool.uv]
