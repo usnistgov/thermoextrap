@@ -171,6 +171,11 @@ def _maybe_lock_or_sync(
             old_lock_path.unlink()
 
 
+def _path_or_none(x: str) -> Path | None:
+    path = Path(x)
+    return path if path.exists() else None
+
+
 def main(args: Sequence[str] | None = None) -> int:
     """Main script."""
     # pylint: disable=duplicate-code
@@ -183,8 +188,8 @@ def main(args: Sequence[str] | None = None) -> int:
     )
     _ = parser.add_argument(
         "--pip-compile-config-file",
-        default=None,
-        type=Path,
+        default="requirements/uv.toml",
+        type=_path_or_none,
         help="""
         Config file to use when invoking ``uv pip compile``.
         Useful if you want ``pip compile`` to have different settings from ``uv sync``.

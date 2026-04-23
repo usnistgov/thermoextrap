@@ -1,0 +1,6 @@
+# Use this to avoid issues caused by pyproject.toml:tool.uv.environments
+
+exclude-newer = "7 days"
+fork-strategy = "requires-python"
+pip.annotation-style = "line"
+pip.generate-hashes = true
