@@ -195,6 +195,7 @@ def main(args: Sequence[str] | None = None) -> int:
         Useful if you want ``pip compile`` to have different settings from ``uv sync``.
         For example, you could use ``--pip-compile-config-file=requirements/uv.toml`` with
         pip-compile specific settings in ``requirements/uv.toml``.
+        Default is to include `requirements/uv.toml` if it exists.
         """,
     )
     _ = parser.add_argument(
