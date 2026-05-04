@@ -1351,8 +1351,6 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         dictionary specifying starting parameter values for the mean function;
         in other words, these values will be substituted into the sympy
         expression to start with
-    x_dim : int, default 1
-        dimension of the input (x)
     do_fit : bool, default True
         whether or not to fit on data before training GP model
     constrain_params : bool, default True
@@ -1365,7 +1363,6 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         x_data: NDArrayAny,
         y_data: NDArrayAny,
         params: OptionalKwsAny | None = None,
-        x_dim: int = 1,
         do_fit: bool = True,
         constrain_params: bool = True,
     ) -> None:
@@ -1430,7 +1427,9 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
 
             # And create Jacobian function
             def jac_func(params: Iterable[Any]) -> NDArrayAny:
-                prefac = 2.0 * (mean_func(x_data, *params) - y_data)
+                prefac = 2.0 * (
+                    mean_func(*np.split(x_data, self.x_dim, axis=-1), *params) - y_data
+                )
                 jac = [
                     np.sum(
                         prefac * deriv(*np.split(x_data, self.x_dim, axis=-1), *params)
@@ -1443,7 +1442,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
             opt = optimize.minimize(
                 loss_func,
                 np.array([getattr(self, s.name) for s in self.param_syms]),
-                method="L-BFGS-B",
+                method="SLSQP",
                 jac=jac_func,
             )
             logger.info("optimization opt: %s", opt)
@@ -1492,6 +1491,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
                     *tf.split(tf.gather_nd(x_vals, this_inds), self.x_dim, axis=-1),
                     *[getattr(self, s.name) for s in self.param_syms],
                 )
+                * tf.ones(tf.shape(this_inds), dtype=x_vals.dtype)
             )
             inds_list.append(this_inds)
 
