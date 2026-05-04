@@ -5614,7 +5614,7 @@ requires-dist = [
 provides-extras = ["accel", "all", "gpr", "mbar", "openmm", "parallel", "viz"]
 
 [package.metadata.requires-dev]
-basedpyright = [{ name = "basedpyright", specifier = ">=1.31.3" }]
+basedpyright = [{ name = "basedpyright", specifier = ">=1.39.3" }]
 dev = [
     { name = "coverage", marker = "python_full_version >= '3.12'", specifier = "<=7.13.0" },
     { name = "dotenv", marker = "python_full_version >= '3.12'" },
