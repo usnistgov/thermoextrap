@@ -14,7 +14,7 @@ copier>=9.14.3
 dotenv
 grayskull>=3.1.0
 mypy[faster-cache]>=1.20.2
-nbqa>=1.8.4
+nbqa>=1.9.1
 nox>=2026.4.10
 prek>=0.3.11
 pyrefly>=0.62.0
