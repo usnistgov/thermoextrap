@@ -1351,12 +1351,18 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         dictionary specifying starting parameter values for the mean function;
         in other words, these values will be substituted into the sympy
         expression to start with
-    x_dim : int, default 1
-        dimension of the input (x)
     do_fit : bool, default True
         whether or not to fit on data before training GP model
     constrain_params : bool, default True
         whether or not to constrain parameters when training GP model
+    minimize_method : str, default="SLSQP"
+        ``method`` argument to :func:`~scipy.optimize.minimize`.
+    **scipy_kwargs
+        Extra keyword arguments to :func:`~scipy.optimize.minimize`.
+
+    See Also
+    --------
+    scipy.optimize.minimize
     """
 
     def __init__(  # noqa: C901, PLR0912
@@ -1365,9 +1371,10 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         x_data: NDArrayAny,
         y_data: NDArrayAny,
         params: OptionalKwsAny | None = None,
-        x_dim: int = 1,
         do_fit: bool = True,
         constrain_params: bool = True,
+        minimize_method: str = "SLSQP",
+        **scipy_kwargs: Any,
     ) -> None:
         super().__init__()
         # Set dimensions of y data and x data
@@ -1430,7 +1437,9 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
 
             # And create Jacobian function
             def jac_func(params: Iterable[Any]) -> NDArrayAny:
-                prefac = 2.0 * (mean_func(x_data, *params) - y_data)
+                prefac = 2.0 * (
+                    mean_func(*np.split(x_data, self.x_dim, axis=-1), *params) - y_data
+                )
                 jac = [
                     np.sum(
                         prefac * deriv(*np.split(x_data, self.x_dim, axis=-1), *params)
@@ -1440,11 +1449,12 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
                 return np.array(jac)
 
             # Perform optimization with scipy
-            opt = optimize.minimize(
+            opt = optimize.minimize(  # type: ignore[call-overload]
                 loss_func,
                 np.array([getattr(self, s.name) for s in self.param_syms]),
-                method="L-BFGS-B",
                 jac=jac_func,
+                method=minimize_method,  # pyright: ignore[reportCallIssue, reportArgumentType]
+                **scipy_kwargs,
             )
             logger.info("optimization opt: %s", opt)
 
@@ -1492,6 +1502,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
                     *tf.split(tf.gather_nd(x_vals, this_inds), self.x_dim, axis=-1),
                     *[getattr(self, s.name) for s in self.param_syms],
                 )
+                * tf.ones(tf.shape(this_inds), dtype=x_vals.dtype)
             )
             inds_list.append(this_inds)
 
