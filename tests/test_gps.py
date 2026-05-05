@@ -418,7 +418,11 @@ def test_sympy_mean_func() -> None:
 
     # Create our mean function to test
     check_sym = SympyMeanFunc(
-        sig_expr, x_check[: len(x_vals), :1], y_check[: len(x_vals)], params=params
+        sig_expr,
+        x_check[: len(x_vals), :1],
+        y_check[: len(x_vals)],
+        params=params,
+        options={"ftol": 1e-12},
     )
 
     # Check that expression matches input

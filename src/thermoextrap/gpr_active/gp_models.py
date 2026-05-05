@@ -1355,6 +1355,14 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         whether or not to fit on data before training GP model
     constrain_params : bool, default True
         whether or not to constrain parameters when training GP model
+    minimize_method : str, default="SLSQP"
+        ``method`` argument to :func:`~scipy.optimize.minimize`.
+    **scipy_kwargs
+        Extra keyword arguments to :func:`~scipy.optimize.minimize`.
+
+    See Also
+    --------
+    scipy.optimize.minimize
     """
 
     def __init__(  # noqa: C901, PLR0912
@@ -1365,6 +1373,8 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
         params: OptionalKwsAny | None = None,
         do_fit: bool = True,
         constrain_params: bool = True,
+        minimize_method: str = "SLSQP",
+        **scipy_kwargs: Any,
     ) -> None:
         super().__init__()
         # Set dimensions of y data and x data
@@ -1439,11 +1449,12 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
                 return np.array(jac)
 
             # Perform optimization with scipy
-            opt = optimize.minimize(
+            opt = optimize.minimize(  # type: ignore[call-overload]
                 loss_func,
                 np.array([getattr(self, s.name) for s in self.param_syms]),
-                method="SLSQP",
                 jac=jac_func,
+                method=minimize_method,  # pyright: ignore[reportCallIssue, reportArgumentType]
+                **scipy_kwargs,
             )
             logger.info("optimization opt: %s", opt)
 

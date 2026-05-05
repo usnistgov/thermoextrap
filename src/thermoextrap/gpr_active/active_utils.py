@@ -841,6 +841,8 @@ def train_GPR(
     gpr: Any,
     record_loss: bool = False,
     start_params: Mapping[int, Any] | Sequence[Any] | None = None,
+    minimize_method: str = "SLSQP",
+    **scipy_kwargs: Any,
 ) -> OptimizeResult | None:
     """
     Trains a given gpr model for n_opt steps.
@@ -861,10 +863,28 @@ def train_GPR(
         parameters set to start_params; the optimization result with the lowest
         loss function value is selected and the GPR parameters are set to those
         values
+    minimize_method : str, default="SLSQP"
+        ``method`` argument to :func:`~scipy.optimize.minimize`.
+    **scipy_kwargs
+        Extra keyword arguments to :func:`~scipy.optimize.minimize`.
+
+    Returns
+    -------
+    :class:`~scipy.optimize.OptimizeResult`, optional
+
+    See Also
+    --------
+    scipy.optimize.minimize
+    gpflow.optimizers.Scipy
+    gpflow.optimizers.Scipy.minimize
     """
     optim = gpflow.optimizers.Scipy()
     loss_info = optim.minimize(
-        gpr.training_loss, gpr.trainable_variables, method="SLSQP", compile=False
+        gpr.training_loss,
+        gpr.trainable_variables,
+        method=minimize_method,
+        compile=False,
+        **scipy_kwargs,
     )
 
     # If provided with starting parameters, also do optimization starting with them
@@ -881,11 +901,11 @@ def train_GPR(
 
         # Perform optimization starting with provided values
         loss_info_new = optim.minimize(
-            # gpr.training_loss, gpr.trainable_variables, method="SLSQP", compile=False
             gpr.training_loss,
             gpr.trainable_variables,
-            method="SLSQP",
+            method=minimize_method,
             compile=False,
+            **scipy_kwargs,
         )
 
         # Make sure one or both losses are not NaN
