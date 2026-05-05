@@ -5,6 +5,18 @@
 
 Changelog for `thermoextrap`
 
+## 1.1.1
+
+Released on 2026-05-05.
+
+### Bug fixes
+
+- fix: Bug fix in SympyMeanFunc ([#96](https://github.com/usnistgov/thermoextrap/pull/96))
+
+### Contributors
+
+- [@JIMonroe](https://github.com/JIMonroe)
+
 ## 1.1.0
 
 Released on 2026-03-18.

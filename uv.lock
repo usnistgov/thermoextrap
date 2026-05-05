@@ -5392,7 +5392,7 @@ wheels = [
 
 [[package]]
 name = "thermoextrap"
-version = "1.1.0"
+version = "1.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "attrs", marker = "python_full_version < '3.13' or sys_platform == 'linux'" },
