@@ -2181,14 +2181,6 @@ class StopCriteria(UpdateStopABC):
         return bool(np.all(tol_bools)), out_dict
 
 
-# def thing(value):
-#     if value == "max":
-#         logger.info("Reached maximum iterations")
-
-#     elif value == "stop":
-#         logger.info("Stopping criteria satisfied")
-
-
 def active_learning(  # noqa: C901, PLR0912
     init_states: Sequence[SupportsDataWrapper | float],
     sim_wrapper: SupportsSimulation,

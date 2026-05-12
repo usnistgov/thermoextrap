@@ -1135,9 +1135,6 @@ class InterpModel(StateCollection[DataT, SupportsModelDerivsDataT]):
 class InterpModelPiecewise(PiecewiseStateCollection[DataT, SupportsModelDerivsDataT]):
     """Apposed to the multiple model InterpModel, perform a piecewise interpolation."""
 
-    # @cached.meth
-    # def single_interpmodel(self, state0, state1):
-    #     return InterpModel([state0, state1])
     @cached.meth
     def single_interpmodel(
         self, *state_indices: SupportsIndex

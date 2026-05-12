@@ -13,7 +13,7 @@ from cmomy.core.validate import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Hashable, Sequence  # noqa: F401
+    from collections.abc import Hashable, Sequence
 
     from cmomy.core.typing import DataT
     from numpy.typing import ArrayLike
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from thermoextrap.core.typing import MultDims, SingleDim
     from thermoextrap.core.typing_compat import TypeAlias
 
-    DimsMapping: TypeAlias = "Sequence[Hashable] | Mapping[int, MultDims]"
+    DimsMapping: TypeAlias = Sequence[Hashable] | Mapping[int, MultDims]
 
 
 ###############################################################################

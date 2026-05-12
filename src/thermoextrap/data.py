@@ -198,7 +198,7 @@ class DataSelector(MyAttrsMixin, Generic[DataT]):
             idx = (idx,)
         if len(idx) != len(self.dims):
             msg = f"bad idx {idx}, vs dims {self.dims}"
-            raise ValueError(msg)
+            raise IndexError(msg)
         selector = dict(zip(self.dims, idx, strict=True))
         return self.data.isel(selector, drop=True)
 
@@ -1148,13 +1148,6 @@ class DataCentralMoments(DataCentralMomentsBase[DataT]):
                     data, moment=mapper, mom_dims=(xmom_dim, umom_dim)
                 )
 
-            # direct assign
-            # if weight is not None:
-            #     data.loc[{umom_dim: 0, xmom_dim: 0}] = weight  # type: ignore[union-attr]
-            # if xave is not None:
-            #     data.loc[{umom_dim: 0, xmom_dim: 1}] = xave  # type: ignore[union-attr]
-            # if uave is not None:
-            #     data.loc[{umom_dim: 1, xmom_dim: 0}] = uave  # type: ignore[union-attr]
             dxduave: cmomy.CentralMomentsData[DataT] = cmomy.CentralMomentsData(
                 data.transpose(..., xmom_dim, umom_dim),
                 mom_ndim=2,
@@ -1369,8 +1362,6 @@ class DataCentralMomentsVals(DataCentralMomentsBase[DataT]):
 
         if resample_values:
             # resample xv/uv
-            indices = sampler.indices
-
             indices = sampler.indices
             if not isinstance(indices, xr.DataArray):
                 indices = xr.DataArray(indices, dims=(rep_dim, self.rec_dim))
