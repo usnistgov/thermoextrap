@@ -679,7 +679,7 @@ def plot_polynomial_consistency(
     for (key0, key1), p in p_values.items():
         logger.info(
             "range0: %s range1: %s p01: %s",
-            *(np.round(x, 3) for x in [key0, key1, p.to_numpy()]),  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType, reportUnknownVariableType]
+            *(np.round(x, 3) for x in (key0, key1, p.to_numpy())),  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType, reportUnknownVariableType]
         )
         lb = min(k[0] for k in (key0, key1))
         ub = max(k[1] for k in (key0, key1))
