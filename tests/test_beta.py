@@ -68,15 +68,8 @@ def test_extrapmodel(fixture) -> None:
     betas = [0.3, 0.4]
     xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
 
-    for _data in (
-        fixture.cdata,
-        fixture.xdata,
-        fixture.xrdata,
-        fixture.xdata_val,
-        fixture.xrdata_val,
-    ):
-        xem1 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
-        fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
+    xem1 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
+    fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
 def test_extrapmodel_ig() -> None:
@@ -144,16 +137,9 @@ def test_extrapmodel_resample(fixture, rng: np.random.Generator) -> None:
     xem0 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.rdata)
     a = xem0.resample(sampler=sampler).predict(betas, order=3)
 
-    for _data in (
-        fixture.cdata,
-        fixture.xdata,
-        fixture.xrdata,
-        fixture.xdata_val,
-        fixture.xrdata_val,
-    ):
-        xem1 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
-        b = xem1.resample(sampler=sampler).predict(betas, order=3)
-        fixture.xr_test(a, b)
+    xem1 = xtrap.beta.factory_extrapmodel(beta=fixture.beta0, data=fixture.cdata)
+    b = xem1.resample(sampler=sampler).predict(betas, order=3)
+    fixture.xr_test(a, b)
 
 
 def test_perturbmodel(fixture) -> None:
@@ -555,21 +541,12 @@ def test_extrapmodel_minuslog_slow(fixture) -> None:
 def test_extrapmodel_minuslog_slow2(fixture) -> None:
     beta0 = 0.5
     betas = [0.2, 0.3]
-    _u, _x, _order = fixture.u, fixture.x, fixture.order
-
     xem0 = xtrap.beta.factory_extrapmodel(beta0, fixture.rdata, post_func="minus_log")
 
-    for _data in (
-        fixture.cdata,
-        fixture.xdata,
-        fixture.xrdata,
-        fixture.xdata_val,
-        fixture.xrdata_val,
-    ):
-        xem1 = xtrap.beta.factory_extrapmodel(
-            beta=fixture.beta0, data=fixture.cdata, post_func="minus_log"
-        )
-        fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
+    xem1 = xtrap.beta.factory_extrapmodel(
+        beta=fixture.beta0, data=fixture.cdata, post_func="minus_log"
+    )
+    fixture.xr_test(xem0.predict(betas, order=3), xem1.predict(betas, order=3))
 
 
 def test_extrapmodel_minuslog_ig() -> None:
@@ -594,7 +571,6 @@ def test_extrapmodel_minuslog_ig() -> None:
     # So resample
     ex_res = ex.resample(sampler={"nrep": 100})
 
-    true_derivs = np.zeros(max_order + 1)
     # Loop over orders and compare based on uncertainty
     for o in range(max_order + 1):
         # Get the exact values we're shooting for

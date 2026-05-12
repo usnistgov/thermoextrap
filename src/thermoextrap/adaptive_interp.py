@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, Generic
 import numpy as np
 import xarray as xr
 
-from .core.typing import DataT
+from .core.typing import DataT, NDArrayAny
 from .core.typing_compat import TypedDict
 
 if TYPE_CHECKING:
@@ -665,33 +665,32 @@ def callback_plot_progress(
     return False
 
 
-# def plot_polynomial_consistency(alphas, states, factory_statecollection):
-#     """Plotter for polynomial consistency."""
-#     import matplotlib.pyplot as plt
+def plot_polynomial_consistency(
+    alphas: NDArrayAny,
+    p_values: dict[Any, xr.DataArray],
+    models_dict: dict[
+        Any, StateCollection[xr.DataArray, SupportsModelDerivs[xr.DataArray]]
+    ],
+) -> None:
+    """Plotter for polynomial consistency."""
+    import matplotlib.pyplot as plt
 
-#     p_values, models_dict = check_polynomial_consistency(
-#         states, factory_statecollection
-#     )
+    hit: set[xr.DataArray] = set()
+    for (key0, key1), p in p_values.items():
+        logger.info(
+            "range0: %s range1: %s p01: %s",
+            *(np.round(x, 3) for x in [key0, key1, p.to_numpy()]),  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType, reportUnknownVariableType]
+        )
+        lb = min(k[0] for k in (key0, key1))
+        ub = max(k[1] for k in (key0, key1))
 
-#     hit = set()
-#     for (key0, key1), p in p_values.items():
-#         print(
-#             "range0: {} range1:{} p01: {}".format(
-#                 *(np.round(x, 3) for x in [key0, key1, p.values])
-#             )
-#         )
+        alphas_lim = alphas[(lb <= alphas) & (alphas <= ub)]
 
-#         lb = min(k[0] for k in (key0, key1))
-#         ub = max(k[1] for k in (key0, key1))
+        for key in key0, key1:
+            if key not in hit:
+                models_dict[key].predict(alphas_lim).mean("rep").plot(  # type: ignore[call-arg] # pyright: ignore[reportCallIssue]
+                    label=str(np.round(key, 3))  # pyright: ignore[reportUnknownArgumentType]
+                )
+                hit.add(key)
 
-#         alphas_lim = alphas[(lb <= alphas) & (alphas <= ub)]
-
-#         for key in key0, key1:
-#             if key not in hit:
-#                 models_dict[key].predict(alphas_lim).mean("rep").plot(
-#                     label=str(np.round(key, 3))
-#                 )
-#                 hit.add(key)
-
-#     plt.legend()
-#     return p_values, models_dict
+    _ = plt.legend()  # pyright: ignore[reportUnknownMemberType]

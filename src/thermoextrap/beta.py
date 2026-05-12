@@ -436,9 +436,9 @@ class SymDerivBeta(SymDerivBase):
     def dun_ave(
         cls,
         n: int,
+        central: bool | None = None,
         expand: bool = True,
         post_func: PostFunc = None,
-        central: bool | None = None,
         beta: Symbol | None = None,
     ) -> Self:
         r"""
@@ -477,11 +477,11 @@ class SymDerivBeta(SymDerivBase):
     def dxdun_ave(
         cls,
         n: int,
+        d: int | None = None,
         xalpha: bool = False,
+        central: bool | None = None,
         expand: bool = True,
         post_func: PostFunc = None,
-        d: int | None = None,
-        central: bool | None = None,
         beta: Symbol | None = None,
     ) -> Self:
         r"""
@@ -527,9 +527,9 @@ class SymDerivBeta(SymDerivBase):
     def un_ave(
         cls,
         n: int,
+        central: bool | None = None,
         expand: bool = True,
         post_func: PostFunc = None,
-        central: bool | None = None,
         beta: Symbol | None = None,
     ) -> Self:
         r"""
@@ -561,9 +561,9 @@ class SymDerivBeta(SymDerivBase):
         n: int,
         d: int | None = None,
         xalpha: bool = False,
+        central: bool | None = None,
         expand: bool = True,
         post_func: PostFunc = None,
-        central: bool | None = None,
         beta: Symbol | None = None,
     ) -> Self:
         r"""
@@ -599,12 +599,12 @@ class SymDerivBeta(SymDerivBase):
     def from_name(
         cls,
         name: SymDerivNames,
+        n: int | None = None,
+        d: int | None = None,
         xalpha: bool = False,
         central: bool | None = None,
         expand: bool = True,
         post_func: PostFunc = None,
-        n: int | None = None,
-        d: int | None = None,
         beta: Symbol | None = None,
     ) -> Self:
         """
@@ -641,25 +641,24 @@ class SymDerivBeta(SymDerivBase):
             msg = f"{name} not found"
             raise ValueError(msg)
 
-        kws: dict[str, Any] = {
-            "expand": expand,
-            "post_func": post_func,
-            "central": central,
-        }
+        kws: dict[str, Any] = {}
         if name == "x_ave":
             kws.update(xalpha=xalpha)
-        # elif name in ["u_ave", "lnPi_correction":
-        #     kws.update(central=central)
         elif name in {"dun_ave", "un_ave"}:
             kws.update(n=n)
         elif name in {"dxdun_ave", "xun_ave"}:
             kws.update(n=n, xalpha=xalpha, d=d)
 
-        elif name == "lnPi_energy":
-            # already have central
-            pass
-
-        return cast("Self", func(**kws))
+        return cast(
+            "Self",
+            func(
+                central=central,
+                expand=expand,
+                post_func=post_func,
+                beta=beta,
+                **kws,
+            ),
+        )
 
 
 ###############################################################################

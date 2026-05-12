@@ -92,14 +92,6 @@ class FixtureData:  # pylint: disable=missing-class-docstring
 
         return em
 
-    # @staticmethod
-    # def fix_ufunc_xufunc(ufunc, xufunc):
-
-    #     ufunc_out = lambda x: float(ufunc(x))
-    #     xufunc_out = lambda x: xufunc.avgdict[x]
-
-    #     return ufunc_out, xufunc_out
-
     @cached.prop
     def u_xu_funcs(self):
         ufunc, xufunc = legacy.buildAvgFuncs(self.x, self.u, self.order)  # type: ignore[attr-defined]

@@ -355,11 +355,6 @@ if TYPE_CHECKING:
 
         func_concat(fb, y=2)
 
-        # def fc(x: list[int]) -> int:
-        #     return sum(x)
-
-        # func_concat(fc)
-
     from os import PathLike
     from pathlib import Path
 

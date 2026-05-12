@@ -35,9 +35,8 @@ if TYPE_CHECKING:
         OptionalKwsAny,
         SingleDim,
     )
-    from thermoextrap.core.typing_compat import Self, TypeVar
+    from thermoextrap.core.typing_compat import Self
 
-    _T = TypeVar("_T")
 
 
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
