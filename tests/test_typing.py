@@ -251,13 +251,16 @@ def test_thermoextrap_data_datacentralmoments_dataset() -> None:
 
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable, Sequence
+    from os import PathLike
+    from pathlib import Path
 
     from thermoextrap.core.typing import (
         DataT,
         SupportsData,
         SupportsDataXU,
     )
+    from thermoextrap.core.typing_compat import Concatenate
     from thermoextrap.models import ExtrapModel, InterpModel
 
     def func_data(x: SupportsData[DataT]) -> int:
@@ -335,10 +338,6 @@ if TYPE_CHECKING:
         func_supports(x_np_int, x_np_float, x_np_float)
         func_supports(x_sp_int, x_sp_float, x_sp_float)
 
-    from collections.abc import Iterable, Sequence
-
-    from thermoextrap.core.typing_compat import Concatenate
-
     def func_concat(
         f: Callable[Concatenate[Sequence[int], ...], int], **kws: Any
     ) -> int:
@@ -354,9 +353,6 @@ if TYPE_CHECKING:
             return sum(x) + y
 
         func_concat(fb, y=2)
-
-    from os import PathLike
-    from pathlib import Path
 
     def func_pathlike(x: str | PathLike[Any]) -> Path:
         return Path(x)
