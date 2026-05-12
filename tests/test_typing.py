@@ -1,4 +1,6 @@
 """Check/test typing pyright"""
+# This typing-focused test intentionally uses version/TYPE_CHECKING branches that
+# may be marked unreachable by pyright depending on the analysis environment.
 # support: reportUnreachable=false
 
 from __future__ import annotations
