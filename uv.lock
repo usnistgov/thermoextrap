@@ -5655,13 +5655,13 @@ requires-dist = [
 provides-extras = ["accel", "all", "gpr", "mbar", "openmm", "parallel", "viz"]
 
 [package.metadata.requires-dev]
-basedpyright = [{ name = "basedpyright", specifier = ">=1.39.3" }]
+basedpyright = [{ name = "basedpyright", specifier = ">=1.39.4" }]
 dev = [
     { name = "coverage", marker = "python_full_version >= '3.12'", specifier = "<=7.13.0" },
     { name = "dotenv", marker = "python_full_version >= '3.12'" },
     { name = "ipykernel", marker = "python_full_version >= '3.12'" },
     { name = "matplotlib", marker = "python_full_version == '3.12.*'" },
-    { name = "mypy", extras = ["faster-cache"], marker = "python_full_version >= '3.12'", specifier = ">=1.20.2" },
+    { name = "mypy", extras = ["faster-cache"], marker = "python_full_version >= '3.12'", specifier = ">=2.1.0" },
     { name = "nbclient", marker = "python_full_version >= '3.12'" },
     { name = "nbconvert", marker = "python_full_version >= '3.12'" },
     { name = "nbval", marker = "python_full_version >= '3.12'" },
@@ -5714,7 +5714,7 @@ docs-spelling = [
     { name = "thermoextrap", extras = ["gpr", "mbar", "viz"], marker = "python_full_version >= '3.12'" },
 ]
 ipython = [{ name = "ipython", marker = "python_full_version >= '3.12'" }]
-mypy = [{ name = "mypy", extras = ["faster-cache"], marker = "python_full_version >= '3.12'", specifier = ">=1.20.2" }]
+mypy = [{ name = "mypy", extras = ["faster-cache"], marker = "python_full_version >= '3.12'", specifier = ">=2.1.0" }]
 notebook = [
     { name = "ipykernel", marker = "python_full_version >= '3.12'" },
     { name = "nbclient", marker = "python_full_version >= '3.12'" },
