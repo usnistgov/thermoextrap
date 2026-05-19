@@ -35,6 +35,7 @@ from .gp_models import (
     ConstantMeanWithDerivs,
     DerivativeKernel,
     LinearWithDerivs,
+    SympyMeanFunc,
 )
 
 if TYPE_CHECKING:
@@ -786,6 +787,13 @@ def create_base_GP_model(
                 np.zeros_like(gpr_data[1][ref_d_bool, :]),
                 x_dim=n_x_dims,
             )
+    elif isinstance(mean_func, sp.Basic):
+        # If provided sympy expression, construct mean function with that
+        mean_func = SympyMeanFunc(
+            mean_func,
+            gpr_data[0][ref_d_bool, :n_x_dims],
+            gpr_data[1][ref_d_bool, :],
+        )
 
     # For multiple output kernels, helpful to scale all outputs so have similar variance
     # (over data, that is, so scale by variance in all y for each output dimension)
