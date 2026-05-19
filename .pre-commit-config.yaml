@@ -59,11 +59,7 @@ repos:
       - id: pyproject-fmt
   # ** validate (schema-store)
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-<<<<<<< before updating
-    rev: 2026.05.06
-=======
     rev: 2026.05.12
->>>>>>> after updating
     hooks:
       - id: validate-pyproject
         name: validate-pyproject-schema-store
@@ -132,11 +128,7 @@ repos:
           - "--custom-command=prek run pyproject2conda-project --all-files"
   # ** uv
   - repo: https://github.com/astral-sh/uv-pre-commit
-<<<<<<< before updating
-    rev: 0.11.12
-=======
     rev: 0.11.13
->>>>>>> after updating
     hooks:
       - id: uv-lock
         alias: requirements
@@ -149,11 +141,7 @@ repos:
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen
-<<<<<<< before updating
-    rev: v4.15.1
-=======
     rev: v4.16.0
->>>>>>> after updating
     hooks:
       - id: commitizen
         stages: [commit-msg]

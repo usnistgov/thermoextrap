@@ -1,11 +1,7 @@
 [build-system]
 build-backend = "uv_build"
 requires = [
-<<<<<<< before updating
-    "uv-build>=0.11.12,<0.12.0",
-=======
     "uv-build>=0.11.13,<0.12.0",
->>>>>>> after updating
 ]
 
 [project]
@@ -127,12 +123,7 @@ docs = [
     "thermoextrap[gpr,mbar,viz]",
 ]
 # other groups
-<<<<<<< before updating
-basedpyright = [ "basedpyright>=1.39.3" ]
-=======
 basedpyright = [ "basedpyright>=1.39.4" ]
-cog = [ "cogapp" ]
->>>>>>> after updating
 docs-live = [
     "sphinx-autobuild",
     { include-group = "docs" },
