@@ -321,7 +321,7 @@ def test_train_gp(sampler: SamplerType) -> None:
 
     # Also test training from a different starting point
     # Not checking for specific behavior here, just seeing if runs
-    output = active_utils.train_GPR(
+    _ = active_utils.train_GPR(
         gp, record_loss=False, start_params=[ref_params[ind] for ind in (0, 1, 3)]
     )
 
@@ -414,11 +414,7 @@ def test_update_stop_abc(rng: Generator, sampler: SamplerType) -> None:
     np.testing.assert_allclose(out_trans_y, x**2)
 
     # Check to make sure GP used properly for default case (just runs the function)
-    (
-        _out_default_mu,
-        _out_default_std,
-        _out_default_conf,
-    ) = check_default.get_transformed_GP_output(gp, out_default_grid)
+    _ = check_default.get_transformed_GP_output(gp, out_default_grid)
 
 
 # For update classes, all have different update criteria
@@ -654,26 +650,6 @@ def test_stop_criteria(rng: Generator, sampler: SamplerType) -> None:
     assert m_es.d_order_pred == 1
     assert m_es.transform_func == check_stop_with_es.transform_func
     assert m_es.log_scale is True
-
-
-# Test full active learning routine on ideal gas
-# Need way to make this fully reproducible...
-# Specifically, need to be able to set random seed for all parts of process
-# Includes bootstrapping of data in thermoextrap/cmomy
-# Just need to carefully check where calling np.random throughout all code
-# import io
-# from contextlib import redirect_stdout
-
-# def test_thing_1(caplog) -> None:
-#     with caplog.at_level(logging.INFO):
-#         active_utils.thing("max")
-#     assert "Reached maximum iterations" in caplog.text
-
-
-# def test_thing_2(caplog) -> None:
-#     with caplog.at_level(logging.INFO):
-#         active_utils.thing("stop")
-#     assert "Stopping criteria satisfied" in caplog.text
 
 
 @pytest.mark.slow

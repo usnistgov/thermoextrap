@@ -40,7 +40,7 @@ class VolumeDerivFuncsIG:
     def __getitem__(self, order: SupportsIndex) -> Callable[..., Any]:
         # Check to make sure not going past first order
         if (order := int(order)) > 1:
-            raise ValueError(
+            raise IndexError(
                 "Volume derivatives cannot go past 1st order"
                 + " and received %i" % order
                 + "\n(because would need derivatives of forces)"
@@ -162,15 +162,17 @@ def factory_extrapmodel_data(
         order = data.order
 
     if order != 1:
-        msg = "only first order supported"
+        msg = "Only first order supported"
         raise ValueError(msg)
     if order > data.order:
-        raise ValueError
+        msg = f"{order=} > {data.order=}"
+        raise ValueError(msg)
     if data.central:
         msg = "Only works with raw moments."
-        raise ValueError
+        raise ValueError(msg)
     if data.deriv_dim is not None:
-        raise ValueError
+        msg = "Missing deriv_dim"
+        raise ValueError(msg)
 
     derivatives = factory_derivatives(reference_volume=volume)
     return ExtrapModel(

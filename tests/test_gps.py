@@ -121,9 +121,7 @@ def test_deriv_kernel_manual_1d() -> None:
     kern_expr, kern_params = make_rbf_expr()
     # Overwrite transforms on kernel parameters
     with pytest.raises(ValueError):
-        deriv_kern = DerivativeKernel(
-            kern_expr, 1, {"var": [1.0, {}], "volume": [2.0, {}]}
-        )
+        _ = DerivativeKernel(kern_expr, 1, {"var": [1.0, {}], "volume": [2.0, {}]})
     kern_params = {"var": [1.0, {}], "l_0": [2.0, {}]}
     deriv_kern = DerivativeKernel(kern_expr, 1, kernel_params=kern_params)
 
@@ -241,7 +239,7 @@ def test_deriv_kernel_self_1d() -> None:
     np.testing.assert_allclose(output_reorder, output)
 
     # And if switch around derivatives and points
-    x_check_deriv_order = x_check_reorder = np.roll(x_check, 1, axis=0)
+    x_check_deriv_order = np.roll(x_check, 1, axis=0)
     output_deriv_order = deriv_kern.K(x_check_deriv_order, x_check_deriv_order).numpy()
     output_deriv_order = np.roll(np.roll(output_deriv_order, -1, axis=0), -1, axis=1)
     np.testing.assert_allclose(output_deriv_order, output)

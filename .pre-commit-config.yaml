@@ -1,7 +1,5 @@
-# pre-commit install
-# pre-commit run --all-files
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
+auto_update:
+  cooldown_days: 7
 ci:
   autoupdate_commit_msg: "chore(deps): update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
@@ -56,12 +54,12 @@ repos:
       - id: taplo-lint
         args: ["--no-schema"]
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.21.1
+    rev: v2.21.2
     hooks:
       - id: pyproject-fmt
   # ** validate (schema-store)
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.04.26
+    rev: 2026.05.12
     hooks:
       - id: validate-pyproject
         name: validate-pyproject-schema-store
@@ -94,7 +92,7 @@ repos:
 
   # Just
   - repo: https://github.com/wpk-nist-gov/just-pre-commit
-    rev: v1.50.0
+    rev: v1.51.0
     hooks:
       - id: justfile-format
 
@@ -113,7 +111,7 @@ repos:
   # * Spelling
   # ** typos
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.45.1
+    rev: v1.46.1
     hooks:
       - id: typos
         exclude_types: [jupyter]
@@ -122,7 +120,7 @@ repos:
   # * Dependencies
   # ** pyproject2conda
   - repo: https://github.com/usnistgov/pyproject2conda
-    rev: v0.22.1
+    rev: v0.23.1
     hooks:
       - id: pyproject2conda-project
         alias: requirements
@@ -130,7 +128,7 @@ repos:
           - "--custom-command=prek run pyproject2conda-project --all-files"
   # ** uv
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.7
+    rev: 0.11.13
     hooks:
       - id: uv-lock
         alias: requirements
@@ -143,14 +141,14 @@ repos:
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.13.10
+    rev: v4.16.0
     hooks:
       - id: commitizen
         stages: [commit-msg]
 
   # * Actions
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.1
+    rev: 0.37.2
     hooks:
       - id: check-github-workflows
         alias: actions
@@ -203,7 +201,7 @@ repos:
         name: nbqa-typos
         alias: typos
         additional_dependencies: &typos-deps
-          - typos==1.45.1
+          - typos==1.46.1
         args:
           - typos
           - --force-exclude

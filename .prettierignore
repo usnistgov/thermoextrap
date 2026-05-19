@@ -10,5 +10,8 @@ CHANGELOG.md
 # Don't fix yaml files under requirements/lock.  These are created by conda-lock.
 /requirements/lock/*.y*ml
 
+# Don't fix yaml files under requirements.  These are created by pyproject2conda
+/requirements/*.y*ml
+
 # Don't fix copier answers
 .copier-answers.y*ml

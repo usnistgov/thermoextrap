@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import datetime
 import logging
 import shlex
-import shutil
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO, format=FORMAT)
 logger = logging.getLogger("requirements_lock")
 
 if sys.version_info < (3, 11):
-    msg = "python>3.11 required"  # pyright: ignore[reportUnreachable]
+    msg = "Python >=3.11 required"  # pyright: ignore[reportUnreachable]
     raise RuntimeError(msg)
 
 
@@ -35,12 +35,27 @@ USE_NO_DEPS = ["uvx-tools.txt", "pre-commit-additional-dependencies.txt"]
 
 
 def _get_min_python_version() -> str:
-    with Path("pyproject.toml").open("rb") as f:
-        return next(  # type: ignore[no-any-return]
+    data: list[str] = (
+        tomllib
+        .loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+        .get("project", {})
+        .get("classifiers", [])
+    )
+    version: str | None = next(
+        (
             c.split()[-1]
-            for c in tomllib.load(f)["project"]["classifiers"]
+            for c in data
             if c.startswith("Programming Language :: Python :: 3.")
+        ),
+        None,
+    )
+    if version is None:
+        msg = (
+            "Could not determine minimum Python version: no "
+            "'Programming Language :: Python :: 3.x' classifier found in pyproject.toml."
         )
+        raise RuntimeError(msg)
+    return version
 
 
 def _get_default_version() -> str:
@@ -48,8 +63,6 @@ def _get_default_version() -> str:
 
 
 def _get_exclude_newer_option(cooldown_days: int) -> str:
-    import datetime
-
     date = datetime.datetime.now(tz=datetime.UTC).date() - datetime.timedelta(
         days=cooldown_days
     )
@@ -100,38 +113,6 @@ def _lock_files(
         _ = check_call(options)
 
 
-# NOTE(wpk): This will not be needed once https://github.com/astral-sh/uv/issues/18155 is closed
-def _maybe_copy_lockfile(lock_path: Path) -> Path | None:
-    if not lock_path.exists():
-        return None
-
-    try:
-        _ = tomllib.loads(lock_path.read_text(encoding="utf-8"))["options"][
-            "exclude-newer"
-        ]
-    except KeyError:
-        return None
-
-    # copy lockfile to temp location
-    import tempfile
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=lock_path.suffix) as tmp_file:
-        new_path = Path(tmp_file.name)
-        logger.info("backing up current uv.lock to %s", new_path)
-        _ = shutil.copy2(lock_path, new_path)
-    return new_path
-
-
-def _only_changed_exclude_newer_time(old_path: Path, new_path: Path) -> bool:
-    old_data, new_data = (
-        tomllib.loads(path.read_text(encoding="utf-8")) for path in (old_path, new_path)
-    )
-
-    old_data["options"]["exclude-newer"] = "0"
-    new_data["options"]["exclude-newer"] = "0"
-    return old_data == new_data
-
-
 def _maybe_lock_or_sync(
     lock: bool,
     sync: bool,
@@ -148,10 +129,7 @@ def _maybe_lock_or_sync(
     if not (lock or sync):
         return
 
-    lock_path = Path("uv.lock")
-    old_lock_path = _maybe_copy_lockfile(lock_path) if upgrade else None
-
-    # update lock_path
+    # Execute uv lock or sync command.
     command = [
         "uv",
         ("sync" if sync else "lock"),
@@ -162,13 +140,6 @@ def _maybe_lock_or_sync(
 
     logger.info(shlex.join(command))
     _ = check_call(command)
-
-    if old_lock_path is not None:
-        if _only_changed_exclude_newer_time(old_lock_path, lock_path):
-            logger.info("only exclude-newer timestamp changed.  Keeping old file")
-            _ = shutil.move(old_lock_path, lock_path)  # pylint: disable=redefined-variable-type
-        else:
-            old_lock_path.unlink()
 
 
 def _path_or_none(x: str) -> Path | None:
@@ -227,7 +198,7 @@ def main(args: Sequence[str] | None = None) -> int:
         type=int,
         default=None,
         help="""
-        Calculate ``--exclude-newer`` options from ``today`` less ``cooldown_days``.
+        Calculate ``--exclude-newer`` from ``current date`` minus ``<cooldown_days>``.
         """,
     )
     _ = parser.add_argument(
