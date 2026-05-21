@@ -788,7 +788,7 @@ def create_base_GP_model(
                 x_dim=n_x_dims,
             )
     elif isinstance(mean_func, sp.Expr):
-        # If providedsympy expression, construct mean function with that
+        # If provided sympy expression, construct mean function with that
         mean_func = SympyMeanFunc(
             mean_func,
             gpr_data[0][ref_d_bool, :n_x_dims],
