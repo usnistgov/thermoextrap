@@ -789,7 +789,7 @@ def create_base_GP_model(
             )
     elif isinstance(mean_func, sp.Expr):
         # If provided sympy expression, construct mean function with that
-        mean_func = SympyMeanFunc(
+        mean_func = SympyMeanFunc(  # pylint: disable=redefined-variable-type
             mean_func,
             gpr_data[0][ref_d_bool, :n_x_dims],
             gpr_data[1][ref_d_bool, :],
