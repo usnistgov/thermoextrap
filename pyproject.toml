@@ -257,9 +257,7 @@ enable_error_code = [
 strict = true
 warn_unused_configs = true
 
-<<<<<<< before updating
 [[tool.mypy.overrides]]
-ignore_missing_imports = true
 module = [
     "matplotlib.*",
     "numba.*",
@@ -268,30 +266,21 @@ module = [
     "sympy.*",
     "tensorflow_probability.*",
 ]
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-strict = false
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-disallow_untyped_calls = false
 module = [
     "tests.*",
 ]
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+strict = false
 
 [[tool.mypy.overrides]]
-check_untyped_defs = false
 module = [ "tests.legacy.*" ]
+check_untyped_defs = false
 
-=======
-# [[tool.mypy.overrides]]
-# module = [  ]
-# ignore_missing_imports = true
-#
-# [[tool.mypy.overrides]]
-# module = [  ]
-# ignore_errors = true
-#
->>>>>>> after updating
 [tool.pyrefly]
 enabled-ignores = [ "pyrefly" ]
 project-includes = [
@@ -303,8 +292,18 @@ project-includes = [
 search-path = [ "." ]
 
 [tool.pyright]
-typeCheckingMode = "strict"
-# typeCheckingMode= "standard"
+typeCheckingMode = "standard"
+strict = [
+    "noxfile.py",
+    "src/thermoextrap/*.py",
+    "src/thermoextrap/core/*.py",
+    "src/thermoextrap/gpr_active/ig_active.py",
+    # "src/thermoextrap/gpr_active/active_utils.py",
+    # "src/thermoextrap/gpr_active/gp_models.py",
+    "src/thermoextrap/gpr_active/sine_active.py",
+    "tests/test_typing.py",
+    "tools/*.py",
+]
 include = [
     "noxfile.py",
     "src",
@@ -320,35 +319,7 @@ exclude = [
     ".tox/**",
     ".venv/**",
 ]
-<<<<<<< before updating
-include = [
-    "src",
-    "tests",
-    # tools
-    "noxfile.py",
-    "tools",
-]
-strict = [
-    "noxfile.py",
-    "src/thermoextrap/*.py",
-    "src/thermoextrap/core/*.py",
-    "src/thermoextrap/gpr_active/ig_active.py",
-    "tools/*.py",
-    # "src/thermoextrap/gpr_active/active_utils.py",
-    # "src/thermoextrap/gpr_active/gp_models.py",
-    "src/thermoextrap/gpr_active/sine_active.py",
-    "tests/test_typing.py",
-]
-typeCheckingMode = "standard"
-=======
 enableTypeIgnoreComments = false
-# strict = [
-#     "src",
-#     "tests",
-#     "noxfile.py",
-#     "tools/*.py",
-# ]
->>>>>>> after updating
 # options
 # reportMissingSuperCall = true
 deprecateTypingAliases = true
