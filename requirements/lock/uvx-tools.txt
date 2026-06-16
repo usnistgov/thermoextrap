@@ -16,9 +16,6 @@ copier-template-extensions==0.3.3 \
     --hash=sha256:86bd5e2e89c94b6f9321e4078781b4456c5658b820bcae49ac60fd1e1dd23c10 \
     --hash=sha256:bf6bbdebada26132640d6e1128723fa1ff7eb59d008de07a7543c51e0facb0ea
     # via -r requirements/uvx-tools.txt
-dotenv==0.9.9 \
-    --hash=sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9
-    # via -r requirements/uvx-tools.txt
 grayskull==3.1.1 \
     --hash=sha256:46ea09c3322f200c35c807dc34dfaf0fc203352fc39d6c222e31a5b065f2f690 \
     --hash=sha256:7ad7d1d2bcb06ef0af297c7d5956844699931e34ea21aa6cb2a61f09eac60108
@@ -72,10 +69,6 @@ mypy[faster-cache]==2.1.0 \
 nbqa==1.9.1 \
     --hash=sha256:95552d2f6c2c038136252a805aa78d85018aef922586270c3a074332737282e5 \
     --hash=sha256:a1f4bcf587c597302fed295951001fc4e1be4ce0e77e1ab1b25ac2fbe3db0cdd
-    # via -r requirements/uvx-tools.txt
-nox==2026.4.10 \
-    --hash=sha256:082c117627590d9b90aa21f86df89b310b07c5842539524203bcb3c719f116c1 \
-    --hash=sha256:2d0af5374f3f37a295428c927d1b04a8182aa01762897d172446dda2f1ce9692
     # via -r requirements/uvx-tools.txt
 prek==0.4.4 \
     --hash=sha256:0b04a0f36d07474f2a9fc5b1ba1197a1b326b2b211f39cd74cf0d4613545f7f4 \

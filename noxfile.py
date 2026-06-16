@@ -2,12 +2,8 @@
 
 # /// script
 # dependencies = [
-<<<<<<< before updating
-#     "nox>=2024.10.9",
-#     "dotenv>=0.9.0"
-=======
 #     "nox>=2026.4.10",
->>>>>>> after updating
+#     "dotenv>=0.9.9"
 # ]
 # ///
 
