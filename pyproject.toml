@@ -124,7 +124,6 @@ docs = [
 ]
 # other groups
 basedpyright = [ "basedpyright>=1.39.7" ]
-cog = [ "cogapp" ]
 docs-live = [
     "sphinx-autobuild",
     { include-group = "docs" },
@@ -176,7 +175,6 @@ dev.requires-python = ">=3.12"
 docs.requires-python = ">=3.12"
 docs-live.requires-python = ">=3.12"
 docs-spelling.requires-python = ">=3.12"
-# other tools
 ipython.requires-python = ">=3.12"
 mypy.requires-python = ">=3.12"
 notebook.requires-python = ">=3.12"
@@ -486,7 +484,7 @@ pip-deps = [
     "pyright>=1.1.410",
     "rooster>=0.1.1",
     "twine>=6.2.0",
-    "ty>=0.0.44",
+    "ty>=0.0.46",
 ]
 groups = [
     "basedpyright",
