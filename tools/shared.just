@@ -17,7 +17,11 @@ TYPECHECK := "-m typecheck_runner -v"
 # run nox
 [group("tools")]
 nox *options:
+<<<<<<< before updating
     {{ UVX_WITH_OPTS }} --with dotenv nox {{ options }}
+=======
+    uv run --script noxfile.py {{ options }}
+>>>>>>> after updating
 
 # run pre-commit
 [group("lint")]
