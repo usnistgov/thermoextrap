@@ -146,23 +146,6 @@ repos:
       - id: commitizen
         stages: [commit-msg]
 
-<<<<<<< before updating
-=======
-  # * Cog
-  - repo: local
-    hooks:
-      - id: cog-readme
-        name: cog-readme
-        alias: cog
-        entry: >-
-          uv run tools/cog_runner.py --format=prettier --lint=markdownlint-cli2
-          --
-        # if need package, prefix with uv run --no-dev --isolated
-        language: python
-        files: ^README\.md$
-        stages: [manual]
-
->>>>>>> after updating
   # * Actions
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.37.2

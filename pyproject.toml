@@ -171,26 +171,14 @@ pip.annotation-style = "line"
 pip.generate-hashes = true
 
 [tool.uv.dependency-groups]
-<<<<<<< before updating
 dev.requires-python = ">=3.12"
 docs.requires-python = ">=3.12"
 docs-live.requires-python = ">=3.12"
 docs-spelling.requires-python = ">=3.12"
-# other tools
 ipython.requires-python = ">=3.12"
 mypy.requires-python = ">=3.12"
 notebook.requires-python = ">=3.12"
 nox.requires-python = ">=3.12"
-=======
-dev.requires-python = ">=3.14"
-docs-live.requires-python = ">=3.14"
-docs-spelling.requires-python = ">=3.14"
-docs.requires-python = ">=3.14"
-ipython.requires-python = ">=3.14"
-mypy.requires-python = ">=3.14"
-notebook.requires-python = ">=3.14"
-nox.requires-python = ">=3.14"
->>>>>>> after updating
 
 # * Checks ---------------------------------------------------------------------
 [tool.repo-review]
@@ -512,7 +500,6 @@ scripts = [
     "noxfile.py",
     "tools/check_dist_version.py",
     "tools/clean_kernelspec.py",
-    "tools/cog_runner.py",
     "tools/sync_pyproject_min_versions.py",
 ]
 
