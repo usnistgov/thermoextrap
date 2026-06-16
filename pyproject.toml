@@ -491,7 +491,6 @@ pip-deps = [
 groups = [
     "basedpyright",
     "mypy",
-    "nox",
     "typecheck-runner",
 ]
 skip-package = true
@@ -500,6 +499,7 @@ style = "requirements"
 [tool.uv-locker]
 pip-compile-config-file = "requirements/uv.toml"
 scripts = [
+    "noxfile.py",
     "tools/check_dist_version.py",
     "tools/clean_kernelspec.py",
     "tools/sync_pyproject_min_versions.py",

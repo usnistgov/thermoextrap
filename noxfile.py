@@ -2,8 +2,8 @@
 
 # /// script
 # dependencies = [
-#     "nox>=2024.10.9",
-#     "dotenv>=0.9.0"
+#     "nox>=2026.4.10",
+#     "dotenv>=0.9.9"
 # ]
 # ///
 
