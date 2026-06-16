@@ -124,7 +124,6 @@ docs = [
 ]
 # other groups
 basedpyright = [ "basedpyright>=1.39.7" ]
-cog = [ "cogapp" ]
 docs-live = [
     "sphinx-autobuild",
     { include-group = "docs" },
@@ -172,6 +171,7 @@ pip.annotation-style = "line"
 pip.generate-hashes = true
 
 [tool.uv.dependency-groups]
+<<<<<<< before updating
 dev.requires-python = ">=3.12"
 docs.requires-python = ">=3.12"
 docs-live.requires-python = ">=3.12"
@@ -181,6 +181,16 @@ ipython.requires-python = ">=3.12"
 mypy.requires-python = ">=3.12"
 notebook.requires-python = ">=3.12"
 nox.requires-python = ">=3.12"
+=======
+dev.requires-python = ">=3.14"
+docs-live.requires-python = ">=3.14"
+docs-spelling.requires-python = ">=3.14"
+docs.requires-python = ">=3.14"
+ipython.requires-python = ">=3.14"
+mypy.requires-python = ">=3.14"
+notebook.requires-python = ">=3.14"
+nox.requires-python = ">=3.14"
+>>>>>>> after updating
 
 # * Checks ---------------------------------------------------------------------
 [tool.repo-review]
@@ -486,7 +496,7 @@ pip-deps = [
     "pyright>=1.1.410",
     "rooster>=0.1.1",
     "twine>=6.2.0",
-    "ty>=0.0.44",
+    "ty>=0.0.46",
 ]
 groups = [
     "basedpyright",
@@ -502,6 +512,7 @@ scripts = [
     "noxfile.py",
     "tools/check_dist_version.py",
     "tools/clean_kernelspec.py",
+    "tools/cog_runner.py",
     "tools/sync_pyproject_min_versions.py",
 ]
 
