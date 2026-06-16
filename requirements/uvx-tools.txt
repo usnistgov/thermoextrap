@@ -11,11 +11,9 @@ basedpyright>=1.39.7
 conda-lock>=4.0.0
 copier-template-extensions>=0.3.3
 copier>=9.15.1
-dotenv
 grayskull>=3.1.1
 mypy[faster-cache]>=2.1.0
 nbqa>=1.9.1
-nox>=2026.4.10
 prek>=0.4.4
 pyrefly>=1.0.0
 pyright>=1.1.410
