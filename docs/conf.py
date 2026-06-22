@@ -266,8 +266,7 @@ language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-<<<<<<< before updating
-# This patterns also effect to html_static_path and html_extra_path
+# These patterns also affect to html_static_path and html_extra_path
 exclude_patterns = [
     "_build",
     "Thumbs.db",
@@ -275,10 +274,6 @@ exclude_patterns = [
     "**.ipynb_checkpoints",
     "jupyter_execute",
 ]
-=======
-# These patterns also affect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
->>>>>>> after updating
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
