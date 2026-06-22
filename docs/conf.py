@@ -266,6 +266,7 @@ language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
+<<<<<<< before updating
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = [
     "_build",
@@ -274,6 +275,10 @@ exclude_patterns = [
     "**.ipynb_checkpoints",
     "jupyter_execute",
 ]
+=======
+# These patterns also affect to html_static_path and html_extra_path
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
+>>>>>>> after updating
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -411,7 +416,7 @@ texinfo_documents = [
         "thermoextrap Documentation",
         author,
         "thermoextrap",
-        "One line description of project.",
+        "Thermodynamic extrapolation",
         "Miscellaneous",
     ),
 ]
@@ -478,6 +483,8 @@ def linkcode_resolve(domain: str, info: dict[str, Any]) -> str | None:
     if not fn:
         return None
 
+    source: list[str] = []
+    lineno: int | None = None
     try:
         source, lineno = inspect.getsourcelines(obj)
     except OSError:
