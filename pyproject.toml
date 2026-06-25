@@ -318,13 +318,12 @@ exclude = [
     ".venv/**",
 ]
 enableTypeIgnoreComments = false
-# options
-# reportMissingSuperCall = true
 deprecateTypingAliases = true
 reportCallInDefaultInitializer = true
 reportImplicitOverride = true
 reportImplicitStringConcatenation = false
 reportImportCycles = true
+# reportMissingSuperCall = true
 reportOverlappingOverload = true
 reportPrivateImportUsage = false
 reportPrivateUsage = false
@@ -480,11 +479,11 @@ pip-deps = [
     "grayskull>=3.1.1",
     "nbqa>=1.9.1",
     "prek>=0.4.5",
-    "pyrefly>=1.0.0",
+    "pyrefly>=1.1.0",
     "pyright>=1.1.410",
     "rooster>=0.1.1",
     "twine>=6.2.0",
-    "ty>=0.0.49",
+    "ty>=0.0.50",
 ]
 groups = [
     "basedpyright",
