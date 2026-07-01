@@ -34,16 +34,16 @@ jobs:
         include:
           - add-paths: .
             body: Use this to merge the changes to this repository.
-            branch: copier/update
+            branch: update/copier
             commit-message: "chore(template): accept new copier update"
             title: "chore(template): accept new copier update"
           # - add-paths: .copier-answers.yml
           #   body: Use this to reject the changes to this repository.
-          #   branch: copier/reject
+          #   branch: update/copier/reject
           #   commit-message: "chore(template): reject new copier update"
           #   title: "chore(template): reject new copier update"
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
           fetch-depth: 0

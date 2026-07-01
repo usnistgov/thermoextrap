@@ -38,7 +38,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-cached-uv-and-python
@@ -47,9 +47,7 @@ jobs:
           cache-dependency-path: uv.lock
 
       - name: Build docs
-        run:
-          uvx -crequirements/lock/uvx-tools.txt nox -s docs -- ++docs-options -W
-          -T
+        run: uv run --script noxfile.py -s docs -- ++docs-options -W -T
 
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0

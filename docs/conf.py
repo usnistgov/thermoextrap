@@ -208,7 +208,7 @@ napoleon_type_aliases = {
     "Series": "~pandas.Series",
     "DataFrame": "~pandas.DataFrame",
     "Categorical": "~pandas.Categorical",
-    "Path": "~~pathlib.Path",
+    "Path": "~pathlib.Path",
     # objects with abbreviated namespace (from pandas)
     "pd.Index": "~pandas.Index",
     "pd.NaT": "~pandas.NaT",
@@ -266,7 +266,7 @@ language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-# This patterns also effect to html_static_path and html_extra_path
+# These patterns also affect to html_static_path and html_extra_path
 exclude_patterns = [
     "_build",
     "Thumbs.db",
@@ -411,7 +411,7 @@ texinfo_documents = [
         "thermoextrap Documentation",
         author,
         "thermoextrap",
-        "One line description of project.",
+        "Thermodynamic extrapolation",
         "Miscellaneous",
     ),
 ]
@@ -458,7 +458,7 @@ def linkcode_resolve(domain: str, info: dict[str, Any]) -> str | None:
     parent_name, *sub_parts = info["module"].split(".")
     parent_mod = sys.modules.get(parent_name)
 
-    try:
+    try:  # noqa: PLW0717
         if len(sub_parts) > 0:
             sub_name = ".".join(sub_parts)
             obj = attrgetter(sub_name)(parent_mod)
@@ -478,6 +478,8 @@ def linkcode_resolve(domain: str, info: dict[str, Any]) -> str | None:
     if not fn:
         return None
 
+    source: list[str] = []
+    lineno: int | None = None
     try:
         source, lineno = inspect.getsourcelines(obj)
     except OSError:

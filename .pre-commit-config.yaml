@@ -19,7 +19,7 @@ repos:
 
   # * sync dependencies
   - repo: https://github.com/wpk-nist-gov/sync-pre-commit-hooks
-    rev: v0.5.1
+    rev: v0.8.1
     hooks:
       - id: forbidden-files
       - id: sync-pre-commit-deps
@@ -54,26 +54,26 @@ repos:
       - id: taplo-lint
         args: ["--no-schema"]
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.21.2
+    rev: v2.25.0
     hooks:
       - id: pyproject-fmt
   # ** validate (schema-store)
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.05.13
+    rev: 2026.06.23
     hooks:
       - id: validate-pyproject
         name: validate-pyproject-schema-store
         stages: [manual]
   # ** repo review
   - repo: https://github.com/scientific-python/cookie
-    rev: 2026.04.04
+    rev: 2026.06.18
     hooks:
       - id: sp-repo-review
         stages: [manual]
 
   # * Prettier
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.8.3
+    rev: v3.8.4
     hooks:
       - id: prettier
         alias: markdownlint
@@ -92,13 +92,13 @@ repos:
 
   # Just
   - repo: https://github.com/wpk-nist-gov/just-pre-commit
-    rev: v1.51.0
+    rev: v1.53.0
     hooks:
       - id: justfile-format
 
   # * Linting
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.13
+    rev: v0.15.19
     hooks:
       - id: ruff-check
         alias: ruff
@@ -111,7 +111,7 @@ repos:
   # * Spelling
   # ** typos
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.46.1
+    rev: v1.47.2
     hooks:
       - id: typos
         exclude_types: [jupyter]
@@ -128,27 +128,27 @@ repos:
           - "--custom-command=prek run pyproject2conda-project --all-files"
   # ** uv
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.14
+    rev: 0.11.24
     hooks:
       - id: uv-lock
         alias: requirements
         args: [--locked]
       - id: pip-compile
         alias: requirements
-        entry: python tools/requirements_lock.py
+        entry: python tools/uv_locker.py
         pass_filenames: true
-        files: ^requirements/[^/]*\.txt$
+        files: ^requirements/[^/]*\.txt$|^tools/*\.py$
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.16.0
+    rev: v4.16.4
     hooks:
       - id: commitizen
         stages: [commit-msg]
 
   # * Actions
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.2
+    rev: 0.37.3
     hooks:
       - id: check-github-workflows
         alias: actions
@@ -175,7 +175,7 @@ repos:
         priority: 0
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
     # Zizmor version.
-    rev: v1.24.1
+    rev: v1.26.1
     hooks:
       # Run the linter.
       - id: zizmor
@@ -201,7 +201,7 @@ repos:
         name: nbqa-typos
         alias: typos
         additional_dependencies: &typos-deps
-          - typos==1.46.1
+          - typos==1.47.2
         args:
           - typos
           - --force-exclude

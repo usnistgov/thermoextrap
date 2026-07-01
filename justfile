@@ -93,9 +93,9 @@ lint-upgrade: (pre-commit "autoupdate") lint-sync-deps
 # sync dependencies (used primarily with lint-upgrade)
 [group("lint")]
 lint-sync-deps:
-    [[ -f requirements/pre-commit-additional-dependencies.txt ]] && uv run --no-project --script tools/requirements_lock.py --upgrade requirements/pre-commit-additional-dependencies.txt || true
-    just pre-commit run -v sync-pre-commit-deps -a || true
-    just pre-commit run -v sync-uv-build-deps -a || true
+    [[ -f requirements/pre-commit-additional-dependencies.txt ]] && uv run tools/uv_locker.py --upgrade requirements/pre-commit-additional-dependencies.txt || true
+    just lint -v sync-pre-commit-deps || true
+    just lint -v sync-uv-build-deps || true
 
 # * User setup -----------------------------------------------------------------
 
@@ -144,8 +144,8 @@ version: version-scm version-import
 # * Requirements/Environment files ---------------------------------------------
 
 _requirements *options:
-    just pre-commit run pyproject2conda-project --all-files --verbose || true
-    uv run --no-project tools/requirements_lock.py --all-files {{ options }}
+    just lint pyproject2conda-project --verbose || true
+    uv run tools/uv_locker.py --all-files {{ options }}
 
 # Rebuild requirements, lock requirements, and run uv sync.  Pass --upgrade/-U to upgrade
 [group("requirements")]
@@ -163,6 +163,19 @@ requirements *options: (_requirements "--sync-or-lock" options)
 [group("requirements")]
 pyproject-upgrade-min-versions:
     uvx --from "uv-upx>=0.4.3" uv-upx upgrade run --no-sync
+
+# Sync min versions in pyproject.toml with using tools/sync_uvx_tool_min_version.py
+sync-pyproject-min-versions: && lock
+    # sync with pyprojects
+    # NOTE: replace tools/sync_pyproject_min_versions.py when add sync-pyproject-min-versions to pre-commit hooks
+    uv run tools/sync_pyproject_min_versions.py \
+    -r requirements/lock/uvx-tools.txt \
+    pyproject.toml \
+    noxfile.py \
+    tools/*.py
+
+# Update/Upgrade all dependencies
+update-deps: (lock "--upgrade") sync-pyproject-min-versions lint-upgrade
 
 # * Typecheck ---------------------------------------------------------------------
 

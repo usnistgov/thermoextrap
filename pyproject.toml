@@ -1,12 +1,12 @@
 [build-system]
 build-backend = "uv_build"
 requires = [
-    "uv-build>=0.11.14,<0.12.0",
+    "uv-build>=0.11.24,<0.12.0",
 ]
 
 [project]
 name = "thermoextrap"
-version = "1.1.1"
+version = "1.2.0"
 description = "Thermodynamic extrapolation"
 readme = "README.md"
 keywords = [
@@ -123,7 +123,7 @@ docs = [
     "thermoextrap[gpr,mbar,viz]",
 ]
 # other groups
-basedpyright = [ "basedpyright>=1.39.4" ]
+basedpyright = [ "basedpyright>=1.39.8" ]
 docs-live = [
     "sphinx-autobuild",
     { include-group = "docs" },
@@ -175,7 +175,6 @@ dev.requires-python = ">=3.12"
 docs.requires-python = ">=3.12"
 docs-live.requires-python = ">=3.12"
 docs-spelling.requires-python = ">=3.12"
-# other tools
 ipython.requires-python = ">=3.12"
 mypy.requires-python = ">=3.12"
 notebook.requires-python = ">=3.12"
@@ -207,6 +206,7 @@ expand_tables = [
     "tool.pytest",
     "tool.typos",
     "tool.uv.dependency-groups",
+    "tool.uv.exclude-newer-package",
 ]
 indent = 4
 keep_full_version = true
@@ -237,27 +237,25 @@ check-file = false
 # * typecheck ---------------------------------------------------------------------
 [tool.mypy]
 files = [
+    "noxfile.py",
     "src",
     "tests",
-    # tools
-    "noxfile.py",
     "tools",
 ]
-strict = true
 # options
 check_untyped_defs = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
 enable_error_code = [
     "ignore-without-code",
     "redundant-expr",
     "truthy-bool",
 ]
-warn_return_any = true
-warn_unreachable = true
+strict = true
 warn_unused_configs = true
-warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
-ignore_missing_imports = true
 module = [
     "matplotlib.*",
     "numba.*",
@@ -266,32 +264,50 @@ module = [
     "sympy.*",
     "tensorflow_probability.*",
 ]
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-strict = false
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-disallow_untyped_calls = false
 module = [
     "tests.*",
 ]
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+strict = false
 
 [[tool.mypy.overrides]]
-check_untyped_defs = false
 module = [ "tests.legacy.*" ]
+check_untyped_defs = false
 
 [tool.pyrefly]
 enabled-ignores = [ "pyrefly" ]
 project-includes = [
+    "noxfile.py",
     "src",
     "tests",
-    # tools
-    "noxfile.py",
     "tools",
 ]
 search-path = [ "." ]
 
 [tool.pyright]
+typeCheckingMode = "standard"
+strict = [
+    "noxfile.py",
+    "src/thermoextrap/*.py",
+    "src/thermoextrap/core/*.py",
+    "src/thermoextrap/gpr_active/ig_active.py",
+    # "src/thermoextrap/gpr_active/active_utils.py",
+    # "src/thermoextrap/gpr_active/gp_models.py",
+    "src/thermoextrap/gpr_active/sine_active.py",
+    "tests/test_typing.py",
+    "tools/*.py",
+]
+include = [
+    "noxfile.py",
+    "src",
+    "tests",
+    "tools",
+]
 exclude = [
     "**/.mypy_cache",
     "**/.numba_cache",
@@ -301,34 +317,16 @@ exclude = [
     ".tox/**",
     ".venv/**",
 ]
-include = [
-    "src",
-    "tests",
-    # tools
-    "noxfile.py",
-    "tools",
-]
-strict = [
-    "noxfile.py",
-    "src/thermoextrap/*.py",
-    "src/thermoextrap/core/*.py",
-    "src/thermoextrap/gpr_active/ig_active.py",
-    "tools/*.py",
-    # "src/thermoextrap/gpr_active/active_utils.py",
-    # "src/thermoextrap/gpr_active/gp_models.py",
-    "src/thermoextrap/gpr_active/sine_active.py",
-    "tests/test_typing.py",
-]
-typeCheckingMode = "standard"
-# options
-# reportMissingSuperCall = true
-deprecateTypingAliases = true
-enableReachabilityAnalysis = false
 enableTypeIgnoreComments = false
+deprecateTypingAliases = true
 reportCallInDefaultInitializer = true
 reportImplicitOverride = true
+reportImplicitStringConcatenation = false
 reportImportCycles = true
+# reportMissingSuperCall = true
 reportOverlappingOverload = true
+reportPrivateImportUsage = false
+reportPrivateUsage = false
 reportPropertyTypeMismatch = true
 reportUninitializedInstanceVariable = true
 reportUnnecessaryTypeIgnoreComment = true
@@ -336,12 +334,9 @@ reportUnreachable = "warning"
 reportUntypedClassDecorator = true
 reportUntypedFunctionDecorator = true
 reportUnusedCallResult = true
-# type-checkers should type-check; linters should lint
-reportImplicitStringConcatenation = false
-reportPrivateImportUsage = false
-reportPrivateUsage = false
 reportUnusedImport = false
 reportUnusedVariable = false
+enableReachabilityAnalysis = false
 
 [[tool.pyright.executionEnvironments]]
 reportArgumentType = false
@@ -355,15 +350,13 @@ reportUnusedCallResult = false
 root = "examples/usage"
 
 [tool.ty]
-# Disable support for `type: ignore` comments
-analysis.respect-type-ignore-comments = false
 src.include = [
+    "noxfile.py",
     "src",
     "tests",
-    # tools
-    "noxfile.py",
     "tools",
 ]
+analysis.respect-type-ignore-comments = false
 
 # * Testing --------------------------------------------------------------------
 [tool.pytest.ini_options]
@@ -440,6 +433,9 @@ report.omit = [
 ]
 report.show_missing = true
 
+[tool.commitizen]
+use_shortcuts = true
+
 # * Dependency creation --------------------------------------------------------
 [tool.pyproject2conda]
 template-python = "requirements/py{py}-{env}"
@@ -477,31 +473,46 @@ skip-package = true
 [tool.pyproject2conda.envs.uvx-tools]
 pip-deps = [
     # these used solely for specking tools to be run via uvx ...
-    "conda-lock>=4.0.0",
+    "conda-lock>=4.0.1",
     "copier-template-extensions>=0.3.3",
-    "copier>=9.15.1",
+    "copier>=9.16.0",
     "grayskull>=3.1.1",
     "nbqa>=1.9.1",
-    "prek>=0.3.13",
-    "pyrefly>=0.64.1",
-    "pyright>=1.1.409",
+    "prek>=0.4.5",
+    "pyrefly>=1.1.1",
+    "pyright>=1.1.410",
     "rooster>=0.1.1",
     "twine>=6.2.0",
-    "ty>=0.0.35",
+    "ty>=0.0.52",
 ]
 groups = [
     "basedpyright",
     "mypy",
-    "nox",
     "typecheck-runner",
 ]
 skip-package = true
 style = "requirements"
 
-# * Other tools ----------------------------------------------------------------
-[tool.commitizen]
-use_shortcuts = true
+[tool.uv-locker]
+pip-compile-config-file = "requirements/uv.toml"
+scripts = [
+    "noxfile.py",
+    "tools/check_dist_version.py",
+    "tools/clean_kernelspec.py",
+    "tools/sync_pyproject_min_versions.py",
+]
 
+[[tool.uv-locker.requirements]]
+path = "requirements/uvx-tools.txt"
+output-file = "requirements/lock/uvx-tools.txt"
+python = "min"
+options = [
+    "--no-deps",
+    "--no-strip-extras",
+    "--universal",
+]
+
+# * Other tools ----------------------------------------------------------------
 [tool.rooster]
 changelog_contributors = true
 major-labels = [ "breaking" ]
