@@ -290,6 +290,7 @@ project-includes = [
 search-path = [ "." ]
 
 [tool.pyright]
+<<<<<<< before updating
 typeCheckingMode = "standard"
 strict = [
     "noxfile.py",
@@ -302,6 +303,15 @@ strict = [
     "tests/test_typing.py",
     "tools/*.py",
 ]
+=======
+typeCheckingMode = "strict"
+# strict = [
+#     "noxfile.py",
+#     "src",
+#     "tests",
+#     "tools/*.py",
+# ]
+>>>>>>> after updating
 include = [
     "noxfile.py",
     "src",
