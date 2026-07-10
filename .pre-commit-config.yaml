@@ -84,7 +84,7 @@ repos:
 
   # * Markdown
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.22.1
+    rev: v0.23.0
     hooks:
       - id: markdownlint-cli2
         alias: markdownlint
@@ -111,7 +111,7 @@ repos:
   # * Spelling
   # ** typos
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.47.2
+    rev: v1.48.0
     hooks:
       - id: typos
         exclude_types: [jupyter]
@@ -201,7 +201,7 @@ repos:
         name: nbqa-typos
         alias: typos
         additional_dependencies: &typos-deps
-          - typos==1.47.2
+          - typos==1.48.0
         args:
           - typos
           - --force-exclude
