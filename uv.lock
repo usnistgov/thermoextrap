@@ -902,7 +902,7 @@ wheels = [
 
 [[package]]
 name = "dask"
-version = "2026.6.0"
+version = "2026.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -914,9 +914,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "toolz" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/60/ca/58434f10ebb45d2ddc6edd6e2988abcd38da1ab1897a5f6f402711a594e9/dask-2026.6.0.tar.gz", hash = "sha256:ae3436bd31ebce2be75edf952bd1fc687a1f11ec03fe8b1bec2903d222344a45", size = 11544529, upload-time = "2026-06-11T17:48:43.316Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4d/b5/aa50877159f1efd65a744107e0662a15d2b80fa0c427d980313367f49493/dask-2026.7.0.tar.gz", hash = "sha256:b039970642ce97a063070bae2763dada8aae27e3cbd8ff6d894072f920a1e252", size = 11548914, upload-time = "2026-07-06T16:58:36.496Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/02/17/b82b537a30be67ba178fc0b0fbda8fcbaeda188fb039d6ad8a84e89353a2/dask-2026.6.0-py3-none-any.whl", hash = "sha256:1539859071065dca379ca592ff76e911cd7965dc466da0040354ab466179189b", size = 1488995, upload-time = "2026-06-11T17:48:41.008Z" },
+    { url = "https://files.pythonhosted.org/packages/90/aa/ceeb81d9dc886d445416310f0eff5c3978f20224b4143e96e36b7e85b011/dask-2026.7.0-py3-none-any.whl", hash = "sha256:68def8b467529ab8425ef9fcc6735dcaefaaf715d5e19ae219485f99a394dbef", size = 1496878, upload-time = "2026-07-06T16:58:34.597Z" },
 ]
 
 [package.optional-dependencies]
@@ -1023,7 +1023,7 @@ wheels = [
 
 [[package]]
 name = "distributed"
-version = "2026.6.0"
+version = "2026.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1041,9 +1041,9 @@ dependencies = [
     { name = "tornado" },
     { name = "zict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/ef/07ccedbf355fea6fd3e14fec12292b4aa140c48d1d6a05a1ad8e6183c690/distributed-2026.6.0.tar.gz", hash = "sha256:88b836dc2d85340cad7e08f2611b9336a70ed018d88bc5a70c3721d4a7efcabd", size = 2459255, upload-time = "2026-06-11T17:56:00.252Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/89/33/210aaca1f7ce3fadec1143dd01edc993b1c32eb52b4a7dd0d8317ce119e6/distributed-2026.7.0.tar.gz", hash = "sha256:3b9ecc6c9d1a9ad64e6b5ba6ec3e35c28efcda6f04fa105074179ad79f45c8b9", size = 2461154, upload-time = "2026-07-06T17:01:01.928Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/62/674ba5ada6de5615b458d768c0f0fb1a7b53299486fb38a36e0694f3c617/distributed-2026.6.0-py3-none-any.whl", hash = "sha256:ca034e8b4d05b8a92f0655ebd0914e82308509a213889456d7ddd2bd0543439b", size = 1006995, upload-time = "2026-06-11T17:55:58.374Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/89/9fedd4ba73034d8101c9095731aab75e08dae09178a6955100299af0f20f/distributed-2026.7.0-py3-none-any.whl", hash = "sha256:792e684c27dfc51f8fdc8e28a7ba895b0d6c86bd9bc7eeca5f7a485f6d9aecf6", size = 1011990, upload-time = "2026-07-06T17:01:00.046Z" },
 ]
 
 [[package]]
@@ -6313,20 +6313,20 @@ wheels = [
 
 [[package]]
 name = "uvicorn"
-version = "0.50.0"
+version = "0.50.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "h11" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2e/41/06cce5dbb9f77591512957710ac709e60b12e6216a2f2d0d607fd49706e8/uvicorn-0.50.0.tar.gz", hash = "sha256:0c92e1bc2259cb7faa4fcef774a5966588f2e88542744550b66799fba10b76f1", size = 93257, upload-time = "2026-07-04T05:03:26.33Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/f6/cc9aadc0e481344a42095d222bfa764122fb8cfba708d1922917bd8bfb01/uvicorn-0.50.2.tar.gz", hash = "sha256:b92bf03509b82bcb9d49e7335b4fd364518ad021c2dc18b4e6a2fec8c955a0bb", size = 93716, upload-time = "2026-07-06T10:38:31.984Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a0/3a/eb70620ca2bf8213603d5c731460687c49fee38b0072f0b4a637781f0a53/uvicorn-0.50.0-py3-none-any.whl", hash = "sha256:05f0eb19edf38208f79f43df8a63081b48df31b0cd1e5997be957a4dc97d1b19", size = 72716, upload-time = "2026-07-04T05:03:24.848Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/f0/7c228ee10c7ab8fd3a21d06579a6f7c6075c6ce72594a20fb5d2f206ff24/uvicorn-0.50.2-py3-none-any.whl", hash = "sha256:4ae72a385630bcc17a0adb8290f26c993865e0b43a2114c2aab96420172c056a", size = 72846, upload-time = "2026-07-06T10:38:30.543Z" },
 ]
 
 [[package]]
 name = "virtualenv"
-version = "21.5.1"
+version = "21.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "distlib" },
@@ -6334,9 +6334,9 @@ dependencies = [
     { name = "platformdirs" },
     { name = "python-discovery" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f1/a5/81f987504738e6defeed61ec1c47e2aefab3c35d8eeb87e1b3f38cf28254/virtualenv-21.5.1.tar.gz", hash = "sha256:dca3bf98275a59c652b69d68e73433e597d977c2da9198882479d1a7188009c8", size = 4578798, upload-time = "2026-06-16T16:23:58.603Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/ff/3dcc01dab91e5d472183dd8d1ac0368b44b70aa3e678a3e47149e8ef716a/virtualenv-21.5.2.tar.gz", hash = "sha256:465da6db2a5b615258cddefb749ceeb3627e4fddda93be88c97ba8321ca3c6d1", size = 5525810, upload-time = "2026-07-06T15:21:23.016Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/02/3623e6169bed617ed1e2d372f7c69f92ec28d54c4dfc997055c8578ec148/virtualenv-21.5.1-py3-none-any.whl", hash = "sha256:55aa670b67bbfb991b03fda39bd3276d92c419d702376e98c5df1c9989a26783", size = 4558820, upload-time = "2026-06-16T16:23:56.963Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/08/0ae1145a8e8d7193f7f37aedc8e37eafd02f70a8513b90624089a7a8e321/virtualenv-21.5.2-py3-none-any.whl", hash = "sha256:4d9f76b4363ed04a4837e812110eb301367eb470f616b62399a50d39dee70e47", size = 5506034, upload-time = "2026-07-06T15:21:20.848Z" },
 ]
 
 [[package]]
