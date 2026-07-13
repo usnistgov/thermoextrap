@@ -51,7 +51,7 @@ test-notebook *files=NOTEBOOKS:
 
 [group("notebook")]
 install-ipykernel:
-    uv run -m ipykernel install --user --name {{ PACKAGE_NAME }} --display-name "PYTHON [venv: {{ PACKAGE_NAME }}]"
+    uv run -m ipykernel install --user --name {{ PACKAGE_NAME }} --display-name "Python [venv: {{ PACKAGE_NAME }}]"
 
 # Execute notebooks inplace using nbclient
 [group("notebook")]
