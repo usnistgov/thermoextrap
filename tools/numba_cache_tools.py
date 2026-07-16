@@ -43,7 +43,7 @@ class _Config:
 config = _Config()
 
 
-class HashCacheLocator(UserProvidedCacheLocator):  # type: ignore[misc]
+class HashCacheLocator(UserProvidedCacheLocator):  # type: ignore[misc, unused-ignore]
     """User defined caching function"""
 
     def get_source_stamp(self) -> Any:

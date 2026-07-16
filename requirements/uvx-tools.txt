@@ -7,17 +7,17 @@
 # You should not manually edit this file.
 # Instead edit the corresponding pyproject.toml file.
 #
-basedpyright>=1.39.8
-conda-lock>=4.0.1
+basedpyright>=1.39.9
+conda-lock>=4.0.2
 copier-template-extensions>=0.3.3
 copier>=9.16.0
 grayskull>=3.1.1
-mypy[faster-cache]>=2.1.0
+mypy[faster-cache]>=2.2.0
 nbqa>=1.9.1
-prek>=0.4.5
+prek>=0.4.8
 pyrefly>=1.1.1
-pyright>=1.1.410
+pyright>=1.1.411
 rooster>=0.1.1
 twine>=6.2.0
-ty>=0.0.52
+ty>=0.0.56
 typecheck-runner>=0.2.0; python_version > "3.9"
