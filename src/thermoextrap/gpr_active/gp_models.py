@@ -161,6 +161,12 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         # Set number of observable dimensions
         self.obs_dims = obs_dims
 
+        # Set chunk size for kernel to make memory footprint smaller
+        # And so not limited by max size of input to tf.raw_ops.UniqueV2
+        self.k_chunk_size = np.floor(
+            np.sqrt(np.iinfo(np.int32).max / (2 * self.obs_dims))
+        ).astype(np.int32)
+
     # Define ARD behavior (if ever want multiple dimensions with different lengthscales)
     # Can have multiple dimensions with different lengthscales, but have to implement manually in
     # the provided sympy expression for the kernel. Hard to detect automatically and can't have
@@ -171,13 +177,13 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         # return self.lengthscales.shape.ndims > 0
         return False
 
-    @override
-    def K(self, X: TensorType, X2: TensorType | None = None) -> Tensor:
-        X = tf.convert_to_tensor(X)
-        X2 = X if X2 is None else tf.convert_to_tensor(X2)
+    def _internal_K(self, X: TensorType, X2: TensorType) -> Tensor:
 
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
         x2, d2 = self._split_x_into_locs_and_deriv_info(X2)
+
+        d1 = tf.cast(d1, tf.int8)
+        d2 = tf.cast(d2, tf.int8)
 
         d1_size = _get_tensor_size(d1)
         d2_size = _get_tensor_size(d2)
@@ -193,9 +199,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
             tf.tile(d1, (1, d2_size)),
             (d1_size * d2_size, -1),
         )
-        expand_d1 = tf.cast(expand_d1, tf.int32)
         expand_d2 = tf.tile(d2, (d1_size, 1))
-        expand_d2 = tf.cast(expand_d2, tf.int32)
         deriv_pairs = tf.stack([expand_d1, expand_d2], axis=1)
 
         # For convenience, do same with x, but no need to stack
@@ -250,6 +254,40 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
         # Reshape to the correct output
         return tf.reshape(k_list_stitch, (x1_size, x2_size))
+
+    @override
+    def K(self, X: TensorType, X2: TensorType | None = None) -> Tensor:
+
+        X = tf.convert_to_tensor(X)
+        X2 = X if X2 is None else tf.convert_to_tensor(X2)
+
+        # Move through X and X2 in chunks
+        # Then put full matrix together at end
+        n_chunks_X = tf.cast(tf.math.ceil(tf.shape(X)[0] / self.k_chunk_size), tf.int32)
+        chunk_sizes_X = tf.tile([self.k_chunk_size], [n_chunks_X - 1])
+        chunk_sizes_X = tf.concat(
+            [chunk_sizes_X, [tf.math.mod(tf.shape(X)[0], self.k_chunk_size)]], axis=0
+        )
+        # chunk_sizes_X.append(tf.shape(X)[0] - (self.k_chunk_size * (n_chunks_X - 1)))
+        chunks_X = tf.split(X, num_or_size_splits=chunk_sizes_X, axis=0)
+        n_chunks_X2 = tf.cast(
+            tf.math.ceil(tf.shape(X2)[0] / self.k_chunk_size), tf.int32
+        )
+        chunk_sizes_X2 = tf.tile([self.k_chunk_size], [n_chunks_X2 - 1])
+        chunk_sizes_X2 = tf.concat(
+            [chunk_sizes_X2, [tf.math.mod(tf.shape(X2)[0], self.k_chunk_size)]], axis=0
+        )
+        # chunk_sizes_X2.append(tf.shape(X2)[0] - (self.k_chunk_size * (n_chunks_X2 - 1)))
+        chunks_X2 = tf.split(X2, num_or_size_splits=chunk_sizes_X2, axis=0)
+
+        row_list = []
+        for ch_X in chunks_X:
+            column_list = []
+            for ch_X2 in chunks_X2:
+                column_list.append(self._internal_K(ch_X, ch_X2))
+            row_list.append(tf.concat(column_list, axis=1))
+
+        return tf.concat(row_list, axis=0)
 
     @override
     def K_diag(self, X: TensorType) -> Tensor:
