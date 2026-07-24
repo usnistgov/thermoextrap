@@ -21,6 +21,10 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "06:00"
+    allow:
+      - dependency-type: all
+    ignore:
+      - dependency-name: setuptools
     cooldown:
       default-days: 7
     groups:
