@@ -81,7 +81,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         dict, so will mine names from kernel_expr and set all parameters to 1.0.
     """
 
-    def __init__(  # noqa: C901
+    def __init__(  # ruff:ignore[complex-structure]
         self,
         kernel_expr: Expr,
         obs_dims: int,
@@ -1065,7 +1065,7 @@ class HeteroscedasticGPR(
         # Nice to handle scaling inside model rather than outside
         scale_fac = np.array(scale_fac)
         if len(scale_fac.shape) == 0:
-            scale_fac = scale_fac * np.ones(self.out_dim)  # noqa: PLR6104
+            scale_fac = scale_fac * np.ones(self.out_dim)  # ruff:ignore[non-augmented-assignment]
         self.scale_fac = scale_fac
         X_data = data[0]
         Y_data = data[1] / self.scale_fac
@@ -1365,7 +1365,7 @@ class SympyMeanFunc(gpflow.functions.MeanFunction):
     scipy.optimize.minimize
     """
 
-    def __init__(  # noqa: C901, PLR0912
+    def __init__(  # ruff:ignore[complex-structure, too-many-branches]
         self,
         expr: Expr,
         x_data: NDArrayAny,

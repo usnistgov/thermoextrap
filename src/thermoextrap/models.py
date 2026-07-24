@@ -75,8 +75,8 @@ docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
 # * Utils ---------------------------------------------------------------------
 def _validate_supports_getitem(
-    instance: Any,  # noqa: ARG001
-    attribute: attrs.Attribute[Any],  # noqa: ARG001
+    instance: Any,  # ruff:ignore[unused-function-argument]
+    attribute: attrs.Attribute[Any],  # ruff:ignore[unused-function-argument]
     value: Any,
 ) -> None:
     if not isinstance(value, SupportsGetItem):
@@ -126,7 +126,7 @@ class SymFuncBase(sp.Function):  # type: ignore[misc,name-defined]
         raise NotImplementedError
 
     @classmethod
-    def eval(cls, beta: Symbol) -> Any:  # noqa: ARG003
+    def eval(cls, beta: Symbol) -> Any:  # ruff:ignore[unused-class-method-argument]
         """
         Evaluate function.
 

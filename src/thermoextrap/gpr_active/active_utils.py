@@ -519,7 +519,7 @@ def make_matern_expr(p: SupportsIndex | Integer) -> tuple[Expr, dict[str, list[A
     poly_part = poly_part * sp.factorial(p) / sp.factorial(2 * p)
     exp_part = sp.exp(-sp.sqrt(2 * p + 1) * d)
     full_expr = sp.simplify(poly_part * exp_part)
-    l = sp.symbols("l", real=True)  # noqa: E741
+    l = sp.symbols("l", real=True)  # ruff:ignore[ambiguous-variable-name]
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
     distance = sp.sqrt((x1 / l - x2 / l) ** 2)
@@ -550,7 +550,7 @@ def make_rbf_expr(
         parameters matching naming in sympy expression
     """
     var = sp.symbols("var", real=True)
-    l = sp.Matrix(  # noqa: E741
+    l = sp.Matrix(  # ruff:ignore[ambiguous-variable-name]
         [sp.symbols(f"l_{i}", real=True) for i in range(n_dims)]
     )
     l_inv = sp.Matrix([1 / k for k in l])  # pyright: ignore[reportOperatorIssue]
@@ -582,7 +582,7 @@ def make_rbf_expr_old() -> tuple[Expr, dict[str, list[Any]]]:
         parameters matching naming in sympy expression
     """
     var = sp.symbols("var", real=True)
-    l = sp.symbols("l", real=True)  # noqa: E741
+    l = sp.symbols("l", real=True)  # ruff:ignore[ambiguous-variable-name]
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
     rbf_kern_expr = var * sp.exp(-0.5 * (x1 / l - x2 / l) ** 2)
@@ -609,7 +609,7 @@ def make_poly_expr(p: int) -> tuple[Expr, dict[str, list[Any]]]:
         parameters matching naming in sympy expression
     """
     var = sp.symbols("var", real=True)
-    l = sp.symbols("l", real=True)  # noqa: E741
+    l = sp.symbols("l", real=True)  # ruff:ignore[ambiguous-variable-name]
     x1 = sp.symbols("x1", real=True)
     x2 = sp.symbols("x2", real=True)
     poly_kern_expr = (var * x1 * x2 + l) ** p
@@ -1049,7 +1049,7 @@ def create_GPR(
 # Here only implement the simplest (and default) transformation, the identity transform
 # (which also computes std given variance and upper and lower confidence interval values)
 def identityTransform(
-    x: NDArrayOrDataArrayT,  # noqa: ARG001
+    x: NDArrayOrDataArrayT,  # ruff:ignore[unused-function-argument]
     y: NDArrayOrDataArrayT,
     y_var: ArrayLike,
 ) -> tuple[NDArrayOrDataArrayT, NDArrayOrDataArrayT, list[NDArrayOrDataArrayT]]:
@@ -1440,7 +1440,7 @@ class UpdateAdaptiveIntegrate(UpdateFuncBase):
         self.tol = tol
 
     @override
-    def do_update(  # noqa: C901, PLR0912
+    def do_update(  # ruff:ignore[complex-structure, too-many-branches]
         self,
         gpr: Any,
         alpha_list: Sequence[Any],
@@ -2189,7 +2189,7 @@ class StopCriteria(UpdateStopABC):
         return bool(np.all(tol_bools)), out_dict
 
 
-def active_learning(  # noqa: C901, PLR0912
+def active_learning(  # ruff:ignore[complex-structure, too-many-branches]
     init_states: Sequence[SupportsDataWrapper | float],
     sim_wrapper: SupportsSimulation,
     update_func: UpdateFuncBase,

@@ -119,7 +119,7 @@ class RecursiveInterp:
             uv=udata, xv=xdata, order=self.max_order, resample_values=True
         )
 
-    getData = deprecate("getData", get_data, "0.2.0")  # noqa: N815
+    getData = deprecate("getData", get_data, "0.2.0")  # ruff:ignore[mixed-case-variable-in-class-scope]
 
     @deprecate_kwarg("beta1", "beta1")
     @deprecate_kwarg("beta2", "beta2")
@@ -128,7 +128,7 @@ class RecursiveInterp:
     @deprecate_kwarg("Bavail", "beta_avail")
     @deprecate_kwarg("doPlot", "do_plot")
     @deprecate_kwarg("plotCompareFunc", "plot_func")
-    def recursive_train(  # noqa: C901, PLR0912, PLR0914, PLR0915
+    def recursive_train(  # ruff:ignore[complex-structure, too-many-branches, too-many-locals, too-many-statements]
         self,
         beta1: SupportsFloat,
         beta2: SupportsFloat,
@@ -286,7 +286,7 @@ class RecursiveInterp:
             if beta2 == self.edge_beta[-1]:
                 self.states.append(extrap2)
 
-    recursiveTrain = deprecate("recursiveTrain", recursive_train, "0.2.0")  # noqa: N815
+    recursiveTrain = deprecate("recursiveTrain", recursive_train, "0.2.0")  # ruff:ignore[mixed-case-variable-in-class-scope]
 
     @deprecate_kwarg("Btrain", "beta_train")
     def sequential_train(
@@ -371,7 +371,7 @@ class RecursiveInterp:
                 logger.info("Maximum bootstrapped error within interval: %f", check_val)
                 logger.info("At point: %f", beta_vals[check_ind[0]])
 
-    sequentialTrain = deprecate("sequentialTrain", sequential_train, "0.2.0")  # noqa: N815
+    sequentialTrain = deprecate("sequentialTrain", sequential_train, "0.2.0")  # ruff:ignore[mixed-case-variable-in-class-scope]
 
     @deprecate_kwarg("B", "beta")
     def predict(self, beta: ArrayLike) -> NDArray[Any]:
@@ -427,7 +427,7 @@ class RecursiveInterp:
         return predict_vals
 
     @deprecate_kwarg("doPlot", "do_plot")
-    def check_poly_consistency(self, do_plot: bool = False) -> list[NDArray[Any]]:  # noqa: PLR0914, PLR0915
+    def check_poly_consistency(self, do_plot: bool = False) -> list[NDArray[Any]]:  # ruff:ignore[too-many-locals, too-many-statements]
         """
         If the interpolation model is a polynomial, checks to see if the polynomials
         are locally consistent. In other words, we want the coefficients between
@@ -555,6 +555,6 @@ class RecursiveInterp:
 
         return all_pvals  # pyright: ignore[reportUnknownVariableType]
 
-    checkPolynomialConsistency = deprecate(  # noqa: N815
+    checkPolynomialConsistency = deprecate(  # ruff:ignore[mixed-case-variable-in-class-scope]
         "checkPolynomialConsistency", check_poly_consistency, "0.2.0"
     )
