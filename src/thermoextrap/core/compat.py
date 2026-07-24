@@ -46,7 +46,7 @@ def xr_dot(
     xarray deprecated `dims` keyword.  Use `dim` instead.
     """
     if isinstance(x, xr.Dataset):
-        assert isinstance(y, xr.DataArray)  # noqa: S101
+        assert isinstance(y, xr.DataArray)  # ruff:ignore[assert]
         return x.map(xr_dot, args=arrays, dim=dim, **kwargs)  # pyright: ignore[reportUnknownMemberType]
 
     if isinstance(y, xr.Dataset):

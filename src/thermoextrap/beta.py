@@ -1,5 +1,5 @@
 # pyright: reportMissingTypeStubs=false, reportIncompatibleMethodOverride=false
-# ruff: noqa: ARG003  # bunch of unused arguments
+# ruff:file-ignore[unused-class-method-argument]  # bunch of unused arguments
 # pylint: disable=duplicate-code
 
 """

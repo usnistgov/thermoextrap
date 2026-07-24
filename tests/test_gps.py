@@ -503,7 +503,7 @@ def test_gp_likelihood() -> None:
     # Now check specifics of building covariance matrix
     # Check using alternative calculation
     def log_cov_model(cov0, p, s, d_o):
-        d_o = d_o + 1  # noqa: PLR6104
+        d_o = d_o + 1  # ruff:ignore[non-augmented-assignment]
         return np.log(cov0) + p * np.add(*np.meshgrid(d_o, d_o)) + s
 
     # Default has p=10.0, s=0.0
@@ -529,7 +529,7 @@ def test_gp_likelihood() -> None:
 # But would make testing more modular and specific
 # Manually parsing and running all methods in class is a pain for testing, though
 @pytest.mark.slow
-def test_gp() -> None:  # noqa: PLR0915
+def test_gp() -> None:  # ruff:ignore[too-many-statements]
     # First create data we can use
     rng = np.random.default_rng(42)
     x_data, y_data, y_var_data = sine_active.make_data(

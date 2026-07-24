@@ -109,7 +109,7 @@ class lnPi_func_central(SymFuncBase):
 
     @classmethod
     @override
-    def eval(cls, beta: Symbol) -> Any:  # noqa: ARG003
+    def eval(cls, beta: Symbol) -> Any:  # ruff:ignore[unused-class-method-argument]
         return None
 
     @classmethod
@@ -143,7 +143,7 @@ class lnPi_func_raw(SymFuncBase):
 
     @classmethod
     @override
-    def eval(cls, beta: Symbol) -> Any:  # noqa: ARG003
+    def eval(cls, beta: Symbol) -> Any:  # ruff:ignore[unused-class-method-argument]
         return None
 
     @classmethod

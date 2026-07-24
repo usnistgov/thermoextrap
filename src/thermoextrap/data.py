@@ -93,7 +93,7 @@ def _meta_converter(meta: DataCallbackABC | None) -> DataCallbackABC:
     return meta
 
 
-def _meta_validator(self: Any, attribute: attrs.Attribute[Any], meta: Any) -> None:  # noqa: ARG001
+def _meta_validator(self: Any, attribute: attrs.Attribute[Any], meta: Any) -> None:  # ruff:ignore[unused-function-argument]
     if not isinstance(meta, DataCallbackABC):
         msg = "meta must be None or subclass of DataCallbackABC"
         raise TypeError(msg)
@@ -102,7 +102,7 @@ def _meta_validator(self: Any, attribute: attrs.Attribute[Any], meta: Any) -> No
 
 def _validate_weight(
     instance: DataCentralMomentsVals[Any],
-    attribute: Any,  # noqa: ARG001
+    attribute: Any,  # ruff:ignore[unused-function-argument]
     value: object,
 ) -> None:
     if value is None or isinstance(value, (np.ndarray, xr.DataArray)):
@@ -117,11 +117,11 @@ def _validate_weight(
 
 def _validate_dxduave(
     instance: DataCentralMomentsVals[DataT],
-    attribute: Any,  # noqa: ARG001
+    attribute: Any,  # ruff:ignore[unused-function-argument]
     value: object,
 ) -> None:
     if value is None:
-        if instance._order is None:  # pyright: ignore[reportPrivateUsage] # noqa: SLF001  # pylint: disable=protected-access
+        if instance._order is None:  # pyright: ignore[reportPrivateUsage] # ruff:ignore[private-member-access]  # pylint: disable=protected-access
             msg = "Must pass order if calculating dxduave"
             raise ValueError(msg)
         return
@@ -279,9 +279,9 @@ class DataCallback(DataCallbackABC):
         pass
 
     @override
-    def deriv_args(  # noqa: PLR6301
+    def deriv_args(  # ruff:ignore[no-self-use]
         self,
-        data: SupportsData[Any],  # noqa: ARG002
+        data: SupportsData[Any],  # ruff:ignore[unused-method-argument]
         *,
         deriv_args: DataDerivArgs,
     ) -> DataDerivArgs:
@@ -290,21 +290,21 @@ class DataCallback(DataCallbackABC):
     @override
     def resample(
         self,
-        data: SupportsData[Any],  # noqa: ARG002
+        data: SupportsData[Any],  # ruff:ignore[unused-method-argument]
         *,
-        meta_kws: OptionalKwsAny,  # noqa: ARG002
-        sampler: cmomy.IndexSampler[Any],  # noqa: ARG002
-        **kws: Any,  # noqa: ARG002
+        meta_kws: OptionalKwsAny,  # ruff:ignore[unused-method-argument]
+        sampler: cmomy.IndexSampler[Any],  # ruff:ignore[unused-method-argument]
+        **kws: Any,  # ruff:ignore[unused-method-argument]
     ) -> Self:
         return self
 
     @override
     def reduce(
         self,
-        data: SupportsData[Any],  # noqa: ARG002
+        data: SupportsData[Any],  # ruff:ignore[unused-method-argument]
         *,
-        meta_kws: OptionalKwsAny,  # noqa: ARG002
-        **kws: Any,  # noqa: ARG002
+        meta_kws: OptionalKwsAny,  # ruff:ignore[unused-method-argument]
+        **kws: Any,  # ruff:ignore[unused-method-argument]
     ) -> Self:
         return self
 
@@ -886,7 +886,7 @@ class DataCentralMoments(DataCentralMomentsBase[DataT]):
 
     @classmethod
     @docfiller_shared.decorate
-    def from_resample_vals(  # noqa: PLR0913,PLR0917
+    def from_resample_vals(  # ruff:ignore[too-many-arguments, too-many-positional-arguments]
         cls,
         xv: DataT,
         uv: xr.DataArray,

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from .core.typing_compat import Self
 
 
-def stack_dataarray(  # noqa: C901
+def stack_dataarray(  # ruff:ignore[complex-structure]
     da: xr.DataArray,
     x_dims: str | Sequence[Hashable],
     y_dims: str | Sequence[Hashable] | None = None,
