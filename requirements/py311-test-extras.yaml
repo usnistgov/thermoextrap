@@ -18,7 +18,7 @@ dependencies:
   - pytest-env
   - pytest-sugar
   - pytest-xdist>3.6.0
-  - setuptools<81.0.0
+  - setuptools<84.0.0
   - pip
   - pip:
       - gpflow>=2.9.0

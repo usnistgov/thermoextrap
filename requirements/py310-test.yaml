@@ -28,7 +28,7 @@ dependencies:
   - pytest-sugar
   - pytest-xdist>3.6.0
   - scipy
-  - setuptools<81.0.0
+  - setuptools<84.0.0
   - sympy
   - xarray>=2024.7.0
   - pip

@@ -43,7 +43,7 @@ dependencies:
   - righttyper
   - scipy
   - scipy-stubs
-  - setuptools<81.0.0
+  - setuptools<84.0.0
   - sympy
   - typecheck-runner>=0.2.0
   - types-tensorflow
