@@ -19,7 +19,7 @@ class VolumeExtrapModelIG(ExtrapModel):
 
     # Can't go to higher order in practice, so don't return any symbolic derivatives
     # Instead, just use this to check and make sure not asking for order above 1
-    def calcDerivFuncs(self) -> None:  # noqa: N802  # pyright: ignore[reportIncompatibleMethodOverride]
+    def calcDerivFuncs(self) -> None:  # ruff:ignore[invalid-function-name]  # pyright: ignore[reportIncompatibleMethodOverride]
         if self.maxOrder > 1:
             warn(
                 "Volume extrapolation cannot go above 1st order without derivatives of forces. "
@@ -32,7 +32,7 @@ class VolumeExtrapModelIG(ExtrapModel):
     # Will be very helpful when generalize to different extrapolation techniques
     # (and interpolation)
     @staticmethod
-    def calcDerivVals(refL, x, W):  # noqa: N802, N803  # pyright: ignore[reportIncompatibleMethodOverride]  # pylint: disable=arguments-differ
+    def calcDerivVals(refL, x, W):  # ruff:ignore[invalid-function-name, invalid-argument-name]  # pyright: ignore[reportIncompatibleMethodOverride]  # pylint: disable=arguments-differ
         """
         Calculates specific derivative values at B with data x and U up to max order.
         Returns these derivatives. Only go to first order for volume extrapolation. And

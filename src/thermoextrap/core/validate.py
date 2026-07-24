@@ -53,7 +53,7 @@ def validate_alpha(
 
 # * Validators
 # Used by attrs
-def validator_dims(self: Any, attribute: attrs.Attribute[Any], dims: Any) -> None:  # noqa: ARG001
+def validator_dims(self: Any, attribute: attrs.Attribute[Any], dims: Any) -> None:  # ruff:ignore[unused-function-argument]
     """Attrs validator for dimensions"""
     for d in dims:
         if d not in self.data.dims:
@@ -62,8 +62,8 @@ def validator_dims(self: Any, attribute: attrs.Attribute[Any], dims: Any) -> Non
 
 
 def validator_xarray_typevar(
-    self: Any,  # noqa: ARG001
-    attribute: attrs.Attribute[Any],  # noqa: ARG001
+    self: Any,  # ruff:ignore[unused-function-argument]
+    attribute: attrs.Attribute[Any],  # ruff:ignore[unused-function-argument]
     x: Any,
 ) -> None:
     """Attrs validator for xarray"""

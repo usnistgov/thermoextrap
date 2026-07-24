@@ -483,7 +483,7 @@ def test_mbar(fixture) -> None:
 
 
 class LogAvgExtrapModel(legacy.ExtrapModel):  # pylint: disable=missing-class-docstring
-    def calcDerivVals(self, refB, x, energy):  # noqa: N802, ARG002, N803  # pyright: ignore[reportIncompatibleMethodOverride]   # pylint: disable=arguments-renamed
+    def calcDerivVals(self, refB, x, energy):  # ruff:ignore[invalid-function-name, unused-method-argument, invalid-argument-name]  # pyright: ignore[reportIncompatibleMethodOverride]   # pylint: disable=arguments-renamed
         if x.shape[0] != energy.shape[0]:
             msg = f"First observable dimension {x.shape[0]} and size of potential energy array {energy.shape[0]} do not match!"
             raise ValueError(msg)
@@ -608,13 +608,13 @@ class ExtrapModelDependent(legacy.ExtrapModel):
 
     # Calculates symbolic derivatives up to maximum order given data
     # Returns list of functions that can be used to evaluate derivatives for specific data
-    def calcDerivFuncs(self):  # noqa: N802
+    def calcDerivFuncs(self):  # ruff:ignore[invalid-function-name]
         return [symDerivAvgXdependent(o) for o in range(self.maxOrder + 1)]
 
     # And given data, calculate numerical values of derivatives up to maximum order
     # Will be very helpful when generalize to different extrapolation techniques
     # (and interpolation)
-    def calcDerivVals(self, refB, x, energy):  # noqa: N802, ARG002, N803  # pyright: ignore[reportIncompatibleMethodOverride]  # pylint: disable=arguments-renamed
+    def calcDerivVals(self, refB, x, energy):  # ruff:ignore[invalid-function-name, unused-method-argument, invalid-argument-name]  # pyright: ignore[reportIncompatibleMethodOverride]  # pylint: disable=arguments-renamed
         """
         Calculates specific derivative values at B with data x and energy up to max order.
         Returns these derivatives.
@@ -766,7 +766,7 @@ class LogAvgExtrapModelDependent(ExtrapModelDependent):
     involves the negative logarithm of an average.
     """
 
-    def calcDerivVals(self, refB, x, energy):  # noqa: N802, N803, ARG002
+    def calcDerivVals(self, refB, x, energy):  # ruff:ignore[invalid-function-name, invalid-argument-name, unused-method-argument]
         """
         Calculates specific derivative values at B with data x and energy up to max order.
         Returns these derivatives.

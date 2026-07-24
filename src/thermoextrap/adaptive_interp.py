@@ -273,7 +273,7 @@ def train_iterative(
     return model, info  # pyright: ignore[reportPossiblyUnboundVariable]
 
 
-def train_recursive(  # noqa: C901,PLR0913,PLR0914,PLR0917
+def train_recursive(  # ruff:ignore[complex-structure, too-many-arguments, too-many-locals, too-many-positional-arguments]
     alphas: ArrayLike,
     factory_state: FactoryState[SupportsModelDerivsDataArrayT],
     factory_statecollection: FactoryStateCollection[SupportsModelDerivsDataArrayT,],
@@ -609,7 +609,7 @@ def factory_state_idealgas(
 
 def callback_plot_progress(
     model: StateCollection[xr.DataArray, SupportsModelDerivsDataArrayT],
-    alphas: ArrayLike,  # noqa: ARG001
+    alphas: ArrayLike,  # ruff:ignore[unused-function-argument]
     info_dict: _InfoDict[xr.DataArray],
     verbose: bool = True,
     maxdepth_stop: int | None = None,

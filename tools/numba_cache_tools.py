@@ -1,6 +1,6 @@
 """Class to override numba cache location/tagging"""
 
-# ruff: noqa: D102
+# ruff:file-ignore[undocumented-public-method]
 # pyright: reportMissingTypeStubs=false, reportImplicitOverride=false
 # pylint: disable=missing-class-docstring
 from __future__ import annotations

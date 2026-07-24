@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import (
-    Callable,  # noqa: F401
-    Hashable,  # noqa: F401
-    Iterable,  # noqa: F401
+    Callable,  # ruff:ignore[unused-import]
+    Hashable,  # ruff:ignore[unused-import]
+    Iterable,  # ruff:ignore[unused-import]
     Iterator,
     Mapping,
     Sequence,
@@ -33,11 +33,11 @@ from numpy.typing import NDArray
 from .typing_compat import Self, TypeAlias, TypeVar
 
 if TYPE_CHECKING:
-    import tensorflow as tf  # noqa: F401
+    import tensorflow as tf  # ruff:ignore[unused-import]
     from cmomy.resample.typing import SamplerType
     from numpy.typing import ArrayLike
     from sympy.core.expr import (  # pyright: ignore[reportMissingTypeStubs]
-        Expr,  # noqa: F401
+        Expr,  # ruff:ignore[unused-import]
     )
 
 
