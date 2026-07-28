@@ -261,7 +261,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         X = tf.convert_to_tensor(X)
         X2 = X if X2 is None else tf.convert_to_tensor(X2)
 
-        k_chunk_size_array = tf.cast(self.k_chunk_size, tf.int32)
+        k_chunk_size_array = tf.cast([self.k_chunk_size], tf.int32)
         # Move through X and X2 in chunks
         # Then put full matrix together at end
         n_chunks_X = tf.cast(tf.math.ceil(tf.shape(X)[0] / self.k_chunk_size), tf.int32)
