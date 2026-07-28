@@ -469,7 +469,7 @@ class RecursiveInterp:
 
         # Before loop, set up plot if wanted
         if do_plot:
-            pcolors = plt.cm.cividis(np.linspace(0.0, 1.0, len(edge_sets)))  # type: ignore[attr-defined,unused-ignore] # pylint: disable=no-member  # pyright: ignore[reportUnknownVariableType, reportAttributeAccessIssue]
+            pcolors = plt.cm.cividis(np.linspace(0.0, 1.0, len(edge_sets)))  # type: ignore[attr-defined,unused-ignore] # pylint: disable=no-member  # pyright: ignore[reportUnknownVariableType]
             pfig, pax = plt.subplots()
             plotymin = 1e10
             plotymax = -1e10
