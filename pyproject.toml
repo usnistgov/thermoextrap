@@ -6,7 +6,7 @@ requires = [
 
 [project]
 name = "thermoextrap"
-version = "1.2.0"
+version = "1.2.1"
 description = "Thermodynamic extrapolation"
 readme = "README.md"
 keywords = [
