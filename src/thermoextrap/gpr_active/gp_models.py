@@ -177,7 +177,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         # return self.lengthscales.shape.ndims > 0
         return False
 
-    def _internal_K(self, X: TensorType, X2: TensorType) -> Tensor:
+    def _internal_K(self, X: tf.Tensor, X2: tf.Tensor) -> Tensor:
 
         x1, d1 = self._split_x_into_locs_and_deriv_info(X)
         x2, d2 = self._split_x_into_locs_and_deriv_info(X2)
@@ -261,10 +261,11 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         X = tf.convert_to_tensor(X)
         X2 = X if X2 is None else tf.convert_to_tensor(X2)
 
+        k_chunk_size_array = tf.cast(self.k_chunk_size, tf.int32)
         # Move through X and X2 in chunks
         # Then put full matrix together at end
         n_chunks_X = tf.cast(tf.math.ceil(tf.shape(X)[0] / self.k_chunk_size), tf.int32)
-        chunk_sizes_X = tf.tile([self.k_chunk_size], [n_chunks_X - 1])
+        chunk_sizes_X = tf.tile(k_chunk_size_array, [n_chunks_X - 1])
         chunk_sizes_X = tf.concat(
             [chunk_sizes_X, [tf.math.mod(tf.shape(X)[0], self.k_chunk_size)]], axis=0
         )
@@ -273,7 +274,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         n_chunks_X2 = tf.cast(
             tf.math.ceil(tf.shape(X2)[0] / self.k_chunk_size), tf.int32
         )
-        chunk_sizes_X2 = tf.tile([self.k_chunk_size], [n_chunks_X2 - 1])
+        chunk_sizes_X2 = tf.tile(k_chunk_size_array, [n_chunks_X2 - 1])
         chunk_sizes_X2 = tf.concat(
             [chunk_sizes_X2, [tf.math.mod(tf.shape(X2)[0], self.k_chunk_size)]], axis=0
         )
@@ -282,9 +283,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
         row_list = []
         for ch_X in chunks_X:
-            column_list = []
-            for ch_X2 in chunks_X2:
-                column_list.append(self._internal_K(ch_X, ch_X2))
+            column_list = [self._internal_K(ch_X, ch_X2) for ch_X2 in chunks_X2]
             row_list.append(tf.concat(column_list, axis=1))
 
         return tf.concat(row_list, axis=0)
