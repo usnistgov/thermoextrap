@@ -817,10 +817,13 @@ def typecheck(  # ruff:ignore[too-many-branches]
         cmd = [
             "mypy",
             "basedpyright",
+            # TODO(wpk): enable pyrefly and ty  # ruff:ignore[line-contains-todo, missing-todo-link]
             # "pyrefly",
             # "ty",
             "pylint",
-            # "typecheck-notebook",
+            # TODO(wpk): enable notebook checks  # ruff:ignore[line-contains-todo, missing-todo-link]
+            # "mypy-notebook",
+            # "pylint-notebook",
         ]
 
     # set the cache directory for mypy
