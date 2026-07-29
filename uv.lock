@@ -6089,7 +6089,7 @@ dev = [
     { name = "nbclient", marker = "python_full_version >= '3.12'" },
     { name = "nbconvert", marker = "python_full_version >= '3.12'" },
     { name = "nbval", marker = "python_full_version >= '3.12'" },
-    { name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2026.4.10" },
+    { name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2026.7.11" },
     { name = "pandas", marker = "python_full_version >= '3.12'", specifier = ">=2.3" },
     { name = "pandas-stubs", marker = "python_full_version >= '3.12'" },
     { name = "pylint", marker = "python_full_version >= '3.12'" },
@@ -6145,7 +6145,7 @@ notebook = [
 ]
 nox = [
     { name = "dotenv", marker = "python_full_version >= '3.12'" },
-    { name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2026.4.10" },
+    { name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2026.7.11" },
 ]
 pandas = [{ name = "pandas", specifier = ">=2.3" }]
 pylint = [{ name = "pylint" }]
@@ -6184,7 +6184,7 @@ test-notebook = [
 type = [
     { name = "dotenv", marker = "python_full_version >= '3.12'" },
     { name = "matplotlib", marker = "python_full_version == '3.12.*'" },
-    { name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2026.4.10" },
+    { name = "nox", marker = "python_full_version >= '3.12'", specifier = ">=2026.7.11" },
     { name = "pandas-stubs" },
     { name = "pylint" },
     { name = "pytest" },

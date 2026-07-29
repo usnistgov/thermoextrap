@@ -136,12 +136,8 @@ docs-spelling = [
 ipython = [ "ipython" ]
 mypy = [ "mypy[faster-cache]>=2.3.0" ]
 notebook = [ "ipykernel", "nbclient" ]
-<<<<<<< before updating
-nox = [ "dotenv", "nox>=2026.4.10" ]
+nox = [ "dotenv", "nox>=2026.7.11" ]
 pandas = [ "pandas>=2.3" ]
-=======
-nox = [ "nox>=2026.7.11" ]
->>>>>>> after updating
 pylint = [ "pylint" ]
 pytest = [ "pytest" ]
 pytest-accept = [ "pytest-accept" ]
@@ -308,7 +304,8 @@ strict = [
     "tools/*.py",
 ]
 include = [
-    "examples/usage/*.ipynb",
+    # TODO(wpk): enable this
+    # "examples/usage/*.ipynb",
     "noxfile.py",
     "src",
     "tests",
@@ -507,11 +504,6 @@ scripts = [
     "noxfile.py",
     "tools/check_dist_version.py",
     "tools/clean_kernelspec.py",
-<<<<<<< before updating
-    "tools/sync_pyproject_min_versions.py",
-=======
-    "tools/cog_runner.py",
->>>>>>> after updating
 ]
 
 [[tool.uv-locker.requirements]]

@@ -4,10 +4,7 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "nox>=2026.7.11",
-<<<<<<< before updating
 #     "dotenv>=0.9.9"
-=======
->>>>>>> after updating
 # ]
 # ///
 
@@ -820,15 +817,13 @@ def typecheck(  # ruff:ignore[too-many-branches]
         cmd = [
             "mypy",
             "basedpyright",
+            # TODO(wpk): enable pyrefly and ty  # ruff:ignore[line-contains-todo, missing-todo-link]
             # "pyrefly",
             # "ty",
             "pylint",
-<<<<<<< before updating
-            # "typecheck-notebook",
-=======
-            "mypy-notebook",
-            "pylint-notebook",
->>>>>>> after updating
+            # TODO(wpk): enable notebook checks  # ruff:ignore[line-contains-todo, missing-todo-link]
+            # "mypy-notebook",
+            # "pylint-notebook",
         ]
 
     # set the cache directory for mypy
