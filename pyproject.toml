@@ -195,6 +195,12 @@ src_dir = [ "src" ]
 toplevel = [ "thermoextrap" ]
 
 [tool.pyproject-fmt]
+<<<<<<< before updating
+=======
+indent = 4
+keep_full_version = true
+# max_supported_python = "3.13"
+>>>>>>> after updating
 expand_tables = [
     "project.entry-points",
     "project.optional-dependencies",
@@ -208,9 +214,12 @@ expand_tables = [
     "tool.uv.dependency-groups",
     "tool.uv.exclude-newer-package",
 ]
+<<<<<<< before updating
 indent = 4
 keep_full_version = true
 max_supported_python = "3.13"
+=======
+>>>>>>> after updating
 
 [tool.typos.default]
 extend-ignore-identifiers-re = [
