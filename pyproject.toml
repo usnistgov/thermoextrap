@@ -284,8 +284,6 @@ ruff.strictly-empty-init-modules = false
 "examples/usage/**/*.ipynb" = [
     "ANN",
     "B018",    # - Don't remove useless expressions in notebooks
-    # "D100",  # - undocumented-public-module
-    # "INP001",
     "ARG001",
     "ARG002",
     "D",
