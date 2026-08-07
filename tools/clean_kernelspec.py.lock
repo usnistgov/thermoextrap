@@ -660,15 +660,15 @@ wheels = [
 
 [[package]]
 name = "jupyter-builder"
-version = "1.1.1"
+version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jupyter-core" },
     { name = "traitlets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c3/61/47f7ae054f5cd3983c10e1d65a6eb7fcd4b87ebb1056e190ef7d63ff4f19/jupyter_builder-1.1.1.tar.gz", hash = "sha256:1a13977912b08deda77fce2c803940131c27cf77a27ed64b9ffca25aa0ed7e6c", size = 971667, upload-time = "2026-07-17T13:14:47.761Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/76/4696d0d0b6903e96ba4f959427c7aad985015dd2726e643eadee2a1eec72/jupyter_builder-1.2.0.tar.gz", hash = "sha256:e62ed4a7e224c73197dd76974754c93070c9f0451ca450a2c81126838b00f866", size = 976342, upload-time = "2026-07-30T07:42:01.151Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/cc/f6a12de1c890ea5dd2816c5c76d5ac6d3ed52db3c37f78691328207d13b9/jupyter_builder-1.1.1-py3-none-any.whl", hash = "sha256:f9c14bc55c0488a073f62af12d468936fcf9ecb7e9dd802f6f9c33de46ad70db", size = 913264, upload-time = "2026-07-17T13:14:45.857Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/05/a0ac568fa8dfff7c697545956990f7aa222f59d6ec50f21a91170e24a69b/jupyter_builder-1.2.0-py3-none-any.whl", hash = "sha256:c8a003714a118ebb590f79b459e1e384dee7dce9aebaa86ace045f5960997fe4", size = 914544, upload-time = "2026-07-30T07:41:59.053Z" },
 ]
 
 [[package]]
