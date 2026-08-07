@@ -10,7 +10,6 @@ import tensorflow as tf
 import xarray as xr
 from module_utilities import cached
 
-
 from thermoextrap.stack import multiindex_to_array
 
 
@@ -82,14 +81,13 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         if len(self.param_syms) == 0:
             raise ValueError(
                 "Provided kernel expression only takes inputs x1 and x2, "
-                + "no optimizable parameters!"
+                "no optimizable parameters!"
             )
         # Make sure that parameters here match those in kernel_params, if it's provided
         if bool(kernel_params):
-            if (
-                [s.name for s in self.param_syms].sort()
-                != list(kernel_params.keys()).sort()
-            ):
+            if [s.name for s in self.param_syms].sort() != list(
+                kernel_params.keys()
+            ).sort():
                 raise ValueError(
                     "Symbol names in kernel_expr must match keys in " + "kernel_params!"
                 )
@@ -240,7 +238,7 @@ class DerivativeKernel(gpflow.kernels.Kernel):
 
 # A custom GPFlow likelihood with heteroscedastic Gaussian noise
 # Comes from GPFlow tutorial on this subject
-class HeteroscedasticGaussian(gpflow.likelihoods.Likelihood):   # pylint: disable=missing-class-docstring
+class HeteroscedasticGaussian(gpflow.likelihoods.Likelihood):  # pylint: disable=missing-class-docstring
     def __init__(self, **kwargs):
         # this likelihood expects a single latent function F, and two columns in
         # the data matrix Y:
@@ -441,7 +439,7 @@ def factory_gprmodel(data, **kws):
 
     # Define RBF kernel expression and parameters
     var = sp.symbols("var")
-    l = sp.symbols("l")  # noqa: E741
+    l = sp.symbols("l")  # ruff: ignore[ambiguous-variable-name]
     x1 = sp.symbols("x1")
     x2 = sp.symbols("x2")
     rbf_kern_expr = var * sp.exp(-0.5 * (x1 / l - x2 / l) ** 2)

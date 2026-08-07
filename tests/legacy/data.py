@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from thermoextrap.data import AbstractData
-
 from typing import TYPE_CHECKING, Generic
 
 import attrs
@@ -16,9 +14,12 @@ from thermoextrap.core.docstrings import DOCFILLER_SHARED
 from thermoextrap.core.typing import DataT
 from thermoextrap.core.validate import validator_xarray_typevar
 from thermoextrap.core.xrutils import xrwrap_uv, xrwrap_xv
-
-from thermoextrap.data import _raise_if_not_xarray, _raise_if_not_dataarray, DataSelector
-
+from thermoextrap.data import (
+    AbstractData,
+    DataSelector,
+    _raise_if_not_dataarray,
+    _raise_if_not_xarray,
+)
 
 if TYPE_CHECKING:
     from typing import Any, ClassVar
@@ -38,8 +39,8 @@ if TYPE_CHECKING:
     from thermoextrap.core.typing_compat import Self
 
 
-
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
+
 
 # * DataValues ----------------------------------------------------------------
 @attrs.frozen

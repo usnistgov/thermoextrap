@@ -33,9 +33,7 @@ class RecursiveInterp:
         )
         self.modelParams = []  # Model params for piecewise intervals
         self.modelParamErrs = []  # Bootstrapped uncertainties in model parameters
-        self.xData = (
-            []
-        )  # Observable data generated at each edge point - CONSIDER WAYS TO SAVE MEMORY
+        self.xData = []  # Observable data generated at each edge point - CONSIDER WAYS TO SAVE MEMORY
         self.uData = []  # Potential energy data generated at each edge point
         self.edgeB = np.array(
             edgeB
@@ -342,16 +340,18 @@ class RecursiveInterp:
             # both the parameters AND the reference state points
             # For the latter, must set manually
             if (paramInd := np.where(self.edgeB <= beta)[0][-1]) == len(self.edgeB) - 1:
-                self.model.refB = np.array(
-                    [self.edgeB[paramInd - 1], self.edgeB[paramInd]]
-                )
+                self.model.refB = np.array([
+                    self.edgeB[paramInd - 1],
+                    self.edgeB[paramInd],
+                ])
                 predictVals[i] = self.model.predict(
                     beta, params=self.modelParams[paramInd - 1], order=self.maxOrder
                 )[0, :]
             else:
-                self.model.refB = np.array(
-                    [self.edgeB[paramInd], self.edgeB[paramInd + 1]]
-                )
+                self.model.refB = np.array([
+                    self.edgeB[paramInd],
+                    self.edgeB[paramInd + 1],
+                ])
                 predictVals[i] = self.model.predict(
                     beta, params=self.modelParams[paramInd], order=self.maxOrder
                 )[0, :]

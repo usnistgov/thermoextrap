@@ -1,6 +1,6 @@
 import argparse
 import glob
-import os
+import pathlib
 import sys
 
 import numpy as np
@@ -13,10 +13,9 @@ from thermoextrap.gpr_active import active_utils
 def parse_bool(astr):
     if astr in {"True", "true", "Yes", "yes", "Y", "y"}:
         return True
-    elif astr in {"False", "false", "No", "no", "N", "n"}:
+    if astr in {"False", "false", "No", "no", "N", "n"}:
         return False
-    else:
-        raise ValueError("Provided string %s is not convertible to boolean." % astr)
+    raise ValueError("Provided string %s is not convertible to boolean." % astr)
 
 
 def transform_Cv(x, y, y_var):
@@ -48,7 +47,7 @@ def main(
 
     dat_in = []
     for b in [beta1, beta2]:
-        if os.path.isdir(f"{output_dir}/beta_{b:f}"):
+        if pathlib.Path(f"{output_dir}/beta_{b:f}").is_dir():
             info_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/polymer_out*.txt"))
             bias_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/cv_bias_out*.txt"))
             if obs_type == "Rg":

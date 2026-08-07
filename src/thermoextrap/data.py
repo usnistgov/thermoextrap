@@ -281,7 +281,7 @@ class DataCallback(DataCallbackABC):
     @override
     def deriv_args(  # ruff:ignore[no-self-use]
         self,
-        data: SupportsData[Any],  # ruff:ignore[unused-method-argument]
+        data: SupportsData[Any],
         *,
         deriv_args: DataDerivArgs,
     ) -> DataDerivArgs:
@@ -290,21 +290,21 @@ class DataCallback(DataCallbackABC):
     @override
     def resample(
         self,
-        data: SupportsData[Any],  # ruff:ignore[unused-method-argument]
+        data: SupportsData[Any],
         *,
-        meta_kws: OptionalKwsAny,  # ruff:ignore[unused-method-argument]
-        sampler: cmomy.IndexSampler[Any],  # ruff:ignore[unused-method-argument]
-        **kws: Any,  # ruff:ignore[unused-method-argument]
+        meta_kws: OptionalKwsAny,
+        sampler: cmomy.IndexSampler[Any],
+        **kws: Any,
     ) -> Self:
         return self
 
     @override
     def reduce(
         self,
-        data: SupportsData[Any],  # ruff:ignore[unused-method-argument]
+        data: SupportsData[Any],
         *,
-        meta_kws: OptionalKwsAny,  # ruff:ignore[unused-method-argument]
-        **kws: Any,  # ruff:ignore[unused-method-argument]
+        meta_kws: OptionalKwsAny,
+        **kws: Any,
     ) -> Self:
         return self
 

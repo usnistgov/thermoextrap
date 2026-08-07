@@ -1,12 +1,14 @@
 """Interpolation class."""
+
 # pylint: disable=redefined-variable-type,arguments-renamed,duplicate-code
 from __future__ import annotations
 
 import math
+
 import numpy as np
+from cmomy.random import validate_rng
 from scipy.special import factorial
 
-from cmomy.random import validate_rng
 from .extrap import ExtrapModel
 
 
@@ -266,9 +268,10 @@ class InterpModel(ExtrapModel):
         pOrder = len(params) - 1
 
         # Calculate the polynomial interpolation values at each desired beta
-        outvals = np.zeros(
-            (len(B), self.x.shape[-1])
-        )  # Each row is a different beta value
+        outvals = np.zeros((
+            len(B),
+            self.x.shape[-1],
+        ))  # Each row is a different beta value
         for i, beta in enumerate(B):
             betaPower = beta ** (np.arange(pOrder + 1))
             betaPower = np.array([betaPower]).T

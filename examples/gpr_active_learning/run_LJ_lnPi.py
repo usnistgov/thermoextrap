@@ -24,17 +24,17 @@ SRS_base_dir = os.path.expanduser("~/bin/thermoextrap/docs/notebooks/gpr/SRS_dat
 def get_sim_activity(Tr):
     if Tr == 0.700:
         return -6.250
-    elif Tr in {0.73, 0.74}:
+    if Tr in {0.73, 0.74}:
         return -5.500
-    elif Tr == 0.770:
+    if Tr == 0.770:
         return -5.800
-    elif Tr == 0.850:
+    if Tr == 0.850:
         return -4.800
-    elif Tr == 0.950:
+    if Tr == 0.950:
         return -4.100
-    elif Tr == 1.100:
+    if Tr == 1.100:
         return -3.380
-    elif Tr == 1.200:
+    if Tr == 1.200:
         return -3.000
     return None
 
@@ -45,26 +45,20 @@ def load_lnPi_info(Tr, ref_mu=-4.0, run_num=None):
         str("%1.2f" % Tr).replace(".", ""),
     )
 
-    U_moms = np.array(
-        [
-            np.loadtxt(f)[:N_cutoff]
-            for f in sorted(glob.glob("%s*.energy.dat" % file_prefix))
-        ]
-    )
+    U_moms = np.array([
+        np.loadtxt(f)[:N_cutoff]
+        for f in sorted(glob.glob("%s*.energy.dat" % file_prefix))
+    ])
     # For first column of U information (which is currently N), set to ones, which is zeroth moment
     U_moms[:, :, 0] = np.ones(U_moms.shape[:-1])
-    lnPis = np.array(
-        [
-            np.loadtxt(f)[:N_cutoff, 1]
-            for f in sorted(glob.glob("%s*.lnpi.dat" % file_prefix))
-        ]
-    )
-    N_vals = np.array(
-        [
-            np.loadtxt(f)[:N_cutoff, 0]
-            for f in sorted(glob.glob("%s*.lnpi.dat" % file_prefix))
-        ]
-    )
+    lnPis = np.array([
+        np.loadtxt(f)[:N_cutoff, 1]
+        for f in sorted(glob.glob("%s*.lnpi.dat" % file_prefix))
+    ])
+    N_vals = np.array([
+        np.loadtxt(f)[:N_cutoff, 0]
+        for f in sorted(glob.glob("%s*.lnpi.dat" % file_prefix))
+    ])
     mu = Tr * get_sim_activity(
         Tr
     )  # Tr is kB*T/eps, activity is mu/kB*T, so getting mu/eps
@@ -159,8 +153,7 @@ def tag_phases(list_of_phases):
 
     if len(list_of_phases) == 2:
         return np.argsort(argmax0)
-    else:
-        return np.where(argmax0 <= list_of_phases[0].shape[0] / 2, 0, 1)
+    return np.where(argmax0 <= list_of_phases[0].shape[0] / 2, 0, 1)
 
 
 def get_VLE_info(lnPi, ref_activity, beta, vol=512.0, efac=10.0):
@@ -235,9 +228,10 @@ def get_sat_props(lnPi, ref_activity, Tr, lnPi_vars=None, N_boot=100):
     if lnPi_vars is not None:
         # Create data for GP model over N dimension
         # No derivatives here, so zeros for second column
-        x_input = np.vstack(
-            [np.arange(1, lnPi.shape[0]), np.zeros(lnPi.shape[0] - 1)]
-        ).T
+        x_input = np.vstack([
+            np.arange(1, lnPi.shape[0]),
+            np.zeros(lnPi.shape[0] - 1),
+        ]).T
         y_input = np.reshape(lnPi, (-1, 1))[1:, :]
         cov_input = np.diag(np.squeeze(lnPi_vars)[1:])
         # Note that ignoring modeling of N=0 bin... will be zero no matter what, with std of 0
@@ -306,12 +300,11 @@ def get_sat_props(lnPi, ref_activity, Tr, lnPi_vars=None, N_boot=100):
         )
         return props, props_conf_int
 
-    else:
-        this_vle_info = get_VLE_info(lnPi, ref_activity, 1 / Tr)
-        lnz = this_vle_info.xge.lnz.isel(component=0, sample=0).values
-        densities = this_vle_info.xge.dens.isel(component=0).values
-        pressures = this_vle_info.xge.pressure().values
-        return np.hstack([lnz, densities, pressures])
+    this_vle_info = get_VLE_info(lnPi, ref_activity, 1 / Tr)
+    lnz = this_vle_info.xge.lnz.isel(component=0, sample=0).values
+    densities = this_vle_info.xge.dens.isel(component=0).values
+    pressures = this_vle_info.xge.pressure().values
+    return np.hstack([lnz, densities, pressures])
 
 
 def main():
@@ -357,9 +350,10 @@ def main():
         gp_pred_std = np.concatenate(
             [np.zeros((gp_pred_std.shape[0], 1)), gp_pred_std], axis=-1
         )
-        gp_pred_conf_int = np.array(
-            [gp_pred_mu - 2.0 * gp_pred_std, gp_pred_mu + 2.0 * gp_pred_std]
-        )
+        gp_pred_conf_int = np.array([
+            gp_pred_mu - 2.0 * gp_pred_std,
+            gp_pred_mu + 2.0 * gp_pred_std,
+        ])
         N_vals = np.arange(gp_pred_mu.shape[1])
 
         # Save GP model info and predictions

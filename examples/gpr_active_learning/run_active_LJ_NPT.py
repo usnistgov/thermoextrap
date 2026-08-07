@@ -17,10 +17,9 @@ from thermoextrap.gpr_active import active_utils
 def parse_bool(astr):
     if astr in {"True", "true", "Yes", "yes", "Y", "y"}:
         return True
-    elif astr in {"False", "false", "No", "no", "N", "n"}:
+    if astr in {"False", "false", "No", "no", "N", "n"}:
         return False
-    else:
-        raise ValueError("Provided string %s is not convertible to boolean." % astr)
+    raise ValueError("Provided string %s is not convertible to boolean." % astr)
 
 
 class StatePsat:
@@ -149,9 +148,11 @@ class DensityGPModel:
         for k in range(self.cov_input.shape[0]):
             new_cov.append(linalg.block_diag(self.cov_input[k], var[0, k]))
         self.cov_input = np.array(new_cov)
-        self.gp = active_utils.create_base_GP_model(
-            (self.x_input, self.y_input, self.cov_input)
-        )
+        self.gp = active_utils.create_base_GP_model((
+            self.x_input,
+            self.y_input,
+            self.cov_input,
+        ))
         active_utils.train_GPR(
             self.gp, start_params=[p.numpy() for p in self.gp.trainable_parameters]
         )
@@ -164,12 +165,10 @@ def find_local_mins(x, pad=20):
     for i in range(1, len(x) - 1):
         # Set lower index to current minus padding, or 0, whichever is greater
         lower = i - pad
-        if lower < 0:
-            lower = 0
+        lower = max(lower, 0)
         # Set upper index to current plus padding, or size of x, whichever is smaller
         upper = i + pad + 1
-        if upper > len(x):
-            upper = len(x)
+        upper = min(upper, len(x))
         # Find minimum over this window
         this_window = x[lower:upper]
         this_min = np.min(this_window)
@@ -181,7 +180,7 @@ def find_local_mins(x, pad=20):
             )
             continue
         # Next check if only this index is minimum, in which case it is a local minimum
-        elif x[i] == this_min:
+        if x[i] == this_min:
             mins.append(i)
 
     return mins
@@ -199,9 +198,7 @@ def find_phase_boundary(lnPi, pad=20):
             break
     if len(local_mins) > 1 and pad > len(lnPi) // 2:
         msg = ">1 local minima found, even with padding of full width of lnPi"
-        raise AttributeError(
-            msg
-        )
+        raise AttributeError(msg)
 
     # Looking for a local minimum in between two local maxima, ideally
     # Still useful to look for maxima either way
@@ -240,10 +237,9 @@ def find_phase_boundary(lnPi, pad=20):
             if len(local_maxs) == 0:
                 # If no local min or max, just monotonically decreases
                 pb = len(lnPi) // 2
-            else:
-                if curr_min > local_maxs[0]:
-                    # If global min is beyond a single local maximum, still set phase boundary to 1
-                    pb = len(lnPi) // 2
+            elif curr_min > local_maxs[0]:
+                # If global min is beyond a single local maximum, still set phase boundary to 1
+                pb = len(lnPi) // 2
     else:
         # Check to make sure have at least one local maximum if have local minimum
         #         if len(local_maxs) == 0:
@@ -425,9 +421,10 @@ def main(inp_files, output_dir, mcf_file, ff_file, pdb_file, no_stop):
         cov_info.append(np.array(this_cov))
         # Input locations for GP are beta and derivative orders in second column
         x_info.append(
-            np.vstack(
-                [b * np.ones(this_derivs.shape[0]), np.arange(this_derivs.shape[0])]
-            ).T
+            np.vstack([
+                b * np.ones(this_derivs.shape[0]),
+                np.arange(this_derivs.shape[0]),
+            ]).T
         )
 
     # Finish assembling input for GP over densities

@@ -2,6 +2,7 @@ import copy
 import glob
 import locale
 import os
+import pathlib
 import sys
 
 import feasst as fst
@@ -111,7 +112,10 @@ def poly_sim_NVT(
         if i == 0:
             grows.extend((for_grow, rev_grow))
         else:
-            grows.extend((for_grow + copy.deepcopy(grows[-2]), rev_grow + copy.deepcopy(grows[-2])))
+            grows.extend((
+                for_grow + copy.deepcopy(grows[-2]),
+                rev_grow + copy.deepcopy(grows[-2]),
+            ))
 
     # Only use a subset of the possible partial regrowth moves
     n_regrow = [1, 2, 3, 4, 9, 19]
@@ -136,24 +140,18 @@ def poly_sim_NVT(
     steps_per = str(int(steps_per))
     mc.add(
         fst.MakeLog(
-            fst.args(
-                {
-                    "trials_per": steps_per,
-                    "file_name": os.path.join(file_prefix, "mc_info%i.txt" % sim_num),
-                }
-            )
+            fst.args({
+                "trials_per": steps_per,
+                "file_name": os.path.join(file_prefix, "mc_info%i.txt" % sim_num),
+            })
         )
     )
     mc.add(
         fst.MakeMovie(
-            fst.args(
-                {
-                    "trials_per": steps_per,
-                    "file_name": os.path.join(
-                        file_prefix, traj_name + "%i.xyz" % sim_num
-                    ),
-                }
-            )
+            fst.args({
+                "trials_per": steps_per,
+                "file_name": os.path.join(file_prefix, traj_name + "%i.xyz" % sim_num),
+            })
         )
     )
 
@@ -176,7 +174,9 @@ def poly_sim_NVT(
 
     # Set up file to hold CV info (RG^2)
     header = "#Step     Rg^2 (nm^2)    Bias (kJ/mole)"
-    rg_file = open(os.path.join(file_prefix, bias_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False))
+    rg_file = pathlib.Path(
+        os.path.join(file_prefix, bias_name + "%i.txt" % sim_num)
+    ).open("w", encoding=locale.getpreferredencoding(False))
     rg_file.write("%s\n" % header)
 
     # Loop over
@@ -194,11 +194,15 @@ def poly_sim_NVT(
     rg_file.close()
 
     # Need to modify some files to fit with expected formatting/naming
-    with open(os.path.join(file_prefix, "mc_info%i.txt" % sim_num), encoding=locale.getpreferredencoding(False)) as f:
+    with pathlib.Path(os.path.join(file_prefix, "mc_info%i.txt" % sim_num)).open(
+        encoding=locale.getpreferredencoding(False)
+    ) as f:
         log = f.readlines()
     log = [line.strip(",").replace(",", "  ") for line in log]
     log[0] = "#" + log[0]
-    with open(os.path.join(file_prefix, info_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False)) as f:
+    with pathlib.Path(os.path.join(file_prefix, info_name + "%i.txt" % sim_num)).open(
+        "w", encoding=locale.getpreferredencoding(False)
+    ) as f:
         f.writelines(log)
 
 
@@ -273,13 +277,11 @@ def poly_sim_ExpandedBeta(
     # Set up flat histogramming in beta space
     delta_beta = (max_beta_fac * beta - min_beta_fac * beta) / (50 - 1)
     beta_hist = fst.Histogram(
-        fst.args(
-            {
-                "width": str(delta_beta),
-                "max": str(max_beta_fac * beta),
-                "min": str(min_beta_fac * beta),
-            }
-        )
+        fst.args({
+            "width": str(delta_beta),
+            "max": str(max_beta_fac * beta),
+            "min": str(min_beta_fac * beta),
+        })
     )
     # edges_beta_hist = (1.0/((1.0/(max_beta_fac*beta))*(max_beta_fac/min_beta_fac)**(np.arange(20)/19)))[::-1]
     # edges_beta_hist = np.linspace(min_beta_fac*beta, max_beta_fac*beta, 50)
@@ -289,9 +291,11 @@ def poly_sim_ExpandedBeta(
         fst.MakeFlatHistogram(
             fst.MakeMacrostateBeta(beta_hist),
             fst.MakeWLTM(
-                fst.args(
-                    {"collect_flatness": "18", "min_flatness": "22", "min_sweeps": "10"}
-                )
+                fst.args({
+                    "collect_flatness": "18",
+                    "min_flatness": "22",
+                    "min_sweeps": "10",
+                })
             ),
         )
     )
@@ -319,7 +323,10 @@ def poly_sim_ExpandedBeta(
         if i == 0:
             grows.extend((for_grow, rev_grow))
         else:
-            grows.extend((for_grow + copy.deepcopy(grows[-2]), rev_grow + copy.deepcopy(grows[-2])))
+            grows.extend((
+                for_grow + copy.deepcopy(grows[-2]),
+                rev_grow + copy.deepcopy(grows[-2]),
+            ))
 
     # Only use a subset of the possible partial regrowth moves
     n_regrow = [1, 2, 4, 9, 19]
@@ -348,49 +355,39 @@ def poly_sim_ExpandedBeta(
     steps_per = str(int(steps_per))
     mc.add(
         fst.MakeLog(
-            fst.args(
-                {
-                    "trials_per": steps_per,
-                    "file_name": os.path.join(file_prefix, "mc_info%i.txt" % sim_num),
-                }
-            )
+            fst.args({
+                "trials_per": steps_per,
+                "file_name": os.path.join(file_prefix, "mc_info%i.txt" % sim_num),
+            })
         )
     )
     mc.add(
         fst.MakeMovie(
-            fst.args(
-                {
-                    "trials_per": steps_per,
-                    "file_name": os.path.join(
-                        file_prefix, traj_name + "%i.xyz" % sim_num
-                    ),
-                }
-            )
+            fst.args({
+                "trials_per": steps_per,
+                "file_name": os.path.join(file_prefix, traj_name + "%i.xyz" % sim_num),
+            })
         )
     )
     mc.add(fst.MakeCriteriaUpdater(fst.args({"trials_per": steps_per})))
     mc.add(
         fst.MakeCriteriaWriter(
-            fst.args(
-                {
-                    "trials_per": steps_per,
-                    "file_name": os.path.join(file_prefix, "beta_crit.txt"),
-                    "file_name_append_phase": "true",
-                }
-            )
+            fst.args({
+                "trials_per": steps_per,
+                "file_name": os.path.join(file_prefix, "beta_crit.txt"),
+                "file_name_append_phase": "true",
+            })
         )
     )
     mc.add(
         fst.MakeEnergy(
-            fst.args(
-                {
-                    "file_name": os.path.join(file_prefix, "beta_energy"),
-                    "file_name_append_phase": "true",
-                    "trials_per_update": "1",
-                    "trials_per_write": steps_per,
-                    "multistate": "true",
-                }
-            )
+            fst.args({
+                "file_name": os.path.join(file_prefix, "beta_energy"),
+                "file_name_append_phase": "true",
+                "trials_per_update": "1",
+                "trials_per_write": steps_per,
+                "multistate": "true",
+            })
         )
     )
 
@@ -413,7 +410,9 @@ def poly_sim_ExpandedBeta(
 
     # Set up file to hold CV info (RG^2)
     header = "#Step     Rg^2 (nm^2)    Bias (kJ/mole)"
-    rg_file = open(os.path.join(file_prefix, bias_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False))
+    rg_file = pathlib.Path(
+        os.path.join(file_prefix, bias_name + "%i.txt" % sim_num)
+    ).open("w", encoding=locale.getpreferredencoding(False))
     rg_file.write("%s\n" % header)
 
     # Loop over
@@ -431,11 +430,15 @@ def poly_sim_ExpandedBeta(
     rg_file.close()
 
     # Need to modify some files to fit with expected formatting/naming
-    with open(os.path.join(file_prefix, "mc_info%i.txt" % sim_num), encoding=locale.getpreferredencoding(False)) as f:
+    with pathlib.Path(os.path.join(file_prefix, "mc_info%i.txt" % sim_num)).open(
+        encoding=locale.getpreferredencoding(False)
+    ) as f:
         log = f.readlines()
     log = [line.strip(",").replace(",", "  ") for line in log]
     log[0] = "#" + log[0]
-    with open(os.path.join(file_prefix, info_name + "%i.txt" % sim_num), "w", encoding=locale.getpreferredencoding(False)) as f:
+    with pathlib.Path(os.path.join(file_prefix, info_name + "%i.txt" % sim_num)).open(
+        "w", encoding=locale.getpreferredencoding(False)
+    ) as f:
         f.writelines(log)
 
 

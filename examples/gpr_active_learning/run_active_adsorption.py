@@ -1,5 +1,6 @@
 import glob
 import os
+import pathlib
 
 import numpy as np
 import xarray as xr
@@ -59,7 +60,6 @@ def get_bulk_P(mu):
     return (
         betaPV * kBT_over_eps / V
     )  # / (beta*V) #Should be pascals since have J/m^3 #Now reduced units
-
 
 
 class Adsorption_DataWrapper(active_utils.DataWrapper):
@@ -133,7 +133,7 @@ def run_active(
     # Create directory for this run
     if init_mu is None:
         init_mu = [-12.0, 3.8]
-    os.mkdir(active_dir)
+    pathlib.Path(active_dir).mkdir()
 
     # Define update functions - will share kwargs, but will use different types
     update_kwargs = {
@@ -150,9 +150,7 @@ def run_active(
         update_func = active_utils.UpdateRandom(**update_kwargs)
     else:
         msg = "Must have 'alm', 'space', or 'rand' in active_dir argument or cannot pick update strategy."
-        raise ValueError(
-            msg
-        )
+        raise ValueError(msg)
 
     # Set up list of metrics to compute
     metrics = [
@@ -208,7 +206,8 @@ def main():
             this_coefs.var("rec").values / this_coefs.sizes["rec"]
         )  # Want std in mean, not just std
         resamp_stds = np.sqrt(
-            this_dat.build_state(max_order=1)
+            this_dat
+            .build_state(max_order=1)
             .resample(sampler={"nrep": 100})
             .derivs(norm=False)
             .var("rep")
@@ -286,23 +285,31 @@ def main():
     train_labels = ["ALM", "Random", "Space"]
     for i, dat_list in enumerate([dat_list_out, dat_list_rand, dat_list_space]):
         print("%s data set:" % train_labels[i])
-        this_gp = active_utils.create_GPR(
-            [dat.build_state(max_order=max_order) for dat in dat_list]
-        )
+        this_gp = active_utils.create_GPR([
+            dat.build_state(max_order=max_order) for dat in dat_list
+        ])
         default_loss = this_gp.training_loss()
         default_params = tuple([par.numpy() for par in this_gp.trainable_parameters])
         print(
-            "\t Unbiased opt from default: loss {:f}, l {:f}, var {:f}, p {:f}".format(default_loss, *default_params)
+            "\t Unbiased opt from default: loss {:f}, l {:f}, var {:f}, p {:f}".format(
+                default_loss, *default_params
+            )
         )
 
-        for j, train_hist in enumerate(
-            [train_history, train_history_rand, train_history_space]
-        ):
+        for j, train_hist in enumerate([
+            train_history,
+            train_history_rand,
+            train_history_space,
+        ]):
             for k, tpar in enumerate(train_hist["params"][-1]):
                 this_gp.trainable_parameters[k].assign(tpar)
             this_loss = this_gp.training_loss()
             print(
-                "\t W/ params from {}: loss {:f}, l {:f}, var {:f}, p {:f}".format(train_labels[j].ljust(10), this_loss, *tuple(train_hist["params"][-1]))
+                "\t W/ params from {}: loss {:f}, l {:f}, var {:f}, p {:f}".format(
+                    train_labels[j].ljust(10),
+                    this_loss,
+                    *tuple(train_hist["params"][-1]),
+                )
             )
 
         print("\n")

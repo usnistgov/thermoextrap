@@ -59,7 +59,7 @@ def multiOutput_extrap_IG(
 
 
 # To help test active learning, build DataWrapper and SimWrapper objects for ideal gas
-class IG_DataWrapper:  # ruff:ignore[invalid-class-name]
+class IG_DataWrapper:
     """Data object for gpr with ideal gas."""
 
     def __init__(self, beta: Any, rng: OptionalRng = None) -> None:

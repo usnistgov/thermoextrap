@@ -2,6 +2,7 @@
 Mainly this is the code to automatically compute derivatives with sympy.
 Also includes other useful functions.
 """
+
 import math
 
 import numpy as np
@@ -86,9 +87,8 @@ def symDerivAvgX(order):
 
         if o == 0:
             for d in tosub:
-                if isinstance(d, sym.Function):
-                    if str(d) == "f(b)":
-                        subvals[d] = xu(0) * z
+                if isinstance(d, sym.Function) and str(d) == "f(b)":
+                    subvals[d] = xu(0) * z
 
         else:
             for d in tosub:
@@ -149,7 +149,7 @@ def buildAvgFuncsDependent(xvals, uvals, order):
     for o in range(order + 1):
         dictu[o] = np.average(uvals**o)
         for j in range(order + 1):
-            dictxu[(j, o)] = np.average(xvals[:, j, :] * (uvalsT**o), axis=0)
+            dictxu[j, o] = np.average(xvals[:, j, :] * (uvalsT**o), axis=0)
 
     # class ufunc(sym.Function):
     #     """Modified sympy Function class to output powers of potential energies."""
@@ -209,9 +209,8 @@ def symDerivAvgXdependent(order):
 
         if o == 0:
             for d in tosub:
-                if isinstance(d, sym.Function):
-                    if str(d) == "f(b)":
-                        subvals[d] = xu(0, 0) * z
+                if isinstance(d, sym.Function) and str(d) == "f(b)":
+                    subvals[d] = xu(0, 0) * z
 
         else:
             for d in tosub:
