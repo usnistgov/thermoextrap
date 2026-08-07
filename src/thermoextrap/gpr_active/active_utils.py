@@ -1048,7 +1048,7 @@ def create_GPR(
 # (preferably around 95%)
 # Here only implement the simplest (and default) transformation, the identity transform
 # (which also computes std given variance and upper and lower confidence interval values)
-def identityTransform(
+def identityTransform(  # ruff:ignore[undocumented-public-function]
     x: NDArrayOrDataArrayT,  # ruff:ignore[unused-function-argument]
     y: NDArrayOrDataArrayT,
     y_var: ArrayLike,

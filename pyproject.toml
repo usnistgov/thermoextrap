@@ -190,6 +190,8 @@ extend-exclude = [
     ".numba_cache",
     ".venv",
     "dist-conda",
+    "examples/gpr_active_learning",
+    "tests/legacy/",
 ]
 fix = true
 # unsafe-fixes = true
@@ -245,14 +247,69 @@ ruff.strictly-empty-init-modules = false
 
 # Project specific ignores
 [tool.ruff.lint.per-file-ignores]
-"**/*.ipynb" = [
-    # "B018",  # - Don't remove useless expressions in notebooks
-    # "D100",  # - undocumented-public-module
-    # "INP001",
+"src/**/*.py" = [
+    "ARG002",
+    "D102",    # - Missing docstring in public method
+    "DOC202",
+    "DOC402",
+    "ERA",     # - eradicate (want to keep some stuff)
+    "FIX002",
+    "N801",
+    "N802",
+    "N803",
+    "N815",
+    "PD",      # - not using pandas?
+    "PLR2004", # - numbers in comparison sometimes ok
+    "TD003",
+    "UP031",
+]
+"src/**/gpr_active/*.py" = [
+    "N806",
+    "PLR0914",
+    "PLR6301",
 ]
 "tests/**/*.py" = [
-    "D",    # - Don't need to document tests
-    "S101", # - Assert is fine with tests
+    "D",       # - Don't need to document tests
+    "S101",    # - Assert is fine with tests
+    "ANN",
+    "E402",
+    "ERA",
+    "NPY",
+    "PD",
+    "PLR0914",
+    "PLR2004",
+    "PT011",
+    "SLF001",
+]
+"examples/usage/**/*.ipynb" = [
+    "ANN",
+    "B018",    # - Don't remove useless expressions in notebooks
+    # "D100",  # - undocumented-public-module
+    # "INP001",
+    "ARG001",
+    "ARG002",
+    "D",
+    "E302",
+    "E305",
+    "ERA",
+    "N801",
+    "N802",
+    "N803",
+    "N806",
+    "N816",
+    "PLR2004",
+    "PLR6104",
+    "PTH111",
+    "PTH207",
+    "T201",
+]
+"examples/usage/gpr/**/*.ipynb" = [
+    "B008",
+    "FA100",
+    "PERF203",
+    "PERF401",
+    "PLR0911",
+    "PLR6301",
 ]
 
 # * Checks ---------------------------------------------------------------------

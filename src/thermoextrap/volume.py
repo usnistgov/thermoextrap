@@ -144,9 +144,9 @@ class VolumeDataCallback(DataCallbackABC, Generic[DataT]):
         self,
         data: SupportsData[Any],
         *,
-        meta_kws: OptionalKwsAny,  # ruff:ignore[unused-method-argument]
+        meta_kws: OptionalKwsAny,
         sampler: IndexSampler[Any],
-        **kws: Any,  # ruff:ignore[unused-method-argument]
+        **kws: Any,
     ) -> Self:
         if not isinstance(data, DataCentralMomentsVals):
             msg = "resampling only possible with DataCentralMomentsVals object."

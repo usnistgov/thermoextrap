@@ -1,4 +1,5 @@
 """Settings for doctests and nbval tests."""
+# ruff:file-ignore[missing-type-function-argument,undocumented-public-function]
 
 import pytest
 
