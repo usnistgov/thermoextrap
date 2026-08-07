@@ -1,11 +1,13 @@
 """Holds analytic ideal gas model.
 Useful for testing and examining fundamental behavior.
 """
+
 import math
+
 import numpy as np
 import sympy as sym
-from scipy.stats import norm
 from cmomy.random import validate_rng
+from scipy.stats import norm
 
 
 class IGmodel:

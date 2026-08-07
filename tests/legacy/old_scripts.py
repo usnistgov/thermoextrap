@@ -5,7 +5,9 @@
 """Legacy (deprecated) code kept only for testing and reference purposes.
 SHOULD NOT BE USED.
 """
+
 import math
+
 import numpy as np
 from scipy.special import factorial
 
@@ -43,9 +45,10 @@ def extrapWithSamples(B, B0, x, U, order):
     dBeta = B - B0
 
     outvec = np.zeros((order + 1, x.shape[1]))  # kth order derivative on kth row
-    outval = np.zeros(
-        (B.shape[0], x.shape[1])
-    )  # each row is extrapolation to different beta
+    outval = np.zeros((
+        B.shape[0],
+        x.shape[1],
+    ))  # each row is extrapolation to different beta
 
     # Get functions defining averages of observable, potential energy, etc.
     avgUfunc, avgXUfunc = buildAvgFuncs(x, U, order)
@@ -142,9 +145,7 @@ def interpPolyMultiPoint(B, refB, x, U, order):
     for i, beta in enumerate(refB):
         # Just need derivatives, which is essentially same cost as computing extrapolation
         # But don't care about what point we extrapolate to or the value we get
-        _, thisderivs = extrapWithSamples(
-            np.average(refB), beta, x[i], U[i], order
-        )
+        _, thisderivs = extrapWithSamples(np.average(refB), beta, x[i], U[i], order)
 
         # Loop over observable elements, with unique derivatives for each
         for j in range(x.shape[2]):
@@ -205,6 +206,7 @@ def perturbWithSamples(B, refB, x, U, useMBAR=False):
 
     if useMBAR:
         from pymbar import mbar
+
         mbarObj = mbar.MBAR(np.array([refB * U]), [U.shape[0]])
         outval = np.zeros((len(B), x.shape[1]))
         for i, b_ in enumerate(B):

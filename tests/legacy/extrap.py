@@ -1,5 +1,5 @@
-"""Main extrapolation classes
-"""
+"""Main extrapolation classes"""
+
 # pylint: disable=redefined-variable-type,arguments-renamed,duplicate-code
 import math
 
@@ -113,9 +113,9 @@ class ExtrapModel:
 
         predictVals = np.zeros((B.shape[0], self.x.shape[-1]))
         for o in range(order + 1):
-            predictVals += np.tensordot(
-                (dBeta**o), params[o], axes=0
-            ) / math.factorial(o)
+            predictVals += np.tensordot((dBeta**o), params[o], axes=0) / math.factorial(
+                o
+            )
 
         return predictVals
 

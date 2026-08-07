@@ -2,6 +2,7 @@ import copy
 import glob
 import locale
 import os
+import pathlib
 import shutil
 import subprocess
 import sys
@@ -25,10 +26,10 @@ def set_inp_param(inp_file, out_file, **kwargs):
                        each line to replace without a newline character. For a
                        single line, this can just be a string.
     """
-
     # Read original file
-    with open(inp_file, encoding=locale.getpreferredencoding(False)) as f:
-        orig_contents = f.read()
+    orig_contents = pathlib.Path(inp_file).read_text(
+        encoding=locale.getpreferredencoding(False)
+    )
     # Split into list by line
     orig_contents = orig_contents.splitlines()
 
@@ -48,10 +49,9 @@ def set_inp_param(inp_file, out_file, **kwargs):
                 if len(new_contents[i].strip()) == 0:
                     end_ind = i
                     break
-            else:
-                if new_contents[i][:2] == "!-":
-                    end_ind = i
-                    break
+            elif new_contents[i][:2] == "!-":
+                end_ind = i
+                break
 
         # Check if new_entry is float, int, etc.
         # Then check if it's a str, making list if just str
@@ -68,8 +68,9 @@ def set_inp_param(inp_file, out_file, **kwargs):
         )
 
     # Write new file
-    with open(out_file, "w", encoding=locale.getpreferredencoding(False)) as f:
-        f.write("\n".join(new_contents))
+    pathlib.Path(out_file).write_text(
+        "\n".join(new_contents), encoding=locale.getpreferredencoding(False)
+    )
 
 
 def calc_temp_and_mass(T_red, eps=1.0 * unit.kilojoule_per_mole):
@@ -130,7 +131,7 @@ def setup_sim_dir(output_dir, ff_file, pdb_file):
     Creates a directory for simulation and copies in necessary files.
     Simple, but will need many times.
     """
-    os.makedirs(output_dir, exist_ok=True)
+    pathlib.Path(output_dir).mkdir(exist_ok=True, parents=True)
     shutil.copy(ff_file, output_dir)
     shutil.copy(pdb_file, output_dir)
     # Return names of files as outputs
@@ -140,7 +141,7 @@ def setup_sim_dir(output_dir, ff_file, pdb_file):
 def update_mcf_file(output_dir, mcf_file, mass):
     """Opens a .mcf file and replaces mass with new mass"""
     # Read lines of input mcf
-    with open(mcf_file, encoding=locale.getpreferredencoding(False)) as f:
+    with pathlib.Path(mcf_file).open(encoding=locale.getpreferredencoding(False)) as f:
         mcf_lines = f.read().splitlines()
 
     # Replace line we care about
@@ -157,8 +158,9 @@ def update_mcf_file(output_dir, mcf_file, mass):
 
     # Save new mcf file
     mcf_name = os.path.split(mcf_file)[-1]
-    with open(os.path.join(output_dir, mcf_name), "w", encoding=locale.getpreferredencoding(False)) as f:
-        f.write("\n".join(mcf_lines))
+    pathlib.Path(os.path.join(output_dir, mcf_name)).write_text(
+        "\n".join(mcf_lines), encoding=locale.getpreferredencoding(False)
+    )
 
 
 def run_NVT(
@@ -544,15 +546,16 @@ def sim_VLE_GEMC(
             inp_kwargs={"Start_Type": "make_config %i" % N_mols[i]},
         )
         # And set up outputs so .xyz inputs match expected naming for GEMC
-        with open(os.path.join(this_path, "equil_nvt.out.xyz"), encoding=locale.getpreferredencoding(False)) as f:
-            xyz_lines = f.read().splitlines()
-        with open(
-            os.path.join(
-                file_prefix, this_run_dir, "equil_nvt.out.box%i.xyz" % (i + 1)
-            ),
-            "w", encoding=locale.getpreferredencoding(False),
+        with pathlib.Path(os.path.join(this_path, "equil_nvt.out.xyz")).open(
+            encoding=locale.getpreferredencoding(False)
         ) as f:
-            f.write("\n".join(xyz_lines[-(N_mols[i] + 2) :]))
+            xyz_lines = f.read().splitlines()
+        pathlib.Path(
+            os.path.join(file_prefix, this_run_dir, "equil_nvt.out.box%i.xyz" % (i + 1))
+        ).write_text(
+            "\n".join(xyz_lines[-(N_mols[i] + 2) :]),
+            encoding=locale.getpreferredencoding(False),
+        )
 
     # Run GEMC equilibration
     this_path = run_GEMC(
@@ -598,7 +601,9 @@ def sim_VLE_GEMC(
         this_prop_file = os.path.join(
             file_prefix, this_run_dir, "prod.out.box%i.prp" % (i + 1)
         )
-        with open(this_prop_file, encoding=locale.getpreferredencoding(False)) as f:
+        with pathlib.Path(this_prop_file).open(
+            encoding=locale.getpreferredencoding(False)
+        ) as f:
             f.readline()
             this_header = f.readline()
             this_units = f.readline().strip()
@@ -611,9 +616,10 @@ def sim_VLE_GEMC(
     full_props = np.hstack(box_props)
     # Add on sum of potential energies in both boxes since counts as full system potential
     # Need to use that for extrapolating any quantity over temperature for GEMC
-    full_props = np.hstack(
-        [full_props, (box_props[0][:, 1] + box_props[1][:, 1])[:, None]]
-    )
+    full_props = np.hstack([
+        full_props,
+        (box_props[0][:, 1] + box_props[1][:, 1])[:, None],
+    ])
     header_info.append("System_Energy_Total")
     unit_info = unit_info + "        (kJ/mol)-Ext"
     np.savetxt(
@@ -722,14 +728,18 @@ def sim_VLE_NPT(
             inp_kwargs={"Start_Type": "make_config %i" % N_mols[i]},
         )
         # And set up outputs so .xyz inputs match expected naming for GEMC
-        with open(os.path.join(this_path, "equil_nvt.out.xyz"), encoding=locale.getpreferredencoding(False)) as f:
+        with pathlib.Path(os.path.join(this_path, "equil_nvt.out.xyz")).open(
+            encoding=locale.getpreferredencoding(False)
+        ) as f:
             xyz_lines = f.read().splitlines()
         this_equil_xyz = os.path.join(
             file_prefix, this_run_dir, "equil_nvt.out.box%i.xyz" % (i + 1)
         )
         this_equil_xyz = os.path.abspath(this_equil_xyz)
-        with open(this_equil_xyz, "w", encoding=locale.getpreferredencoding(False)) as f:
-            f.write("\n".join(xyz_lines[-(N_mols[i] + 2) :]))
+        pathlib.Path(this_equil_xyz).write_text(
+            "\n".join(xyz_lines[-(N_mols[i] + 2) :]),
+            encoding=locale.getpreferredencoding(False),
+        )
 
         # Run NPT equilibration
         this_path = run_NPT(
@@ -762,7 +772,9 @@ def sim_VLE_NPT(
 
         # Collect necessary output info
         this_prop_file = os.path.join(this_path, "prod.out.prp")
-        with open(this_prop_file, encoding=locale.getpreferredencoding(False)) as f:
+        with pathlib.Path(this_prop_file).open(
+            encoding=locale.getpreferredencoding(False)
+        ) as f:
             f.readline()
             this_header = f.readline()
             this_units = f.readline().strip()
@@ -791,13 +803,11 @@ def sim_VLE_NPT(
     # Also just output VLE information needed for lnPsat and its derivative
     np.savetxt(
         os.path.join(file_prefix, "%s%i.txt" % (vle_name, sim_num)),
-        np.hstack(
-            [
-                np.log(psat_red),
-                np.average(full_props[:, [1, 4]], axis=0) / N_mols[0],
-                np.average(full_props[:, [10, 13]], axis=0) / N_mols[1],
-            ]
-        )[None, :],
+        np.hstack([
+            np.log(psat_red),
+            np.average(full_props[:, [1, 4]], axis=0) / N_mols[0],
+            np.average(full_props[:, [10, 13]], axis=0) / N_mols[1],
+        ])[None, :],
         header=" ln(Psat)    u_box1    h_box1    u_box2    h_box2",
     )
 
@@ -837,5 +847,4 @@ def pull_psat_info(
     """
     if sim_num is None:
         sim_num = len(glob.glob(os.path.join(base_dir, out_name + "*.txt"))) - 1
-    if os.path.exists(os.path.join(base_dir, out_name + "%i.txt" % sim_num)):
-        pass
+    pathlib.Path(os.path.join(base_dir, out_name + "%i.txt" % sim_num)).exists()

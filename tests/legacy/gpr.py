@@ -5,6 +5,7 @@ Routines GPR interpolation models
 # pylint: disable=redefined-variable-type,missing-class-docstring,arguments-differ,duplicate-code
 
 from typing import Any
+
 import gpflow
 import numpy as np
 import sympy as sp
@@ -82,14 +83,13 @@ class DerivativeKernel(gpflow.kernels.Kernel):
         if len(self.param_syms) == 0:
             raise ValueError(
                 "Provided kernel expression only takes inputs x1 and x2, "
-                + "no optimizable parameters!"
+                "no optimizable parameters!"
             )
         # Make sure that parameters here match those in kernel_params, if it's provided
         if bool(kernel_params):
-            if (
-                [s.name for s in self.param_syms].sort()
-                != list(kernel_params.keys()).sort()
-            ):
+            if [s.name for s in self.param_syms].sort() != list(
+                kernel_params.keys()
+            ).sort():
                 raise ValueError(
                     "Symbol names in kernel_expr must match keys in " + "kernel_params!"
                 )

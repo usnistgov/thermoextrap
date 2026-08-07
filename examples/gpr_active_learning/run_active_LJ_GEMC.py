@@ -1,6 +1,6 @@
 import argparse
 import glob
-import os
+import pathlib
 import sys
 
 import numpy as np
@@ -15,103 +15,96 @@ from thermoextrap.gpr_active import active_utils
 def parse_bool(astr):
     if astr in {"True", "true", "Yes", "yes", "Y", "y"}:
         return True
-    elif astr in {"False", "false", "No", "no", "N", "n"}:
+    if astr in {"False", "false", "No", "no", "N", "n"}:
         return False
-    else:
-        raise ValueError("Provided string %s is not convertible to boolean." % astr)
+    raise ValueError("Provided string %s is not convertible to boolean." % astr)
 
 
 def make_ground_truth_dens():
-    Tr_data = np.array(
-        [
-            0.7,
-            0.72,
-            0.74,
-            0.76,
-            0.78,
-            0.8,
-            0.82,
-            0.84,
-            0.86,
-            0.88,
-            0.9,
-            0.92,
-            0.94,
-            0.96,
-            0.98,
-            1.0,
-            1.02,
-            1.04,
-            1.06,
-            1.08,
-            1.1,
-            1.12,
-            1.14,
-            1.16,
-            1.18,
-            1.2,
-        ]
-    )
-    dens_lo_data = np.array(
-        [
-            0.0019956,
-            0.0025624,
-            0.0032425,
-            0.0040495,
-            0.0049974,
-            0.0061007,
-            0.0073745,
-            0.0088349,
-            0.010499,
-            0.012384,
-            0.01451,
-            0.016897,
-            0.019569,
-            0.022549,
-            0.025868,
-            0.029556,
-            0.03365,
-            0.038192,
-            0.043233,
-            0.048831,
-            0.055061,
-            0.062015,
-            0.069813,
-            0.078615,
-            0.088649,
-            0.1003,
-        ]
-    )
-    dens_hi_data = np.array(
-        [
-            0.84341,
-            0.83492,
-            0.82635,
-            0.81764,
-            0.80879,
-            0.79981,
-            0.7907,
-            0.78147,
-            0.7721,
-            0.76256,
-            0.75284,
-            0.74291,
-            0.73276,
-            0.7224,
-            0.71182,
-            0.70094,
-            0.68974,
-            0.67817,
-            0.66618,
-            0.65373,
-            0.64075,
-            0.62715,
-            0.6128,
-            0.59753,
-            0.58115,
-            0.56329,
-        ]
-    )
+    Tr_data = np.array([
+        0.7,
+        0.72,
+        0.74,
+        0.76,
+        0.78,
+        0.8,
+        0.82,
+        0.84,
+        0.86,
+        0.88,
+        0.9,
+        0.92,
+        0.94,
+        0.96,
+        0.98,
+        1.0,
+        1.02,
+        1.04,
+        1.06,
+        1.08,
+        1.1,
+        1.12,
+        1.14,
+        1.16,
+        1.18,
+        1.2,
+    ])
+    dens_lo_data = np.array([
+        0.0019956,
+        0.0025624,
+        0.0032425,
+        0.0040495,
+        0.0049974,
+        0.0061007,
+        0.0073745,
+        0.0088349,
+        0.010499,
+        0.012384,
+        0.01451,
+        0.016897,
+        0.019569,
+        0.022549,
+        0.025868,
+        0.029556,
+        0.03365,
+        0.038192,
+        0.043233,
+        0.048831,
+        0.055061,
+        0.062015,
+        0.069813,
+        0.078615,
+        0.088649,
+        0.1003,
+    ])
+    dens_hi_data = np.array([
+        0.84341,
+        0.83492,
+        0.82635,
+        0.81764,
+        0.80879,
+        0.79981,
+        0.7907,
+        0.78147,
+        0.7721,
+        0.76256,
+        0.75284,
+        0.74291,
+        0.73276,
+        0.7224,
+        0.71182,
+        0.70094,
+        0.68974,
+        0.67817,
+        0.66618,
+        0.65373,
+        0.64075,
+        0.62715,
+        0.6128,
+        0.59753,
+        0.58115,
+        0.56329,
+    ])
     beta_data = 1.0 / Tr_data
     ground_truth_lo = interpolate.interp1d(beta_data, dens_lo_data, kind="cubic")
     ground_truth_hi = interpolate.interp1d(beta_data, dens_hi_data, kind="cubic")
@@ -184,7 +177,7 @@ def main(
 
     dat_in = []
     for b in [beta1, beta2]:
-        if os.path.isdir(f"{output_dir}/beta_{b:f}"):
+        if pathlib.Path(f"{output_dir}/beta_{b:f}").is_dir():
             info_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/sim_info_out*.txt"))
             bias_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/cv_bias_out*.txt"))
             x_files = sorted(glob.glob(f"{output_dir}/beta_{b:f}/dens_out*.txt"))

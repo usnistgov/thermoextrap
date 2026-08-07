@@ -4,9 +4,8 @@ This includes perturbation and a wrapper on MBAR.
 # pylint: disable=redefined-variable-type,duplicate-code
 
 import numpy as np
-
-
 from cmomy.random import validate_rng
+
 from .interp import InterpModel
 
 
@@ -79,12 +78,13 @@ class PerturbModel:
 
         if useMBAR:
             from pymbar import mbar
+
             mbarObj = mbar.MBAR(np.array([refB * U]), [U.shape[0]])
             predictVals = np.zeros((len(B), x.shape[1]))
             for i, b in enumerate(B):
-                predictVals[i, :] = mbarObj.compute_multiple_expectations(
-                    x.T, b * U
-                )["mu"]
+                predictVals[i, :] = mbarObj.compute_multiple_expectations(x.T, b * U)[
+                    "mu"
+                ]
 
         else:
             # Compute what goes in the exponent and subtract out the maximum
