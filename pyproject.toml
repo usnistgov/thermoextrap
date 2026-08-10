@@ -232,9 +232,6 @@ ignore = [
     "S603",    # - subprocess-without-shell-equals-true
     "S607",    # - start-process-with-partial-path
     "TID252",  # - Allow relative imports
-    # numpy/pandas
-    "NPY",     # - not using numpy?
-    "PD",      # - not using pandas?
 ]
 isort.known-first-party = [
     "thermoextrap",
@@ -245,14 +242,13 @@ pylint.max-positional-args = 15
 pylint.max-public-methods = 30
 ruff.strictly-empty-init-modules = false
 
-# Project specific ignores
 [tool.ruff.lint.per-file-ignores]
-"src/**/*.py" = [
-    "ARG002",
+"src/**" = [
     "D102",    # - Missing docstring in public method
+    "ARG002",
+    "ERA",     # - eradicate (want to keep some stuff)
     "DOC202",
     "DOC402",
-    "ERA",     # - eradicate (want to keep some stuff)
     "FIX002",
     "N801",
     "N802",
@@ -263,12 +259,7 @@ ruff.strictly-empty-init-modules = false
     "TD003",
     "UP031",
 ]
-"src/**/gpr_active/*.py" = [
-    "N806",
-    "PLR0914",
-    "PLR6301",
-]
-"tests/**/*.py" = [
+"tests/**" = [
     "D",       # - Don't need to document tests
     "S101",    # - Assert is fine with tests
     "ANN",
@@ -281,11 +272,11 @@ ruff.strictly-empty-init-modules = false
     "PT011",
     "SLF001",
 ]
-"examples/usage/**/*.ipynb" = [
+"examples/**" = [
     "ANN",
-    "B018",    # - Don't remove useless expressions in notebooks
     "ARG001",
     "ARG002",
+    "B018",    # - Don't remove useless expressions in notebooks
     "D",
     "E302",
     "E305",
@@ -300,6 +291,11 @@ ruff.strictly-empty-init-modules = false
     "PTH111",
     "PTH207",
     "T201",
+]
+"src/**/gpr_active/*.py" = [
+    "N806",
+    "PLR0914",
+    "PLR6301",
 ]
 "examples/usage/gpr/**/*.ipynb" = [
     "B008",
@@ -340,6 +336,7 @@ expand_tables = [
     "tool.ruff.format",
     "tool.ruff.lint",
     "tool.ruff.lint.per-file-ignores",
+    "tool.ty.overrides",
     "tool.typos",
     "tool.uv.dependency-groups",
     "tool.uv.exclude-newer-package",
