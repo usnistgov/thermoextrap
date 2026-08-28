@@ -209,31 +209,31 @@ select = [
 ]
 # fixable = [ "ALL" ]
 unfixable = [
-    "PLR6104",
+    "non-augmented-assignment",
     "ERA",
     "T",
 ]
 ignore = [
-    "ANN401",  # - Any ok sometimes
-    "COM",     # - flake8-commas, formatter should take care of this?
-    "CPY",     # - Don't require copyright
-    "D105",    # - Missing magic method docstring
-    "D107",    # - Missing docstring in __init__
-    "D203",    # - 1 blank line required before class docstring
-    "D205",    # - blank line after summary
-    "D212",    # - Multi-line docstring summary should start at the first line
-    "D400",    # - First line should end with a period
-    "D401",    # - First line of docstring should be in imperative mood: "{first_line}"
-    "DOC201",  # - Missing return from documentation
-    "DOC501",  # - Missing raises from documentation
-    "E501",    # - line too long - let formatter fix this
-    "E731",    # - do not assign a lambda expression, use a def
-    "FBT",     # - bools are ok
-    "PLC0415", # - import should be at top level (leads to issues with imports in func?)
-    "S404",    # - Want to use subprocess sometimes
-    "S603",    # - subprocess-without-shell-equals-true
-    "S607",    # - start-process-with-partial-path
-    "TID252",  # - Allow relative imports
+    "any-type",                             # - Any ok sometimes
+    "COM",                                  # - flake8-commas, formatter should take care of this?
+    "CPY",                                  # - Don't require copyright
+    "undocumented-magic-method",            # - Missing magic method docstring
+    "undocumented-public-init",             # - Missing docstring in __init__
+    "incorrect-blank-line-before-class",    # - 1 blank line required before class docstring
+    "missing-blank-line-after-summary",     # - blank line after summary
+    "multi-line-summary-first-line",        # - Multi-line docstring summary should start at the first line
+    "missing-trailing-period",              # - First line should end with a period
+    "non-imperative-mood",                  # - First line of docstring should be in imperative mood: "{first_line}"
+    "docstring-missing-returns",            # - Missing return from documentation
+    "docstring-missing-exception",          # - Missing raises from documentation
+    "line-too-long",                        # - line too long - let formatter fix this
+    "lambda-assignment",                    # - do not assign a lambda expression, use a def
+    "FBT",                                  # - bools are ok
+    "import-outside-top-level",             # - import should be at top level (leads to issues with imports in func?)
+    "suspicious-subprocess-import",         # - Want to use subprocess sometimes
+    "subprocess-without-shell-equals-true", # - subprocess-without-shell-equals-true
+    "start-process-with-partial-path",      # - start-process-with-partial-path
+    "relative-imports",                     # - Allow relative imports
 ]
 isort.known-first-party = [
     "thermoextrap",
@@ -246,66 +246,66 @@ ruff.strictly-empty-init-modules = false
 
 [tool.ruff.lint.per-file-ignores]
 "src/**" = [
-    "D102",    # - Missing docstring in public method
-    "ARG002",
-    "ERA",     # - eradicate (want to keep some stuff)
-    "DOC202",
-    "DOC402",
-    "FIX002",
-    "N801",
-    "N802",
-    "N803",
-    "N815",
-    "PD",      # - not using pandas?
-    "PLR2004", # - numbers in comparison sometimes ok
-    "TD003",
-    "UP031",
+    "undocumented-public-method",         # - Missing docstring in public method
+    "unused-method-argument",
+    "ERA",                                # - eradicate (want to keep some stuff)
+    "docstring-extraneous-returns",
+    "docstring-missing-yields",
+    "line-contains-todo",
+    "invalid-class-name",
+    "invalid-function-name",
+    "invalid-argument-name",
+    "mixed-case-variable-in-class-scope",
+    "PD",                                 # - not using pandas?
+    "magic-value-comparison",             # - numbers in comparison sometimes ok
+    "missing-todo-link",
+    "printf-string-formatting",
 ]
 "tests/**" = [
-    "D",       # - Don't need to document tests
-    "S101",    # - Assert is fine with tests
+    "D",                                # - Don't need to document tests
+    "assert",                           # - Assert is fine with tests
     "ANN",
-    "E402",
+    "module-import-not-at-top-of-file",
     "ERA",
     "NPY",
     "PD",
-    "PLR0914",
-    "PLR2004",
-    "PT011",
-    "SLF001",
+    "too-many-locals",
+    "magic-value-comparison",
+    "pytest-raises-too-broad",
+    "private-member-access",
 ]
 "examples/**" = [
     "ANN",
-    "ARG001",
-    "ARG002",
-    "B018",    # - Don't remove useless expressions in notebooks
+    "unused-function-argument",
+    "unused-method-argument",
+    "useless-expression",                  # - Don't remove useless expressions in notebooks
     "D",
-    "E302",
-    "E305",
+    "blank-lines-top-level",
+    "blank-lines-after-function-or-class",
     "ERA",
-    "N801",
-    "N802",
-    "N803",
-    "N806",
-    "N816",
-    "PLR2004",
-    "PLR6104",
-    "PTH111",
-    "PTH207",
-    "T201",
+    "invalid-class-name",
+    "invalid-function-name",
+    "invalid-argument-name",
+    "non-lowercase-variable-in-function",
+    "mixed-case-variable-in-global-scope",
+    "magic-value-comparison",
+    "non-augmented-assignment",
+    "os-path-expanduser",
+    "glob",
+    "print",
 ]
 "src/**/gpr_active/*.py" = [
-    "N806",
-    "PLR0914",
-    "PLR6301",
+    "non-lowercase-variable-in-function",
+    "too-many-locals",
+    "no-self-use",
 ]
 "examples/usage/gpr/**/*.ipynb" = [
-    "B008",
-    "FA100",
-    "PERF203",
-    "PERF401",
-    "PLR0911",
-    "PLR6301",
+    "function-call-in-default-argument",
+    "future-rewritable-type-annotation",
+    "try-except-in-loop",
+    "manual-list-comprehension",
+    "too-many-return-statements",
+    "no-self-use",
 ]
 
 # * Checks ---------------------------------------------------------------------
