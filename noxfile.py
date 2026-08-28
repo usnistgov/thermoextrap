@@ -5,10 +5,7 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "nox>=2026.8.17",
-<<<<<<< before updating
 #     "dotenv>=0.9.9"
-=======
->>>>>>> after updating
 # ]
 #
 # [tool.ty]

@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "uv_build"
 requires = [
-    "uv-build>=0.12.7,<0.13.0",
+    "uv-build>=0.12.5,<0.13.0",
 ]
 
 [project]
@@ -136,12 +136,8 @@ docs-spelling = [
 ipython = [ "ipython" ]
 mypy = [ "mypy[faster-cache]>=2.3.1" ]
 notebook = [ "ipykernel", "nbclient" ]
-<<<<<<< before updating
 nox = [ "dotenv", "nox>=2026.8.17" ]
 pandas = [ "pandas>=2.3" ]
-=======
-nox = [ "nox>=2026.8.17" ]
->>>>>>> after updating
 pylint = [ "pylint" ]
 pytest = [ "pytest" ]
 pytest-accept = [ "pytest-accept" ]
@@ -169,7 +165,7 @@ environments = [
     # "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
 ]
 exclude-newer = "7 days"
-# Needed until prek>=0.5.0 is 7 days old
+# Needed until prek>=0.5.0 is 7 days old (also update uv.toml)
 exclude-newer-package = { prek = "0 days" }
 managed = true
 build-backend.source-exclude = [ ".*cache" ]
