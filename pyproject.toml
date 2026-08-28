@@ -136,8 +136,12 @@ docs-spelling = [
 ipython = [ "ipython" ]
 mypy = [ "mypy[faster-cache]>=2.3.1" ]
 notebook = [ "ipykernel", "nbclient" ]
+<<<<<<< before updating
 nox = [ "dotenv", "nox>=2026.8.17" ]
 pandas = [ "pandas>=2.3" ]
+=======
+nox = [ "nox>=2026.8.17" ]
+>>>>>>> after updating
 pylint = [ "pylint" ]
 pytest = [ "pytest" ]
 pytest-accept = [ "pytest-accept" ]
@@ -165,6 +169,8 @@ environments = [
     # "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
 ]
 exclude-newer = "7 days"
+# Needed until prek>=0.5.0 is 7 days old
+exclude-newer-package = { prek = "0 days" }
 managed = true
 build-backend.source-exclude = [ ".*cache" ]
 build-backend.source-include = [ "tests/**" ]
@@ -612,7 +618,7 @@ pip-deps = [
     "copier>=9.17.2",
     "grayskull>=3.1.1",
     "nbqa>=1.9.1",
-    "prek>=0.4.14",
+    "prek>=0.5.0",
     "pyrefly>=1.2.0",
     "pyright>=1.1.411",
     "rooster>=0.1.1",
