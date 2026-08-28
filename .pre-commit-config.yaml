@@ -65,7 +65,7 @@ repos:
       - id: taplo-lint
         args: ["--no-schema"]
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.28.0
+    rev: v2.28.1
     hooks:
       - id: pyproject-fmt
   # ** validate (schema-store)
@@ -109,7 +109,7 @@ repos:
 
   # * Linting
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.3
+    rev: v0.16.5
     hooks:
       - id: ruff-check
         alias: ruff
@@ -131,7 +131,7 @@ repos:
   # * Dependencies
   # ** pyproject2conda
   - repo: https://github.com/usnistgov/pyproject2conda
-    rev: v0.23.1
+    rev: v0.23.2
     hooks:
       - id: pyproject2conda-project
         alias: requirements
@@ -139,7 +139,7 @@ repos:
           - "--custom-command=prek run pyproject2conda-project --all-files"
   # ** uv
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.12.5
+    rev: 0.12.7
     hooks:
       - id: uv-lock
         alias: requirements
@@ -152,7 +152,7 @@ repos:
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.17.1
+    rev: v4.18.0
     hooks:
       - id: commitizen
         stages: [commit-msg]
