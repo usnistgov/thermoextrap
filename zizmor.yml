@@ -1,0 +1,4 @@
+# NOTE: github self-repository fails with submoles.
+rules:
+  self-repository:
+    disable: true
