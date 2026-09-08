@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "uv_build"
 requires = [
-    "uv-build>=0.12.7,<0.13.0",
+    "uv-build>=0.12.8,<0.13.0",
 ]
 
 [project]
@@ -199,41 +199,104 @@ fix = true
 # unsafe-fixes = true
 
 [tool.ruff.format]
-docstring-code-format = true
 preview = true  # needed for markdown support
+docstring-code-format = true
+
+[tool.ruff.lint.per-file-ignores]
+"src/**" = [
+    "docstring-extraneous-returns",
+    "docstring-missing-yields",
+    "ERA",                                # - eradicate (want to keep some stuff)
+    "invalid-argument-name",
+    "invalid-class-name",
+    "invalid-function-name",
+    "line-contains-todo",
+    "magic-value-comparison",             # - numbers in comparison sometimes ok
+    "missing-todo-link",
+    "mixed-case-variable-in-class-scope",
+    "PD",                                 # - not using pandas?
+    "printf-string-formatting",
+    "undocumented-public-method",         # - Missing docstring in public method
+    "unused-method-argument",
+]
+"tests/**" = [
+    "ANN",
+    "assert",                           # - Assert is fine with tests
+    "D",                                # - Don't need to document tests
+    "ERA",
+    "magic-value-comparison",
+    "module-import-not-at-top-of-file",
+    "NPY",
+    "PD",
+    "private-member-access",
+    "pytest-raises-too-broad",
+    "too-many-locals",
+]
+"examples/**" = [
+    "ANN",
+    "blank-lines-after-function-or-class",
+    "blank-lines-top-level",
+    "D",
+    "ERA",
+    "glob",
+    "invalid-argument-name",
+    "invalid-class-name",
+    "invalid-function-name",
+    "magic-value-comparison",
+    "mixed-case-variable-in-global-scope",
+    "non-augmented-assignment",
+    "non-lowercase-variable-in-function",
+    "os-path-expanduser",
+    "print",
+    "unused-function-argument",
+    "unused-method-argument",
+    "useless-expression",                  # - Don't remove useless expressions in notebooks
+]
+"src/**/gpr_active/*.py" = [
+    "no-self-use",
+    "non-lowercase-variable-in-function",
+    "too-many-locals",
+]
+"examples/usage/gpr/**/*.ipynb" = [
+    "function-call-in-default-argument",
+    "future-rewritable-type-annotation",
+    "manual-list-comprehension",
+    "no-self-use",
+    "too-many-return-statements",
+    "try-except-in-loop",
+]
 
 [tool.ruff.lint]
-preview = true
 select = [
     "ALL",
-]
-# fixable = [ "ALL" ]
-unfixable = [
-    "non-augmented-assignment",
-    "ERA",
-    "T",
 ]
 ignore = [
     "any-type",                             # - Any ok sometimes
     "COM",                                  # - flake8-commas, formatter should take care of this?
     "CPY",                                  # - Don't require copyright
-    "undocumented-magic-method",            # - Missing magic method docstring
-    "undocumented-public-init",             # - Missing docstring in __init__
-    "incorrect-blank-line-before-class",    # - 1 blank line required before class docstring
-    "missing-blank-line-after-summary",     # - blank line after summary
-    "multi-line-summary-first-line",        # - Multi-line docstring summary should start at the first line
-    "missing-trailing-period",              # - First line should end with a period
-    "non-imperative-mood",                  # - First line of docstring should be in imperative mood: "{first_line}"
-    "docstring-missing-returns",            # - Missing return from documentation
     "docstring-missing-exception",          # - Missing raises from documentation
-    "line-too-long",                        # - line too long - let formatter fix this
-    "lambda-assignment",                    # - do not assign a lambda expression, use a def
+    "docstring-missing-returns",            # - Missing return from documentation
     "FBT",                                  # - bools are ok
     "import-outside-top-level",             # - import should be at top level (leads to issues with imports in func?)
-    "suspicious-subprocess-import",         # - Want to use subprocess sometimes
-    "subprocess-without-shell-equals-true", # - subprocess-without-shell-equals-true
-    "start-process-with-partial-path",      # - start-process-with-partial-path
+    "incorrect-blank-line-before-class",    # - 1 blank line required before class docstring
+    "lambda-assignment",                    # - do not assign a lambda expression, use a def
+    "line-too-long",                        # - line too long - let formatter fix this
+    "missing-blank-line-after-summary",     # - blank line after summary
+    "missing-trailing-period",              # - First line should end with a period
+    "multi-line-summary-first-line",        # - Multi-line docstring summary should start at the first line
+    "non-imperative-mood",                  # - First line of docstring should be in imperative mood: "{first_line}"
     "relative-imports",                     # - Allow relative imports
+    "start-process-with-partial-path",      # - start-process-with-partial-path
+    "subprocess-without-shell-equals-true", # - subprocess-without-shell-equals-true
+    "suspicious-subprocess-import",         # - Want to use subprocess sometimes
+    "undocumented-magic-method",            # - Missing magic method docstring
+    "undocumented-public-init",             # - Missing docstring in __init__
+]
+# fixable = [ "ALL" ]
+unfixable = [
+    "ERA",
+    "non-augmented-assignment",
+    "T",
 ]
 isort.known-first-party = [
     "thermoextrap",
@@ -242,71 +305,8 @@ pydocstyle.convention = "numpy"
 pylint.max-args = 15
 pylint.max-positional-args = 15
 pylint.max-public-methods = 30
+preview = true
 ruff.strictly-empty-init-modules = false
-
-[tool.ruff.lint.per-file-ignores]
-"src/**" = [
-    "undocumented-public-method",         # - Missing docstring in public method
-    "unused-method-argument",
-    "ERA",                                # - eradicate (want to keep some stuff)
-    "docstring-extraneous-returns",
-    "docstring-missing-yields",
-    "line-contains-todo",
-    "invalid-class-name",
-    "invalid-function-name",
-    "invalid-argument-name",
-    "mixed-case-variable-in-class-scope",
-    "PD",                                 # - not using pandas?
-    "magic-value-comparison",             # - numbers in comparison sometimes ok
-    "missing-todo-link",
-    "printf-string-formatting",
-]
-"tests/**" = [
-    "D",                                # - Don't need to document tests
-    "assert",                           # - Assert is fine with tests
-    "ANN",
-    "module-import-not-at-top-of-file",
-    "ERA",
-    "NPY",
-    "PD",
-    "too-many-locals",
-    "magic-value-comparison",
-    "pytest-raises-too-broad",
-    "private-member-access",
-]
-"examples/**" = [
-    "ANN",
-    "unused-function-argument",
-    "unused-method-argument",
-    "useless-expression",                  # - Don't remove useless expressions in notebooks
-    "D",
-    "blank-lines-top-level",
-    "blank-lines-after-function-or-class",
-    "ERA",
-    "invalid-class-name",
-    "invalid-function-name",
-    "invalid-argument-name",
-    "non-lowercase-variable-in-function",
-    "mixed-case-variable-in-global-scope",
-    "magic-value-comparison",
-    "non-augmented-assignment",
-    "os-path-expanduser",
-    "glob",
-    "print",
-]
-"src/**/gpr_active/*.py" = [
-    "non-lowercase-variable-in-function",
-    "too-many-locals",
-    "no-self-use",
-]
-"examples/usage/gpr/**/*.ipynb" = [
-    "function-call-in-default-argument",
-    "future-rewritable-type-annotation",
-    "try-except-in-loop",
-    "manual-list-comprehension",
-    "too-many-return-statements",
-    "no-self-use",
-]
 
 # * Checks ---------------------------------------------------------------------
 [tool.repo-review]
@@ -412,7 +412,6 @@ module = [ "tests.legacy.*" ]
 check_untyped_defs = false
 
 [tool.pyrefly]
-enabled-ignores = [ "pyrefly" ]
 project-includes = [
     "examples/usage/*.ipynb",
     "noxfile.py",
@@ -421,6 +420,7 @@ project-includes = [
     "tools",
 ]
 search-path = [ "." ]
+enabled-ignores = [ "pyrefly" ]
 
 [tool.pyright]
 typeCheckingMode = "standard"
@@ -496,6 +496,12 @@ analysis.respect-type-ignore-comments = false
 
 # * Testing --------------------------------------------------------------------
 [tool.pytest.ini_options]
+minversion = "8"
+testpaths = [
+    "README.md",
+    "tests",
+    "thermoextrap",
+]
 addopts = [
     "--cov-config=pyproject.toml",
     "--doctest-glob=*.md",
@@ -509,11 +515,6 @@ addopts = [
     # xdist
     "-n",
     "4",
-]
-testpaths = [
-    "README.md",
-    "tests",
-    "thermoextrap",
 ]
 # options
 filterwarnings = [
@@ -532,9 +533,8 @@ filterwarnings = [
     "ignore: pkg_resources is deprecated as an API:DeprecationWarning",
     "ignore: pkg_resources is deprecated:UserWarning",
 ]
-log_cli_level = "INFO"
 log_level = "INFO"
-minversion = "8"
+log_cli_level = "INFO"
 strict_xfail = "true"
 
 [tool.pytest_env]
@@ -636,6 +636,7 @@ scripts = [
     "noxfile.py",
     "tools/check_dist_version.py",
     "tools/clean_kernelspec.py",
+    "tools/get_version_from_pre_commit_config.py",
 ]
 
 [[tool.uv-locker.requirements]]
