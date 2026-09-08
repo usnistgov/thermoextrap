@@ -1,11 +1,7 @@
 [build-system]
 build-backend = "uv_build"
 requires = [
-<<<<<<< before updating
-    "uv-build>=0.12.7,<0.13.0",
-=======
     "uv-build>=0.12.8,<0.13.0",
->>>>>>> after updating
 ]
 
 [project]
@@ -208,17 +204,66 @@ docstring-code-format = true
 
 [tool.ruff.lint.per-file-ignores]
 "src/**" = [
-    "NPY", # - not using numpy?
-    "PD",  # - not using pandas?
+    "docstring-extraneous-returns",
+    "docstring-missing-yields",
+    "ERA",                                # - eradicate (want to keep some stuff)
+    "invalid-argument-name",
+    "invalid-class-name",
+    "invalid-function-name",
+    "line-contains-todo",
+    "magic-value-comparison",             # - numbers in comparison sometimes ok
+    "missing-todo-link",
+    "mixed-case-variable-in-class-scope",
+    "PD",                                 # - not using pandas?
+    "printf-string-formatting",
+    "undocumented-public-method",         # - Missing docstring in public method
+    "unused-method-argument",
 ]
 "tests/**" = [
-    "assert", # - Assert is fine with tests
-    "D",      # - Don't need to document tests
+    "ANN",
+    "assert",                           # - Assert is fine with tests
+    "D",                                # - Don't need to document tests
+    "ERA",
+    "magic-value-comparison",
+    "module-import-not-at-top-of-file",
+    "NPY",
+    "PD",
+    "private-member-access",
+    "pytest-raises-too-broad",
+    "too-many-locals",
 ]
 "examples/**" = [
-    # "useless-expression",         # - Don't remove useless expressions in notebooks
-    # "undocumented-public-module", # - undocumented-public-module
-    # "implicit-namespace-package",
+    "ANN",
+    "blank-lines-after-function-or-class",
+    "blank-lines-top-level",
+    "D",
+    "ERA",
+    "glob",
+    "invalid-argument-name",
+    "invalid-class-name",
+    "invalid-function-name",
+    "magic-value-comparison",
+    "mixed-case-variable-in-global-scope",
+    "non-augmented-assignment",
+    "non-lowercase-variable-in-function",
+    "os-path-expanduser",
+    "print",
+    "unused-function-argument",
+    "unused-method-argument",
+    "useless-expression",                  # - Don't remove useless expressions in notebooks
+]
+"src/**/gpr_active/*.py" = [
+    "no-self-use",
+    "non-lowercase-variable-in-function",
+    "too-many-locals",
+]
+"examples/usage/gpr/**/*.ipynb" = [
+    "function-call-in-default-argument",
+    "future-rewritable-type-annotation",
+    "manual-list-comprehension",
+    "no-self-use",
+    "too-many-return-statements",
+    "try-except-in-loop",
 ]
 
 [tool.ruff.lint]
@@ -263,73 +308,6 @@ pylint.max-public-methods = 30
 preview = true
 ruff.strictly-empty-init-modules = false
 
-<<<<<<< before updating
-[tool.ruff.lint.per-file-ignores]
-"src/**" = [
-    "undocumented-public-method",         # - Missing docstring in public method
-    "unused-method-argument",
-    "ERA",                                # - eradicate (want to keep some stuff)
-    "docstring-extraneous-returns",
-    "docstring-missing-yields",
-    "line-contains-todo",
-    "invalid-class-name",
-    "invalid-function-name",
-    "invalid-argument-name",
-    "mixed-case-variable-in-class-scope",
-    "PD",                                 # - not using pandas?
-    "magic-value-comparison",             # - numbers in comparison sometimes ok
-    "missing-todo-link",
-    "printf-string-formatting",
-]
-"tests/**" = [
-    "D",                                # - Don't need to document tests
-    "assert",                           # - Assert is fine with tests
-    "ANN",
-    "module-import-not-at-top-of-file",
-    "ERA",
-    "NPY",
-    "PD",
-    "too-many-locals",
-    "magic-value-comparison",
-    "pytest-raises-too-broad",
-    "private-member-access",
-]
-"examples/**" = [
-    "ANN",
-    "unused-function-argument",
-    "unused-method-argument",
-    "useless-expression",                  # - Don't remove useless expressions in notebooks
-    "D",
-    "blank-lines-top-level",
-    "blank-lines-after-function-or-class",
-    "ERA",
-    "invalid-class-name",
-    "invalid-function-name",
-    "invalid-argument-name",
-    "non-lowercase-variable-in-function",
-    "mixed-case-variable-in-global-scope",
-    "magic-value-comparison",
-    "non-augmented-assignment",
-    "os-path-expanduser",
-    "glob",
-    "print",
-]
-"src/**/gpr_active/*.py" = [
-    "non-lowercase-variable-in-function",
-    "too-many-locals",
-    "no-self-use",
-]
-"examples/usage/gpr/**/*.ipynb" = [
-    "function-call-in-default-argument",
-    "future-rewritable-type-annotation",
-    "try-except-in-loop",
-    "manual-list-comprehension",
-    "too-many-return-statements",
-    "no-self-use",
-]
-
-=======
->>>>>>> after updating
 # * Checks ---------------------------------------------------------------------
 [tool.repo-review]
 ignore = [
@@ -521,8 +499,8 @@ analysis.respect-type-ignore-comments = false
 minversion = "8"
 testpaths = [
     "README.md",
-    "thermoextrap",
     "tests",
+    "thermoextrap",
 ]
 addopts = [
     "--cov-config=pyproject.toml",
@@ -537,12 +515,6 @@ addopts = [
     # xdist
     "-n",
     "4",
-]
-<<<<<<< before updating
-testpaths = [
-    "README.md",
-    "tests",
-    "thermoextrap",
 ]
 # options
 filterwarnings = [
@@ -561,11 +533,6 @@ filterwarnings = [
     "ignore: pkg_resources is deprecated as an API:DeprecationWarning",
     "ignore: pkg_resources is deprecated:UserWarning",
 ]
-log_cli_level = "INFO"
-=======
-# options
-filterwarnings = [ "error" ]
->>>>>>> after updating
 log_level = "INFO"
 log_cli_level = "INFO"
 strict_xfail = "true"
@@ -644,7 +611,7 @@ pip-deps = [
     # these used solely for specking tools to be run via uvx ...
     "conda-lock>=4.0.2",
     "copier-template-extensions>=0.3.3",
-    "copier>=9.18.1",
+    "copier>=9.17.2",
     "grayskull>=3.1.1",
     "nbqa>=1.9.1",
     "prek>=0.5.2",
@@ -652,11 +619,7 @@ pip-deps = [
     "pyright>=1.1.411",
     "rooster>=0.1.1",
     "twine>=7.0.0",
-<<<<<<< before updating
     "ty>=0.0.75",
-=======
-    "ty>=0.0.77",
->>>>>>> after updating
 ]
 groups = [
     "basedpyright",
@@ -673,11 +636,7 @@ scripts = [
     "noxfile.py",
     "tools/check_dist_version.py",
     "tools/clean_kernelspec.py",
-<<<<<<< before updating
-=======
-    "tools/cog_runner.py",
     "tools/get_version_from_pre_commit_config.py",
->>>>>>> after updating
 ]
 
 [[tool.uv-locker.requirements]]
