@@ -2,7 +2,7 @@
 
 import "shared.just"
 
-NOTEBOOKS := "examples/usage/basic"
+NOTEBOOKS := "examples/usage/basic/*.ipynb"
 
 _nbqa_typecheck checker *files:
     {{ UVX_WITH_OPTS }} \
