@@ -18,7 +18,7 @@ authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
@@ -58,7 +58,7 @@ gpr = [
     "setuptools<81.0.0",
     "tensorflow>=2.16,<2.17; python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
     "tensorflow>=2.16; python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
-    "tensorflow>=2.20; python_version>='3.13' and sys_platform=='linux'",
+    "tensorflow>=2.20; python_version>='3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
     "tensorflow-probability[tf]~=0.24.0",
 ]
 mbar = [
@@ -123,7 +123,7 @@ docs = [
     "thermoextrap[gpr,mbar,viz]",
 ]
 # other groups
-basedpyright = [ "basedpyright>=1.39.10" ]
+basedpyright = [ "basedpyright>=1.40.0" ]
 docs-live = [
     "sphinx-autobuild",
     { include-group = "docs" },
@@ -158,11 +158,12 @@ required-version = ">=0.11.8"
 default-groups = [ "dev" ]
 fork-strategy = "requires-python"
 environments = [
-    "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
+    "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64') and sys_platform!='emscripten'",
     "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
     "python_version>='3.13' and sys_platform=='linux'",
-    # "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
-    # "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64')",
+    "python_version>='3.13' and sys_platform=='win32'",
+    # NOTE: there is a contridiction with gpflow and tensorflow-macos.  See https://github.com/GPflow/GPflow/issues/2141
+    # "python_version>='3.13' and sys_platform=='darwin' and platform_machine=='arm64'",
 ]
 exclude-newer = "7 days"
 # Needed until prek>=0.5.0 is 7 days old (also update uv.toml)
@@ -611,7 +612,7 @@ pip-deps = [
     # these used solely for specking tools to be run via uvx ...
     "conda-lock>=4.0.2",
     "copier-template-extensions>=0.3.3",
-    "copier>=9.18.1",
+    "copier>=9.18.2",
     "grayskull>=3.2.0",
     "nbqa>=1.9.1",
     "prek>=0.5.3",
@@ -619,7 +620,7 @@ pip-deps = [
     "pyright>=1.1.411",
     "rooster>=0.1.1",
     "twine>=7.0.0",
-    "ty>=0.0.78",
+    "ty>=0.0.79",
 ]
 groups = [
     "basedpyright",
