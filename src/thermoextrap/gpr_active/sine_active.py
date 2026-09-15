@@ -34,7 +34,7 @@ def noise_func(
     """
     linear_term = s * (x - x.min())
     cos_term = np.cos(x) ** 2
-    return n * (linear_term + cos_term)  # type: ignore[no-any-return]  # pyright: ignore[reportReturnType]
+    return n * (linear_term + cos_term)  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
 
 
 def make_data(

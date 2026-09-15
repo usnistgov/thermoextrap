@@ -29,7 +29,7 @@ from . import beta as beta_xpan
 from .core._attrs_utils import convert_dims_to_tuple
 from .core.docstrings import DOCFILLER_SHARED
 from .core.sputils import get_default_indexed, get_default_symbol
-from .core.typing import DataT
+from .core.typing import DataT, NDArrayAny
 from .core.typing_compat import override
 from .core.validate import validator_xarray_typevar
 from .data import DataCallbackABC
@@ -213,7 +213,7 @@ def _convert_ncoords(
         msg = "Converter only works with `lnPiDataCallback`"
         raise TypeError(msg)
 
-    ncoords_ = np.meshgrid(
+    ncoords_: tuple[NDArrayAny, ...] = np.meshgrid(
         *tuple(self_.lnPi0[x].to_numpy() for x in self_.dims_n),  # pyright: ignore[reportUnknownArgumentType,reportUnknownMemberType]
         indexing="ij",
     )

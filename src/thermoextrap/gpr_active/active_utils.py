@@ -1055,7 +1055,7 @@ def identityTransform(  # ruff:ignore[undocumented-public-function]
 ) -> tuple[NDArrayOrDataArrayT, NDArrayOrDataArrayT, list[NDArrayOrDataArrayT]]:
     y_std: NDArrayOrDataArrayT = np.sqrt(y_var)  # type: ignore[assignment]  # pyright: ignore[reportAssignmentType]
     conf_int = [y - 2.0 * y_std, y + 2.0 * y_std]
-    return y, y_std, conf_int  # type: ignore[return-value]
+    return y, y_std, conf_int  # type: ignore[return-value]  # pyright: ignore[reportReturnType]
 
 
 # The following functions will be useful in both update function and stopping criteria classes
@@ -1109,6 +1109,7 @@ class UpdateStopABC:
         variance).
         """
         # Set up grid of points based on adjustable parameter values passed to GPR
+        alpha_list = np.asarray(alpha_list)
         alpha_min = np.min(alpha_list)
         alpha_max = np.max(alpha_list)
         if self.log_scale:
@@ -1368,7 +1369,7 @@ class UpdateRandom(UpdateFuncBase):
         out_mu = gpr_mu[new_ind, ...]
         out_std = gpr_std[new_ind, ...]
 
-        return new_alpha, out_mu, out_std
+        return float(new_alpha), out_mu, out_std
 
 
 class UpdateSpaceFill(UpdateFuncBase):
@@ -2391,5 +2392,5 @@ def _catch_inf_unconstrained_param(param: Any, value: Any) -> Any:
     # So attempt to catch that behavior here
     this_transformed_param = param.transform.inverse(value).numpy()
     if (not np.isfinite(this_transformed_param)) and np.isclose(value, 0.0):
-        return np.finfo(np.float64).eps
+        return np.finfo(np.float64).eps  # pylint: disable=no-member
     return value

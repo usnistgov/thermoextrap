@@ -330,7 +330,7 @@ if TYPE_CHECKING:
         x_np_int: np.int_,
         x_sp_int: sp.Integer,
         x_float: float,
-        x_np_float: np.float_,
+        x_np_float: np.float64,
         x_sp_float: sp.Float,
     ) -> None:
         func_supports(x_int, x_int, x_int)

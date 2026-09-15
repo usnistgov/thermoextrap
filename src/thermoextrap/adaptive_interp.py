@@ -124,7 +124,7 @@ def _check_relative_fluctuations(
     if len(err_rel) > 0 and len(states) > 0 and alpha_tol > 0:
         alphas_states = xr.DataArray([s.alpha0 for s in states], dims=alphas_states_dim)
         err_rel = err_rel.where(
-            np.abs(err_rel[alpha_name] - alphas_states).min(alphas_states_dim)  # type: ignore[arg-type]  # pyright: ignore[reportCallIssue, reportArgumentType]
+            np.abs(err_rel[alpha_name] - alphas_states).min(alphas_states_dim)  # type: ignore[call-overload]  # pyright: ignore[reportCallIssue, reportArgumentType]
             > alpha_tol,
             drop=True,
         )
@@ -644,7 +644,7 @@ def callback_plot_progress(
     logger.info("alphas: %s", model.alpha0)
 
     if ax is None:
-        _, ax = plt.subplots()  # pyright: ignore[reportUnknownMemberType]
+        _, ax = plt.subplots()
 
     pred = info_dict["ave"]
     pred.plot(ax=ax)  # type: ignore[call-arg]  # pyright: ignore[reportCallIssue]
@@ -679,7 +679,7 @@ def plot_polynomial_consistency(
     for (key0, key1), p in p_values.items():
         logger.info(
             "range0: %s range1: %s p01: %s",
-            *(np.round(x, 3) for x in (key0, key1, p.to_numpy())),  # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType, reportUnknownVariableType]
+            *(np.round(x, 3) for x in (key0, key1, p.to_numpy())),
         )
         lb = min(k[0] for k in (key0, key1))
         ub = max(k[1] for k in (key0, key1))

@@ -7,18 +7,47 @@
 # You should not manually edit this file.
 # Instead edit the corresponding pyproject.toml file.
 #
-name: py310-test-extras
+name: py313-dev
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.13
+  - attrs>=24.1.0
+  - bottleneck
+  - cmomy>=1.0.3
+  - coverage<=7.13.0
+  - dask
+  - dm-tree
+  - docstring-inheritance
+  - dotenv
+  - ipykernel
+  - lazy-loader
+  - matplotlib-base
+  - module-utilities>=0.11.0
+  - mypy>=2.3.1
+  - nbclient
+  - nbconvert
+  - nbval
+  - nox>=2026.8.17
+  - numba>=0.60.0
+  - numpy>=1.26.0
+  - packaging
+  - pandas-stubs
   - pandas>=2.3
+  - pylint
   - pytest
   - pytest-cov
   - pytest-env
   - pytest-sugar
   - pytest-xdist>3.6.0
+  - righttyper
+  - scipy
+  - scipy-stubs
   - setuptools<81.0.0
+  - sympy
+  - typecheck-runner>=0.2.0
+  - types-tensorflow
+  - xarray>=2024.7.0
   - pip
   - pip:
       - gpflow>=2.9.2

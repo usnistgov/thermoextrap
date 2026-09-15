@@ -517,6 +517,20 @@ def _test(
 ) -> None:
     tmpdir = os.environ.get("TMPDIR", None)
 
+    from textwrap import dedent
+
+    cmd = dedent("""
+    from importlib.metadata import distributions
+    for mod in sorted(_.metadata.get("Name") for _ in distributions()):
+        print(mod)
+
+    print("import tensorflow")
+    import tensorflow
+    print("import tensorflow as tf")
+    import tensorflow as tf
+    """)
+    session.run("python", "-c", cmd)
+
     session_run_commands(session, run)
     if not test_no_pytest:
         opts = combine_list_str(test_options or [])

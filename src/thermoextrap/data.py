@@ -1416,7 +1416,7 @@ class DataCentralMomentsVals(DataCentralMomentsBase[DataT]):
 
 
 @overload
-def factory_data_values(
+def factory_data_values(  # pyright: ignore[reportOverlappingOverload]
     uv: ArrayLike | xr.DataArray,
     xv: DataT,
     *,
