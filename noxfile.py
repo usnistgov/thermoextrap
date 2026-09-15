@@ -517,6 +517,7 @@ def _test(
 ) -> None:
     tmpdir = os.environ.get("TMPDIR", None)
 
+    session.run("uv", "pip", "list")
     session.run("python", "-c", "import tensorflow as tf")
 
     session_run_commands(session, run)
