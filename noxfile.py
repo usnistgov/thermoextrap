@@ -523,6 +523,11 @@ def _test(
     from importlib.metadata import distributions
     for mod in sorted(_.metadata.get("Name") for _ in distributions()):
         print(mod)
+
+    print("import tensorflow")
+    import tensorflow
+    print("import tensorflow as tf")
+    import tensorflow as tf
     """)
     session.run("python", "-c", cmd)
     session.run("python", "-c", "import tensorflow as tf")
