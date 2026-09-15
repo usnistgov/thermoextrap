@@ -517,6 +517,8 @@ def _test(
 ) -> None:
     tmpdir = os.environ.get("TMPDIR", None)
 
+    session.run("python", "-c", "import tensorflow as tf")
+
     session_run_commands(session, run)
     if not test_no_pytest:
         opts = combine_list_str(test_options or [])
