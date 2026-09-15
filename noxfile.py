@@ -530,7 +530,6 @@ def _test(
     import tensorflow as tf
     """)
     session.run("python", "-c", cmd)
-    session.run("python", "-c", "import tensorflow as tf")
 
     session_run_commands(session, run)
     if not test_no_pytest:

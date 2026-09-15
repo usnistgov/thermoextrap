@@ -27,5 +27,5 @@ dependencies:
       - tensorflow<2.17,>=2.16; python_version < "3.13" and (sys_platform == "darwin" and platform_machine == "x86_64")
       - tensorflow>=2.16; python_version < "3.13" and (sys_platform == "darwin" and platform_machine != "x86_64")
       - tensorflow>=2.16; python_version < "3.13" and sys_platform != "darwin"
-      - tensorflow>=2.16; python_version >= "3.10" and sys_platform == "win32"
       - tensorflow>=2.20; python_version >= "3.10" and sys_platform == "linux"
+      - tensorflow>=2.20; python_version >= "3.10" and sys_platform == "win32"
