@@ -2392,5 +2392,5 @@ def _catch_inf_unconstrained_param(param: Any, value: Any) -> Any:
     # So attempt to catch that behavior here
     this_transformed_param = param.transform.inverse(value).numpy()
     if (not np.isfinite(this_transformed_param)) and np.isclose(value, 0.0):
-        return np.finfo(np.float64).eps
+        return np.finfo(np.float64).eps  # pylint: disable=no-member
     return value
