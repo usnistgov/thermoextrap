@@ -332,9 +332,9 @@ class StackedDerivatives:
         stacked = self.stacked(order=order)
         xdata = multiindex_to_array(stacked.indexes[self.xstack_dim])  # pyright: ignore[reportUnknownArgumentType]
 
-        ydata = [g.to_numpy() for _, g in stacked.groupby(self.ystack_dim)]  # pyright: ignore[reportUnknownVariableType]
+        ydata = [g.to_numpy() for _, g in stacked.groupby(self.ystack_dim)]
 
-        return xdata, ydata  # pyright: ignore[reportUnknownVariableType]
+        return xdata, ydata
 
     def xindexer_from_arrays(self, **kwargs: Any) -> pd.Index[Any]:
         """

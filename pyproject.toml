@@ -161,16 +161,12 @@ override-dependencies = [
 ]
 fork-strategy = "requires-python"
 environments = [
+    # Group: basic
     "python_version<'3.14' and (sys_platform=='linux' or sys_platform=='win32')",
-    # "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
-    # "python_version<'3.13' and (sys_platform!='darwin' or platform_machine!='x86_64') and sys_platform!='emscripten'",
-    # "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
-    # # "python_version>='3.13' and python_version<'3.14' and (sys_platform=='linux' or sys_platform=='win32')",
-    # "python_version>='3.13' and python_version<'3.14' and sys_platform=='linux'",
-    # "python_version<'3.14' and (sys_platform!='darwin' or platform_machine!='x86_64')",
-    # "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
-    # "python_version<'3.14' and (sys_platform=='linux' or sys_platform=='win32')",
     "python_version<'3.14' and sys_platform=='darwin' and platform_machine=='arm64'",
+
+    # Group: last
+    "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
 ]
 exclude-newer = "7 days"
 # Needed until prek>=0.5.0 is 7 days old (also update uv.toml)

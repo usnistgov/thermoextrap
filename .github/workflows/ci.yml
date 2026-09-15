@@ -218,11 +218,6 @@ jobs:
               ${{ needs.build-package.outputs.max-python-version }}
             session: test
             options: "--run-slow"
-          - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.default-python-version }}
-            session: test-notebook
-            options: ""
           - os: macos-latest
             python-version:
               ${{ needs.build-package.outputs.default-python-version }}

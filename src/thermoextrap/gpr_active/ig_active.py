@@ -74,7 +74,7 @@ class IG_DataWrapper:
         x, u_ = idealgas.generate_data((n_conf, n_part), self.beta, rng=self.rng)
         x = xr.DataArray(x[:, None], dims=["rec", "val"])
         u = xr.DataArray(u_, dims=["rec"])
-        return u, x, np.ones(u.shape, dtype=u.dtype)  # pyright: ignore[reportUnknownVariableType,reportUnknownMemberType,reportUnknownArgumentType]
+        return u, x, np.ones(u.shape, dtype=u.dtype)
 
     def build_state(
         self,

@@ -469,7 +469,7 @@ class RecursiveInterp:
 
         # Before loop, set up plot if wanted
         if do_plot:
-            pcolors = plt.cm.cividis(np.linspace(0.0, 1.0, len(edge_sets)))  # type: ignore[attr-defined,unused-ignore] # pylint: disable=no-member  # pyright: ignore[reportUnknownVariableType]
+            pcolors = plt.cm.cividis(np.linspace(0.0, 1.0, len(edge_sets)))  # type: ignore[attr-defined,unused-ignore] # pylint: disable=no-member
             pfig, pax = plt.subplots()
             plotymin = 1e10
             plotymax = -1e10
@@ -533,15 +533,13 @@ class RecursiveInterp:
                 plotpoints = np.linspace(
                     self.edge_beta[aset[0]], self.edge_beta[aset[2]], 50
                 )
-                plotfull = np.polynomial.polynomial.polyval(plotpoints, fullcoeffs)  # type: ignore[no-untyped-call]  # pyright: ignore[reportUnknownVariableType]
-                plotreg1 = np.polynomial.polynomial.polyval(plotpoints, reg1coeffs)  # type: ignore[no-untyped-call]  # pyright: ignore[reportUnknownVariableType]
-                plotreg2 = np.polynomial.polynomial.polyval(plotpoints, reg2coeffs)  # type: ignore[no-untyped-call]  # pyright: ignore[reportUnknownVariableType]
+                plotfull = np.polynomial.polynomial.polyval(plotpoints, fullcoeffs)
+                plotreg1 = np.polynomial.polynomial.polyval(plotpoints, reg1coeffs)
+                plotreg2 = np.polynomial.polynomial.polyval(plotpoints, reg2coeffs)
                 _ = pax.plot(plotpoints, plotfull, color=pcolors[i], linestyle="-")
                 _ = pax.plot(plotpoints, plotreg1, color=pcolors[i], linestyle=":")
                 _ = pax.plot(plotpoints, plotreg2, color=pcolors[i], linestyle="--")
-                allploty = np.hstack(  # pyright: ignore[reportUnknownVariableType]
-                    (plotfull, plotreg1, plotreg2)
-                )
+                allploty = np.hstack((plotfull, plotreg1, plotreg2))
                 plotymin = min(np.min(allploty), plotymin)
                 plotymax = max(np.max(allploty), plotymax)
 
