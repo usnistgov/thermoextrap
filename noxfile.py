@@ -517,7 +517,14 @@ def _test(
 ) -> None:
     tmpdir = os.environ.get("TMPDIR", None)
 
-    session.run("uv", "pip", "list")
+    from textwrap import dedent
+
+    cmd = dedent("""
+    from importlib.metadata import distributions
+    for mod in sorted(_.metadata.get("Name") for _ in distributions()):
+        print(mod)
+    """)
+    session.run("python", "-c", cmd)
     session.run("python", "-c", "import tensorflow as tf")
 
     session_run_commands(session, run)
