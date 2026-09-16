@@ -337,6 +337,7 @@ expand_tables = [
     "project.urls",
     "tool.mypy.overrides",
     "tool.pyproject2conda",
+    "tool.pyrefly",
     "tool.pyright.executionEnvironments",
     "tool.pytest",
     "tool.ruff.format",
@@ -425,6 +426,10 @@ project-includes = [
 ]
 search-path = [ "." ]
 enabled-ignores = [ "pyrefly" ]
+min-severity = "warn"
+
+[tool.pyrefly.errors]
+unused-ignore = "warn"
 
 [tool.pyright]
 typeCheckingMode = "standard"
