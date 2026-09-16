@@ -329,11 +329,7 @@ toplevel = [ "thermoextrap" ]
 [tool.pyproject-fmt]
 indent = 4
 keep_full_version = true
-<<<<<<< before updating
 max_supported_python = "3.13"
-=======
-max_supported_python = "3.14"
->>>>>>> after updating
 expand_tables = [
     "project.entry-points",
     "project.optional-dependencies",
@@ -672,11 +668,6 @@ scripts = [
     "noxfile.py",
     "tools/check_dist_version.py",
     "tools/clean_kernelspec.py",
-<<<<<<< before updating
-    "tools/get_version_from_pre_commit_config.py",
-=======
-    "tools/cog_runner.py",
->>>>>>> after updating
 ]
 
 [[tool.uv-locker.requirements]]
