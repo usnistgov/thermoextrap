@@ -446,6 +446,10 @@ untyped-import = "error"
 unused-ignore = "error"
 variance-mismatch = "error"
 
+[[tool.pyrefly.sub-config]]
+matches = "noxfile.py"
+errors.open-unpacking = "ignore"
+
 [tool.pyright]
 typeCheckingMode = "standard"
 strict = [
