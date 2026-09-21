@@ -144,7 +144,7 @@ test-extras = [
     { include-group = "test" },
 ]
 test-notebook = [
-    "coverage<=7.13.0",
+    "coverage<=7.16.1",
     "nbval",
     "thermoextrap[viz]",
     { include-group = "test" },
