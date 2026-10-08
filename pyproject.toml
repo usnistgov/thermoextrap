@@ -103,7 +103,7 @@ type = [
     "matplotlib; python_version=='3.12'",
     "pandas-stubs",
     "scipy-stubs; python_version>='3.10'",
-    "thermoextrap[gpr,mbar]",
+    "thermoextrap[gpr,mbar,viz]",
     "types-tensorflow",
     { include-group = "nox" },
     { include-group = "pylint" },
@@ -395,7 +395,6 @@ warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 module = [
-    "matplotlib.*",
     "numba.*",
     "pymbar.*",
     "scipy.*",

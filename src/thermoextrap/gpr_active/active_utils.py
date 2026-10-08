@@ -1258,7 +1258,7 @@ class UpdateFuncBase(UpdateStopABC):
     def __call__(
         self, gpr: Any, alpha_list: Sequence[Any]
     ) -> tuple[float, NDArrayAny, NDArrayAny]:
-        new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)  # pylint: disable=assignment-from-no-return
+        new_alpha, pred_mu, pred_std = self.do_update(gpr, alpha_list)
 
         if self.log_scale:
             new_alpha = 10.0 ** (new_alpha)
