@@ -753,6 +753,7 @@ class StateCollection(
     def __len__(self) -> int:
         return len(self.states)
 
+    # pylint: disable=arguments-differ
     @overload
     def __getitem__(self, idx: SupportsIndex, /) -> SupportsModelDataT_co: ...
     @overload
