@@ -40,8 +40,10 @@ dependencies = [
     "numba>=0.60.0",
     "numpy>=1.26.0",
     "packaging",
+    "pandas>=2.3.3",
     "scipy",
     "sympy",
+    "typing-extensions; python_version<'3.13'",
     "xarray>=2024.7.0",
 ]
 
@@ -327,10 +329,12 @@ src_dir = [ "src" ]
 toplevel = [ "thermoextrap" ]
 
 [tool.deptry]
+extend_exclude = [ "examples/gpr_active_learning/.*" ]
 known_first_party = [ "thermoextrap" ]
 # Group: ignores
 per_rule_ignores.DEP001 = [ "pkginfo" ]
-per_rule_ignores.DEP004 = [ "nox", "pytest" ]
+per_rule_ignores.DEP002 = [ "dm-tree", "bottleneck", "setuptools", "tensorflow-probability", "openmm", "dask" ]
+per_rule_ignores.DEP004 = [ "nox", "pytest", "dotenv" ]
 
 [tool.pyproject-fmt]
 indent = 4

@@ -22,6 +22,7 @@ dependencies:
   - numpy>=1.26.0
   - packaging
   - pandas>=2.3
+  - pandas>=2.3.3
   - pytest
   - pytest-cov
   - pytest-env
@@ -30,6 +31,7 @@ dependencies:
   - scipy
   - setuptools<81.0.0
   - sympy
+  - typing-extensions
   - xarray>=2024.7.0
   - pip
   - pip:

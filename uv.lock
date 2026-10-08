@@ -6483,10 +6483,13 @@ dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version == '3.11.*' and platform_machine != 'x86_64') or (python_full_version == '3.11.*' and sys_platform == 'linux') or (python_full_version == '3.11.*' and sys_platform == 'win32')" },
     { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and python_full_version < '3.14' and platform_machine != 'x86_64') or (python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'linux') or (python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'win32')" },
     { name = "packaging" },
+    { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (python_full_version >= '3.14' and platform_machine != 'x86_64') or (python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux' and sys_platform != 'win32') or (python_full_version >= '3.14' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform == 'win32')" },
+    { name = "pandas", version = "3.0.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.14' and platform_machine != 'x86_64') or (python_full_version >= '3.11' and python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux' and sys_platform != 'win32') or (python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'linux') or (python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'win32')" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (python_full_version >= '3.14' and platform_machine != 'x86_64') or (python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux' and sys_platform != 'win32') or (python_full_version >= '3.14' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform == 'win32')" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux' and sys_platform != 'win32') or (python_full_version == '3.11.*' and platform_machine != 'x86_64') or (python_full_version == '3.11.*' and sys_platform == 'linux') or (python_full_version == '3.11.*' and sys_platform == 'win32')" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and python_full_version < '3.14' and platform_machine != 'x86_64') or (python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'linux') or (python_full_version >= '3.12' and python_full_version < '3.14' and sys_platform == 'win32')" },
     { name = "sympy" },
+    { name = "typing-extensions", marker = "(python_full_version != '3.13.*' and platform_machine != 'x86_64') or (python_full_version != '3.13.*' and sys_platform == 'linux') or (python_full_version != '3.13.*' and sys_platform == 'win32') or (platform_machine == 'x86_64' and sys_platform != 'linux' and sys_platform != 'win32')" },
     { name = "xarray", version = "2025.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (python_full_version >= '3.14' and platform_machine != 'x86_64') or (python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux' and sys_platform != 'win32') or (python_full_version >= '3.14' and sys_platform == 'linux') or (python_full_version >= '3.14' and sys_platform == 'win32')" },
     { name = "xarray", version = "2026.9.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.11' and python_full_version < '3.14' and platform_machine != 'x86_64') or (python_full_version >= '3.11' and python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform != 'linux' and sys_platform != 'win32') or (python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'linux') or (python_full_version >= '3.11' and python_full_version < '3.14' and sys_platform == 'win32')" },
 ]
@@ -6690,6 +6693,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26.0" },
     { name = "openmm", marker = "extra == 'openmm'" },
     { name = "packaging" },
+    { name = "pandas", specifier = ">=2.3.3" },
     { name = "pymbar", extras = ["jax"], marker = "extra == 'mbar'", specifier = ">=4.0" },
     { name = "scipy" },
     { name = "setuptools", marker = "extra == 'gpr'", specifier = "<81.0.0" },
@@ -6698,6 +6702,7 @@ requires-dist = [
     { name = "tensorflow", marker = "(platform_machine != 'x86_64' and extra == 'gpr') or (sys_platform != 'darwin' and extra == 'gpr')", specifier = ">=2.20" },
     { name = "tensorflow-probability", extras = ["tf"], marker = "extra == 'gpr'", specifier = ">=0.24.0" },
     { name = "thermoextrap", extras = ["accel", "gpr", "mbar", "parallel", "viz"], marker = "extra == 'all'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "xarray", specifier = ">=2024.7.0" },
 ]
 provides-extras = ["accel", "all", "gpr", "mbar", "openmm", "parallel", "viz"]
