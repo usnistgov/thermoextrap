@@ -20,19 +20,24 @@ repos:
 
   # * sync dependencies
   - repo: https://github.com/wpk-nist-gov/sync-pre-commit-hooks
-    rev: "v0.10.0"
+    rev: "v0.12.2"
     hooks:
       - id: forbidden-files
+      - id: format-code-section-headers
+        types_or: [file, text]
+        files: \.(py|pyi|yaml|toml)$|\.?[jJ]ustfile$|.*\.just$
+        args:
+          - "--max-line-length=100"
       - id: sync-pre-commit-deps
       - id: sync-uv-build-deps
       - id: sync-uv-dependency-groups
       - id: sync-pyproject-min-versions
         files: |
           (?x)^(
-            pyproject\.toml|
-            requirements/lock/uvx-tools\.txt|
-            noxfile\.py|
-            ^tools/.*\.py
+            pyproject\.toml
+            |requirements/lock/uvx-tools\.txt
+            |noxfile\.py
+            |^tools/.*\.py
           )$
         args:
           - "--requirements=requirements/lock/uvx-tools.txt"
@@ -70,7 +75,11 @@ repos:
       - id: pyproject-fmt
   # ** validate (schema-store)
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
+<<<<<<< before updating
     rev: "2026.10.02"
+=======
+    rev: "2026.10.06"
+>>>>>>> after updating
     hooks:
       - id: validate-pyproject
         name: validate-pyproject-schema-store
@@ -158,7 +167,7 @@ repos:
         args: [--locked]
       - id: pip-compile
         alias: requirements
-        entry: python tools/uv_locker.py
+        entry: uv run tools/uv_locker.py
         pass_filenames: true
         files: ^requirements/[^/]*\.txt$|^tools/*\.py$
 
@@ -169,6 +178,22 @@ repos:
       - id: commitizen
         stages: [commit-msg]
 
+<<<<<<< before updating
+=======
+  # * Cog
+  - repo: local
+    hooks:
+      - id: cog-readme
+        name: cog-readme
+        alias: cog
+        entry: >-
+          uv run tools/cog_runner.py --format=prettier --lint=markdownlint-cli2 --
+        # if need package, prefix with uv run --no-dev --isolated
+        language: python
+        files: ^README\.md$
+        stages: [manual]
+
+>>>>>>> after updating
   # * Actions
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: "0.38.2"
@@ -188,11 +213,18 @@ repos:
           - "-ignore=SC2129" # ignorable stylistic lint from shellcheck
           - "-ignore=SC2016" # another shellcheck lint: seems to have false positives?
           # NOTE: Ignore these until https://github.com/rhysd/actionlint/issues/711 resolved
+<<<<<<< before updating
           # - "-ignore"
           # - 'specifying action "\$/.+" in invalid format because ref is missing'
           # - "-ignore"
           # - 'reusable workflow call "\$/.+" at "uses" is not following the
           #   format'
+=======
+          - "-ignore"
+          - 'specifying action "\$/.+" in invalid format because ref is missing'
+          - "-ignore"
+          - 'reusable workflow call "\$/.+" at "uses" is not following the format'
+>>>>>>> after updating
         language: golang # means renovate will also update `additional_dependencies`
         additional_dependencies:
           # actionlint has a shellcheck integration which extracts shell scripts in `run:` steps from GitHub Actions
@@ -210,7 +242,7 @@ repos:
       - id: zizmor
         alias: actions
 
-  # * Notebook specific --------------------------------------------------------
+  # * Notebook specific ----------------------------------------------------------------------------
   # * Strip out metadata from notebooks
   - repo: https://github.com/kynan/nbstripout
     rev: "0.9.1"
@@ -259,4 +291,4 @@ repos:
         files: ^docs/examples/.*\.md$
         pass_filenames: false
 
-  #  * Other tools --------------------------------------------------------------
+  # * Other tools ----------------------------------------------------------------------------------
