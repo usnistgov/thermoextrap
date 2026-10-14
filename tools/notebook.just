@@ -1,4 +1,4 @@
-# * Notebook specific rules ----------------------------------------------------
+# * Notebook specific rules ------------------------------------------------------------
 
 import "shared.just"
 

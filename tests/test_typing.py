@@ -51,7 +51,7 @@ datacentralmoments_dataarray = xtrap.data.DataCentralMoments(dxduave_dataarray)
 datacentralmoments_dataset = xtrap.data.DataCentralMoments(dxduave_dataset)
 
 
-# * DataSelector --------------------------------------------------------------
+# * DataSelector -----------------------------------------------------------------------
 def check_dataselector(
     actual: T,
     klass: type[Any],
@@ -101,7 +101,7 @@ def test_thermoextrap_data_dataselector() -> None:
     )
 
 
-# * DataCentralMoments --------------------------------------------------------
+# * DataCentralMoments -----------------------------------------------------------------
 def check_datacentralmoments(
     actual: T,
     klass: type[Any],

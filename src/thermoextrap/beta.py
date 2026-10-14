@@ -49,8 +49,8 @@ if TYPE_CHECKING:
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap", "beta")
 
 
-# * Recursive derivatives for beta expansion ----------------------------------
-# ** Central moments ----------------------------------------------------------
+# * Recursive derivatives for beta expansion -------------------------------------------
+# ** Central moments -------------------------------------------------------------------
 class du_func(SymFuncBase):
     r"""
     Sympy function to evaluate energy fluctuations using central moments.
@@ -261,7 +261,7 @@ class x_func_central(SymFuncBase):
         return cls(beta, deriv)
 
 
-# ** raw moments --------------------------------------------------------------
+# ** raw moments -----------------------------------------------------------------------
 class u_func(SymFuncBase):
     r"""Sympy function to evaluate derivatives of energy :math:`\langle u \rangle` using raw moments."""
 
