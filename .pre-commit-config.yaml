@@ -75,11 +75,7 @@ repos:
       - id: pyproject-fmt
   # ** validate (schema-store)
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-<<<<<<< before updating
-    rev: "2026.10.02"
-=======
     rev: "2026.10.06"
->>>>>>> after updating
     hooks:
       - id: validate-pyproject
         name: validate-pyproject-schema-store
@@ -143,7 +139,7 @@ repos:
   # * Spelling
   # ** typos
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: "v1.50.3"
+    rev: "v1.51.1"
     hooks:
       - id: typos
         exclude_types: [jupyter]
@@ -173,27 +169,11 @@ repos:
 
   # * Commit message
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: "v4.19.1"
+    rev: "v4.19.2"
     hooks:
       - id: commitizen
         stages: [commit-msg]
 
-<<<<<<< before updating
-=======
-  # * Cog
-  - repo: local
-    hooks:
-      - id: cog-readme
-        name: cog-readme
-        alias: cog
-        entry: >-
-          uv run tools/cog_runner.py --format=prettier --lint=markdownlint-cli2 --
-        # if need package, prefix with uv run --no-dev --isolated
-        language: python
-        files: ^README\.md$
-        stages: [manual]
-
->>>>>>> after updating
   # * Actions
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: "0.38.2"
@@ -213,18 +193,11 @@ repos:
           - "-ignore=SC2129" # ignorable stylistic lint from shellcheck
           - "-ignore=SC2016" # another shellcheck lint: seems to have false positives?
           # NOTE: Ignore these until https://github.com/rhysd/actionlint/issues/711 resolved
-<<<<<<< before updating
           # - "-ignore"
           # - 'specifying action "\$/.+" in invalid format because ref is missing'
           # - "-ignore"
           # - 'reusable workflow call "\$/.+" at "uses" is not following the
           #   format'
-=======
-          - "-ignore"
-          - 'specifying action "\$/.+" in invalid format because ref is missing'
-          - "-ignore"
-          - 'reusable workflow call "\$/.+" at "uses" is not following the format'
->>>>>>> after updating
         language: golang # means renovate will also update `additional_dependencies`
         additional_dependencies:
           # actionlint has a shellcheck integration which extracts shell scripts in `run:` steps from GitHub Actions
@@ -262,7 +235,7 @@ repos:
         name: nbqa-typos
         alias: typos
         additional_dependencies: &typos-deps
-          - typos==1.50.3
+          - typos==1.51.1
         args:
           - typos
           - --force-exclude

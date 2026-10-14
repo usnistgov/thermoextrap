@@ -193,31 +193,23 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-<<<<<<< before updating
-        python-version:
-          ${{ fromJson(needs.build-package.outputs.minmax-python-versions) }}
-=======
-        python-version: ${{ fromJson(needs.build-package.outputs.minmax-default-python-versions) }}
->>>>>>> after updating
+        python-version: ${{ fromJson(needs.build-package.outputs.minmax-python-versions) }}
         session:
           - test
         options:
           - ""
         exclude:
           - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.max-python-version }}
+            python-version: ${{ needs.build-package.outputs.max-python-version }}
             session: test
             options: ""
         include:
           - os: ubuntu-latest
-            python-version:
-              ${{ needs.build-package.outputs.max-python-version }}
+            python-version: ${{ needs.build-package.outputs.max-python-version }}
             session: test
             options: "--run-slow"
           - os: macos-latest
-            python-version:
-              ${{ needs.build-package.outputs.default-python-version }}
+            python-version: ${{ needs.build-package.outputs.default-python-version }}
             session: test
             options: ""
           - os: windows-latest
@@ -253,9 +245,7 @@ jobs:
           path: |
             ${{ github.workspace }}/.numba_cache
             ${{ github.workspace }}\.numba_cache
-          key:
-            numba-cache|${{ runner.os }}|${{ runner.arch }}|${{
-            env.pythonLocation }}|${{ hashFiles('uv.lock') }}
+          key: numba-cache|${{ runner.os }}|${{ runner.arch }}|${{ env.pythonLocation }}|${{ hashFiles('uv.lock') }}
 
       - name: Cache contents before
         if: steps.numba-cache-restore.outputs.cache-hit

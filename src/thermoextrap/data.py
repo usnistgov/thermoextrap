@@ -74,7 +74,7 @@ __all__ = [
 ]
 
 
-# * Utilities -----------------------------------------------------------------
+# * Utilities --------------------------------------------------------------------------
 def _raise_if_not_dataarray(x: object, name: str | None = None) -> None:
     if not is_dataarray(x):
         msg = f"type({name})={type(x)} must be a DataArray."
@@ -131,7 +131,7 @@ def _validate_dxduave(
         raise TypeError(msg)
 
 
-# * Selector ------------------------------------------------------------------
+# * Selector ---------------------------------------------------------------------------
 @attrs.frozen
 class DataSelector(MyAttrsMixin, Generic[DataT]):
     """
@@ -207,7 +207,7 @@ class DataSelector(MyAttrsMixin, Generic[DataT]):
         return repr(self.data)
 
 
-# * Callback -----------------------------------------------------------------
+# * Callback ---------------------------------------------------------------------------
 @attrs.frozen
 class DataCallbackABC(
     MyAttrsMixin,
@@ -309,7 +309,7 @@ class DataCallback(DataCallbackABC):
         return self
 
 
-# * Abstract Data -------------------------------------------------------------
+# * Abstract Data ----------------------------------------------------------------------
 @attrs.frozen
 class AbstractData(
     MyAttrsMixin,
@@ -368,7 +368,7 @@ class AbstractData(
         return func(self, *args, **kwargs)
 
 
-# * DataCentralMoments --------------------------------------------------------
+# * DataCentralMoments -----------------------------------------------------------------
 @attrs.frozen
 @docfiller_shared.decorate
 class DataCentralMomentsBase(AbstractData, Generic[DataT]):

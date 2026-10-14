@@ -73,7 +73,7 @@ if TYPE_CHECKING:
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
 
-# * Utils ---------------------------------------------------------------------
+# * Utils ------------------------------------------------------------------------------
 def _validate_supports_getitem(
     instance: Any,  # ruff:ignore[unused-function-argument]
     attribute: attrs.Attribute[Any],  # ruff:ignore[unused-function-argument]
@@ -84,7 +84,7 @@ def _validate_supports_getitem(
         raise TypeError(msg)
 
 
-# * Structure(s) to deal with analytic derivatives, etc -----------------------
+# * Structure(s) to deal with analytic derivatives, etc --------------------------------
 class SymFuncBase(sp.Function):  # type: ignore[misc,name-defined]
     """
     Base class to define a sympy function for user defined derivatives.

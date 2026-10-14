@@ -42,7 +42,7 @@ if TYPE_CHECKING:
 docfiller_shared = DOCFILLER_SHARED.levels_to_top("cmomy", "xtrap")
 
 
-# * DataValues ----------------------------------------------------------------
+# * DataValues -------------------------------------------------------------------------
 @attrs.frozen
 @docfiller_shared.decorate
 class DataValuesBase(AbstractData, Generic[DataT]):
