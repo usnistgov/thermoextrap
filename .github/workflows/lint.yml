@@ -24,7 +24,7 @@ env:
 
 jobs:
   pre_job:
-    uses: $/.github/workflows/skip_duplicate_actions.yml
+    uses: ./.github/workflows/skip_duplicate_actions.yml
 
   lint:
     name: Lint
@@ -39,7 +39,7 @@ jobs:
           persist-credentials: false
 
       # Not always needed but some hooks use it...
-      - uses: $/.github/actions/setup-cached-uv-and-python
+      - uses: ./.github/actions/setup-cached-uv-and-python
         with:
           python-version-file: ".python-version"
           cache-dependency-path: uv.lock
