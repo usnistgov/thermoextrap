@@ -25,19 +25,7 @@ permissions: {}
 
 jobs:
   pre_job:
-    # continue-on-error: true # Uncomment once integration is finished
-    runs-on: ubuntu-latest
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - name: Don't run CI on draft PR
-        if: github.event_name == 'pull_request' && github.event.pull_request.draft == true
-        run: exit 1
-
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@b974a9395958c231af965b70070979a577efa578 # v5.3.2
-        with:
-          paths_ignore: '[".cruft.json", ".copier.yml"]'
+    uses: $/.github/workflows/skip_duplicate_actions.yml
 
   build-package:
     name: Build & verify package
@@ -94,6 +82,7 @@ jobs:
       minmax-default-python-versions: ${{ steps.versions.outputs.minmax_default_python_versions }}
       all-python-version: ${{ steps.versions.outputs.all_python_versions }}
 
+<<<<<<< before updating
   lint:
     # only run checks not covered by pre-commit.ci
     name: Lint package
@@ -130,6 +119,8 @@ jobs:
         run: >-
           prek run --show-diff-on-failure --color=always --all-files --hook-stage=manual -v
 
+=======
+>>>>>>> after updating
   pinact:
     name: Pin actions
     needs: pre_job
@@ -358,7 +349,6 @@ jobs:
     if: always()
     needs:
       - pre_job
-      - lint
       - pinact
       - typecheck
       - test
@@ -369,5 +359,5 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
         with:
-          allowed-skips: "lint,pinact,typecheck,test,coverage,docs"
+          allowed-skips: "pinact,typecheck,test,coverage,docs"
           jobs: ${{ toJSON(needs) }}
