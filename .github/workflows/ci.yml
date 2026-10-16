@@ -300,13 +300,8 @@ jobs:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
     permissions:
-<<<<<<< before updating
-      contents: write
-    uses: ./.github/workflows/docs.yml
-=======
       contents: write # required for action
-    uses: $/.github/workflows/docs.yml
->>>>>>> after updating
+    uses: ./.github/workflows/docs.yml
     with:
       deploy: false
 
