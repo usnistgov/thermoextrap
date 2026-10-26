@@ -46,7 +46,7 @@ dependencies:
   - scipy-stubs
   - setuptools<81.0.0
   - sympy
-  - typecheck-runner>=0.2.0
+  - typecheck-runner>=0.2.2
   - types-tensorflow
   - xarray>=2024.7.0
   - pip
