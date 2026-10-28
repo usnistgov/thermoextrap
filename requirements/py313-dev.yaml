@@ -28,7 +28,7 @@ dependencies:
   - nbclient
   - nbconvert
   - nbval
-  - nox>=2026.8.17
+  - nox>=2026.10.20
   - numba>=0.60.0
   - numpy>=1.26.0
   - packaging
