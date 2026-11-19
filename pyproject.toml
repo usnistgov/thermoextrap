@@ -18,14 +18,13 @@ authors = [
     { name = "Jacob Monroe", email = "jacob.monroe@nist.gov" },
     { name = "William Krekelberg", email = "wpk@nist.gov" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -171,8 +170,11 @@ environments = [
     "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
 ]
 exclude-newer = "7 days"
+<<<<<<< before updating
 # Needed until prek>=0.5.0 is 7 days old (also update uv.toml)
 exclude-newer-package = { prek = "0 days" }
+=======
+>>>>>>> after updating
 managed = true
 build-backend.source-exclude = [ ".*cache" ]
 build-backend.source-include = [ "tests/**" ]
@@ -654,18 +656,18 @@ skip-package = true
 [tool.pyproject2conda.envs.uvx-tools]
 pip-deps = [
     # these used solely for specking tools to be run via uvx ...
-    "conda-lock>=4.0.5",
-    "copier-template-extensions>=0.3.3", #  sync-pyproject-min-versions: ignore
+    "conda-lock>=4.1.0",
+    "copier-template-extensions>=0.3.4",
     "copier>=9.19.1",
     "grayskull>=3.2.0",
-    "nbqa>=1.9.1",
+    "nbqa>=1.10.0",
     "prek>=0.5.10",
     "pyrefly>=1.4.1",
     "pyright>=1.1.414",
     "rooster>=0.1.1",
     "rust-just>=1.59.0",
     "twine>=7.0.0",
-    "ty>=0.0.98",
+    "ty>=0.0.100",
 ]
 groups = [
     "basedpyright",
