@@ -5,23 +5,14 @@ from __future__ import annotations
 
 import sys
 from types import EllipsisType
-from typing import Concatenate, TypeAlias, TypeGuard
-
-if sys.version_info >= (3, 11):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
+from typing import Concatenate, TypeAlias, TypedDict, TypeGuard
 
 if sys.version_info >= (3, 12):
     from typing import override
 else:
     from typing_extensions import override
 
-if sys.version_info >= (3, 11):
-    from typing import NotRequired, Required, Self, Unpack
-else:
-    from typing_extensions import NotRequired, Required, Self, Unpack
-
+from typing import NotRequired, Required, Self, Unpack
 
 if sys.version_info >= (3, 13):
     from typing import TypeIs, TypeVar

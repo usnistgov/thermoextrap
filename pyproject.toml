@@ -170,11 +170,6 @@ environments = [
     "python_version<'3.13' and (sys_platform=='darwin' and platform_machine=='x86_64')",
 ]
 exclude-newer = "7 days"
-<<<<<<< before updating
-# Needed until prek>=0.5.0 is 7 days old (also update uv.toml)
-exclude-newer-package = { prek = "0 days" }
-=======
->>>>>>> after updating
 managed = true
 build-backend.source-exclude = [ ".*cache" ]
 build-backend.source-include = [ "tests/**" ]
@@ -661,13 +656,13 @@ pip-deps = [
     "copier>=9.19.1",
     "grayskull>=3.2.0",
     "nbqa>=1.10.0",
-    "prek>=0.5.10",
+    "prek>=0.5.11",
     "pyrefly>=1.4.1",
     "pyright>=1.1.414",
     "rooster>=0.1.1",
     "rust-just>=1.59.0",
     "twine>=7.0.0",
-    "ty>=0.0.100",
+    "ty>=0.0.101",
 ]
 groups = [
     "basedpyright",
